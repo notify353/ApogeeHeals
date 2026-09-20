@@ -1,0 +1,19 @@
+## Interface: 16001
+## Title: Apogee Heals
+## Notes: Minimal five-player healing frames for Forever.
+## Author: notify353
+## Version: 0.1.0-dev
+## SavedVariablesPerCharacter: ApogeeHealsDB
+
+Core/Access.lua
+Core/Client.lua
+Core/Storage.lua
+UI/Style.lua
+Core/UnitAPI.lua
+Drinking/Runtime.lua
+IncomingHeals/View.lua
+PartyFrames/Preview.lua
+PartyFrames/View.lua
+UI/Settings.lua
+PartyFrames/Runtime.lua
+ApogeeHeals.lua

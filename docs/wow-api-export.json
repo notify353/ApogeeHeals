@@ -1,0 +1,22 @@
+{
+  "clientVersion": "1.60.1.69913",
+  "interface": 16001,
+  "reviewedOn": "2026-09-20",
+  "requiredFiles": [
+    "Blizzard_APIDocumentationGenerated/UnitDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/ClassColorDocumentation.lua",
+    "Blizzard_Fonts_Shared/Shared/GameFonts.xml",
+    "Blizzard_APIDocumentationGenerated/UnitHealPredictionCalculatorAPIDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/UnitHealPredictionCalculatorSharedDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/UnitAuraDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/SpellDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/SimpleStatusBarAPIDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/SimpleFontStringAPIDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/SimpleFrameAPIDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/CurveUtilDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/LuaColorCurveObjectAPIDocumentation.lua",
+    "Blizzard_FrameXML/SecureTemplates.lua",
+    "Blizzard_FrameXML/SecureTemplates.xml",
+    "Blizzard_RestrictedAddOnEnvironment/SecureStateDriver.lua"
+  ]
+}
