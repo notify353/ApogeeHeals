@@ -9,3 +9,5 @@
 - No casting, profiles, extra settings or unrelated features without explicit scope.
 - Run pwsh ./scripts/test-local.ps1. Report live acceptance separately from mocks.
 - Installation, publication and releases require explicit approval. Preserve MIT notices.
+
+- Standing owner authorization (2026-09-24): requests to change this addon include validated local WoW Forever installation without another installation prompt; this supersedes separate-approval requirements above for local installation only. Verify the actual Forever destination, preserve SavedVariables and unrecognized/user-modified files, keep a verified rollback backup, verify copied files and report reload needs. Do not operate or restart the game. Offline checks/installation do not establish in-game acceptance; publishing, pushes and releases remain separately authorized.

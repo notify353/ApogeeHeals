@@ -2,9 +2,13 @@ local _, A = ...
 local R = {}
 A.Runtime = R
 function R.Request()
-    if R.pending then return end
+    if R.suspended or R.pending then return end
     R.pending = true
-    C_Timer.After(0, function() R.pending = false; A.View.Refresh(); A.Buffs.Refresh() end)
+    C_Timer.After(0, function()
+        R.pending = false
+        if R.suspended then return end
+        A.View.Refresh(); A.Buffs.Refresh()
+    end)
 end
 function R.Start()
     local driver = CreateFrame("Frame")
@@ -27,6 +31,7 @@ function R.Start()
         if event == "UNIT_SPELLCAST_SUCCEEDED" then
             A.Buffs.OnCast(unit, spellID)
         elseif event == "PLAYER_LEAVING_WORLD" then
+            R.suspended = true
             A.Buffs.suspended = true
             A.Buffs.Stop()
             return
@@ -45,7 +50,9 @@ function R.Start()
             end
             A.View.ApplyPosition(); A.Settings.Refresh()
         elseif event == "SPELLS_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
-            if event == "PLAYER_ENTERING_WORLD" then A.Buffs.suspended = nil end
+            if event == "PLAYER_ENTERING_WORLD" then
+                R.suspended, A.Buffs.suspended = nil, nil
+            end
             A.Bindings.Apply()
             A.Drinking.Resolve()
         elseif event == "UI_SCALE_CHANGED" or event == "DISPLAY_SIZE_CHANGED" then

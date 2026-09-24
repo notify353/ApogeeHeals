@@ -26,9 +26,15 @@ function B.Paint(row, missing)
         icon:SetTexture(entry and entry.icon); icon:SetShown(entry ~= nil)
         if not InCombatLockdown() then
             local button = row.buffButtons[index]
-            button:SetAttribute("type1", entry and "spell" or "")
-            button:SetAttribute("spell1", entry and entry.id or nil)
-            RegisterStateDriver(button, "visibility", entry and "[combat] hide; show" or "hide")
+            local id = entry and entry.id or nil
+            -- Cache only our public configured spell identity, never aura data.
+            -- Combat painting leaves this untouched so deferred changes still apply.
+            if not button.configured or button.configuredSpell ~= id then
+                button:SetAttribute("type1", entry and "spell" or "")
+                button:SetAttribute("spell1", id)
+                RegisterStateDriver(button, "visibility", entry and "[combat] hide; show" or "hide")
+                button.configured, button.configuredSpell = true, id
+            end
         end
     end
     row.buffOverflow:SetText(#missing > 4 and "+" .. (#missing - 4) or "")

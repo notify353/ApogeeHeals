@@ -11,12 +11,12 @@ for row, prefix in ipairs({ "", "shift-", "ctrl-" }) do
 end
 function B.Resolve(id)
     if type(id) ~= "number" or id <= 0 or id % 1 ~= 0 then return nil, "Invalid spell." end
-    local info = A.Access.Read(C_Spell.GetSpellInfo, id)
+    local info = A.Access.Read(C_Spell and C_Spell.GetSpellInfo, id)
     if type(info) ~= "table" or not A.Access.Readable(info.name, info.iconID)
         or type(info.name) ~= "string" or info.name == "" then
         return nil, "Spell information unavailable."
     end
-    local bank = Enum.SpellBookSpellBank and Enum.SpellBookSpellBank.Player
+    local bank = Enum and Enum.SpellBookSpellBank and Enum.SpellBookSpellBank.Player
     if not bank or not C_SpellBook
         or A.Access.Read(C_SpellBook.IsSpellInSpellBook, id, bank, false) ~= true
         or A.Access.Read(C_SpellBook.IsSpellKnown, id, bank) ~= true then
@@ -34,12 +34,13 @@ function B.Cursor()
     if not A.Access.Readable(kind, index, bank, id) or kind ~= "spell" then
         return nil, "Drop a learned healing spell from your spellbook."
     end
-    if bank ~= "spell" and (not Enum.SpellBookSpellBank or bank ~= Enum.SpellBookSpellBank.Player) then
+    local playerBank = Enum and Enum.SpellBookSpellBank and Enum.SpellBookSpellBank.Player
+    if bank ~= "spell" and (playerBank == nil or bank ~= playerBank) then
         return nil, "Choose a player spell."
     end
     if type(id) ~= "number" and type(index) == "number" and C_SpellBook
-        and Enum.SpellBookSpellBank then
-        local info = A.Access.Read(C_SpellBook.GetSpellBookItemInfo, index, Enum.SpellBookSpellBank.Player)
+        and playerBank ~= nil then
+        local info = A.Access.Read(C_SpellBook.GetSpellBookItemInfo, index, playerBank)
         if type(info) == "table" and A.Access.Readable(info.spellID) then id = info.spellID end
     end
     local info, reason = B.Resolve(id)
@@ -56,14 +57,17 @@ function B.Apply()
     B.pending = nil
     for _, frame in ipairs(A.View.rows) do
         frame:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp", "Button4Up", "Button5Up")
-        for _, prefix in ipairs({ "", "shift-", "ctrl-", "ctrl-shift-", "alt-",
-            "alt-shift-", "alt-ctrl-", "alt-ctrl-shift-" }) do
-            for button = 1, 5 do
-                local id = B.Effective(prefix .. button)
-                local info = B.byId[prefix .. button] and id and B.Resolve(id)
-                -- Plain left targets only without an assignment or learned default. Unavailable assignments
-                -- and empty modified slots must not fall through to another action.
-                local fallback = button == 1 and prefix == "" and id == nil and "target" or ""
+    end
+    for _, prefix in ipairs({ "", "shift-", "ctrl-", "ctrl-shift-", "alt-",
+        "alt-shift-", "alt-ctrl-", "alt-ctrl-shift-" }) do
+        for button = 1, 5 do
+            -- One transient resolution per combination, shared by its fixed recipients.
+            local id = B.byId[prefix .. button] and B.Effective(prefix .. button)
+            local info = id and B.Resolve(id)
+            -- Plain left targets only without an assignment or learned default. Unavailable assignments
+            -- and empty modified slots must not fall through to another action.
+            local fallback = button == 1 and prefix == "" and id == nil and "target" or ""
+            for _, frame in ipairs(A.View.rows) do
                 frame:SetAttribute(prefix .. "type" .. button, info and "spell" or fallback)
                 frame:SetAttribute(prefix .. "spell" .. button, info and id or nil)
             end

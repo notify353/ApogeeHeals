@@ -1,9 +1,16 @@
-# In-game prototype acceptance (pending)
+# In-game prototype acceptance
+
+On 2026-09-24 the owner reported testing all five installed Apogee candidates
+in game and authorized committing/integrating/pushing them to main. This records
+user-reported acceptance of the installed Heals cleanup, quality and performance
+candidate on the reviewed 1.60.1.70009 client. It is not an exhaustive execution
+record for every case below, a measured FPS result, or completion of the separate
+Focus audio request. Earlier pending entries remain detailed regression checklists.
 
 ## Learned upkeep buffs (pending)
 
-- Reminder learning was reported working by the owner. Click-to-reapply remains
-  pending: left-click each missing icon on self and party1-party4 and verify the
+- Reminder learning and click-to-reapply were reported working by the owner.
+  Full acceptance remains pending: left-click each missing icon on self and party1-party4 and verify the
   correct learned spell, exactly one cast, and unchanged selected target with
   both key-down preferences. Modified clicks must do nothing. Range, resource,
   reagent and recipient failures must not redirect to another player. Test
@@ -34,7 +41,7 @@
 
 The owner approved test installation and confirmed incoming heals visible in game.
 Visual iterations were reviewed during testing; the complete checklist below remains
-pending. Further installation changes require authorization. Local mocks and export checks
+pending. Requested addon changes include verified local installation. Local mocks and export checks
 do not complete any of these checks.
 
 - Login and reload outside combat: player row appears, locked, with correct name,
