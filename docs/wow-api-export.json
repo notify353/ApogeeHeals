@@ -1,8 +1,9 @@
 {
-  "clientVersion": "1.60.1.69913",
+  "clientVersion": "1.60.1.70009",
   "interface": 16001,
-  "reviewedOn": "2026-09-20",
+  "reviewedOn": "2026-09-24",
   "requiredFiles": [
+    "Blizzard_APIDocumentationGenerated/FrameScriptDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/UnitDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/ClassColorDocumentation.lua",
     "Blizzard_Fonts_Shared/Shared/GameFonts.xml",

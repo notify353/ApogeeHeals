@@ -22,12 +22,12 @@ function B.Scan(unit)
     end
 end
 function B.Info(id)
-    local info = A.Access.Read(C_Spell.GetSpellInfo, id)
+    local info = A.Access.Read(C_Spell and C_Spell.GetSpellInfo, id)
     if type(info) == "table" and A.Access.Readable(info.name, info.iconID)
         and type(info.name) == "string" and info.name ~= "" then return info end
 end
 function B.ForParty(entry)
-    local selfOnly = A.Access.Read(C_Spell.IsSelfBuff, entry.id)
+    local selfOnly = A.Access.Read(C_Spell and C_Spell.IsSelfBuff, entry.id)
     if selfOnly == true then return false end
     if selfOnly == false then return true end
     -- Unknown classification retains actual observation, not a guessed scope.
@@ -66,7 +66,7 @@ function B.Refresh()
     local watched = {}
     for _, entry in ipairs(A.db.buffs) do
         local info = entry.enabled and A.Bindings.Resolve(entry.id)
-        if info then watched[#watched + 1] = { entry = entry, info = info } end
+        if info then watched[#watched + 1] = { entry = entry, info = info, party = B.ForParty(entry) } end
     end
     for index, row in ipairs(A.View.rows) do
         local missing = {}
@@ -74,7 +74,7 @@ function B.Refresh()
             local names, ids = {}, {}
             for _, aura in ipairs(snapshots[index]) do names[aura.name] = true; ids[aura.spellId] = true end
             for _, watch in ipairs(watched) do
-                if (row.unit == "player" or B.ForParty(watch.entry))
+                if (row.unit == "player" or watch.party)
                     and not ids[watch.entry.id] and not names[watch.info.name] then
                     missing[#missing + 1] = { id = watch.entry.id, icon = watch.info.iconID }
                 end
@@ -82,7 +82,7 @@ function B.Refresh()
         end
         B.Paint(row, missing)
     end
-    if B.RefreshPicker then B.RefreshPicker() end
+    if B.picker and B.picker:IsShown() then B.RefreshPicker() end
 end
 function B.Stop()
     B.candidates = {}

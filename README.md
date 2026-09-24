@@ -1,7 +1,7 @@
 # Apogee Heals
 
 Minimal five-player healing frames for **WoW Forever 1.60.x, interface 16001**.
-Prototype 0.1.0-dev; reviewed against local export 1.60.1.69913. The owner confirmed incoming heals and reviewed
+Prototype 0.1.0-dev; reviewed against local export 1.60.1.70009. The owner confirmed incoming heals and reviewed
 the appearance in game; full live acceptance remains pending. Not released. Classic Era is deliberately unsupported.
 
 ## Prototype
@@ -141,6 +141,11 @@ guesses, thirsty warnings, countdowns, alerts or messages.
 
 ## Architecture
 
+The addon identity remains `ApogeeHeals`, its display title is **Apogee Heals**,
+and its author is **notify353**. Feature folders contain PascalCase Lua modules;
+`docs`, `scripts` and `tests` hold supporting material. These conventions match
+the independent Apogee addons without introducing a shared runtime or dependency.
+
 `ApogeeHeals.lua` composes private addon modules. Core owns client access,
 native display sinks and character storage. PartyFrames owns rendering, secure
 unit buttons and event lifecycle; Drinking owns recognition; Bindings owns spell
@@ -149,6 +154,12 @@ editor. Buffs owns class-independent discovery, missing-buff icons and the watch
 list. Only an event-triggered one-shot timer is
 used for live refreshes; OnUpdate handlers run only during dragging or the visible
 animated preview (drawing capped at twenty times per second).
+
+Unchanged buff reminders retain their secure setup; watched spell scope is
+resolved once per refresh and hidden pickers refresh on reopening. Bindings
+resolve once per combination for all fixed recipients. Pending refreshes pause
+between leaving and entering the world. Aura observations remain fresh;
+offline work-count measurements are in `docs/PERFORMANCE_REVIEW.md`.
 
 IncomingHeals owns a native calculator and clipped preview bar per health frame.
 Prediction events refresh through the same coalesced event loop. Unavailable
@@ -176,9 +187,10 @@ before API changes; it checks the installed build and export file freshness.
 See docs/API_REFERENCE.md for matching-source authority and optional native
 contract tests. Mocked engine behavior does not establish live combat safety.
 
-No installation or deployment is performed by these scripts. After explicit
-installation approval, the destination folder is Interface/AddOns/ApogeeHeals
-in the Forever test client. Do not overwrite an existing installation blindly.
+No installation or deployment is performed by these scripts. Requested addon
+changes include local installation after checks into Interface/AddOns/ApogeeHeals
+in the verified Forever beta client, with a rollback backup and copy verification.
+Preserve unexpected user edits and saved data; publication requires separate approval.
 Follow docs/ACCEPTANCE.md before calling this prototype playable or releasing it.
 
 MIT licensed. Tank style/access/display patterns and the original Party Health

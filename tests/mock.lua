@@ -94,7 +94,7 @@ function M.New()
     GetTime = function() return m.time or 0 end
     UnitIsUnit = function(a, b) return a == b end
     WOW_PROJECT_ID = 1
-    GetBuildInfo = function() return "1.60.1", "69913", "", 16001 end
+    GetBuildInfo = function() return "1.60.1", "70009", "", 16001 end
     local secrets = setmetatable({}, {__mode = "k"})
     function m.Secret()
         local x = setmetatable({}, { __add = function() error("secret arithmetic") end,
@@ -104,6 +104,13 @@ function M.New()
     end
     issecretvalue = function(v) return secrets[v] == true end
     canaccessvalue = function(v) return not secrets[v] end
+    local inaccessibleTables = setmetatable({}, {__mode = "k"})
+    function m.InaccessibleTable()
+        local value = setmetatable({}, {__index = function() error("forbidden table indexing") end})
+        inaccessibleTables[value] = true
+        return value
+    end
+    canaccesstable = function(value) return not secrets[value] and not inaccessibleTables[value] end
     UnitExists = function(u) return m.units[u] ~= nil end
     UnitLevel = function(u) return m.units[u] and (m.units[u].level or 60) end
     UnitClass = function(u) return "Localized class", m.units[u] and (m.units[u].class or "PRIEST") end

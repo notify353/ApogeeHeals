@@ -2,18 +2,51 @@
 
 Matching local source:
 `C:/Program Files (x86)/World of Warcraft/_classic_beta_/BlizzardInterfaceCode/Interface/AddOns`.
-Build 1.60.1.69913, project 1, interface 16001; checked 2026-09-20.
+Build 1.60.1.70009, project 1, interface 16001; checked 2026-09-24.
 Metadata and required source files are in wow-api-export.json. The checker is
 read-only and fails on a changed installed build or stale/missing export. Export
 timestamps are a freshness heuristic, not proof of runtime compatibility.
+
+## Forever-only cleanup review (2026-09-24)
+
+The installed executable and product metadata agree on 1.60.1.70009. All seventeen
+required export files postdate the executable. Rechecked the native health and
+incoming-heal display contracts, guarded aura/spellbook reads, self-buff
+classification, secure click dispatch and visibility source. The recorded build
+and runtime warning baseline now match this review; live acceptance is separate.
+
+Heals already has a Forever-only family/interface gate, one TOC and no Era
+runtime branch or cross-addon dependency. No feature or module removal is
+supported by this audit. Keep the inherited drink and class-default spell IDs:
+Forever resolves and validates them before use, and the export cannot prove
+server spell/aura coverage. Keep native target/spell actions and restricted-value
+guards. The `_classic_beta_` directory and `wow_classic_beta` product are the
+actual Forever installation identifiers, not obsolete Era compatibility paths.
+
+Author metadata, technical identity, saved data and existing feature-folder
+organization already match the shared Apogee convention. Historical attribution
+and MIT notices remain intact. Focus audio and live range detection remain
+deferred work, outside this cleanup.
+
+## Current table-access review
+
+The refreshed 70009 FrameScript contract still distinguishes access to a value
+from permission to index table contents. The common access helper now checks
+`canaccesstable` after value guards and before consumers index spell, spellbook,
+aura or class-color tables. Startup requires that guard. FrameScriptDocumentation
+is now included in the export freshness manifest. Shared spell/aura consumers
+also tolerate missing spell namespaces/enums without losing saved assignments.
+Relevant current signatures and native dispatch remain compatible with the
+reviewed behavior. The old manifest did not store hashes, so this is a contract
+review and current-source execution, not a claim of byte-identical exports.
 
 ## Contracts used
 
 - Readable player labels omit surnames using the client's surname separator,
   with whitespace/hyphen fallback. Restricted or unavailable identities display
   blank; they never enter Lua string operations. Camelot NameUtil confirms that
-  UnitName's first return can contain both first name and surname. The installed
-  build has changed since this export; current-build live validation is pending.
+  UnitName's first return can contain both first name and surname. Current-build
+  live validation is pending.
 
 - Blizzard_Fonts_Shared/Shared/GameFonts.xml defines Number12Font, a native
   locale-aware sans-serif family used for preview-handle text. Names retain the
