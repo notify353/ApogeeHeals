@@ -21,10 +21,17 @@ function M.New()
         return f
     end
     function methods:SetSize(w, h) protected(self); self.width, self.height = w, h end
+    function methods:SetHeight(h) self.height = h end
+    function methods:SetScrollChild(child) self.scrollChild = child end
     function methods:SetPoint(...) protected(self); self.point = {...} end
     function methods:ClearAllPoints() protected(self); self.point = nil end
     function methods:SetScale(s) protected(self); self.scale = s end
     function methods:SetFrameLevel(value) protected(self); self.level = value end
+    function methods:SetFrameStrata(value) self.strata = value end
+    function methods:IsShown() return self.shown end
+    function methods:SetVertexColor(...) self.vertexColor = {...} end
+    function methods:SetHighlightTexture(value) self.highlight = value end
+    function methods:IsMouseOver() return self.hovered == true end
     function methods:GetFrameLevel() return self.level or 1 end
     function methods:SetAlpha(value) self.alpha = value end
     function methods:GetEffectiveScale() return self.scale * (self.parent and self.parent:GetEffectiveScale() or 1) end
@@ -38,8 +45,14 @@ function M.New()
     function methods:SetClipsChildren(value) protected(self); self.clipsChildren = value end
     function methods:StartMoving() protected(self); self.moving = true end
     function methods:StopMovingOrSizing() protected(self); self.moving = false end
-    function methods:Show() protected(self); self.shown = true end
-    function methods:Hide() protected(self); self.shown = false end
+    function methods:Show()
+        protected(self); local changed = not self.shown; self.shown = true
+        if changed and self.scripts.OnShow then self.scripts.OnShow(self) end
+    end
+    function methods:Hide()
+        protected(self); local changed = self.shown; self.shown = false
+        if changed and self.scripts.OnHide then self.scripts.OnHide(self) end
+    end
     function methods:SetShown(v) if v then self:Show() else self:Hide() end end
     function methods:SetAttribute(k, v) protected(self); self.attributes[k] = v end
     function methods:GetAttribute(k) return self.attributes[k] end
@@ -75,8 +88,11 @@ function M.New()
     function methods:GetChecked() return self.checked end
     function methods:SetEnabled(v) self.enabled = v end
     UIParent = object("Frame"); UIParent.width, UIParent.height = 1920, 1080
+    Minimap = object("Frame", nil, UIParent)
     CreateFrame = object
     InCombatLockdown = function() return m.combat end
+    GetTime = function() return m.time or 0 end
+    UnitIsUnit = function(a, b) return a == b end
     WOW_PROJECT_ID = 1
     GetBuildInfo = function() return "1.60.1", "69913", "", 16001 end
     local secrets = setmetatable({}, {__mode = "k"})
@@ -155,6 +171,11 @@ function M.New()
         RegisterAddOnCategory = function(category) m.category = category end,
     }
     ApogeeHealsDB = nil
+    UISpecialFrames = {}
+    GetCursorInfo = function() if m.cursor then return unpack(m.cursor) end end
+    ClearCursor = function() m.cursor = nil end
+    GameTooltip = { Hide=function() end, Show=function() end, SetOwner=function() end,
+        SetText=function() end, AddLine=function() end }
     function m.Flush()
         local queue = m.timers; m.timers = {}
         for _, callback in ipairs(queue) do callback() end

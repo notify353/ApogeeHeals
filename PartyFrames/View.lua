@@ -78,6 +78,7 @@ function V.SetUnlocked(value)
     V.handle:SetShown(V.unlocked)
     A.Preview.SetShown(V.unlocked)
     for _, row in ipairs(V.rows) do row:SetAlpha(V.unlocked and 0 or 1) end
+    A.Buffs.Refresh()
 end
 local function followHandle()
     if InCombatLockdown() then return end
@@ -92,7 +93,7 @@ local function anchorHandle()
 end
 function V.ResetPosition()
     if InCombatLockdown() then return end
-    A.db.position = { x = -180, y = 55 }; V.ApplyPosition()
+    A.db.position = A.Storage.DefaultPosition(); V.ApplyPosition()
 end
 function V.Create()
     V.rows = {}; V.curve = A.UnitAPI.CreateHealthCurve()
@@ -107,6 +108,7 @@ function V.Create()
         row:SetAttribute("useOnKeyDown", false)
         row:SetAttribute("unit", unit); row:SetAttribute("type1", "target")
         buildRow(row, false, i == 1)
+        A.Buffs.Create(row)
         row:Hide()
         RegisterStateDriver(row, "visibility", "[group:raid] hide; [@" .. unit .. ",exists] show; hide")
         V.rows[i] = row
@@ -145,6 +147,9 @@ end
 function V.Refresh()
     for _, row in ipairs(V.rows) do
         local state = A.UnitAPI.State(row.unit)
+        local classOK, _, classToken = pcall(UnitClass, row.unit)
+        if not classOK then classToken = nil end
+        A.UnitAPI.PaintClassStrip(row.classStrip, classToken)
         row.name:SetText(""); row.level:SetText(""); row.status:SetText("")
         row.drinkIcon:Hide()
         local showName = state ~= "missing" and state ~= "dead" and state ~= "offline"

@@ -48,13 +48,31 @@ function U.PaintClassColor(label, classToken)
         if A.Access.Readable(color) and color then label:SetTextColor(color:GetRGB()) end
     end)
 end
+function U.PaintClassStrip(strip, classToken)
+    strip:SetColorTexture(unpack(A.Style.muted))
+    if not A.Access.Readable(classToken) or type(classToken) ~= "string" then return end
+    pcall(function()
+        local color = C_ClassColor.GetClassColor(classToken)
+        if A.Access.Readable(color) and color then
+            local r, g, b = color:GetRGB()
+            strip:SetColorTexture(r, g, b, 1)
+        end
+    end)
+end
 function U.PaintName(label, unit)
     local classOK, _, classToken = pcall(UnitClass, unit)
     if classOK then U.PaintClassColor(label, classToken)
     else label:SetTextColor(1, 1, 1, 1) end
-    -- SetText is a native secret-capable sink; no concatenation or name-based keys.
-    local ok = pcall(function() label:SetText(UnitName(unit)) end)
-    if not ok then label:SetText(UNKNOWN or "Unknown") end
+    -- Only shorten readable names; never inspect a restricted identity.
+    local name = R(UnitName, unit)
+    if type(name) ~= "string" then label:SetText(""); return end
+    local separators = Constants and Constants.CharacterNameSeparatorConsts
+    local separator = separators and separators.CHARACTERNAME_SURNAME_SEPARATOR
+    if type(separator) == "string" and separator ~= "" then
+        local index = name:find(separator, 1, true)
+        if index then name = name:sub(1, index - 1) end
+    end
+    label:SetText(name:match("^[^%s%-]+") or "")
 end
 function U.State(unit)
     if R(UnitExists, unit) ~= true then return "missing" end

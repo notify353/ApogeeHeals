@@ -36,7 +36,7 @@ function S.PowerColor(kind)
     return 0.7, 0.7, 0.7, 1
 end
 function S.RowEdges(row, first)
-    -- Only the internal health/power rule remains. Inter-player space is empty.
+    -- Internal rule and flush class rail; inter-player space stays empty.
     local layer = CreateFrame("Frame", nil, row)
     layer:SetAllPoints(row)
     layer:SetFrameLevel(row.nameLayer:GetFrameLevel() + 1)
@@ -45,6 +45,14 @@ function S.RowEdges(row, first)
     texture:SetSize(S.width, S.barGap)
     texture:SetPoint("TOPLEFT", row, "TOPLEFT", 0, -S.healthHeight)
     texture:SetColorTexture(0.08, 0.10, 0.13, 1)
+    local seam = layer:CreateTexture(nil, "OVERLAY")
+    seam:SetSize(2.5, S.clusterHeight)
+    seam:SetPoint("TOPLEFT", row, "TOPLEFT", 0, 0)
+    seam:SetColorTexture(0.08, 0.10, 0.13, 1)
+    row.classStrip = layer:CreateTexture(nil, "OVERLAY", nil, 1)
+    row.classStrip:SetSize(2, S.clusterHeight)
+    row.classStrip:SetPoint("TOPLEFT", row, "TOPLEFT", 0, 0)
+    row.classStrip:SetColorTexture(unpack(S.muted))
 end
 function S.HealthColor(percent)
     if percent > 0.60 then return 0.28, 0.74, 0.46, 1 end

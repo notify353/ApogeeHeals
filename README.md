@@ -8,13 +8,18 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 
 - Player-first vertical stack followed by party1 through party4. Player remains
   while solo; native visibility hides missing units and all rows in raids.
+- Default placement aligns beneath Apogee Tank's Forever bars, with a 9px gap
+  below its single-target layout. No Tank dependency or frame attachment is used.
+  Existing saved positions remain unchanged; use **Reset position** to adopt it.
 - Apogee Tank styling with taller health bars: 112x14 health, 112x5 power, at 2x scale.
-  Names use Blizzard's native class colors, left-aligned inside health bars with the
+  First names only use Blizzard's native class colors, left-aligned inside health bars with the
   original readable game font and dark shadow, shown only outside
-  combat. Long names truncate. Health-state and active-resource colors remain.
+  combat. Restricted names stay blank. Long names truncate. Health-state and active-resource colors remain.
   A muted level appears immediately to the left of each name; unavailable levels
   show a question mark. Levels hide together with names in combat and status states.
-- A fine opaque rule divides health from power; fully transparent spaces separate
+- A fine opaque rule divides health from power. A slim Blizzard class-color strip sits flush inside each row's left
+  edge, spanning health and power with a dark separator. It remains visible in combat.
+  Fully transparent spaces separate
   players, with no outer border or header lane. OFFLINE and DEAD
   replace the name inside the empty health bar. A small cup beside the health bar
   indicates confirmed drinking outside combat, with smaller artwork in a dark inset frame.
@@ -23,7 +28,8 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 - Incoming heals from all healers appear as a pale-green segment immediately
   after current health. Forever's native calculator caps it at missing health
   and accounts for healing absorption. No numbers or extra settings are added.
-- Native left-click targeting, with no click-casting configuration or registration.
+- Native left-click targeting when unassigned, with healing click bindings on Left, Right,
+  Middle, Mouse 4 and Mouse 5 (plain, Shift and Ctrl). No global binding overrides.
   Standard native target actions also retain the client's spell/item cursor behavior.
 - Escape -> Options -> AddOns -> Apogee Heals: Unlock frames and Reset position.
   Unlock also shows a five-member sample party, even while solo, with health,
@@ -35,12 +41,91 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
   The twelve-second loop stops immediately when locked or combat begins.
   Drag the handle above the stack. Releasing the drag locks it; combat also locks it.
   Locking ends the preview and restores the live party display.
-  Only the position is saved per character. Reload starts locked.
+  Position and healing assignments are saved per character. Reload starts locked.
+
+### Healing bindings
+
+Left-click the **healing icon at the minimap's bottom-right** to open or close
+healing bindings. Its border turns gold while the editor is open. Right-click
+opens Heals settings. The button locks during combat. The existing
+**Options > AddOns > Apogee Heals > Edit healing bindings** shortcut also works.
+Drop a learned
+friendly spell from the player spellbook onto one of fifteen mouse/modifier slots.
+Pickup followed by clicking a slot also works. The selected spell ID/rank is kept;
+hover to see its name and rank. Active helpful spells (including friendly buffs)
+are accepted; harmful and passive spells are rejected. New manual assignments start empty.
+
+Priests automatically get **Lesser Heal on plain Left** and **Power Word: Shield
+on plain Right**. Paladins get **Holy Light on plain Left**.
+Each uses its highest learned rank. Defaults are
+class-specific and do not write saved assignments.
+Your manual spell always takes priority, even if it becomes unavailable. Removing
+the override restores the default. The default icon has no remove control; drop a
+spell onto it to override. Other classes and combinations have no defaults yet.
+
+Drag a tile onto another to move or swap; dropping outside cancels. Use its small
+x to remove it. Escape or the minimap button closes the editor. Drag the header to move it
+for this session. The editor is unprotected and never casts. Combat closes it and
+cancels editing. Preview party rows also never cast.
+
+The editor follows Keybinds' floating-grid design: 36-pixel tiles, four-pixel gaps,
+inset icons and a narrow translucent header, with no dialog backdrop. Columns
+are Left, Right, Middle, Mouse 4 and Mouse 5, labeled L/R/M/4/5. S- and C- prefixes
+identify Shift and Ctrl rows; hover a tile for its full combination, or the header
+for editing instructions. Invalid drops explain the issue in chat.
+
+Click a live party row with the assigned combination to cast on that fixed unit.
+Plain left-click targets when it has neither an assignment nor a learned class
+default. Removing an assignment restores its class default, or targeting when
+none is available. Empty Shift/Ctrl slots do nothing,
+including on Left. An unavailable assigned spell stays inactive, without targeting
+instead. Alt and combined modifiers have no healing
+action. Removed or unavailable spells are inactive; unavailable assignments stay
+saved and recover when learned again. Spellbook changes during combat apply after
+combat. Native WoW enforces spell range, recipient validity and resource costs.
+
+These are local unit-button actions, not global keyboard/mouse overrides or edits
+to Blizzard's click-binding configuration. **Mouse 3-5 coexistence with Apogee
+Keybinds remains pending live testing**, since Keybinds claims those inputs globally.
+Combat routing, target preservation, invalid-recipient behavior and visual layout
+also require live acceptance. Test installations do not establish live acceptance.
 
 The addon leaves Blizzard frames and other Apogee addons alone. It does not need
 Tank, Keybinds or Party Health Bars installed. No raid/pet frames, shield/HoT overlays,
-dispel indicators, live range fading, health/power numbers, profiles, minimap button
+dispel indicators, live range fading, health/power numbers, profiles
 or drinking countdowns.
+
+## Learned upkeep buffs
+
+Heals learns active, friendly player spells after a successful cast and a complete,
+readable aura observation within ten seconds. The aura must come from you and
+have a duration of at least five minutes. There is no class filter or spell list.
+Short buffs, passive spells, items, pets, failed casts and unreadable observations
+do not teach a reminder. Cast buffs outside combat to teach them.
+
+Missing buffs appear as small icons to the left of each living, connected party
+row, with four visible icons and an overflow count. The client's self-buff check
+keeps self-only effects on your row; party-capable buffs are checked on every
+row even when first learned on yourself. If classification is unavailable, actual
+party application remains the fallback evidence. Existing learned buffs use this
+rule without relearning. **Left-click a reminder icon to reapply its learned spell
+to that row's player**, without selecting them first. Modified clicks do nothing.
+The game still enforces range, mana, reagents and spell restrictions. Reminders
+hide in combat and during preview; no automatic casts occur. Learning scope
+avoids assuming that self-only buffs can be applied to everyone.
+Dead, offline, unknown and preview rows receive no reminders.
+Learning and reminders pause in combat and resume from fresh observations afterward.
+
+An existing buff from another caster satisfies coverage. Observed ranks with
+the same localized client spell name share one watch entry. Differently named
+single/group buffs are not guessed to be equivalent. The five-minute rule is a
+duration filter, not a claim that every qualifying spell should always be maintained.
+
+Open **Options > AddOns > Apogee Heals > Buff reminders** to uncheck an unwanted
+reminder. Choices persist across reloads and relearning. The list supports up to
+32 learned entries. Self-only versus party coverage is detected automatically;
+there is no manual scope setting. No duration countdown, automatic casting, party chat alerts
+or shared Tank state is involved. Tank can be absent or disabled.
 
 ## Drinking limitations
 
@@ -57,9 +142,11 @@ guesses, thirsty warnings, countdowns, alerts or messages.
 ## Architecture
 
 `ApogeeHeals.lua` composes private addon modules. Core owns client access,
-native display sinks and position storage. PartyFrames owns rendering, secure
-unit buttons and event lifecycle; Drinking owns recognition; UI owns fixed
-style and the two settings controls. Only an event-triggered one-shot timer is
+native display sinks and character storage. PartyFrames owns rendering, secure
+unit buttons and event lifecycle; Drinking owns recognition; Bindings owns spell
+validation and secure click assignments; UI owns style, settings and the binding
+editor. Buffs owns class-independent discovery, missing-buff icons and the watch
+list. Only an event-triggered one-shot timer is
 used for live refreshes; OnUpdate handlers run only during dragging or the visible
 animated preview (drawing capped at twenty times per second).
 
@@ -75,7 +162,9 @@ independent handle; the protected anchor follows only outside combat. Combat
 stops the handle immediately and saves the last safe position after combat.
 No custom restricted snippets or global WoW API replacements are used.
 
-`ApogeeHealsDB` contains version 1 and position x/y offsets in scaled UI units
+`ApogeeHealsDB` contains version 3, a learned upkeep-buff watch list,
+a mouse-combination-to-spell-ID binding map,
+and position x/y offsets in scaled UI units
 relative to screen center. Invalid or off-screen positions recover safely.
 A newer schema is preserved untouched and disables startup with an explanation.
 

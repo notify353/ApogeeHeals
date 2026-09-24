@@ -1,5 +1,37 @@
 # In-game prototype acceptance (pending)
 
+## Learned upkeep buffs (pending)
+
+- Reminder learning was reported working by the owner. Click-to-reapply remains
+  pending: left-click each missing icon on self and party1-party4 and verify the
+  correct learned spell, exactly one cast, and unchanged selected target with
+  both key-down preferences. Modified clicks must do nothing. Range, resource,
+  reagent and recipient failures must not redirect to another player. Test
+  combat transitions and preview mode for hidden/inactive reminder hit areas.
+
+- With Tank disabled or absent, cast a known five-minute-or-longer friendly buff
+  outside combat on yourself and a party member. Confirm automatic discovery,
+  icon removal where present and missing icons on other living party members.
+  Confirm learning a party-capable buff on yourself produces a missing reminder
+  on an unbuffed party member immediately, including after loading an older
+  self-scoped watch entry. Truly self-only effects must stay on your own row.
+- Test another class without any spell catalog changes. Short effects such as
+  Renew/shields, passive effects, items, pets and failed casts must not be learned.
+  Cast/aura IDs that differ cannot be inferred; record actual live identities
+  if an otherwise qualifying buff is not discovered.
+- A different caster's same-name/rank buff satisfies coverage. Removal/expiry
+  restores the icon. Learning a rank with the same client name keeps one entry.
+  Differently named group and single buffs are separate; disable unwanted watches.
+- Uncheck a learned entry in Buff reminders, recast and reload: it stays disabled.
+  Recheck it, test scrolling and four-icon overflow, and inspect row spacing.
+- Combat immediately clears icons and closes the picker, with no blocked actions.
+  Combat exit refreshes real state. Unknown aura data, dead/offline/missing units,
+  preview mode, zoning and raid conversion must not leave stale reminders.
+- Existing bindings and position survive schema migration. Tank's files and
+  saved data remain untouched. Source/mock checks do not establish live behavior.
+
+## Existing frame acceptance
+
 The owner approved test installation and confirmed incoming heals visible in game.
 Visual iterations were reviewed during testing; the complete checklist below remains
 pending. Further installation changes require authorization. Local mocks and export checks
@@ -10,8 +42,8 @@ do not complete any of these checks.
   until combat ends without blocked actions.
 - Add/remove each party member, including during combat. Verify names and fills
   follow native unit tokens; click every displayed row and confirm the target.
-- Check left-click targeting with ActionButtonUseKeyDown enabled and disabled.
-  Verify no custom spell action, right-click action or click-binding registration.
+- Check unassigned plain left-click targeting with ActionButtonUseKeyDown enabled and disabled.
+  Unassigned right/middle/extra buttons must not cast.
 - Convert to raid and leave raid: all rows hide in raid and recover afterward.
 - Damage/heal, spend/regain mana, and test rage/energy/resource-form changes.
   Dead/offline states clear fills; resurrection/reconnection restore them.
@@ -45,3 +77,57 @@ do not complete any of these checks.
 - Keep Blizzard frames visible and verify no sibling-addon settings change.
 - Observe script errors and blocked-action/taint reports throughout. Resolve any
   failures before describing this build as live-accepted or publishing it.
+
+## Healing click bindings (pending)
+
+- Verify the bottom-right minimap healing icon remains separate from Keybinds.
+  Left-click toggles the editor; gold border follows settings-open and
+  Escape too. Right-click opens Heals settings. Combat closes the editor and
+  locks the button, and combat exit restores access.
+
+- Open the editor from settings. Inspect the fifteen-slot layout at normal and
+  increased UI scales, spell/rank tooltips and unavailable-spell explanations.
+  Compare tile sizes, gaps, colors and header styling beside Keybinds: no large
+  backdrop, dialog title or footer. Confirm tile legends and remove controls stay
+  readable over icons. Drag its header; close with the minimap button or Escape.
+  Reload starts with the editor closed.
+- Drop player spellbook heals of two different ranks. Verify exact ranks survive
+  swapping and reload. Reject pet, passive, harmful, item and macro assignments.
+  A friendly buff is supported because the client classifies it as helpful.
+- Test pickup/click, drag/drop, swaps, outside cancellation and removal. Editor
+  interactions and unlocked party previews must never cast.
+- Test all fifteen combinations on player and party1-party4, including in combat
+  and with both ActionButtonUseKeyDown values. Each gesture casts once, keeps the
+  selected target unchanged and uses the clicked unit. Plain Left without an
+  assignment or learned class default targets.
+  Assign plain Left, Shift-Left and Ctrl-Left independently, then remove plain
+  Left and confirm its default (or targeting without one) returns without affecting modified spells.
+  Empty modified Left slots and unavailable assigned Left spells must do nothing.
+- Test Alt and combined modifiers: no healing fallback. Remove a plain binding
+  while retaining Shift and verify neither activates the other's spell.
+- Test missing, dead, offline, hostile and out-of-range recipients with auto-self
+  cast enabled and disabled. An invalid click must not redirect to target or self.
+- Enter combat during a drag or edit. It cancels immediately, with no blocked
+  action. Reload during combat and test deferred startup; spell changes defer
+  until combat ends. Test roster changes and raid visibility as before.
+- Load Apogee Keybinds too, with its Mouse 3-5 assignments active. Verify Heals
+  row clicks do not also trigger global actions, and clicking elsewhere retains
+  Keybinds behavior. Repeat with each addon loaded alone. If routing conflicts,
+  do not call the affected combinations supported; record the exact collision
+  before deciding any separate integration work. No sibling files were changed.
+
+- On a Priest with no manual Left assignment, confirm Lesser Heal's highest
+  learned rank appears and casts. Learning a new Lesser Heal rank updates the
+  default outside combat. A manual lower-rank or other-spell override remains
+  exact; removing it restores the default. Reload preserves this behavior.
+  Classes without defaults and modified slots gain no default; no known candidate restores
+  plain targeting. Confirm the default tooltip and absence of a remove control.
+- On a Priest with no manual Right assignment, verify Power Word: Shield uses
+  the highest learned rank. A manual override wins, removal restores Shield,
+  modifiers remain separate and other classes gain no right-click default.
+- On a Paladin without a manual Left assignment, verify Holy Light uses the
+  highest learned rank. An explicit lower-rank assignment must remain unchanged.
+- Verify first-name-only labels and the flush class strip for each party member,
+  including class changes in reused slots, combat, offline and dead states.
+- Use Reset position and check spacing beneath Tank's Forever player/target bars;
+  existing saved positions must survive reload until explicitly reset.

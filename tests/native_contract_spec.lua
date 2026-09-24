@@ -35,6 +35,50 @@ chunk = assert(loadstring("return " .. action)); setfenv(chunk, env)
 local target = chunk()
 for _, row in ipairs(a.View.rows) do target(row, row.unit, "LeftButton"); assert(targeted == row.unit) end
 
+-- Execute the matching client's actual spell action and release dispatcher.
+-- This proves the source contract, not secure provenance or physical input routing.
+local spellAction = assert(source:match("SECURE_ACTIONS%.spell%s*=%s*(function.-\n    end);"))
+local castID, castUnit, castCount = nil, nil, 0
+env.SecureButton_GetModifiedAttribute = function(frame, field, button)
+    assert(button == "RightButton")
+    return frame.attributes[field .. "2"]
+end
+env.CastSpellByID = function(id, unit) castID, castUnit, castCount = id, unit, castCount + 1 end
+env.CastSpellByName = function() error("spell rank identity was lost") end
+chunk = assert(loadstring("return " .. spellAction)); setfenv(chunk, env)
+local cast = chunk()
+env.OnActionButtonClick = function(frame, button) cast(frame, frame.unit, button) end
+for _, row in ipairs(a.View.rows) do
+    row.attributes.spell2 = 2050
+    for _, keyDown in ipairs({false, true}) do
+        env.GetCVarBool = function() return keyDown end
+        local before = castCount
+        env.SecureActionButton_OnClick(row, "RightButton", true)
+        assert(castCount == before)
+        env.SecureActionButton_OnClick(row, "RightButton", false)
+        assert(castCount == before + 1 and castID == 2050 and castUnit == row.unit)
+    end
+end
+print("PASS matching-export spell-ID/fixed-unit action and one release per gesture")
+env.SecureButton_GetModifiedAttribute = function(frame, field, button)
+    assert(button == "LeftButton"); return frame.attributes[field .. "1"]
+end
+env.OnActionButtonClick = function(frame, button) cast(frame, frame.attributes.unit, button) end
+for _, row in ipairs(a.View.rows) do
+    a.Buffs.Paint(row, {{id=1243,icon=1}})
+    local reminder = row.buffButtons[1]
+    assert(reminder.driver == "[combat] hide; show")
+    for _, keyDown in ipairs({false, true}) do
+        env.GetCVarBool = function() return keyDown end
+        local before = castCount
+        env.SecureActionButton_OnClick(reminder, "LeftButton", true)
+        assert(castCount == before)
+        env.SecureActionButton_OnClick(reminder, "LeftButton", false)
+        assert(castCount == before + 1 and castID == 1243 and castUnit == row.unit)
+    end
+end
+print("PASS matching-export buff reminder casts once on its fixed row unit")
+
 local stateSource = read("Blizzard_RestrictedAddOnEnvironment/SecureStateDriver.lua")
 local stateEnv = setmetatable({}, {__index = _G})
 local raid, present = false, {player=true}

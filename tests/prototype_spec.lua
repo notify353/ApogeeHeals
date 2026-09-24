@@ -9,7 +9,7 @@ test("composition, fixed geometry and native targeting", function()
     equal(#a.View.rows, 5); equal(a.View.root.scale, 2)
     for i, row in ipairs(a.View.rows) do
         equal(row.attributes.unit, i == 1 and "player" or "party" .. (i - 1))
-        equal(row.attributes.type1, "target"); equal(row.attributes.type2, nil)
+        equal(row.attributes.type1, "target"); equal(row.attributes.type2, "")
         equal(row.clicks[1], "LeftButtonUp"); equal(row.health.width, 112)
         equal(row.health.height, 14); equal(row.power.height, 5)
         equal(row.power.point[5], -14.5); equal(row.name.wrap, false)
@@ -37,16 +37,27 @@ test("dead, offline, missing and unknown states clear stale bars", function()
     m.units.player.connected = m.Secret(); a.View.Refresh(); equal(row.health.value, 0)
     m.units.player = nil; a.View.Refresh(); equal(row.name.text, ""); equal(row.status.text, "")
 end)
-test("restricted health, power and names pass only into native sinks", function()
+test("restricted health and power reach native sinks; restricted names stay blank", function()
     local m = Mock.New(); local a = m.Start()
     local secret = m.Secret()
     for _, field in ipairs({"health", "maxHealth", "power", "maxPower", "name"}) do m.units.player[field] = secret end
     a.View.Refresh(); local row = a.View.rows[1]
-    equal(row.health.value, secret); equal(row.health.max, secret); equal(row.name.text, secret)
+    equal(row.health.value, secret); equal(row.health.max, secret); equal(row.name.text, "")
     equal(row.power.value, secret)
     m.units.player.kind = secret; a.View.Refresh(); equal(row.power.value, 0)
     UnitHealth = function() error("unavailable") end
     a.View.Refresh(); equal(row.health.value, 0)
+end)
+test("player labels show first names only and refresh when a name changes", function()
+    local m = Mock.New(); local a = m.Start(); local row = a.View.rows[1]
+    for _, example in ipairs({{"Anduin Wrynn", "Anduin"}, {"Anduin-Wrynn", "Anduin"},
+        {"Priest", "Priest"}, {"Élodie Dubois", "Élodie"}, {"", ""}}) do
+        m.units.player.name = example[1]; a.View.Refresh(); equal(row.name.text, example[2])
+    end
+    local previous = Constants
+    Constants = {CharacterNameSeparatorConsts={CHARACTERNAME_SURNAME_SEPARATOR="·"}}
+    m.units.player.name = "Anduin·Wrynn"; a.View.Refresh(); equal(row.name.text, "Anduin")
+    Constants = previous
 end)
 test("confirmed drinks, localized identities and unavailable auras", function()
     local m = Mock.New(); local a = m.Start(); local row = a.View.rows[1]
@@ -100,10 +111,10 @@ test("position validation, persistence and future-schema preservation", function
     m.Event("ADDON_LOADED", "ApogeeHeals"); m.Flush()
     equal(a.db.position.x, -123); equal(a.db.position.y, 45)
     local invalid = a.Storage.Open({version=1,position={x=0/0,y=math.huge}})
-    equal(invalid.position.x, -180)
+    equal(invalid.position.x, 70.5); equal(invalid.position.y, -45)
     a.db.position={x=90000,y=-90000}; a.View.ApplyPosition()
     assert(a.db.position.x <= 353); assert(a.db.position.y >= -164.5)
-    a.View.ResetPosition(); equal(a.db.position.x, -180)
+    a.View.ResetPosition(); equal(a.db.position.x, 70.5); equal(a.db.position.y, -45)
     m.combat=true; a.View.ResetPosition(); a.View.SetUnlocked(true); equal(a.View.unlocked, false)
     local m2 = Mock.New(); local a2 = m2.Load()
     local future = {version=9,position={x=1,y=2}}; ApogeeHealsDB=future

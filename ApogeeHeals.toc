@@ -8,6 +8,10 @@
 Core/Access.lua
 Core/Client.lua
 Core/Storage.lua
+Bindings/Runtime.lua
+Bindings/Defaults.lua
+Buffs/Runtime.lua
+Buffs/View.lua
 UI/Style.lua
 Core/UnitAPI.lua
 Drinking/Runtime.lua
@@ -15,5 +19,7 @@ IncomingHeals/View.lua
 PartyFrames/Preview.lua
 PartyFrames/View.lua
 UI/Settings.lua
+UI/BindingEditor.lua
+UI/Minimap.lua
 PartyFrames/Runtime.lua
 ApogeeHeals.lua

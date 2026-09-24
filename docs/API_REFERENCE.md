@@ -9,6 +9,12 @@ timestamps are a freshness heuristic, not proof of runtime compatibility.
 
 ## Contracts used
 
+- Readable player labels omit surnames using the client's surname separator,
+  with whitespace/hyphen fallback. Restricted or unavailable identities display
+  blank; they never enter Lua string operations. Camelot NameUtil confirms that
+  UnitName's first return can contain both first name and surname. The installed
+  build has changed since this export; current-build live validation is pending.
+
 - Blizzard_Fonts_Shared/Shared/GameFonts.xml defines Number12Font, a native
   locale-aware sans-serif family used for preview-handle text. Names retain the
   original GameFontHighlightSmall font at 8 logical pixels for readability.
@@ -42,10 +48,53 @@ timestamps are a freshness heuristic, not proof of runtime compatibility.
   access disables the drinking claim while health frames continue working.
 - SpellDocumentation: C_Spell.GetSpellInfo resolves each candidate ID to this
   client's spell ID and localized name; unresolved candidates are not used.
+- Buff discovery uses UNIT_SPELLCAST_SUCCEEDED's public player/spell identity
+  as a ten-second candidate. A complete HELPFUL scan must then find that exact
+  aura ID, a public player sourceUnit (literal player or UnitIsUnit alias), and
+  a finite public duration >= 300 seconds. There is no static buff catalog.
+  IsSpellKnown/in-spellbook/helpful/non-harmful/non-passive checks exclude
+  unlearned and non-player actions. Discovery and reminders run outside combat.
+  Coverage uses readable IDs/names from a full scan, regardless of caster;
+  unreadable or truncated scans establish neither absence nor new learning.
+  Duration and source are never inspected before access guards. No remaining
+  time calculation, cast-success assumption of coverage or combat snapshot is used.
+  Learned ranks with identical client names share a watch entry; differently
+  named effects remain separate. C_Spell.IsSelfBuff classifies self-only effects;
+  a readable false enables party coverage immediately, including existing learned
+  buffs. A readable true limits coverage to player. Unknown values fall back to
+  observed party application. Spell identities, enabled
+  flags and this scope persist, never aura objects, recipients or timers.
+- Each visible buff reminder has its own SecureActionButtonTemplate with an
+  immutable row unit. Out-of-combat refresh installs the learned spell ID and
+  type1=spell, or clears both. LeftButtonUp/useOnKeyDown=false produces one
+  release action; modified left clicks explicitly do nothing. Native visibility
+  drivers hide reminders in combat. Combat cleanup touches only icon artwork,
+  not protected buttons or attributes. Preview clears reminder actions outside
+  combat. The matching-source test exercises native dispatch for all five units.
 - SecureTemplates.lua/xml: SecureActionButtonTemplate, unit/type1 attributes,
   native target action. Explicit useOnKeyDown=false pairs with LeftButtonUp,
-  regardless of the user's ActionButtonUseKeyDown setting. No unit click-binding
-  registration, SecureUnitButton binding dispatch, or restricted snippets.
+  regardless of the user's ActionButtonUseKeyDown setting. Optional healing actions
+  register Left/Right/Middle/Button4/Button5 releases and install modifier-specific
+  type/spell attributes outside combat. The existing explicit unit wins before
+  self/focus casting checks. Exact IDs reach the native SECURE_ACTIONS.spell path.
+  Empty strings explicitly block unsupported Alt/combined modifiers; cleared
+  assignments restore a learned class default, otherwise clear type and spell;
+  plain Left without either restores target.
+  An unavailable saved Left assignment stays a no-op; it does not target instead.
+  No unit click-binding registration,
+  global override bindings, SecureUnitButton binding dispatch, or restricted snippets.
+- SpellBookDocumentation: IsSpellInSpellBook(Player, includeOverrides=false) and
+  IsSpellKnown gate exact player spell IDs. Cursor fallback resolves a player-book
+  index through GetSpellBookItemInfo. SpellDocumentation supplies helpful/harmful/
+  passive validation, icon/name and GetSpellSubtext rank labels. Public-read guards
+  precede inspecting returned values. Helpful classification includes friendly buffs;
+  it is not a healing-effect classifier. Manual assignments retain exact ranks.
+- Class defaults contain Priest plain Left (Lesser Heal candidates 2053, 2052,
+  2050) and plain Right (Power Word: Shield candidates 10901, 10900, 10899,
+  10898, 6066, 6065, 3747, 600, 592, 17), resolved highest-first through learned/helpful
+  checks. UnitClass's class token must be public. Defaults never write storage;
+  manual entries take priority even when unavailable. Spellbook refreshes apply
+  outside combat; these candidate identities need live confirmation on Forever.
 - Blizzard_RestrictedAddOnEnvironment/SecureStateDriver.lua: native visibility
   resolution for `[group:raid] hide; [@unit,exists] show; hide`. Native handling
   owns combat roster visibility; the addon never changes those attributes then.
