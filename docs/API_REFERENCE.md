@@ -79,7 +79,9 @@ Native range behavior and combat presentation still require live acceptance.
   RegisterForDrag("RightButton") activates temporary
   OnUpdate sampling. HookScript("OnSizeChanged") preserves existing map handlers.
   Placement uses a constant circular radius (half the larger dimension + 20)
-  and default angle 220. Valid drags update only a local session angle; the
+  and default angle 220 minus max(15, deg(2*asin(min(1,46/(2*radius))))),
+  putting Heals upper-left, Keybinds middle and Tank lower-right.
+  Valid drags update only a local session angle; the
   historical minimapAngle field is preserved verbatim but never used for placement.
   Reload resets the local angle. Shared neighboring defaults use adaptive angular
   spacing with a minimum 46-pixel chord to avoid overlapping 32-pixel click boxes.

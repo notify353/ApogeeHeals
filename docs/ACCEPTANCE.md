@@ -88,8 +88,9 @@ Focus audio request. Earlier pending entries remain detailed regression checklis
 
 ## Existing frame acceptance
 
-- Minimap placement/dragging (new, live acceptance pending): verify the 220-degree
-  default sits outside the minimap beside Tank/Keybinds without overlap; check
+- Minimap placement/dragging (new, live acceptance pending): verify the
+  default sits upper-left of Keybinds (middle) and Tank (lower-right) outside
+  the minimap without overlap; check
   round/resized/rectangular maps and UI scaling. Drag through axes, diagonals and
   intermediate angles: the orbit must stay circular with constant radius, never
   trace a square. Right-drag, resize and zone to retain session placement; reload

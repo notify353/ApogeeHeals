@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Reset the minimap icon to the middle of the default cluster (220 degrees) on
+- Reset the minimap icon to the upper-left of the default cluster on
   reload/login. Right-drag applies for the current session only, including across
   resize/zoning; historical saved angles are retained but ignored.
 
@@ -19,8 +19,7 @@
   and report the feature unavailable; poison-triggered combat Purify remains blocked.
 - Correct minimap dragging to a smooth circular orbit using half the larger map
   dimension plus 20 pixels; preserve the current session angle on resize.
-- Place the minimap button outside the rim at the shared Heals default of 220
-  degrees; right-drag changes only the current session. Preserve artwork and
+- Place the minimap button outside the rim at the upper-left cluster default; right-drag changes only the current session. Preserve artwork and
   clicks, suppress clicks after dragging, and adapt to map resize/UI scaling.
 - Paladins get learned Might reminders without discovery; learned Wisdom is
   available unchecked in Buff reminders. Preserve opt-outs and prior blessing
