@@ -90,7 +90,9 @@ Focus audio request. Earlier pending entries remain detailed regression checklis
 
 - Minimap placement/dragging (new, live acceptance pending): verify the
   default sits upper-left of Keybinds (middle) and Tank (lower-right) outside
-  the minimap without overlap; check
+  the minimap without overlap, with even gaps and matching rim distance. The
+  shared radius uses a 16-pixel offset for nominal 32-pixel button tangency;
+  actual painted ring/rim alignment must be checked in game; check
   round/resized/rectangular maps and UI scaling. Drag through axes, diagonals and
   intermediate angles: the orbit must stay circular with constant radius, never
   trace a square. Right-drag, resize and zone to retain session placement; reload

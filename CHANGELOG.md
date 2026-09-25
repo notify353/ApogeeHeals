@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Bring minimap button centers onto the shared nominal tangent orbit: half the
+  larger minimap dimension plus 16 pixels, with equal 46-pixel-minimum chord gaps.
+  Preserve native border padding and artwork; painted rim alignment needs live review.
+
 - Reset the minimap icon to the upper-left of the default cluster on
   reload/login. Right-drag applies for the current session only, including across
   resize/zoning; historical saved angles are retained but ignored.
@@ -18,7 +22,7 @@
   reported forbidden OnClick replacement warnings. Preserve existing buff layout
   and report the feature unavailable; poison-triggered combat Purify remains blocked.
 - Correct minimap dragging to a smooth circular orbit using half the larger map
-  dimension plus 20 pixels; preserve the current session angle on resize.
+  dimension plus 16 pixels; preserve the current session angle on resize.
 - Place the minimap button outside the rim at the upper-left cluster default; right-drag changes only the current session. Preserve artwork and
   clicks, suppress clicks after dragging, and adapt to map resize/UI scaling.
 - Paladins get learned Might reminders without discovery; learned Wisdom is

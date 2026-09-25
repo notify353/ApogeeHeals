@@ -19,7 +19,7 @@ function M.Position(angle)
     if not finite(width) or not finite(height) or width <= 0 or height <= 0 then return false end
     local level = Minimap:GetFrameLevel()
     if not finite(level) or level < 0 or level % 1 ~= 0 or not finite(level + 20) then return false end
-    local radius = math.max(width, height) / 2 + 20
+    local radius = math.max(width, height) / 2 + 16
     if not finite(angle) then
         local spacing = math.max(15, math.deg(2 * math.asin(math.min(1, 46 / (2 * radius)))))
         angle = finite(sessionAngle) and sessionAngle or (220 - spacing)

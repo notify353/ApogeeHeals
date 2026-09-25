@@ -51,7 +51,7 @@ opens Heals settings. **Right-drag** moves it around the outside rim for this
 session only; reload/login resets it to the upper-left of the Apogee cluster,
 followed by Keybinds in the middle and Tank below-right. Historical saved angles
 are retained but ignored. The orbit
-is circular, with radius half the larger minimap dimension plus 20 pixels,
+is circular, with radius half the larger minimap dimension plus 16 pixels,
 including resized or rectangular maps. It updates on map resize and UI scale
 changes. The button locks during combat. The existing
 **Options > AddOns > Apogee Heals > Edit healing bindings** shortcut also works.
