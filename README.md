@@ -97,9 +97,29 @@ or drinking countdowns.
 
 ## Learned upkeep buffs
 
+Paladins receive **Blessing of Might reminders as soon as a rank is learned**;
+no discovery cast is needed. Learned **Blessing of Wisdom** is also added to
+Buff reminders, initially unchecked. To prefer Wisdom, uncheck Might and check
+Wisdom there. These defaults use the highest client-confirmed learned ordinary
+rank and preserve saved opt-outs through upgrades and reloads. They do not seed
+greater blessings, seals, short defensive cooldowns or combat utility.
+
+Only one maintained blessing is prompted per recipient: the first enabled,
+learned blessing in the existing watch order. Earlier discovered choices retain
+priority over appended defaults; there is no automatic class/role optimization.
+Any recognized ordinary or greater Might, Wisdom, Kings, Salvation, Sanctuary or
+Light already on a recipient suppresses another blessing prompt, even from a
+different caster. This conservative policy avoids replacement prompts; it does
+not optimize multi-Paladin blessing assignments. Other discovered upkeep buffs
+remain independent. A full 32-entry watch list is preserved without eviction.
+
+Hover a visible reminder for **Blizzard's native spell tooltip**, including its
+actual rank. Tooltips close when reminders change/disappear, the roster changes
+or combat begins. Click behavior is unchanged.
+
 Heals learns active, friendly player spells after a successful cast and a complete,
 readable aura observation within ten seconds. The aura must come from you and
-have a duration of at least five minutes. There is no class filter or spell list.
+have a duration of at least five minutes. Discovery has no class filter or spell list.
 Short buffs, passive spells, items, pets, failed casts and unreadable observations
 do not teach a reminder. Cast buffs outside combat to teach them.
 
@@ -186,6 +206,11 @@ scenarios and whitespace checks. Run `pwsh ./scripts/check-wow-api-export.ps1`
 before API changes; it checks the installed build and export file freshness.
 See docs/API_REFERENCE.md for matching-source authority and optional native
 contract tests. Mocked engine behavior does not establish live combat safety.
+
+After a central build, run `lua tests/generated_dev.lua <ApogeeHealsDev-root>`
+against its generated child folder for buff discovery/defaults/tooltips under
+the real DEV identity. The harness mocks admission as granted; central checks
+separately own admission, pin hashes and distribution isolation.
 
 No installation or deployment is performed by these scripts. Requested addon
 changes include local installation after checks into Interface/AddOns/ApogeeHeals

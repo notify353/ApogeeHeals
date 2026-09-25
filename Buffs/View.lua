@@ -1,5 +1,10 @@
 local _, A = ...
 local B = A.Buffs
+function B.HideTooltip(button)
+    if not button or B.tooltipButton ~= button then return end
+    if GameTooltip:IsOwned(button) then GameTooltip:Hide() end
+    B.tooltipButton = nil
+end
 function B.Create(row)
     row.buffReminders, row.buffButtons = {}, {}
     for index = 1, 4 do
@@ -12,6 +17,16 @@ function B.Create(row)
             button:SetAttribute(prefix .. "type1", "")
         end
         button:SetHighlightTexture("Interface/Buttons/ButtonHilight-Square")
+        button:SetScript("OnEnter", function()
+            if InCombatLockdown() or not button.reminderSpell then return end
+            GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
+            B.tooltipButton = button
+            -- Native tooltip includes the actual configured rank and client spell text.
+            if GameTooltip:SetSpellByID(button.reminderSpell, false, true) then GameTooltip:Show()
+            else B.HideTooltip(button) end
+        end)
+        button:SetScript("OnLeave", function() B.HideTooltip(button) end)
+        button:SetScript("OnHide", function() B.HideTooltip(button) end)
         local icon = button:CreateTexture(nil, "ARTWORK")
         icon:SetAllPoints()
         icon:SetTexCoord(0.07, 0.93, 0.07, 0.93); icon:Hide()
@@ -23,10 +38,12 @@ end
 function B.Paint(row, missing)
     for index, icon in ipairs(row.buffReminders) do
         local entry = missing[index]
+        local button = row.buffButtons[index]
+        local id = entry and entry.id or nil
+        if button.reminderSpell ~= id then B.HideTooltip(button) end
+        button.reminderSpell = id -- Public display identity only; never a protected combat attribute.
         icon:SetTexture(entry and entry.icon); icon:SetShown(entry ~= nil)
         if not InCombatLockdown() then
-            local button = row.buffButtons[index]
-            local id = entry and entry.id or nil
             -- Cache only our public configured spell identity, never aura data.
             -- Combat painting leaves this untouched so deferred changes still apply.
             if not button.configured or button.configuredSpell ~= id then

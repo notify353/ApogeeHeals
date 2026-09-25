@@ -30,6 +30,8 @@ function R.Start()
         end
         if event == "UNIT_SPELLCAST_SUCCEEDED" then
             A.Buffs.OnCast(unit, spellID)
+        elseif event == "GROUP_ROSTER_UPDATE" then
+            A.Buffs.HideTooltip(A.Buffs.tooltipButton)
         elseif event == "PLAYER_LEAVING_WORLD" then
             R.suspended = true
             A.Buffs.suspended = true
@@ -50,6 +52,7 @@ function R.Start()
             end
             A.View.ApplyPosition(); A.Settings.Refresh()
         elseif event == "SPELLS_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
+            A.BuffDefaults.pending = true
             if event == "PLAYER_ENTERING_WORLD" then
                 R.suspended, A.Buffs.suspended = nil, nil
             end

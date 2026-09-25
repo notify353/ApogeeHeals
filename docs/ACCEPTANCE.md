@@ -9,6 +9,20 @@ Focus audio request. Earlier pending entries remain detailed regression checklis
 
 ## Learned upkeep buffs (pending)
 
+- Paladin defaults/tooltips: on a fresh DEV Paladin with Might learned, verify
+  an unbuffed self and party member show Might without a discovery cast. Learning
+  Wisdom must leave Might selected and add Wisdom unchecked in Buff reminders.
+  Existing enabled/discovered blessings keep their earlier priority. Uncheck
+  Might/check Wisdom to switch. Rank upgrades/reloads preserve explicit opt-outs.
+  An existing ordinary/greater maintained blessing suppresses other blessing
+  prompts, including another caster's blessing; at most one appears per unit.
+  Verify this conservative policy rather than multi-Paladin assignment logic.
+- Hover self/party reminders: native spell description and actual rank should
+  match the click action. Leave, hide, roster replacement, coverage, rank change,
+  preview, zoning and combat must clear stale tooltips. No protected action
+  changes or hidden hit areas may be introduced by tooltip handlers. These
+  new defaults and tooltip behavior have offline tests; live acceptance is pending.
+
 - Reminder learning and click-to-reapply were reported working by the owner.
   Full acceptance remains pending: left-click each missing icon on self and party1-party4 and verify the
   correct learned spell, exactly one cast, and unchanged selected target with

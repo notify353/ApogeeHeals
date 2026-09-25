@@ -42,6 +42,23 @@ review and current-source execution, not a claim of byte-identical exports.
 
 ## Contracts used
 
+- Paladin default reminders use ordinary Might candidate ranks 25291, 19838,
+  19837, 19836, 19835, 19834, 19740 and Wisdom 25290, 19854, 19853, 19852,
+  19850, 19742, highest first. As with existing healing defaults, every selected
+  rank must resolve through readable C_Spell.GetSpellInfo, both player-bank
+  IsSpellInSpellBook(includeOverrides=false) and IsSpellKnown, and active,
+  helpful, non-harmful validation. The export proves these API contracts, not
+  the server's spell database; actual identities and availability are checked
+  on the running client. No level-based spell grant is assumed. Greater and
+  other ordinary blessing IDs are coverage/exclusivity candidates only, never
+  automatically granted actions. Seeding/rank migration defers in combat.
+- Blizzard_ActionBar/Shared/SpellFlyout.lua uses native
+  GameTooltip:SetSpellByID(spellID, false, true) after SetOwner; the final true
+  requests spell subtext. Reminder tooltips use the same native method with the
+  public configured ID. OnLeave, OnHide, roster changes and icon replacement
+  clear only the tooltip owned by that button. Combat clears presentation,
+  without changing protected action attributes.
+
 - Readable player labels omit surnames using the client's surname separator,
   with whitespace/hyphen fallback. Restricted or unavailable identities display
   blank; they never enter Lua string operations. Camelot NameUtil confirms that

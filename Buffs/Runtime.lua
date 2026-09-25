@@ -42,20 +42,24 @@ function B.Learn(aura, unit)
     if not own or not A.Bindings.Resolve(aura.spellId) then return end
     local spell = B.Info(aura.spellId)
     if not spell then return end
+    local group = A.BuffDefaults.SeededGroup(aura.spellId)
+    local learnedID = A.BuffDefaults.active and group and A.BuffDefaults.ranks[group] or aura.spellId
     for _, entry in ipairs(A.db.buffs) do
         local previous = B.Info(entry.id)
-        if entry.id == aura.spellId or (previous and previous.name == spell.name) then
-            entry.id = aura.spellId -- Localized client names group observed ranks, not guessed equivalents.
+        if entry.id == aura.spellId or (previous and previous.name == spell.name)
+            or (A.BuffDefaults.active and group and A.BuffDefaults.SeededGroup(entry.id) == group) then
+            entry.id = learnedID -- Keep the highest learned seeded rank, including after a downrank cast.
             if unit ~= "player" then entry.party = true end
             return
         end
     end
     if #A.db.buffs < B.limit then
-        A.db.buffs[#A.db.buffs + 1] = { id = aura.spellId, enabled = true, party = unit ~= "player" }
+        A.db.buffs[#A.db.buffs + 1] = { id = learnedID, enabled = true, party = unit ~= "player" }
     end
 end
 function B.Refresh()
     if InCombatLockdown() or B.suspended then return end
+    A.BuffDefaults.Seed()
     local now = GetTime()
     for id, expires in pairs(B.candidates) do if expires < now then B.candidates[id] = nil end end
     local snapshots = {}
@@ -71,10 +75,16 @@ function B.Refresh()
     for index, row in ipairs(A.View.rows) do
         local missing = {}
         if snapshots[index] and not A.View.unlocked then
-            local names, ids = {}, {}
-            for _, aura in ipairs(snapshots[index]) do names[aura.name] = true; ids[aura.spellId] = true end
+            local names, ids, blessed = {}, {}, false
+            for _, aura in ipairs(snapshots[index]) do
+                names[aura.name] = true; ids[aura.spellId] = true
+                if A.BuffDefaults.Group(aura.spellId) then blessed = true end
+            end
+            local blessing = A.BuffDefaults.Choose(watched, row.unit)
             for _, watch in ipairs(watched) do
+                local grouped = A.BuffDefaults.active and A.BuffDefaults.Group(watch.entry.id)
                 if (row.unit == "player" or watch.party)
+                    and (not grouped or (watch == blessing and not blessed))
                     and not ids[watch.entry.id] and not names[watch.info.name] then
                     missing[#missing + 1] = { id = watch.entry.id, icon = watch.info.iconID }
                 end

@@ -12,6 +12,7 @@
     "Blizzard_APIDocumentationGenerated/UnitAuraDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/SpellDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/SpellBookDocumentation.lua",
+    "Blizzard_ActionBar/Shared/SpellFlyout.lua",
     "Blizzard_APIDocumentationGenerated/SimpleStatusBarAPIDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/SimpleFontStringAPIDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/SimpleFrameAPIDocumentation.lua",

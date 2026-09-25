@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Paladins get learned Might reminders without discovery; learned Wisdom is
+  available unchecked in Buff reminders. Preserve opt-outs and prior blessing
+  priority, upgrade seeded ranks, and show at most one missing blessing per unit.
+- Buff reminder hover uses Blizzard's native tooltip for the exact spell/rank;
+  clear it when the reminder changes, hides, changes roster or enters combat.
 - Show the shared green Apogee brand icon in the native AddOns list using a
   bundled copy of the existing artwork and addon-local TOC metadata.
 - Avoid unchanged buff-action/visibility setup, hidden picker rebuilds and

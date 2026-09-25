@@ -11,6 +11,7 @@ Core/Client.lua
 Core/Storage.lua
 Bindings/Runtime.lua
 Bindings/Defaults.lua
+Buffs/Defaults.lua
 Buffs/Runtime.lua
 Buffs/View.lua
 UI/Style.lua
