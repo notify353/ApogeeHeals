@@ -167,6 +167,15 @@ replaced by the secure spell-action handler. No indicator-only, permanent-button
 or invisible-hitbox substitute has been enabled. A different visible-action
 design requires explicit agreement; settings report the unavailable feature.
 
+## Healing Mouse placement
+
+With Keybinds available, Healing Mouse opens flush to the right of its Weapons
+header with aligned tops. The optional anchor follows the Weapons position even
+when its configuration panel is hidden; opening Heals does not show Keybinds.
+Without that anchor, Healing Mouse opens centered. Dragging its header overrides
+the default and saves a separate per-character editor position. Existing party
+frame placement is unchanged. DEV only uses the DEV Keybinds anchor.
+
 ## Spell range
 
 Rows fade and show OUT OF RANGE when the exact unmodified left-click spell

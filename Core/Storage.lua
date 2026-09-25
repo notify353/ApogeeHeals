@@ -17,6 +17,11 @@ function A.Storage.Open(saved)
     if type(position) ~= "table" or not finite(position.x) or not finite(position.y) then
         position = A.Storage.DefaultPosition()
     end
+    local editor = type(saved) == "table" and saved.editorPosition
+    local editorPosition
+    if type(editor) == "table" and finite(editor.x) and finite(editor.y) then
+        editorPosition = { x = editor.x, y = editor.y }
+    end
     local bindings = {}
     local source = type(saved) == "table" and saved.bindings
     if type(source) == "table" then
@@ -42,5 +47,5 @@ function A.Storage.Open(saved)
     local angle = type(saved) == "table" and saved.minimapAngle
     if type(angle) ~= "number" or angle ~= angle or math.abs(angle) >= math.huge then angle = nil end
     return { version = 3, position = { x = position.x, y = position.y }, bindings = bindings, buffs = buffs,
-        minimapAngle = angle }
+        minimapAngle = angle, editorPosition = editorPosition }
 end

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Default Healing Mouse to the right edge of the optional same-family Keybinds
+  Weapons header with aligned tops and no gap. Preserve manual placement per
+  character; use centered standalone placement when the anchor is unavailable.
+
 - Fade each row and show OUT OF RANGE only when the exact applied unmodified
   left-click spell reports a public out-of-range result for that fixed recipient.
   Unknown/private results clear feedback; range-only sampling preserves combat actions.

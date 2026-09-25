@@ -63,6 +63,17 @@ Focus audio request. Earlier pending entries remain detailed regression checklis
   fixed-unit combat cast remains blocked. An alternative visible-action design
   needs explicit agreement; release acceptance remains held.
 
+## Healing Mouse placement (live acceptance pending)
+
+- With Keybinds configuration visible, open Healing Mouse: its header must touch
+  the Weapons header's right edge with aligned tops and no horizontal gap.
+- Move Weapons and confirm the default dock follows. Hide Keybinds configuration
+  and confirm Heals remains usable. With Keybinds absent, confirm centered fallback.
+- Drag Healing Mouse, close/reopen/reload, and confirm custom placement survives
+  without moving party frames or Weapons. Check UI scaling and combat closure.
+- DEV must bind only the DEV header; no cross-family UI access. Screen clamping
+  can prevent a flush fit when the combined panels would extend off screen.
+
 ## Left-click range (live acceptance pending)
 
 - Assign two learned friendly spells with different ranges in turn to plain Left.

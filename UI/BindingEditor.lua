@@ -7,13 +7,48 @@ local function text(parent, value, x, y, size)
     local label = A.Style.Text(parent, size or 11)
     label:SetPoint("TOPLEFT", x, y); label:SetText(value); return label
 end
+local function finite(value)
+    return A.Access.Readable(value) and type(value) == "number"
+        and value == value and math.abs(value) < 100000
+end
+function E.Place()
+    if not E.frame or InCombatLockdown() or E.moving or E.customPosition then return end
+    local saved = A.db.editorPosition
+    E.frame:ClearAllPoints()
+    if type(saved) == "table" and finite(saved.x) and finite(saved.y) then
+        E.frame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", saved.x, saved.y)
+        return
+    end
+    -- Optional public anchor only; never access Keybinds' namespace or saved data.
+    -- Central DEV generation rewrites this explicitly audited cross-addon identity.
+    local header = _G["ApogeeKeybindsWeaponsHeader"]
+    if A.Access.Readable(header) and type(header) == "table" then
+        E.frame:SetPoint("TOPLEFT", header, "TOPRIGHT", 0, 0)
+    else E.frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0) end
+end
+function E.StopMoving()
+    if not E.frame then return end
+    E.frame:StopMovingOrSizing()
+    if not E.moving then return end
+    E.moving, E.customPosition = nil, true
+    if InCombatLockdown() then return end
+    local x = A.Access.Read(E.frame.GetLeft, E.frame)
+    local y = A.Access.Read(E.frame.GetBottom, E.frame)
+    local scale = A.Access.Read(E.frame.GetEffectiveScale, E.frame)
+    local parentScale = A.Access.Read(UIParent.GetEffectiveScale, UIParent)
+    if finite(x) and finite(y) and finite(scale) and scale > 0
+        and finite(parentScale) and parentScale > 0 then
+        x, y = x * scale / parentScale, y * scale / parentScale
+        if finite(x) and finite(y) then A.db.editorPosition = { x = x, y = y } end
+    end
+end
 function E.Cancel()
     E.source = nil
     if E.frame then E.Refresh() end
 end
 function E.Close()
     E.Cancel()
-    if E.frame then E.frame:StopMovingOrSizing() end
+    E.StopMoving()
     if E.frame then E.frame:Hide() end
     if GameTooltip then GameTooltip:Hide() end
 end
@@ -44,6 +79,7 @@ function E.Open()
     if InCombatLockdown() then return end
     if not E.frame then E.Create() end
     E.Cancel()
+    E.Place()
     E.frame:Show()
     A.Minimap.Refresh()
 end
@@ -53,7 +89,7 @@ function E.Create()
     local width = 5 * step - style.gap
     local gridTop = style.header + style.headerGap
     E.frame = frame; frame:SetSize(width, gridTop + 3 * step - style.gap)
-    frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+    E.Place()
     frame:SetFrameStrata("LOW"); frame:EnableMouse(false); frame:SetClampedToScreen(true)
     frame:SetMovable(true)
     local handle = CreateFrame("Button", nil, frame)
@@ -62,8 +98,11 @@ function E.Create()
     background:SetAllPoints(); background:SetColorTexture(0.09, 0.12, 0.17, 0.8)
     local title = A.Style.Text(handle, 9)
     title:SetPoint("CENTER", 0, 0); title:SetText("Healing Mouse")
-    handle:SetScript("OnDragStart", function() if not InCombatLockdown() then frame:StartMoving() end end)
-    handle:SetScript("OnDragStop", function() frame:StopMovingOrSizing() end)
+    E.handle = handle
+    handle:SetScript("OnDragStart", function()
+        if not InCombatLockdown() then E.moving = true; frame:StartMoving() end
+    end)
+    handle:SetScript("OnDragStop", E.StopMoving)
     handle:SetScript("OnEnter", function()
         if InCombatLockdown() then return end
         GameTooltip:SetOwner(handle, "ANCHOR_RIGHT"); GameTooltip:SetText("Healing bindings")
@@ -134,9 +173,17 @@ function E.Create()
         remove:SetScript("OnClick", function() E.Cancel(); A.Bindings.Put(id, nil) end)
     end
     frame:SetScript("OnHide", function()
-        E.Cancel(); frame:StopMovingOrSizing(); GameTooltip:Hide()
+        E.Cancel(); E.StopMoving(); GameTooltip:Hide()
         A.Minimap.Refresh()
     end)
-    frame:SetScript("OnShow", function() A.Minimap.Refresh() end)
+    frame:SetScript("OnShow", function() E.Place(); A.Minimap.Refresh() end)
+    for _, event in ipairs({ "ADDON_LOADED", "PLAYER_LOGIN", "PLAYER_REGEN_ENABLED", "UI_SCALE_CHANGED" }) do
+        frame:RegisterEvent(event)
+    end
+    frame:SetScript("OnEvent", function()
+        if E.placementPending then return end
+        E.placementPending = true
+        C_Timer.After(0, function() E.placementPending = nil; E.Place() end)
+    end)
     UISpecialFrames[#UISpecialFrames + 1] = "ApogeeHealsBindingEditor"
 end
