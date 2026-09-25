@@ -170,7 +170,7 @@ design requires explicit agreement; settings report the unavailable feature.
 
 ## Healing Mouse placement
 
-With Keybinds available, Healing Mouse opens flush to the right of its Weapons
+With Keybinds available, Healing Mouse opens eight logical pixels to the right of its Weapons
 header with aligned tops. The optional anchor follows the Weapons position even
 when its configuration panel is hidden; opening Heals does not show Keybinds.
 Without that anchor, Healing Mouse opens centered. Dragging its header overrides

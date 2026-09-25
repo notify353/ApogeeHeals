@@ -65,8 +65,8 @@ Focus audio request. Earlier pending entries remain detailed regression checklis
 
 ## Healing Mouse placement (live acceptance pending)
 
-- With Keybinds configuration visible, open Healing Mouse: its header must touch
-  the Weapons header's right edge with aligned tops and no horizontal gap.
+- With Keybinds configuration visible, open Healing Mouse: its header must sit
+  eight logical pixels right of the Weapons header, with aligned tops.
 - Move Weapons and confirm the default dock follows. Hide Keybinds configuration
   and confirm Heals remains usable. With Keybinds absent, confirm centered fallback.
 - Drag Healing Mouse, close/reopen/reload, and confirm custom placement survives

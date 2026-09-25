@@ -11,7 +11,7 @@
   resize/zoning; historical saved angles are retained but ignored.
 
 - Default Healing Mouse to the right edge of the optional same-family Keybinds
-  Weapons header with aligned tops and no gap. Preserve manual placement per
+  Weapons header with aligned tops and an eight-pixel gap. Preserve manual placement per
   character; use centered standalone placement when the anchor is unavailable.
 
 - Fade each row and show OUT OF RANGE only when the exact applied unmodified

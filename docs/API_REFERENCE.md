@@ -43,7 +43,7 @@ review and current-source execution, not a claim of byte-identical exports.
 ## Optional editor anchor
 
 Healing Mouse can anchor TOPLEFT to the public ApogeeKeybindsWeaponsHeader
-TOPRIGHT at zero offsets. The existing Keybinds header retains its own lifecycle;
+TOPRIGHT at x=8, y=0. The existing Keybinds header retains its own lifecycle;
 Heals neither reads its private namespace/storage nor changes its visibility.
 Central generation explicitly rewrites this foreign identity to the DEV header
 for the DEV consumer. Missing/inaccessible anchor falls back to center; queued

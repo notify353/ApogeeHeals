@@ -23,7 +23,7 @@ function E.Place()
     -- Central DEV generation rewrites this explicitly audited cross-addon identity.
     local header = _G["ApogeeKeybindsWeaponsHeader"]
     if A.Access.Readable(header) and type(header) == "table" then
-        E.frame:SetPoint("TOPLEFT", header, "TOPRIGHT", 0, 0)
+        E.frame:SetPoint("TOPLEFT", header, "TOPRIGHT", 8, 0)
     else E.frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0) end
 end
 function E.StopMoving()

@@ -12,7 +12,7 @@ end
 local m,a,e=setup(nil,true)
 local header=_G[headerName]
 assert(e.frame.point[1]=="TOPLEFT" and e.frame.point[2]==header
-    and e.frame.point[3]=="TOPRIGHT" and e.frame.point[4]==0 and e.frame.point[5]==0)
+    and e.frame.point[3]=="TOPRIGHT" and e.frame.point[4]==8 and e.frame.point[5]==0)
 header:Hide();e.Close();e.Open()
 assert(e.frame.shown and not header.shown and e.frame.point[2]==header)
 -- Default docking does not write saved coordinates or copy Keybinds state.
