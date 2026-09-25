@@ -14,15 +14,20 @@ assert(button.width==32 and button.height==32 and button.parent==Minimap)
 assert(button.strata=="MEDIUM" and button.level==Minimap:GetFrameLevel()+20)
 assert(button.drags[1]=="RightButton" and #button.drags==1)
 assert(button.point[1]=="CENTER" and button.point[2]==Minimap and button.point[3]=="CENTER")
-close(button.point[4],110*math.cos(math.rad(260)));close(button.point[5],110*math.sin(math.rad(260)))
+close(button.point[4],90*math.cos(math.rad(260)));close(button.point[5],90*math.sin(math.rad(260)))
 assert(a.db.minimapAngle==nil and button.scripts.OnUpdate==nil)
 for _, size in ipairs({{120,120},{140,140},{200,200},{120,200},{200,120},{320,100}}) do
     Minimap.width,Minimap.height=unpack(size)
+    local radius=math.max(size[1],size[2])/2+20
+    for _, angle in ipairs({0,17,45,90,135,180,190,225,260,270,315,359}) do
+        assert(M.Position(angle));local x,y=button.point[4],button.point[5]
+        close(math.sqrt(x*x+y*y),radius)
+        close(x,radius*math.cos(math.rad(angle)));close(y,radius*math.sin(math.rad(angle)))
+    end
     local positions={}
     for _, angle in ipairs({190,225,260}) do
         assert(M.Position(angle)); local x,y=button.point[4],button.point[5]
-        assert(math.abs(x)>=size[1]/2+20-0.000001 or math.abs(y)>=size[2]/2+20-0.000001)
-        assert(math.sqrt(x*x+y*y)>=110-0.000001)
+        close(math.sqrt(x*x+y*y),radius)
         positions[#positions+1]={x,y}
     end
     for i=1,3 do for j=i+1,3 do
@@ -39,7 +44,7 @@ Minimap.width=140;Minimap.height=0/0;assert(not M.Position() and button.point==o
 Minimap.height=math.huge;assert(not M.Position() and button.point==old)
 Minimap.height=140;Minimap.scripts.OnSizeChanged(Minimap)
 assert(resizes()==1 and button.point~=old)
-print("PASS shared default cluster outside square/rectangular bounds, nonoverlap, finite dimensions and resize hook")
+print("PASS circular constant-radius orbit and default nonoverlap across sizes/rectangles, finite dimensions and resize hook")
 
 local opened=0;a.Settings.category={GetID=function() return 123 end}
 Settings.OpenToCategory=function(id) assert(id==123);opened=opened+1 end
@@ -49,7 +54,7 @@ Minimap.scale=0.5;m.cursorX=(500+100)*0.5;m.cursorY=500*0.5
 button.scripts.OnDragStart(button,"LeftButton");assert(not M.dragging)
 button.scripts.OnDragStart(button,"RightButton")
 assert(M.dragging and button.scripts.OnUpdate and not GameTooltip.shown)
-close(a.db.minimapAngle,0);close(button.point[4],110);close(button.point[5],0)
+close(a.db.minimapAngle,0);close(button.point[4],90);close(button.point[5],0)
 Minimap.scale=2;m.cursorX=500*2;m.cursorY=(500+100)*2;button.scripts.OnUpdate()
 close(a.db.minimapAngle,90)
 button.scripts.OnDragStop();assert(not M.dragging and not button.scripts.OnUpdate)
@@ -62,7 +67,7 @@ button.scripts.OnDragStart(button,"RightButton");button.scripts.OnMouseUp(button
 assert(not M.dragging and not button.scripts.OnUpdate)
 button.scripts.OnClick(button,"RightButton");assert(opened==3)
 local saved=a.db;m,a=setup(saved);M,button=a.Minimap,a.Minimap.button
-assert(a.db.minimapAngle==90);close(button.point[4],0);close(button.point[5],110)
+assert(a.db.minimapAngle==90);close(button.point[4],0);close(button.point[5],90)
 for _, angle in ipairs({135,17.5,-30,1080,1e8}) do
     local restored=a.Storage.Open({version=3,minimapAngle=angle})
     assert(restored.minimapAngle==angle)

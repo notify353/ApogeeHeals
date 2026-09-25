@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Correct minimap dragging to a smooth circular orbit using half the larger map
+  dimension plus 20 pixels; preserve default and user-dragged angles.
 - Place the minimap button outside the rim at the shared Heals default of 260
   degrees; right-drag to persist an angle per character. Preserve artwork and
   clicks, suppress clicks after dragging, and adapt to map resize/UI scaling.

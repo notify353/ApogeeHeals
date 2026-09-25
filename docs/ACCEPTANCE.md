@@ -55,7 +55,9 @@ Focus audio request. Earlier pending entries remain detailed regression checklis
 
 - Minimap placement/dragging (new, live acceptance pending): verify the 260-degree
   default sits outside the minimap beside Tank/Keybinds without overlap; check
-  square/round/rectangular resized maps and UI scaling. Right-drag and reload to
+  round/resized/rectangular maps and UI scaling. Drag through axes, diagonals and
+  intermediate angles: the orbit must stay circular with constant radius, never
+  trace a square. Right-drag and reload to
   retain placement. Left-click still toggles bindings; ordinary right-click still
   opens Heals settings. Drag release must not open settings, and the next fresh
   click must work. Combat, zoning and hiding cancel dragging without losing the

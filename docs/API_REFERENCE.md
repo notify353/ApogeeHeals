@@ -50,8 +50,8 @@ review and current-source execution, not a claim of byte-identical exports.
   unless its public finite integer permits the shared +20 level offset.
   RegisterForDrag("RightButton") activates temporary
   OnUpdate sampling. HookScript("OnSizeChanged") preserves existing map handlers.
-  Placement uses expanded rectangular bounds (half-size + 20), minimum radius
-  110 and default angle 260. Only actual valid drag updates persist minimapAngle.
+  Placement uses a constant circular radius (half the larger dimension + 20)
+  and default angle 260. Only actual valid drag updates persist minimapAngle.
   Resize/world/scale/combat-exit events refresh position without permanent polling;
   combat, hiding and leaving the world cancel drag sampling and owned tooltips.
 

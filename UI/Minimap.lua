@@ -21,10 +21,7 @@ function M.Position(angle)
     if not finite(angle) then angle = finite(A.db.minimapAngle) and A.db.minimapAngle or 260 end
     local rad = math.rad(angle % 360)
     local c, s = math.cos(rad), math.sin(rad)
-    local hw, hh = width / 2 + 20, height / 2 + 20
-    local rx = math.abs(c) < 0.000001 and math.huge or hw / math.abs(c)
-    local ry = math.abs(s) < 0.000001 and math.huge or hh / math.abs(s)
-    local radius = math.max(110, math.min(rx, ry))
+    local radius = math.max(width, height) / 2 + 20
     local x, y = radius * c, radius * s
     if not finite(x) or not finite(y) then return false end
     M.button:SetFrameLevel(level + 20)

@@ -50,8 +50,8 @@ healing bindings. Its border turns gold while the editor is open. Right-click
 opens Heals settings. **Right-drag** moves it around the outside rim and saves
 the angle per character. The default is 260 degrees, beside the other Apogee
 buttons; defaults are never written over explicit saved placements. The orbit
-uses the minimap's expanded rectangular bounds, including square or resized
-maps, with a minimum radius of 110 pixels. It updates on map resize and UI scale
+is circular, with radius half the larger minimap dimension plus 20 pixels,
+including resized or rectangular maps. It updates on map resize and UI scale
 changes. The button locks during combat. The existing
 **Options > AddOns > Apogee Heals > Edit healing bindings** shortcut also works.
 Drop a learned
