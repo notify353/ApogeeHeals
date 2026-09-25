@@ -46,7 +46,9 @@ review and current-source execution, not a claim of byte-identical exports.
   SimpleFrame.GetEffectiveScale and SimpleScriptRegion.GetCenter supply the
   minimap-local conversion. GetCenter may return nothing or secret coordinates;
   all cursor/center/scale/dimension inputs are checked for public finite values
-  before calculation. RegisterForDrag("RightButton") activates temporary
+  before calculation. GetFrameLevel is also aspect-secret: placement defers
+  unless its public finite integer permits the shared +20 level offset.
+  RegisterForDrag("RightButton") activates temporary
   OnUpdate sampling. HookScript("OnSizeChanged") preserves existing map handlers.
   Placement uses expanded rectangular bounds (half-size + 20), minimum radius
   110 and default angle 260. Only actual valid drag updates persist minimapAngle.

@@ -16,6 +16,8 @@ function M.Position(angle)
     if not M.button or M.suspended or InCombatLockdown() then return false end
     local width, height = Minimap:GetWidth(), Minimap:GetHeight()
     if not finite(width) or not finite(height) or width <= 0 or height <= 0 then return false end
+    local level = Minimap:GetFrameLevel()
+    if not finite(level) or level < 0 or level % 1 ~= 0 or not finite(level + 20) then return false end
     if not finite(angle) then angle = finite(A.db.minimapAngle) and A.db.minimapAngle or 260 end
     local rad = math.rad(angle % 360)
     local c, s = math.cos(rad), math.sin(rad)
@@ -25,6 +27,7 @@ function M.Position(angle)
     local radius = math.max(110, math.min(rx, ry))
     local x, y = radius * c, radius * s
     if not finite(x) or not finite(y) then return false end
+    M.button:SetFrameLevel(level + 20)
     M.button:ClearAllPoints(); M.button:SetPoint("CENTER", Minimap, "CENTER", x, y)
     return true
 end
@@ -54,7 +57,6 @@ function M.Create()
     local button = CreateFrame("Button", "ApogeeHealsMinimapButton", Minimap)
     M.button = button; button:SetSize(32, 32)
     button:SetFrameStrata("MEDIUM")
-    button:SetFrameLevel(Minimap:GetFrameLevel() + 20)
     local icon = button:CreateTexture(nil, "ARTWORK")
     icon:SetSize(20, 20); icon:SetPoint("CENTER", 0, 0)
     icon:SetTexture("Interface/Icons/Spell_Holy_Heal")

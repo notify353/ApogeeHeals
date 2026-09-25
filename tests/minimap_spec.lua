@@ -31,6 +31,9 @@ for _, size in ipairs({{120,120},{140,140},{200,200},{120,200},{200,120},{320,10
 end
 assert(a.db.minimapAngle==nil)
 local old=button.point;Minimap.width=0;assert(not M.Position() and button.point==old)
+Minimap.width=140;Minimap.level=m.Secret();assert(not M.Position() and button.point==old)
+Minimap.level=math.huge;assert(not M.Position() and button.point==old)
+Minimap.level=1
 Minimap.width=m.Secret();assert(not M.Position() and button.point==old)
 Minimap.width=140;Minimap.height=0/0;assert(not M.Position() and button.point==old)
 Minimap.height=math.huge;assert(not M.Position() and button.point==old)
@@ -77,7 +80,12 @@ end
 drag();local angle=a.db.minimapAngle;old=button.point
 m.cursorX=m.Secret();button.scripts.OnUpdate();assert(a.db.minimapAngle==angle and button.point==old)
 m.cursorX=400;Minimap.centerX=nil;button.scripts.OnUpdate();assert(a.db.minimapAngle==angle)
+Minimap.centerX=m.Secret();button.scripts.OnUpdate();assert(a.db.minimapAngle==angle)
 Minimap.centerX=500;Minimap.scale=0;button.scripts.OnUpdate();assert(a.db.minimapAngle==angle)
+local scaleGetter=Minimap.GetEffectiveScale
+Minimap.GetEffectiveScale=function() return m.Secret() end
+button.scripts.OnUpdate();assert(a.db.minimapAngle==angle)
+Minimap.GetEffectiveScale=scaleGetter
 Minimap.scale=1;m.cursorX,m.cursorY=500,500;button.scripts.OnUpdate();assert(a.db.minimapAngle==angle)
 m.combat=true;m.Event("PLAYER_REGEN_DISABLED")
 assert(not M.dragging and button.scripts.OnUpdate==nil and not button.enabled)
