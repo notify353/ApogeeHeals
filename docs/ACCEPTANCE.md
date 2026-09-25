@@ -51,31 +51,17 @@ Focus audio request. Earlier pending entries remain detailed regression checklis
 - Existing bindings and position survive schema migration. Tank's files and
   saved data remain untouched. Source/mock checks do not establish live behavior.
 
-## Purify candidate (required live gate, unresolved)
+## Purify (live failure; requested feature unresolved)
 
-- With Purify actually learned on a Paladin, reload outside combat. Heals
-  settings must report a configured native control, not an initialization or
-  capability failure. No Purify icon/hit target should exist on unpoisoned rows.
-  Its 12-pixel icon belongs in the existing left-side action strip after visible
-  buff reminders with 14-pixel spacing; verify no reminder/overflow overlap.
-  Combat freezes its last safe slot while ordinary buff prompts disappear.
-  Its native aura tooltip currently describes the poison, not the Purify spell.
-- The essential live probe: while in combat with poison on a known self/party
-  unit, confirm only that unit's row gains the Purify icon; release Left once on
-  it and confirm exactly one Purify cast on that fixed recipient, poison removal
-  and icon disappearance. The selected target must not change, and no other
-  underlying UI/world action or blocked-action error may occur. This proves the
-  composed native AuraButton/secure-click path, which mocks cannot establish.
-- Repeat for self and party1-party4, both key-down preferences, multiple poison
-  auras, ordinary disease-only/no-poison state, roster replacement, death,
-  offline/out-of-range targets, combat entry/exit and reload. Modified/right
-  clicks must not cast. Preview disables hosts. Unlearned Purify or missing
-  native templates must not produce fallback actions or invisible hit areas.
-- Intrinsic UntrustedScriptExecution/AlwaysPropagateInput restrictions are
-  present in the matching export. If they prevent the requested click or cause
-  unwanted propagation, record that failure and keep combat cleansing unresolved.
-  Do not remove restrictions or substitute an indicator-only/static button
-  without agreement. Release acceptance remains held until this gate is resolved.
+- The 70009 live candidate failed with five forbidden OnClick replacement
+  warnings from SecureTemplates.xml:8. Do not repeat that rejected composition.
+- After corrective DEV installation, reload outside combat and confirm those
+  warnings no longer appear; no Purify icon or hit target is created. Confirm
+  existing Might reminders/tooltips and circular minimap behavior still work.
+- Offline regression checks establish zero attempted construction and preserved
+  buff layout, not live correction acceptance. The requested poison-triggered,
+  fixed-unit combat cast remains blocked. An alternative visible-action design
+  needs explicit agreement; release acceptance remains held.
 
 ## Existing frame acceptance
 

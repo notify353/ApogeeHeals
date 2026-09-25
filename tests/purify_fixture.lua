@@ -21,45 +21,20 @@ function F.New(options)
     if options.noTemplates then C_XMLUtil = nil end
     if options.secretTemplates then C_XMLUtil.GetTemplateInfo=function() return m.InaccessibleTable() end end
     local createFrame = CreateFrame
-    m.cleanseContainers = {}
+    m.cleanseContainers, m.xmlWarnings = {}, 0
     CreateFrame = function(kind, name, parent, template)
-        local frame=createFrame(kind,name,parent,template)
-        if template=="CustomAuraContainerTemplate" then
-            m.cleanseContainers[#m.cleanseContainers+1]=frame
-            frame.AddAuraSlot=function(self,key,filter,description)
-                assert(not m.combat and key=="poison" and filter=="HARMFUL")
-                assert(description.templateNames[1]=="SecureActionButtonTemplate")
-                self.description=description
-                local button=createFrame("AuraButton",nil,self,"SecureActionButtonTemplate")
-                self.nativeButton=button -- Only the mock native container retains this handle.
-                button.IsProtected=function() return not options.unprotected end
-                button.SetCancelAuraButtons=function(_,value) assert(value==nil) end
-                button.SetTooltipAnchorPoint=function(_,value) assert(value=="ANCHOR_RIGHT") end
-                description.initializeFrame(button)
-                button.shown=false
-                -- Simulate access restrictions after initialization. Addon code
-                -- must never inspect/mutate the native button after handoff.
-                for _, method in ipairs({"SetAttribute","GetAttribute","SetPoint","SetSize","IsShown",
-                    "Show","Hide","SetShown","SetScript","RegisterForClicks","IsProtected"}) do
-                    button[method]=function() error("tainted access to native-owned aura button") end
-                end
-            end
-            frame.SetUnit=function(self,unit)
-                assert(not m.combat and not self.nativeUnit);self.nativeUnit=unit
-            end
-            frame.SetEnabled=function(self,enabled) assert(not m.combat);self.nativeEnabled=enabled end
+        local frame = createFrame(kind, name, parent, template)
+        if template == "CustomAuraContainerTemplate" then
+            m.cleanseContainers[#m.cleanseContainers + 1] = frame
+            -- Real XML reports a warning without throwing a Lua error. A pcall
+            -- around construction cannot establish that secure composition works.
+            frame.AddAuraSlot = function() m.xmlWarnings = m.xmlWarnings + 1 end
+            frame.SetUnit = function() end
+            frame.SetEnabled = function() end
         end
         return frame
     end
     local a=m.Load();m.Event("ADDON_LOADED","ApogeeHeals");m.Flush()
-    function m.NativePoison(unit,dispelType)
-        for _, container in ipairs(m.cleanseContainers) do
-            if container.nativeUnit==unit then
-                -- Trusted-engine simulation, never a public addon aura getter.
-                container.nativeButton.shown=container.description.candidateFilters.includeDispelTypes[dispelType] == true
-            end
-        end
-    end
     return m,a
 end
 return F

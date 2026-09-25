@@ -37,57 +37,19 @@ assert(frame.shown)
 env.CustomAuraButtonPrivateMixin.ApplyVisibility(frame,"party1",nil)
 assert(not frame.shown)
 
--- Exact native frame-provider ordering: public initialization happens before
--- access restrictions and initial native display. No addon script replaces it.
-env.AuraContainerCustomFrameProviderMixin={}
-local phase=0
-local object={GetObjectTable=function(self)return self end,
-    UpdateAuraDisplay=function() assert(phase==3);phase=4 end}
-env.CreateFrameOutbound=function(kind,_,_,templates)
-    assert(kind=="AuraButton" and templates=="CustomAuraButtonTemplate, SecureActionButtonTemplate")
-    assert(phase==0);phase=1;return object
-end
-env.securecallfunction=function(fn,...) return fn(...) end
-env.AuraContainerUtil.ApplyAccessRestrictions=function(button,flags)
-    assert(button==object and phase==2 and flags=="native restrictions");phase=3
-end
-execute(definition(read("Blizzard_AuraContainer/Blizzard_AuraContainerFrameProviders.lua"),
-    "AuraContainerCustomFrameProviderMixin:CreateFrame"),env)
-local provider={ownedFrames={},availableFrames={},accessRestrictions="native restrictions",
-    GetParent=function() return {} end,
-    GetTemplateString=function() return "CustomAuraButtonTemplate, SecureActionButtonTemplate" end,
-    initializeFrame=function(button) assert(phase==1 and button==object);phase=2 end}
-env.AuraContainerCustomFrameProviderMixin.CreateFrame(provider)
-assert(phase==4 and provider.ownedFrames[1]==object)
-print("PASS matching-export poison-only filter, native secret visibility and initialization-before-restrictions contracts")
-
-local m,a=dofile("tests/purify_fixture.lua").New()
-local secure=read("Blizzard_FrameXML/SecureTemplates.lua")
-env.SecureButton_GetAttribute=function(button,key) return button.attributes[key] end
-env.SecureButton_GetModifiedAttribute=function(button,key) return button.attributes[key.."1"] end
-local casts,recipient=0,nil
-env.CastSpellByID=function(id,unit) assert(id==1152);casts=casts+1;recipient=unit end
-env.CastSpellByName=function() error("lost exact Purify identity") end
-env.TargetUnit=function() error("Purify changed selected target") end
-local action=assert(secure:match("SECURE_ACTIONS%.spell%s*=%s*(function.-\n    end);"))
-local cast=execute("return "..action,env)
-env.OnActionButtonClick=function(button,mouse) cast(button,button.attributes.unit,mouse) end
-env.OnActionButtonPressAndHoldRelease=function() error("unexpected hold") end
-execute(definition(secure,"SecureActionButton_ShouldUseOnKeyDown").."\n"..
-    definition(secure,"SecureActionButton_OnClick"),env)
-for index,container in ipairs(m.cleanseContainers) do
-    local button=container.nativeButton
-    for _,keyDown in ipairs({false,true}) do
-        env.GetCVarBool=function() return keyDown end
-        local before=casts
-        env.SecureActionButton_OnClick(button,"LeftButton",true);assert(casts==before)
-        env.SecureActionButton_OnClick(button,"LeftButton",false)
-        assert(casts==before+1 and recipient==a.View.rows[index].unit)
-    end
-end
--- These intrinsic restrictions are material. Source tests cannot prove that
--- secure-action template composition is accepted by the real input/taint engine.
+-- Verify why composing the two intrinsic/template handlers is invalid.
+-- The actual rejection is established by the live engine warning, not this test.
 local intrinsic=read("Blizzard_AuraContainer/Blizzard_AuraButton.xml")
+local secure=read("Blizzard_FrameXML/SecureTemplates.xml")
 assert(intrinsic:find('aspect="UntrustedScriptExecution"',1,true))
 assert(intrinsic:find('aspect="AlwaysPropagateInput"',1,true))
-print("PASS matching-export Purify release action on five fixed units; live restricted-aura/input composition still unverified")
+assert(intrinsic:find('method="OnClick_Intrinsic"',1,true))
+assert(secure:find('function="SecureActionButton_OnClick"',1,true))
+local click=definition(read("Blizzard_AuraContainer/Blizzard_AuraButton.lua"),
+    "AuraButtonPrivateMixin:OnClick_Intrinsic")
+assert(click:find("CancelAuraByInstanceID",1,true))
+assert(click:find("CancelTemporaryEnchantment",1,true))
+assert(not click:find("CastSpell",1,true))
+local m,a=dofile("tests/purify_fixture.lua").New({might=true})
+assert(#a.View.rows==5 and #m.cleanseContainers==0 and m.xmlWarnings==0)
+print("PASS matching-export native poison display and conflicting intrinsic click contracts; rejected control disabled")

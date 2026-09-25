@@ -97,7 +97,7 @@ also require live acceptance. Test installations do not establish live acceptanc
 
 The addon leaves Blizzard frames and other Apogee addons alone. It does not need
 Tank, Keybinds or Party Health Bars installed. No raid/pet frames, shield/HoT overlays,
-dispel coverage beyond the Purify candidate, live range fading, health/power numbers, profiles
+dispel coverage, live range fading, health/power numbers, profiles
 or drinking countdowns.
 
 ## Learned upkeep buffs
@@ -152,37 +152,20 @@ reminder. Choices persist across reloads and relearning. The list supports up to
 there is no manual scope setting. No duration countdown, automatic casting, party chat alerts
 or shared Tank state is involved. Tank can be absent or disabled.
 
-## Purify candidate (native combat acceptance pending)
+## Purify (blocked by live native restriction)
 
-For a Paladin with Purify learned, Heals configures a poison-only native aura
-slot in each real party row's existing left-side buff/action prompt area, using
-the same 12-pixel icon and 14-pixel spacing. Outside combat it occupies the next
-slot after visible buff reminders; overflow text reserves space beyond it. The
-position freezes in combat while native visibility continues. Its artwork is the learned
-Purify icon, and its native aura tooltip describes the triggering poison.
-The native intrinsic's script restrictions prevent assuming a custom spell-tooltip
-handler is safe; the existing buff reminders retain their native spell tooltips.
-The requested behavior is one left-button release casting Purify on that fixed
-row's unit without selecting it. Modified clicks have no action. Disease alone
-does not trigger the poison indicator. Range, mana and valid-target checks stay
-with the game. Preview and unavailable/unlearned capabilities disable the hosts.
+The live 70009 client rejected the poison-triggered secure-button candidate with
+five `Cannot assign script handler for 'onclick' (cannot replace a forbidden
+script handler)` warnings from SecureTemplates.xml:8. The candidate is disabled:
+Heals no longer constructs its native aura containers, buttons or hit areas.
+Reload after installing the correction to remove the previously created frames.
+Existing buff reminders, spell tooltips and minimap behavior remain available.
 
-Blizzard's native container filters poison and controls the entire button's
-visibility, including restricted aura observations. Heals never reads harmful
-aura fields and never changes the native button after its out-of-combat setup.
-There is no permanently active invisible fallback hit area. Missing templates
-or failed secure initialization leave the control disabled; the settings panel
-reports configuration availability without exposing aura data.
-
-**This candidate is not yet verified in the live secure engine.** The exact
-70009 aura-button intrinsic restricts untrusted script execution and propagates
-input. Offline native-source tests prove the separate filtering, visibility,
-initialization and fixed-unit spell-dispatch contracts, but cannot prove their
-composition permits this click during restricted combat. Live acceptance must
-confirm poison-only appearance, one cast on the indicated unit, disappearance
-after cleansing and no blocked action or unintended underlying click. If the
-engine rejects this composition, the requested combat feature remains blocked;
-it is not silently replaced with an always-visible button or a restriction bypass.
+Poison-triggered, fixed-unit Purify during combat remains unfulfilled. Native
+poison display works independently, but its intrinsic click handler cannot be
+replaced by the secure spell-action handler. No indicator-only, permanent-button
+or invisible-hitbox substitute has been enabled. A different visible-action
+design requires explicit agreement; settings report the unavailable feature.
 
 ## Drinking limitations
 

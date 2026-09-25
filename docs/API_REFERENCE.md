@@ -167,45 +167,30 @@ review and current-source execution, not a claim of byte-identical exports.
 
 ## Optional matching-source tests
 
-### Purify native-slot candidate (70009)
+### Purify native-slot rejection (70009)
 
-`Cleansing/Runtime.lua` checks public C_XMLUtil.GetTemplateInfo results before
-requesting CustomAuraContainerTemplate/CustomAuraButtonTemplate and the standard
-SecureActionButtonTemplate. Only a Paladin whose running client validates Purify
-1152 as learned, active and helpful is configured. The single `HARMFUL` aura slot
-uses `candidateFilters.includeDispelTypes = { Poison = true }`, a documented
-option in Blizzard_CustomAuraContainer.lua. Unlike spell-ID identity filters,
-the actual AuraContainerUtil.DoesAuraPassCandidateFilters implementation applies
-this dispel-type filter even when identity filtering is disallowed for friendly
-harmful auras. No Heals code reads aura identities, dispel fields or secret state.
+Live acceptance failed: SecureTemplates.xml:8 emitted five forbidden OnClick
+replacement warnings. AuraButton's intrinsic OnClick_Intrinsic is protected by
+UntrustedScriptExecution and AlwaysPropagateInput; SecureActionButtonTemplate
+attempts to assign SecureActionButton_OnClick. Public template discovery and
+initialization hooks do not establish composability. The warning does not throw
+a Lua exception, so pcall is not a capability check for this failure.
 
-The native frame provider creates its AuraButton, invokes `initializeFrame`, then
-applies DenyTaintedAccessWhenAurasAreSecret and updates display. Initialization
-sets the standard secure action and fixed unit once, before handoff. The addon
-never retains or accesses the AuraButton afterward. The host uses native unit
-visibility for existence/death/friendliness/raid state; changes for learned-spell
-availability and preview happen only outside combat. Native ApplyVisibility
-uses secretwrap and SetShown on the entire aura button, so this is not a
-permanently clickable button with hidden artwork. Failed construction keeps
-hosts hidden, with no alternative action or secret-access fallback.
+Cleansing/Runtime.lua now only reports unavailability. It constructs no native
+aura container or secure Purify action, reads no aura state, and reserves no buff
+strip space. Existing fixed-unit buff actions are unaffected. Reload is required
+to discard frames from the failed candidate. The exact requested feature remains
+blocked, with no automatic substitute or restriction bypass.
 
-**The composed input path is unverified, not established supported behavior.**
-Blizzard_AuraButton.xml defines intrinsic ForbiddenAspects including
-UntrustedScriptExecution and AlwaysPropagateInput. ForbiddenAspectConstants
-describes script-execution restrictions and forced mouse/keypress propagation.
-The public template/initialization hooks prove configuration entry points;
-they do not prove the inherited SecureActionButtonTemplate OnClick will execute
-on this restricted intrinsic. Do not remove/override these restrictions, replace
-the native scripts, synthesize input, or infer secure-engine acceptance from
-mocked execution of SecureActionButton_OnClick. The live poison/click probe in
-ACCEPTANCE.md is a required gate before claiming the requested combat feature.
-
-Matching-source tests execute the exact poison filter, secret-visibility method,
-provider initialization/restriction order and secure fixed-unit spell release
-functions. Engine template composition, input propagation, taint/protected
-execution and server poisoning are outside their proof. If the engine rejects
-the composition, a different visible-action design needs explicit user agreement;
-this candidate must not be described as successful combat cleansing.
+Matching-export tests retain the separate native poison filter and secret display
+contracts, and check the conflicting handlers. Intrinsic OnClick only supports
+aura/enchantment cancellation. Forbidden script/input aspects propagate to child
+frames; a child button is not an established workaround. No supported secure
+poison-only visibility/action bridge was found in this export. A permanent visible
+fixed-unit action beside a native poison indicator would change the requested UI
+and needs agreement before implementation. Mocks verify zero attempted/repeated
+construction across startup, spell/world/roster events, preview and combat exit;
+they do not claim native combat cleansing acceptance.
 
 ```powershell
 pwsh ./scripts/test-local.ps1 -ForeverExportPath 'C:/Program Files (x86)/World of Warcraft/_classic_beta_/BlizzardInterfaceCode/Interface/AddOns'
