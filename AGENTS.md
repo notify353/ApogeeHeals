@@ -8,6 +8,13 @@
 - Keep fixed unit tokens; do not modify protected layout or attributes in combat.
 - No casting, profiles, extra settings or unrelated features without explicit scope.
 - Run pwsh ./scripts/test-local.ps1. Report live acceptance separately from mocks.
-- Installation, publication and releases require explicit approval. Preserve MIT notices.
+- Preserve MIT notices. Publishing, pushes and releases require separate authorization.
 
-- Standing owner authorization (2026-09-24): requests to change this addon include validated local WoW Forever installation without another installation prompt; this supersedes separate-approval requirements above for local installation only. Verify the actual Forever destination, preserve SavedVariables and unrecognized/user-modified files, keep a verified rollback backup, verify copied files and report reload needs. Do not operate or restart the game. Offline checks/installation do not establish in-game acceptance; publishing, pushes and releases remain separately authorized.
+## Local DEV installation workflow
+
+- Requested addon changes include validated local DEV installation without a separate install prompt. This replaces the earlier direct child-install workflow; never overwrite canonical PROD from this repository or a child installer.
+- The central Apogee distribution owner handles reviewed immutable child commit/file hashes in `distribution/candidate.lock.json`, aggregate checks, builds and the single installer. Do not include dirty sibling files implicitly. Docs-only commits do not change runtime pins or republish artifacts.
+- Stable authority: `C:/Dev/WoW/ApogeePartyHealthBars/distribution/DUAL_WORKFLOW.md`. Run central commands from `C:/Dev/WoW/ApogeePartyHealthBars`, not a temporary prototype worktree.
+- Central build: `python -B scripts/dual_distribution.py --sources-root C:/Dev/WoW --output <unique-artifact-dir>`.
+- Central DEV install: `python -B scripts/install_dual_distribution.py --client-root "C:/Program Files (x86)/World of Warcraft/_classic_beta_" --sources-root C:/Dev/WoW --artifacts <same-dir> --backup <unique-backup-dir> --previous-install <latest-central-transaction.json>`. Never use `--initial-retrofit` for routine development.
+- Preserve separate DEV/PROD identities and SavedVariables, unrecognized/user-modified files and verified rollback receipts. Verify installed bytes and report reload needs. Do not operate or restart the game. Offline checks and installation do not establish in-game acceptance.
