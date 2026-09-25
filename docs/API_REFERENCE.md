@@ -42,6 +42,17 @@ review and current-source execution, not a claim of byte-identical exports.
 
 ## Contracts used
 
+- InputDocumentation.GetCursorPosition returns screen coordinates;
+  SimpleFrame.GetEffectiveScale and SimpleScriptRegion.GetCenter supply the
+  minimap-local conversion. GetCenter may return nothing or secret coordinates;
+  all cursor/center/scale/dimension inputs are checked for public finite values
+  before calculation. RegisterForDrag("RightButton") activates temporary
+  OnUpdate sampling. HookScript("OnSizeChanged") preserves existing map handlers.
+  Placement uses expanded rectangular bounds (half-size + 20), minimum radius
+  110 and default angle 260. Only actual valid drag updates persist minimapAngle.
+  Resize/world/scale/combat-exit events refresh position without permanent polling;
+  combat, hiding and leaving the world cancel drag sampling and owned tooltips.
+
 - Paladin default reminders use ordinary Might candidate ranks 25291, 19838,
   19837, 19836, 19835, 19834, 19740 and Wisdom 25290, 19854, 19853, 19852,
   19850, 19742, highest first. As with existing healing defaults, every selected

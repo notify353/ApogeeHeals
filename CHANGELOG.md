@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Place the minimap button outside the rim at the shared Heals default of 260
+  degrees; right-drag to persist an angle per character. Preserve artwork and
+  clicks, suppress clicks after dragging, and adapt to map resize/UI scaling.
 - Paladins get learned Might reminders without discovery; learned Wisdom is
   available unchecked in Buff reminders. Preserve opt-outs and prior blessing
   priority, upgrade seeded ranks, and show at most one missing blessing per unit.

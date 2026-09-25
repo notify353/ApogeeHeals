@@ -45,9 +45,14 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 
 ### Healing bindings
 
-Left-click the **healing icon at the minimap's bottom-right** to open or close
+Left-click the **healing icon outside the minimap's lower edge** to open or close
 healing bindings. Its border turns gold while the editor is open. Right-click
-opens Heals settings. The button locks during combat. The existing
+opens Heals settings. **Right-drag** moves it around the outside rim and saves
+the angle per character. The default is 260 degrees, beside the other Apogee
+buttons; defaults are never written over explicit saved placements. The orbit
+uses the minimap's expanded rectangular bounds, including square or resized
+maps, with a minimum radius of 110 pixels. It updates on map resize and UI scale
+changes. The button locks during combat. The existing
 **Options > AddOns > Apogee Heals > Edit healing bindings** shortcut also works.
 Drop a learned
 friendly spell from the player spellbook onto one of fifteen mouse/modifier slots.
@@ -208,7 +213,8 @@ See docs/API_REFERENCE.md for matching-source authority and optional native
 contract tests. Mocked engine behavior does not establish live combat safety.
 
 After a central build, run `lua tests/generated_dev.lua <ApogeeHealsDev-root>`
-against its generated child folder for buff discovery/defaults/tooltips under
+against its generated child folder for buff discovery/defaults/tooltips and
+minimap placement/dragging under
 the real DEV identity. The harness mocks admission as granted; central checks
 separately own admission, pin hashes and distribution isolation.
 

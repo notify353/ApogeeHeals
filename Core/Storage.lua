@@ -39,5 +39,8 @@ function A.Storage.Open(saved)
             end
         end
     end
-    return { version = 3, position = { x = position.x, y = position.y }, bindings = bindings, buffs = buffs }
+    local angle = type(saved) == "table" and saved.minimapAngle
+    if type(angle) ~= "number" or angle ~= angle or math.abs(angle) >= math.huge then angle = nil end
+    return { version = 3, position = { x = position.x, y = position.y }, bindings = bindings, buffs = buffs,
+        minimapAngle = angle }
 end

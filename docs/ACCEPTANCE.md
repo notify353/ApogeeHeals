@@ -53,6 +53,14 @@ Focus audio request. Earlier pending entries remain detailed regression checklis
 
 ## Existing frame acceptance
 
+- Minimap placement/dragging (new, live acceptance pending): verify the 260-degree
+  default sits outside the minimap beside Tank/Keybinds without overlap; check
+  square/round/rectangular resized maps and UI scaling. Right-drag and reload to
+  retain placement. Left-click still toggles bindings; ordinary right-click still
+  opens Heals settings. Drag release must not open settings, and the next fresh
+  click must work. Combat, zoning and hiding cancel dragging without losing the
+  saved angle or leaving update callbacks. Invalid map geometry defers placement.
+
 The owner approved test installation and confirmed incoming heals visible in game.
 Visual iterations were reviewed during testing; the complete checklist below remains
 pending. Requested addon changes include verified local installation. Local mocks and export checks

@@ -37,6 +37,7 @@ function M.New()
     function methods:GetEffectiveScale() return self.scale * (self.parent and self.parent:GetEffectiveScale() or 1) end
     function methods:GetWidth() return self.width end
     function methods:GetHeight() return self.height end
+    function methods:GetCenter() return self.centerX, self.centerY end
     function methods:GetLeft() return self.left or 300 end
     function methods:GetTop() return self.top or 400 end
     function methods:GetBottom() return self.bottom or 402 end
@@ -60,6 +61,10 @@ function M.New()
     function methods:RegisterForDrag(...) self.drags = {...} end
     function methods:EnableMouse(v) self.mouse = v end
     function methods:SetScript(k, v) self.scripts[k] = v end
+    function methods:HookScript(k, v)
+        local previous = self.scripts[k]
+        self.scripts[k] = function(...) if previous then previous(...) end; v(...) end
+    end
     function methods:RegisterEvent(e) self.events[e] = true end
     function methods:UnregisterEvent(e) self.events[e] = nil end
     function methods:UnregisterAllEvents() self.events = {} end
@@ -89,6 +94,8 @@ function M.New()
     function methods:SetEnabled(v) self.enabled = v end
     UIParent = object("Frame"); UIParent.width, UIParent.height = 1920, 1080
     Minimap = object("Frame", nil, UIParent)
+    Minimap.width, Minimap.height, Minimap.centerX, Minimap.centerY = 140, 140, 500, 500
+    GetCursorPosition = function() return m.cursorX, m.cursorY end
     CreateFrame = object
     InCombatLockdown = function() return m.combat end
     GetTime = function() return m.time or 0 end
@@ -181,7 +188,9 @@ function M.New()
     UISpecialFrames = {}
     GetCursorInfo = function() if m.cursor then return unpack(m.cursor) end end
     ClearCursor = function() m.cursor = nil end
-    GameTooltip = { Hide=function() end, Show=function() end, SetOwner=function() end,
+    GameTooltip = { Hide=function(self) self.shown=false;self.owner=nil end,
+        Show=function(self) self.shown=true end, SetOwner=function(self,owner) self.owner=owner end,
+        IsOwned=function(self,owner) return self.owner==owner end,
         SetText=function() end, AddLine=function() end }
     function m.Flush()
         local queue = m.timers; m.timers = {}

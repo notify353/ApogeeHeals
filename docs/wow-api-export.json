@@ -16,6 +16,8 @@
     "Blizzard_APIDocumentationGenerated/SimpleStatusBarAPIDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/SimpleFontStringAPIDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/SimpleFrameAPIDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/InputDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/SimpleScriptRegionAPIDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/CurveUtilDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/LuaColorCurveObjectAPIDocumentation.lua",
     "Blizzard_FrameXML/SecureTemplates.lua",
