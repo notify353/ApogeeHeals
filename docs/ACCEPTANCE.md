@@ -51,6 +51,32 @@ Focus audio request. Earlier pending entries remain detailed regression checklis
 - Existing bindings and position survive schema migration. Tank's files and
   saved data remain untouched. Source/mock checks do not establish live behavior.
 
+## Purify candidate (required live gate, unresolved)
+
+- With Purify actually learned on a Paladin, reload outside combat. Heals
+  settings must report a configured native control, not an initialization or
+  capability failure. No Purify icon/hit target should exist on unpoisoned rows.
+  Its 12-pixel icon belongs in the existing left-side action strip after visible
+  buff reminders with 14-pixel spacing; verify no reminder/overflow overlap.
+  Combat freezes its last safe slot while ordinary buff prompts disappear.
+  Its native aura tooltip currently describes the poison, not the Purify spell.
+- The essential live probe: while in combat with poison on a known self/party
+  unit, confirm only that unit's row gains the Purify icon; release Left once on
+  it and confirm exactly one Purify cast on that fixed recipient, poison removal
+  and icon disappearance. The selected target must not change, and no other
+  underlying UI/world action or blocked-action error may occur. This proves the
+  composed native AuraButton/secure-click path, which mocks cannot establish.
+- Repeat for self and party1-party4, both key-down preferences, multiple poison
+  auras, ordinary disease-only/no-poison state, roster replacement, death,
+  offline/out-of-range targets, combat entry/exit and reload. Modified/right
+  clicks must not cast. Preview disables hosts. Unlearned Purify or missing
+  native templates must not produce fallback actions or invisible hit areas.
+- Intrinsic UntrustedScriptExecution/AlwaysPropagateInput restrictions are
+  present in the matching export. If they prevent the requested click or cause
+  unwanted propagation, record that failure and keep combat cleansing unresolved.
+  Do not remove restrictions or substitute an indicator-only/static button
+  without agreement. Release acceptance remains held until this gate is resolved.
+
 ## Existing frame acceptance
 
 - Minimap placement/dragging (new, live acceptance pending): verify the 260-degree

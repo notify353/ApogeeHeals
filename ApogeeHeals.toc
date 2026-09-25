@@ -14,6 +14,7 @@ Bindings/Defaults.lua
 Buffs/Defaults.lua
 Buffs/Runtime.lua
 Buffs/View.lua
+Cleansing/Runtime.lua
 UI/Style.lua
 Core/UnitAPI.lua
 Drinking/Runtime.lua

@@ -56,6 +56,7 @@ function B.Paint(row, missing)
     end
     row.buffOverflow:SetText(#missing > 4 and "+" .. (#missing - 4) or "")
     row.buffOverflow:SetShown(#missing > 4)
+    A.Cleansing.Place(row, math.min(#missing, 4))
 end
 function B.RefreshPicker()
     if not B.picker then return end

@@ -167,6 +167,46 @@ review and current-source execution, not a claim of byte-identical exports.
 
 ## Optional matching-source tests
 
+### Purify native-slot candidate (70009)
+
+`Cleansing/Runtime.lua` checks public C_XMLUtil.GetTemplateInfo results before
+requesting CustomAuraContainerTemplate/CustomAuraButtonTemplate and the standard
+SecureActionButtonTemplate. Only a Paladin whose running client validates Purify
+1152 as learned, active and helpful is configured. The single `HARMFUL` aura slot
+uses `candidateFilters.includeDispelTypes = { Poison = true }`, a documented
+option in Blizzard_CustomAuraContainer.lua. Unlike spell-ID identity filters,
+the actual AuraContainerUtil.DoesAuraPassCandidateFilters implementation applies
+this dispel-type filter even when identity filtering is disallowed for friendly
+harmful auras. No Heals code reads aura identities, dispel fields or secret state.
+
+The native frame provider creates its AuraButton, invokes `initializeFrame`, then
+applies DenyTaintedAccessWhenAurasAreSecret and updates display. Initialization
+sets the standard secure action and fixed unit once, before handoff. The addon
+never retains or accesses the AuraButton afterward. The host uses native unit
+visibility for existence/death/friendliness/raid state; changes for learned-spell
+availability and preview happen only outside combat. Native ApplyVisibility
+uses secretwrap and SetShown on the entire aura button, so this is not a
+permanently clickable button with hidden artwork. Failed construction keeps
+hosts hidden, with no alternative action or secret-access fallback.
+
+**The composed input path is unverified, not established supported behavior.**
+Blizzard_AuraButton.xml defines intrinsic ForbiddenAspects including
+UntrustedScriptExecution and AlwaysPropagateInput. ForbiddenAspectConstants
+describes script-execution restrictions and forced mouse/keypress propagation.
+The public template/initialization hooks prove configuration entry points;
+they do not prove the inherited SecureActionButtonTemplate OnClick will execute
+on this restricted intrinsic. Do not remove/override these restrictions, replace
+the native scripts, synthesize input, or infer secure-engine acceptance from
+mocked execution of SecureActionButton_OnClick. The live poison/click probe in
+ACCEPTANCE.md is a required gate before claiming the requested combat feature.
+
+Matching-source tests execute the exact poison filter, secret-visibility method,
+provider initialization/restriction order and secure fixed-unit spell release
+functions. Engine template composition, input propagation, taint/protected
+execution and server poisoning are outside their proof. If the engine rejects
+the composition, a different visible-action design needs explicit user agreement;
+this candidate must not be described as successful combat cleansing.
+
 ```powershell
 pwsh ./scripts/test-local.ps1 -ForeverExportPath 'C:/Program Files (x86)/World of Warcraft/_classic_beta_/BlizzardInterfaceCode/Interface/AddOns'
 ```

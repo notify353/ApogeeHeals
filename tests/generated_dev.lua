@@ -9,6 +9,10 @@ end
 local fixture = read("tests/mock.lua"):gsub("ApogeeHeals", name)
 local realDofile = dofile
 dofile = function(path)
+    if path == "tests/purify_fixture.lua" then
+        local data = read(path):gsub("ApogeeHeals", name)
+        return assert(loadstring(data, "@" .. path .. " (DEV fixture)"))()
+    end
     if path ~= "tests/mock.lua" then return realDofile(path) end
     local Mock = assert(loadstring(fixture, "@tests/mock.lua (DEV fixture)"))()
     local new = Mock.New
@@ -28,9 +32,10 @@ dofile = function(path)
     end
     return Mock
 end
-for _, path in ipairs({ "tests/buffs_spec.lua", "tests/paladin_buffs_spec.lua", "tests/minimap_spec.lua" }) do
+for _, path in ipairs({ "tests/buffs_spec.lua", "tests/paladin_buffs_spec.lua", "tests/minimap_spec.lua",
+    "tests/purify_spec.lua", "tests/native_purify_spec.lua" }) do
     local fixtureTest = read(path):gsub("ApogeeHeals", name)
     assert(loadstring(fixtureTest, "@" .. path .. " (DEV fixture)"))()
 end
 dofile = realDofile
-print("PASS generated DEV buffs, native tooltips and minimap placement/drag scenarios")
+print("PASS generated DEV buffs, tooltips, minimap and native Purify candidate scenarios")

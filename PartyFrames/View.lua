@@ -78,6 +78,7 @@ function V.SetUnlocked(value)
     V.handle:SetShown(V.unlocked)
     A.Preview.SetShown(V.unlocked)
     for _, row in ipairs(V.rows) do row:SetAlpha(V.unlocked and 0 or 1) end
+    A.Cleansing.pending = true; A.Cleansing.Refresh()
     A.Buffs.Refresh()
 end
 local function followHandle()

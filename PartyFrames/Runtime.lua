@@ -7,7 +7,7 @@ function R.Request()
     C_Timer.After(0, function()
         R.pending = false
         if R.suspended then return end
-        A.View.Refresh(); A.Buffs.Refresh()
+        A.View.Refresh(); A.Buffs.Refresh(); A.Cleansing.Refresh()
     end)
 end
 function R.Start()
@@ -46,12 +46,14 @@ function R.Start()
                 row.status:SetText(""); row.name:Hide(); row.level:Hide(); row.drinkIcon:Hide()
             end
         elseif event == "PLAYER_REGEN_ENABLED" then
+            A.Cleansing.pending = true
             A.Bindings.Apply()
             if A.View.pendingPosition then
                 A.View.pendingPosition = nil; A.View.SavePosition()
             end
             A.View.ApplyPosition(); A.Settings.Refresh()
         elseif event == "SPELLS_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
+            A.Cleansing.pending = true
             A.BuffDefaults.pending = true
             if event == "PLAYER_ENTERING_WORLD" then
                 R.suspended, A.Buffs.suspended = nil, nil
