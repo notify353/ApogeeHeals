@@ -36,6 +36,11 @@ local function buildRow(row, preview, first)
     row.status:SetJustifyH("CENTER"); row.status:SetJustifyV("MIDDLE")
     row.status:SetTextColor(unpack(S.muted))
     row.status:SetShadowColor(0, 0, 0, 1); row.status:SetShadowOffset(1, -1)
+    row.rangeStatus = S.Text(row.nameLayer, 8)
+    row.rangeStatus:SetAllPoints(row.status)
+    row.rangeStatus:SetJustifyH("CENTER"); row.rangeStatus:SetJustifyV("MIDDLE")
+    row.rangeStatus:SetTextColor(unpack(S.muted)); row.rangeStatus:SetText("OUT OF RANGE")
+    row.rangeStatus:Hide()
     -- Smaller artwork in an inset dark frame, attached closely to the row.
     row.drinkIcon = CreateFrame("Frame", nil, row)
     row.drinkIcon:SetSize(12, 12)
@@ -80,6 +85,7 @@ function V.SetUnlocked(value)
     for _, row in ipairs(V.rows) do row:SetAlpha(V.unlocked and 0 or 1) end
     A.Cleansing.pending = true; A.Cleansing.Refresh()
     A.Buffs.Refresh()
+    if A.Runtime.driver then A.Runtime.RangePolling() end
 end
 local function followHandle()
     if InCombatLockdown() then return end
@@ -145,6 +151,22 @@ function V.Lock()
     V.SetUnlocked(false)
     if A.Settings then A.Settings.Refresh() end
 end
+function V.PaintRange(row, state)
+    local result
+    if not V.unlocked and not A.Runtime.suspended and state == "alive" and A.Bindings.rangeSpell then
+        result = A.Access.Read(C_Spell and C_Spell.IsSpellInRange, A.Bindings.rangeSpell, row.unit)
+    end
+    -- Only a public boolean false establishes out-of-range. Unknown clears stale feedback.
+    local outside = result == false
+    row.rangeStatus:SetShown(outside)
+    row:SetAlpha(V.unlocked and 0 or (outside and 0.45 or 1))
+    local showName = not outside and state ~= "missing" and state ~= "dead" and state ~= "offline"
+        and not InCombatLockdown()
+    row.name:SetShown(showName); row.level:SetShown(showName)
+end
+function V.RefreshRange()
+    for _, row in ipairs(V.rows) do V.PaintRange(row, A.UnitAPI.State(row.unit)) end
+end
 function V.Refresh()
     for _, row in ipairs(V.rows) do
         local state = A.UnitAPI.State(row.unit)
@@ -173,5 +195,6 @@ function V.Refresh()
             if state == "offline" then row.status:SetText("OFFLINE")
             elseif state == "dead" then row.status:SetText("DEAD") end
         end
+        V.PaintRange(row, state)
     end
 end

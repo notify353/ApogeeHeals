@@ -33,9 +33,9 @@ dofile = function(path)
     return Mock
 end
 for _, path in ipairs({ "tests/buffs_spec.lua", "tests/paladin_buffs_spec.lua", "tests/minimap_spec.lua",
-    "tests/purify_spec.lua", "tests/native_purify_spec.lua" }) do
+    "tests/purify_spec.lua", "tests/native_purify_spec.lua", "tests/range_spec.lua" }) do
     local fixtureTest = read(path):gsub("ApogeeHeals", name)
     assert(loadstring(fixtureTest, "@" .. path .. " (DEV fixture)"))()
 end
 dofile = realDofile
-print("PASS generated DEV buffs, tooltips, minimap and native Purify candidate scenarios")
+print("PASS generated DEV buffs, tooltips, minimap and disabled Purify and spell-range scenarios")

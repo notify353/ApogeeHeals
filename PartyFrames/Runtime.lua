@@ -10,6 +10,20 @@ function R.Request()
         A.View.Refresh(); A.Buffs.Refresh(); A.Cleansing.Refresh()
     end)
 end
+function R.RangePolling()
+    if not R.driver then return end
+    R.driver:SetScript("OnUpdate", nil)
+    R.rangeElapsed = 0
+    A.View.RefreshRange()
+    if R.suspended or A.View.unlocked or not A.Bindings.rangeSpell
+        or not C_Spell or type(C_Spell.IsSpellInRange) ~= "function" then return end
+    R.driver:SetScript("OnUpdate", function(_, elapsed)
+        R.rangeElapsed = R.rangeElapsed + elapsed
+        if R.rangeElapsed < 0.2 then return end
+        R.rangeElapsed = 0
+        A.View.RefreshRange()
+    end)
+end
 function R.Start()
     local driver = CreateFrame("Frame")
     R.driver = driver
@@ -36,6 +50,7 @@ function R.Start()
             R.suspended = true
             A.Buffs.suspended = true
             A.Buffs.Stop()
+            R.RangePolling()
             return
         elseif event == "PLAYER_REGEN_DISABLED" then
             A.Buffs.Stop()
@@ -65,5 +80,6 @@ function R.Start()
         end
         R.Request()
     end)
+    R.RangePolling()
     R.Request()
 end

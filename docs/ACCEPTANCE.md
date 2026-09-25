@@ -63,6 +63,18 @@ Focus audio request. Earlier pending entries remain detailed regression checklis
   fixed-unit combat cast remains blocked. An alternative visible-action design
   needs explicit agreement; release acceptance remains held.
 
+## Left-click range (live acceptance pending)
+
+- Assign two learned friendly spells with different ranges in turn to plain Left.
+  Move a party recipient across each spell boundary, keeping a different current
+  target. Only out-of-range rows should fade to 45% and show OUT OF RANGE.
+- Confirm player and party1-party4 recipients, learned class default/removal,
+  exact manual ranks, combat movement and deferred spellbook changes. Clicks
+  must still cast the configured spell at the fixed recipient without retargeting.
+- Confirm dead/offline/missing rows and invalid/unavailable range reads do not
+  retain an old OUT OF RANGE claim. Preview and zoning stop live range sampling.
+  Mocks cannot establish native protected-frame or restricted-result acceptance.
+
 ## Existing frame acceptance
 
 - Minimap placement/dragging (new, live acceptance pending): verify the 260-degree

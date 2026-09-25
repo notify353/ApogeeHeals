@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Fade each row and show OUT OF RANGE only when the exact applied unmodified
+  left-click spell reports a public out-of-range result for that fixed recipient.
+  Unknown/private results clear feedback; range-only sampling preserves combat actions.
+
 - Disable the rejected Purify native-button composition after the live client
   reported forbidden OnClick replacement warnings. Preserve existing buff layout
   and report the feature unavailable; poison-triggered combat Purify remains blocked.

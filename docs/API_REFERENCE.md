@@ -40,6 +40,22 @@ Relevant current signatures and native dispatch remain compatible with the
 reviewed behavior. The old manifest did not store hashes, so this is a contract
 review and current-source execution, not a claim of byte-identical exports.
 
+## Left-click spell range (70009)
+
+C_Spell.IsSpellInRange(spellIdentifier, targetUnit) returns a nullable boolean and
+accepts the explicit fixed row recipient. True means in range, false out of range,
+and nil invalid/unknown. Access.Read rejects secret/inaccessible results before
+comparison. No distance estimate, target fallback or UnitInRange substitute is used.
+EnableSpellRangeCheck/SPELL_RANGE_CHECK_UPDATE only track the current target and
+cannot supply party-row updates. A 0.2-second range-only OnUpdate samples at most
+five units without aura scans; it stops during preview/world exit or without an
+active mapped spell/API. The cached ID is the exact successfully applied plain
+left action, including learned class defaults. Deferred combat changes keep the
+installed action's ID until Apply can safely update both. Only presentation alpha
+and labels change in combat; no protected attributes/layout/visibility change.
+Unknown, dead, offline and missing recipients clear previous range feedback.
+Native range behavior and combat presentation still require live acceptance.
+
 ## Contracts used
 
 - InputDocumentation.GetCursorPosition returns screen coordinates;

@@ -97,7 +97,7 @@ also require live acceptance. Test installations do not establish live acceptanc
 
 The addon leaves Blizzard frames and other Apogee addons alone. It does not need
 Tank, Keybinds or Party Health Bars installed. No raid/pet frames, shield/HoT overlays,
-dispel coverage, live range fading, health/power numbers, profiles
+dispel coverage, health/power numbers, profiles
 or drinking countdowns.
 
 ## Learned upkeep buffs
@@ -167,6 +167,17 @@ replaced by the secure spell-action handler. No indicator-only, permanent-button
 or invisible-hitbox substitute has been enabled. A different visible-action
 design requires explicit agreement; settings report the unavailable feature.
 
+## Spell range
+
+Rows fade and show OUT OF RANGE when the exact unmodified left-click spell
+reports that recipient out of range, including the learned class default.
+Checks use each row's fixed unit, independent of the selected target. They update
+about five times a second without scanning auras. Missing, restricted or invalid
+results restore normal presentation without claiming the spell is in range.
+No mapping means no spell-range feedback. Combat keeps the actually installed
+mapping until deferred binding changes can apply safely. Native combat behavior
+still needs live confirmation.
+
 ## Drinking limitations
 
 The original addon supplies a small set of candidate Classic drink identities.
@@ -192,7 +203,7 @@ unit buttons and event lifecycle; Drinking owns recognition; Bindings owns spell
 validation and secure click assignments; UI owns style, settings and the binding
 editor. Buffs owns class-independent discovery, missing-buff icons and the watch
 list. Only an event-triggered one-shot timer is
-used for live refreshes; OnUpdate handlers run only during dragging or the visible
+used for live refreshes; OnUpdate handlers run during active spell-range sampling, dragging or the visible
 animated preview (drawing capped at twenty times per second).
 
 Unchanged buff reminders retain their secure setup; watched spell scope is

@@ -67,12 +67,14 @@ function B.Apply()
             -- Plain left targets only without an assignment or learned default. Unavailable assignments
             -- and empty modified slots must not fall through to another action.
             local fallback = button == 1 and prefix == "" and id == nil and "target" or ""
+            if prefix == "" and button == 1 then B.rangeSpell = info and id or nil end
             for _, frame in ipairs(A.View.rows) do
                 frame:SetAttribute(prefix .. "type" .. button, info and "spell" or fallback)
                 frame:SetAttribute(prefix .. "spell" .. button, info and id or nil)
             end
         end
     end
+    if A.Runtime.driver then A.Runtime.RangePolling() end
     if A.BindingEditor then A.BindingEditor.Refresh() end
 end
 function B.Put(slot, id)
