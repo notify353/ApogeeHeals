@@ -20,7 +20,7 @@ local function create(row, info)
     local host = CreateFrame("Frame", nil, row)
     host:SetSize(12, 12); host:Hide()
     row.cleanseHost = host
-    P.Place(row, 0)
+    P.Place(row, row.buffReminderCount or 0)
     row.buffOverflow:ClearAllPoints(); row.buffOverflow:SetPoint("RIGHT", row.health, "LEFT", -75, 0)
     local ok = pcall(function()
         local container = CreateFrame("AuraContainer", nil, host, "CustomAuraContainerTemplate")

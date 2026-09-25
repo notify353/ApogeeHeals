@@ -52,3 +52,15 @@ m,a=Fixture.New({unprotected=true})
 assert(a.Cleansing.failed and #m.cleanseContainers==1 and a.View.rows[1].cleanseHost.driver=="hide")
 a.Cleansing.pending=true;a.Cleansing.Refresh();assert(#m.cleanseContainers==1)
 print("PASS unavailable/unlearned/restricted/native-template failures have no active fallback hitbox")
+
+-- First native-host activation can happen after Buffs.Refresh in the same
+-- queued request (e.g. learning Purify with an existing Might reminder).
+m,a=Fixture.New({known=false,might=true})
+local player=a.View.rows[1]
+assert(player.buffReminders[1].shown and player.buffReminderCount==1 and not player.cleanseHost)
+m.known=true;m.Event("SPELLS_CHANGED");m.Flush()
+assert(player.buffReminders[1].shown and player.cleanseHost.point[4]==-17)
+m.NativePoison("player","Poison")
+assert(m.cleanseContainers[1].nativeButton.shown and player.buffReminders[1].shown)
+assert(player.buffButtons[1].point[4]==-3 and player.cleanseHost.point[4]==-17)
+print("PASS first Purify activation uses already-painted buff count without waiting for another repaint")

@@ -10,11 +10,13 @@ function F.New(options)
     Enum.SpellBookSpellBank = {Player=0}
     C_Spell.GetSpellInfo = function(id)
         if id == 1152 then return {spellID=id,name="Purify",iconID=135949} end
+        if id == 19740 and options.might then return {spellID=id,name="Might",iconID=135906} end
     end
     C_Spell.IsSpellHelpful = function() return options.helpful ~= false end
     C_Spell.IsSpellHarmful = function() return false end
     C_Spell.IsSpellPassive = function() return false end
-    C_SpellBook = {IsSpellInSpellBook=function() return m.known end, IsSpellKnown=function() return m.known end}
+    local function known(id) return (id==1152 and m.known) or (id==19740 and options.might==true) end
+    C_SpellBook = {IsSpellInSpellBook=known, IsSpellKnown=known}
     C_XMLUtil = {GetTemplateInfo=function() return {type="Frame"} end}
     if options.noTemplates then C_XMLUtil = nil end
     if options.secretTemplates then C_XMLUtil.GetTemplateInfo=function() return m.InaccessibleTable() end end
