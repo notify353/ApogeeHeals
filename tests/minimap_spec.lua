@@ -14,7 +14,7 @@ assert(button.width==32 and button.height==32 and button.parent==Minimap)
 assert(button.strata=="MEDIUM" and button.level==Minimap:GetFrameLevel()+20)
 assert(button.drags[1]=="RightButton" and #button.drags==1)
 assert(button.point[1]=="CENTER" and button.point[2]==Minimap and button.point[3]=="CENTER")
-close(button.point[4],90*math.cos(math.rad(260)));close(button.point[5],90*math.sin(math.rad(260)))
+close(button.point[4],90*math.cos(math.rad(220)));close(button.point[5],90*math.sin(math.rad(220)))
 assert(a.db.minimapAngle==nil and button.scripts.OnUpdate==nil)
 for _, size in ipairs({{120,120},{140,140},{200,200},{120,200},{200,120},{320,100}}) do
     Minimap.width,Minimap.height=unpack(size)
@@ -25,7 +25,8 @@ for _, size in ipairs({{120,120},{140,140},{200,200},{120,200},{200,120},{320,10
         close(x,radius*math.cos(math.rad(angle)));close(y,radius*math.sin(math.rad(angle)))
     end
     local positions={}
-    for _, angle in ipairs({190,225,260}) do
+    local spacing=math.max(15,math.deg(2*math.asin(math.min(1,46/(2*radius)))))
+    for _, angle in ipairs({220-spacing,220,220+spacing}) do
         assert(M.Position(angle)); local x,y=button.point[4],button.point[5]
         close(math.sqrt(x*x+y*y),radius)
         positions[#positions+1]={x,y}
@@ -54,9 +55,9 @@ Minimap.scale=0.5;m.cursorX=(500+100)*0.5;m.cursorY=500*0.5
 button.scripts.OnDragStart(button,"LeftButton");assert(not M.dragging)
 button.scripts.OnDragStart(button,"RightButton")
 assert(M.dragging and button.scripts.OnUpdate and not GameTooltip.shown)
-close(a.db.minimapAngle,0);close(button.point[4],90);close(button.point[5],0)
+assert(a.db.minimapAngle==nil);close(button.point[4],90);close(button.point[5],0)
 Minimap.scale=2;m.cursorX=500*2;m.cursorY=(500+100)*2;button.scripts.OnUpdate()
-close(a.db.minimapAngle,90)
+assert(a.db.minimapAngle==nil);close(button.point[4],0);close(button.point[5],90)
 button.scripts.OnDragStop();assert(not M.dragging and not button.scripts.OnUpdate)
 button.scripts.OnClick(button,"RightButton");assert(opened==1)
 button.scripts.OnMouseDown(button,"RightButton");button.scripts.OnClick(button,"RightButton");assert(opened==2)
@@ -67,22 +68,21 @@ button.scripts.OnDragStart(button,"RightButton");button.scripts.OnMouseUp(button
 assert(not M.dragging and not button.scripts.OnUpdate)
 button.scripts.OnClick(button,"RightButton");assert(opened==3)
 local saved=a.db;m,a=setup(saved);M,button=a.Minimap,a.Minimap.button
-assert(a.db.minimapAngle==90);close(button.point[4],0);close(button.point[5],90)
+assert(a.db.minimapAngle==nil);close(button.point[4],90*math.cos(math.rad(220)));close(button.point[5],90*math.sin(math.rad(220)))
 for _, angle in ipairs({135,17.5,-30,1080,1e8}) do
-    local restored=a.Storage.Open({version=3,minimapAngle=angle})
-    assert(restored.minimapAngle==angle)
+    m,a=setup({version=3,minimapAngle=angle});M,button=a.Minimap,a.Minimap.button
+    assert(a.db.minimapAngle==angle)
+    close(button.point[4],90*math.cos(math.rad(220)))
+    close(button.point[5],90*math.sin(math.rad(220)))
 end
-for _, angle in ipairs({0/0,math.huge,-math.huge,"135",{}}) do
-    assert(a.Storage.Open({version=3,minimapAngle=angle}).minimapAngle==nil)
-end
-assert(a.Storage.Open({version=3}).minimapAngle==nil)
-print("PASS scale-correct right drag, reload/finite-angle preservation and post-drag click suppression recovery")
+local historical=a.db.minimapAngle
+print("PASS scale-correct session drag, reload default, ignored historical angle and click suppression recovery")
 
 local function drag()
     m.cursorX,m.cursorY=400,500
     button.scripts.OnMouseDown(button,"RightButton");button.scripts.OnDragStart(button,"RightButton")
 end
-drag();local angle=a.db.minimapAngle;old=button.point
+drag();local angle=historical;old=button.point
 m.cursorX=m.Secret();button.scripts.OnUpdate();assert(a.db.minimapAngle==angle and button.point==old)
 m.cursorX=400;Minimap.centerX=nil;button.scripts.OnUpdate();assert(a.db.minimapAngle==angle)
 Minimap.centerX=m.Secret();button.scripts.OnUpdate();assert(a.db.minimapAngle==angle)
@@ -97,6 +97,7 @@ assert(not M.dragging and button.scripts.OnUpdate==nil and not button.enabled)
 Minimap.width=200;Minimap.scripts.OnSizeChanged(Minimap);assert(button.point==old)
 button.scripts.OnDragStart(button,"RightButton");assert(not M.dragging)
 m.combat=false;m.Event("PLAYER_REGEN_ENABLED");assert(button.point~=old and button.enabled)
+close(button.point[4],-120);close(button.point[5],0)
 drag();button:Hide();assert(not M.dragging and not button.scripts.OnUpdate and a.db.minimapAngle==angle)
 button:Show();drag();m.Event("PLAYER_LEAVING_WORLD")
 assert(not M.dragging and not button.scripts.OnUpdate and a.db.minimapAngle==angle)

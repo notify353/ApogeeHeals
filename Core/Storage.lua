@@ -44,8 +44,10 @@ function A.Storage.Open(saved)
             end
         end
     end
-    local angle = type(saved) == "table" and saved.minimapAngle
-    if type(angle) ~= "number" or angle ~= angle or math.abs(angle) >= math.huge then angle = nil end
+    -- Retain the historical field verbatim for compatibility; minimap placement
+    -- never initializes from it or writes session drags back to it.
+    local angle
+    if type(saved) == "table" then angle = saved.minimapAngle end
     return { version = 3, position = { x = position.x, y = position.y }, bindings = bindings, buffs = buffs,
         minimapAngle = angle, editorPosition = editorPosition }
 end

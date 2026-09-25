@@ -79,7 +79,10 @@ Native range behavior and combat presentation still require live acceptance.
   RegisterForDrag("RightButton") activates temporary
   OnUpdate sampling. HookScript("OnSizeChanged") preserves existing map handlers.
   Placement uses a constant circular radius (half the larger dimension + 20)
-  and default angle 260. Only actual valid drag updates persist minimapAngle.
+  and default angle 220. Valid drags update only a local session angle; the
+  historical minimapAngle field is preserved verbatim but never used for placement.
+  Reload resets the local angle. Shared neighboring defaults use adaptive angular
+  spacing with a minimum 46-pixel chord to avoid overlapping 32-pixel click boxes.
   Resize/world/scale/combat-exit events refresh position without permanent polling;
   combat, hiding and leaving the world cancel drag sampling and owned tooltips.
 

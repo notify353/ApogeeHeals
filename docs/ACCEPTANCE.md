@@ -88,15 +88,15 @@ Focus audio request. Earlier pending entries remain detailed regression checklis
 
 ## Existing frame acceptance
 
-- Minimap placement/dragging (new, live acceptance pending): verify the 260-degree
+- Minimap placement/dragging (new, live acceptance pending): verify the 220-degree
   default sits outside the minimap beside Tank/Keybinds without overlap; check
   round/resized/rectangular maps and UI scaling. Drag through axes, diagonals and
   intermediate angles: the orbit must stay circular with constant radius, never
-  trace a square. Right-drag and reload to
-  retain placement. Left-click still toggles bindings; ordinary right-click still
+  trace a square. Right-drag, resize and zone to retain session placement; reload
+  must restore the default cluster even when an older saved angle exists. Left-click still toggles bindings; ordinary right-click still
   opens Heals settings. Drag release must not open settings, and the next fresh
   click must work. Combat, zoning and hiding cancel dragging without losing the
-  saved angle or leaving update callbacks. Invalid map geometry defers placement.
+  session angle or leaving update callbacks. Invalid map geometry defers placement.
 
 The owner approved test installation and confirmed incoming heals visible in game.
 Visual iterations were reviewed during testing; the complete checklist below remains

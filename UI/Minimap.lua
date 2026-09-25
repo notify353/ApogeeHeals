@@ -1,6 +1,7 @@
 -- Interaction pattern adapted from Apogee Keybinds (MIT, copyright 2026 notify353).
 local _, A = ...
 local M = {}
+local sessionAngle
 A.Minimap = M
 local function finite(value)
     return A.Access.Readable(value) and type(value) == "number" and value == value and math.abs(value) < math.huge
@@ -18,7 +19,7 @@ function M.Position(angle)
     if not finite(width) or not finite(height) or width <= 0 or height <= 0 then return false end
     local level = Minimap:GetFrameLevel()
     if not finite(level) or level < 0 or level % 1 ~= 0 or not finite(level + 20) then return false end
-    if not finite(angle) then angle = finite(A.db.minimapAngle) and A.db.minimapAngle or 260 end
+    if not finite(angle) then angle = finite(sessionAngle) and sessionAngle or 220 end
     local rad = math.rad(angle % 360)
     local c, s = math.cos(rad), math.sin(rad)
     local radius = math.max(width, height) / 2 + 20
@@ -39,7 +40,7 @@ function M.DragUpdate()
     local dx, dy = x / scale - cx, y / scale - cy
     if not finite(dx) or not finite(dy) or (dx == 0 and dy == 0) then return end
     local angle = math.deg(math.atan2(dy, dx)) % 360
-    if M.Position(angle) then A.db.minimapAngle = angle end
+    if M.Position(angle) then sessionAngle = angle end
 end
 function M.Refresh()
     if not M.button then return end
