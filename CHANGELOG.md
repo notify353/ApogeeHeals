@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-- Show the existing healing icon in the native AddOns list using TOC metadata.
+- Show the shared green Apogee brand icon in the native AddOns list using a
+  bundled copy of the existing artwork and addon-local TOC metadata.
 - Avoid unchanged buff-action/visibility setup, hidden picker rebuilds and
   repeated per-recipient spell/scope lookups. Suspend queued refreshes while
   leaving the world; keep fresh aura observations and combat-safe updates.

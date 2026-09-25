@@ -1,6 +1,6 @@
 ## Interface: 16001
 ## Title: Apogee Heals
-## IconTexture: Interface/Icons/Spell_Holy_Heal
+## IconTexture: Interface/AddOns/ApogeeHeals/Media/Textures/ApogeeLogo.png
 ## Notes: Minimal five-player healing frames for Forever.
 ## Author: notify353
 ## Version: 0.1.0-dev
