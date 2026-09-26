@@ -29,6 +29,9 @@ function A.Storage.Open(saved)
             local id = source[slot.id]
             if type(id) == "number" and id > 0 and id < 2147483647 and id % 1 == 0 then
                 bindings[slot.id] = id
+            elseif type(id) == "table" and id.kind == "item" and type(id.id) == "number"
+                and id.id > 0 and id.id < 2147483647 and id.id % 1 == 0 then
+                bindings[slot.id] = {kind="item", id=id.id}
             end
         end
     end

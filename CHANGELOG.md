@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Allow bag bandages on Healing Mouse tiles, with saved item identity, icons,
+  drag/swap/remove and native secure use on the clicked party member.
+
 - Bring minimap button centers onto the shared nominal tangent orbit: half the
   larger minimap dimension plus 16 pixels, with equal 46-pixel-minimum chord gaps.
   Preserve native border padding and artwork; painted rim alignment needs live review.
