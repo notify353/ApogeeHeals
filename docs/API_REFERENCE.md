@@ -238,3 +238,23 @@ restricted-value enforcement, rendering or server-specific drinking auras.
 
 Routine build changes within the same Forever family warn and use capability
 checks at runtime. Development still requires a fresh matching export review.
+
+## Bandage assignments (70009)
+
+GameCursorDocumentation exposes GetCursorInfo; Blizzard_ArtifactPerks consumes
+its item cursor as type, itemID, itemLink. ItemDocumentation.GetItemInfoInstant
+returns ID, icon, class and subclass; public guards precede classification against
+ItemClass.Consumable and ItemConsumableSubclass.Bandage. GetItemNameByID supplies
+the optional localized display name; an uncached name uses the item ID label.
+GET_ITEM_INFO_RECEIVED retries unavailable metadata outside combat (deferred to
+combat exit otherwise). Saved spell numbers remain unchanged; item entries are
+{kind="item", id=positiveInteger} in the existing bindings map. No bag slots,
+counts, target state or restricted values are persisted.
+
+SecureTemplates SECURE_ACTIONS.item reads the modified item attribute, resolves
+item:ID through SecureCmdItemParse and calls SecureCmdUseItem with the fixed row
+unit. Every out-of-combat apply clears the opposite spell/item attribute. Empty
+stacks remain assigned; native inventory resolution, range, cooldowns, skill and
+Recently Bandaged restrictions decide whether physical input succeeds. Item
+assignments disable the spell-only range indicator. Tests execute matching native
+item/release source with mocked engine functions; live acceptance is still needed.

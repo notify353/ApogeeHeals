@@ -35,7 +35,7 @@ function R.Start()
         "UNIT_SPELLCAST_SUCCEEDED", "PLAYER_LEAVING_WORLD",
         "UNIT_HEAL_PREDICTION", "UNIT_HEAL_ABSORB_AMOUNT_CHANGED",
         "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "SPELLS_CHANGED",
-        "UI_SCALE_CHANGED", "DISPLAY_SIZE_CHANGED" }) do driver:RegisterEvent(event) end
+        "UI_SCALE_CHANGED", "DISPLAY_SIZE_CHANGED", "GET_ITEM_INFO_RECEIVED" }) do driver:RegisterEvent(event) end
     driver:SetScript("OnEvent", function(_, event, unit, castGUID, spellID)
         if event:match("^UNIT_") then
             if not A.Access.Readable(unit) then return end
@@ -67,6 +67,15 @@ function R.Start()
                 A.View.pendingPosition = nil; A.View.SavePosition()
             end
             A.View.ApplyPosition(); A.Settings.Refresh()
+        elseif event == "GET_ITEM_INFO_RECEIVED" then
+            if A.Access.Readable(unit) then
+                for _, assigned in pairs(A.db.bindings) do
+                    if type(assigned) == "table" and assigned.kind == "item" and assigned.id == unit then
+                        A.Bindings.Apply(); break
+                    end
+                end
+            end
+            return
         elseif event == "SPELLS_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
             A.Cleansing.pending = true
             A.BuffDefaults.pending = true

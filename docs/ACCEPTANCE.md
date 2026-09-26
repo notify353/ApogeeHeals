@@ -200,3 +200,16 @@ do not complete any of these checks.
   including class changes in reused slots, combat, offline and dead states.
 - Use Reset position and check spacing beneath Tank's Forever player/target bars;
   existing saved positions must survive reload until explicitly reset.
+
+
+## Bandage drop and use (pending live acceptance)
+
+- With DEV active, drop a bag bandage onto plain/Shift/Ctrl Healing Mouse tiles;
+  verify icon/name, spell-item replacement, drag swaps, remove/default restoration
+  and reload persistence. Non-bandage items must leave the old assignment intact.
+- Click each fixed player/party recipient with the assigned mouse combination,
+  including in combat; verify a single native bandage action and no target change.
+- Move/split the stack, exhaust it and replenish it; the item identity stays bound.
+  Check range, cooldown, skill and Recently Bandaged failures behave natively.
+- Editing stays locked in combat; spell defaults and spell range feedback remain
+  intact after replacing/removing the bandage. Check for taint or blocked actions.

@@ -71,7 +71,7 @@ function E.Drop(id)
         local spell, reason = A.Bindings.Cursor()
         if spell and A.Bindings.Put(id, spell) then
             ClearCursor()
-        else print("Apogee Heals: " .. (reason or "Unable to assign spell.")) end
+        else print("Apogee Heals: " .. (reason or "Unable to assign spell or bandage.")) end
     end
     E.Refresh()
 end
@@ -106,7 +106,7 @@ function E.Create()
     handle:SetScript("OnEnter", function()
         if InCombatLockdown() then return end
         GameTooltip:SetOwner(handle, "ANCHOR_RIGHT"); GameTooltip:SetText("Healing bindings")
-        GameTooltip:AddLine("Drag the header to move. Drop spells onto the tiles.", 0.8, 0.85, 0.9, true)
+        GameTooltip:AddLine("Drag the header to move. Drop spells or bag bandages onto the tiles.", 0.8, 0.85, 0.9, true)
         GameTooltip:AddLine("Columns: Left, Right, Middle, Mouse 4, Mouse 5.", 0.8, 0.85, 0.9, true)
         GameTooltip:AddLine("Rows: plain, Shift (S-), Ctrl (C-). L = Left, R = Right, M = Middle.", 0.8, 0.85, 0.9, true)
         GameTooltip:AddLine("Priest defaults: Left Lesser Heal, Right Power Word: Shield.", 0.8, 0.85, 0.9, true)
@@ -155,12 +155,12 @@ function E.Create()
             GameTooltip:SetOwner(button, "ANCHOR_RIGHT"); GameTooltip:SetText(slot.label)
             if info then
                 GameTooltip:AddLine(info.name, 1, 1, 1)
-                local rank = A.Access.Read(C_Spell.GetSpellSubtext, spell)
+                local rank = not info.itemID and A.Access.Read(C_Spell and C_Spell.GetSpellSubtext, spell)
                 if type(rank) == "string" and rank ~= "" then GameTooltip:AddLine(rank) end
             else GameTooltip:AddLine(reason or (id == "1" and "Empty: targets the clicked party member."
-                or "Empty: drop a learned healing spell.")) end
+                or "Empty: drop a learned healing spell or bandage.")) end
             if automatic then
-                GameTooltip:AddLine("Class default: highest learned rank. Drop a spell to override.", 0.8, 0.85, 0.9, true)
+                GameTooltip:AddLine("Class default: highest learned rank. Drop a spell or bandage to override.", 0.8, 0.85, 0.9, true)
             else
                 GameTooltip:AddLine("Drag to move or swap. Use x to restore the default.", 0.8, 0.85, 0.9, true)
             end

@@ -32,7 +32,7 @@ dofile = function(path)
     end
     return Mock
 end
-for _, path in ipairs({ "tests/buffs_spec.lua", "tests/paladin_buffs_spec.lua", "tests/minimap_spec.lua",
+for _, path in ipairs({ "tests/items_spec.lua", "tests/bindings_spec.lua", "tests/buffs_spec.lua", "tests/paladin_buffs_spec.lua", "tests/minimap_spec.lua",
     "tests/purify_spec.lua", "tests/native_purify_spec.lua", "tests/range_spec.lua", "tests/editor_position_spec.lua" }) do
     local fixtureTest = read(path):gsub("ApogeeHeals", name)
         :gsub("ApogeeKeybindsWeaponsHeader", "ApogeeKeybindsDevWeaponsHeader")

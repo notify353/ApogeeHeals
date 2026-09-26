@@ -99,3 +99,28 @@ present.party1=nil; resolve(frame, "state-visibility", a.View.rows[2].driver); a
 raid=true
 for _, row in ipairs(a.View.rows) do resolve(frame, "state-visibility", row.driver); assert(not frame.shown) end
 print("PASS matching-export click dispatch, target action and visibility resolver contracts")
+
+-- Execute the matching native item path without simulating a cast in addon code.
+local itemAction = assert(source:match("SECURE_ACTIONS%.item%s*=%s*(function.-\n    end);"))
+local used, uses
+uses = 0
+local itemEnv = setmetatable({
+    SecureButton_GetModifiedAttribute=function(frame, field) return frame.attributes[field .. "2"] end,
+    SecureCmdItemParse=function(item) assert(item == "item:1251"); return item end,
+    C_Item={IsEquippableItem=function() return false end},
+    SecureCmdUseItem=function(name, bag, slot, unit) used=unit; uses=uses+1 end,
+}, {__index=env})
+chunk = assert(loadstring("return " .. itemAction)); setfenv(chunk, itemEnv)
+local useItem = chunk()
+env.OnActionButtonClick = function(frame, button) useItem(frame, frame.attributes.unit, button) end
+for _, row in ipairs(a.View.rows) do
+    row.attributes.type2 = "item"; row.attributes.item2 = "item:1251"
+    for _, down in ipairs({false, true}) do
+        env.GetCVarBool = function() return down end
+        local before = uses
+        env.SecureActionButton_OnClick(row, "RightButton", true); assert(uses == before)
+        env.SecureActionButton_OnClick(row, "RightButton", false)
+        assert(uses == before + 1 and used == row.unit)
+    end
+end
+print("PASS matching-export item action, fixed recipient and release dispatch")
