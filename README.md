@@ -8,6 +8,10 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 
 - Player-first vertical stack followed by party1 through party4. Player remains
   while solo; native visibility hides missing units and all rows in raids.
+- Up to eight native debuff icons extend right of each player/party health bar,
+  after the reserved drinking-icon space. Hover for the native aura tooltip.
+  All harmful aura types qualify, including effects you cannot dispel. Native
+  code owns ordering, updates and combat display; no debuff casting is added.
 - Target sits above the player with a full-row gap; target's target stays
   closely above target. Both retain their size and align with the stack's left
   edge. The drag handle sits above the pair; no helper caption is shown.

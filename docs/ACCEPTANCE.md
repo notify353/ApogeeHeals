@@ -273,3 +273,12 @@ do not complete any of these checks.
 - Direct editor clicks flash without casting; drag/drop and removing assignments
   still work. Close/reopen the editor and enter combat: no stuck flash, unsolicited
   editor opening or blocked-action/taint warning should occur.
+# Native debuff strip (live acceptance pending)
+
+- Reload DEV. Apply/remove harmful effects on player and party1-4; icons should
+  update beside the corresponding health bar in and out of combat.
+- Check multiple simultaneous debuffs (including nondispellable effects), the
+  eight-icon limit, native hover tooltips and no forbidden-script warnings.
+- Check the drinking cup does not overlap icons, group members leaving/rejoining,
+  raid hiding and opening/closing preview. Existing health-bar clicks must work.
+- Offline mocks/export checks do not establish these native results.

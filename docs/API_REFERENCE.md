@@ -1,5 +1,33 @@
 # Forever API authority
 
+## Player/party debuff display (70009, 2026-09-27)
+
+CustomAuraContainerTemplate exposes an untainted inbound AuraContainer with
+SetUnit, AddAuraGroup and SetEnabled. Each live player/party row creates one
+container outside combat, fixed to that row's unit. A HARMFUL group admits all
+debuff types with a maximum of eight icons and the default native ordering.
+The native group provider preallocates ten CustomAuraButtonTemplate frames and
+applies DenyTaintedAccessWhenAurasAreSecret after the initialization callback.
+The addon initializes only size, artwork, native SetIcon, tooltip anchor and
+SetCancelAuraButtons(nil). It retains no aura button references, observes no
+aura state, supplies no extra templates and replaces no intrinsic handlers.
+
+The native container owns UNIT_AURA registration, filtering, assignment, icon
+visibility and flow layout. Its group applies UntrustedLayoutScriptExecution;
+no addon frame is anchored to its changing bounds. The container is anchored
+once to the health bar's right edge with a fixed 16-pixel gap reserving the
+existing drinking indicator. Native children inherit row visibility/alpha;
+target rows and synthetic previews create no containers. Missing or unreadable
+template metadata disables this optional display without blocking health bars.
+No Lua aura scans, duration calculations, overflow counts, protected attributes
+or combat layout writes are introduced. This uses the native display alone,
+not the previously rejected AuraButton/SecureActionButton composition.
+
+Mocks verify configuration/lifecycle and execute the matching exported group
+setup. They cannot establish native engine permissions, tooltips, rendering or
+combat acceptance. Verify acquisition/removal, roster changes, raid hiding,
+preview transitions and combat on all five recipients after DEV reload.
+
 Matching local source:
 `C:/Program Files (x86)/World of Warcraft/_classic_beta_/BlizzardInterfaceCode/Interface/AddOns`.
 Build 1.60.1.70009, project 1, interface 16001; checked 2026-09-24.

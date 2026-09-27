@@ -2,6 +2,33 @@ local _, A = ...
 local V, S = {}, A.Style
 A.View = V
 local units = { "player", "party1", "party2", "party3", "party4" }
+local function createDebuffs(row)
+    -- All aura selection, ordering, visibility and updates stay in native code.
+    -- Never retain or inspect the native aura buttons after initialization.
+    local info = A.Access.Read(C_XMLUtil and C_XMLUtil.GetTemplateInfo, "CustomAuraContainerTemplate")
+    if not info or not A.Access.Readable(info.type) or info.type ~= "AuraContainer" then return end
+    local container = CreateFrame("AuraContainer", nil, row, "CustomAuraContainerTemplate")
+    container:SetPoint("TOPLEFT", row.health, "TOPRIGHT", 16, -1)
+    container:SetSize(110, 12)
+    container:SetUnit(row.unit)
+    container:AddAuraGroup("debuffs", "HARMFUL", {
+        maxFrameCount = 8,
+        layout = { elementSpacing = 2, elementWidth = 12, elementHeight = 12 },
+        initializeFrame = function(button)
+            button:SetSize(12, 12)
+            button:SetCancelAuraButtons(nil)
+            button:SetTooltipAnchorPoint("ANCHOR_RIGHT")
+            local background = button:CreateTexture(nil, "BACKGROUND")
+            background:SetAllPoints(); background:SetColorTexture(0.35, 0.08, 0.08, 1)
+            local icon = button:CreateTexture(nil, "ARTWORK")
+            icon:SetPoint("TOPLEFT", button, "TOPLEFT", 1, -1)
+            icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -1, 1)
+            icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+            button:SetIcon(icon)
+        end,
+    })
+    container:SetEnabled(true)
+end
 local function bar(parent, height, y, width)
     local result = CreateFrame("StatusBar", nil, parent)
     result:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, y)
@@ -117,6 +144,7 @@ function V.Create()
         row:SetAttribute("useOnKeyDown", false)
         row:SetAttribute("unit", unit); row:SetAttribute("type1", "target")
         buildRow(row, false, i == 1)
+        createDebuffs(row)
         A.Buffs.Create(row)
         row:Hide()
         RegisterStateDriver(row, "visibility", "[group:raid] hide; [@" .. unit .. ",exists] show; hide")

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Display up to eight native harmful-aura icons to the right of player/party
+  health bars, with native tooltips and space for the drinking indicator.
+
 - Remove the target-of-target helper caption and its reserved drag-handle space.
 
 - Correct Forever surname display by joining the separate name and surname
