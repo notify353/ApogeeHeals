@@ -15,8 +15,11 @@ aura state, supplies no extra templates and replaces no intrinsic handlers.
 The native container owns UNIT_AURA registration, filtering, assignment, icon
 visibility and flow layout. Its group applies UntrustedLayoutScriptExecution;
 no addon frame is anchored to its changing bounds. The container is anchored
-once to the health bar's right edge with a fixed 16-pixel gap reserving the
-existing drinking indicator (46 pixels on Paladins reserves cleansing buttons). Native children inherit row visibility/alpha;
+once to the health bar's right edge with fixed spacing reserving the drinking
+indicator and, on Paladins, cleansing buttons. Icon size derives from the public
+health-plus-power cluster height (19.5 logical pixels); native flow element sizes
+match it, with two-pixel gaps and top alignment. Cleansing halo artwork extends
+one pixel, fitting within the row gap. Native children inherit row visibility/alpha;
 target rows and synthetic previews create no containers. Missing or unreadable
 template metadata disables this optional display without blocking health bars.
 No Lua aura scans, duration calculations, overflow counts, protected attributes

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Align right-side icons with the full health-plus-power height using square
+  artwork and consistent spacing; keep cleansing glows within the row gaps.
+
 - Add permanent learned Purify/Cleanse buttons beside Paladin player/party bars,
   with independent native gold glows for matching debuff types and fixed-unit clicks.
 

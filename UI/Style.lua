@@ -6,6 +6,9 @@ local S = { width = 112, healthHeight = 14, powerHeight = 5, barGap = 0.5,
 A.Style = S
 S.targetWidth = S.width
 S.clusterHeight = S.healthHeight + S.barGap + S.powerHeight
+S.sideIconSize = S.clusterHeight
+S.sideIconGap = 2
+S.sideIconOffset = S.sideIconSize + 2 * S.sideIconGap
 S.targetGap = S.clusterHeight
 -- Reserve both target rows and a separate drag handle above them.
 S.handleOffset = S.targetGap + 2 * S.clusterHeight + S.targetTargetGap + 2

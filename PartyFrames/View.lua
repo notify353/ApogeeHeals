@@ -8,14 +8,16 @@ local function createDebuffs(row)
     local info = A.Access.Read(C_XMLUtil and C_XMLUtil.GetTemplateInfo, "CustomAuraContainerTemplate")
     if not info or not A.Access.Readable(info.type) or info.type ~= "AuraContainer" then return end
     local container = CreateFrame("AuraContainer", nil, row, "CustomAuraContainerTemplate")
-    container:SetPoint("TOPLEFT", row.health, "TOPRIGHT", row.cleanseButtons and 46 or 16, -1)
-    container:SetSize(110, 12)
+    local size, gap = S.sideIconSize, S.sideIconGap
+    local offset = S.sideIconOffset + (row.cleanseButtons and 2 * (size + gap) or 0)
+    container:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset, 0)
+    container:SetSize(8 * size + 7 * gap, size)
     container:SetUnit(row.unit)
     container:AddAuraGroup("debuffs", "HARMFUL", {
         maxFrameCount = 8,
-        layout = { elementSpacing = 2, elementWidth = 12, elementHeight = 12 },
+        layout = { elementSpacing = gap, elementWidth = size, elementHeight = size },
         initializeFrame = function(button)
-            button:SetSize(12, 12)
+            button:SetSize(size, size)
             button:SetCancelAuraButtons(nil)
             button:SetTooltipAnchorPoint("ANCHOR_RIGHT")
             local background = button:CreateTexture(nil, "BACKGROUND")
@@ -71,8 +73,8 @@ local function buildRow(row, preview, first, width)
     row.rangeStatus:Hide()
     -- Smaller artwork in an inset dark frame, attached closely to the row.
     row.drinkIcon = CreateFrame("Frame", nil, row)
-    row.drinkIcon:SetSize(12, 12)
-    row.drinkIcon:SetPoint("LEFT", row.health, "RIGHT", 2, 0)
+    row.drinkIcon:SetSize(S.sideIconSize, S.sideIconSize)
+    row.drinkIcon:SetPoint("TOPLEFT", row.health, "TOPRIGHT", S.sideIconGap, 0)
     row.drinkIcon:EnableMouse(false)
     local drinkBackground = row.drinkIcon:CreateTexture(nil, "BACKGROUND")
     drinkBackground:SetAllPoints(); drinkBackground:SetColorTexture(0.08, 0.10, 0.13, 1)

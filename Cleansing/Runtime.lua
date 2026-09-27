@@ -15,22 +15,25 @@ function P.HideTooltip()
 end
 function P.Create(row)
     if not paladin() then return end
+    local size, gap, offset = A.Style.sideIconSize, A.Style.sideIconGap, A.Style.sideIconGap
     row.cleanseButtons = {}
+    row.drinkIcon:ClearAllPoints()
+    row.drinkIcon:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset + 2 * (size + gap), 0)
     local info = A.Access.Read(C_XMLUtil and C_XMLUtil.GetTemplateInfo, "CustomAuraContainerTemplate")
     local container
     if info and A.Access.Readable(info.type) and info.type == "AuraContainer" then
         container = CreateFrame("AuraContainer", nil, row, "CustomAuraContainerTemplate")
-        container:SetPoint("TOPLEFT", row.health, "TOPRIGHT", 16, -1)
-        container:SetSize(26, 12)
+        container:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset, 0)
+        container:SetSize(2 * size + gap, size)
         container:SetUnit(row.unit)
         row.cleanseIndicator = container
     end
     for index, spell in ipairs(spells) do
-        local x = 16 + (index - 1) * 14
+        local x = offset + (index - 1) * (size + gap)
         -- A permanent secure sibling, never a child of or anchored to an AuraButton.
         local button = CreateFrame("Button", nil, row, "SecureActionButtonTemplate")
-        button:SetSize(12, 12)
-        button:SetPoint("TOPLEFT", row.health, "TOPRIGHT", x, -1)
+        button:SetSize(size, size)
+        button:SetPoint("TOPLEFT", row.health, "TOPRIGHT", x, 0)
         local level = A.Access.Read(row.health.GetFrameLevel, row.health)
         if type(level) == "number" and level >= 0 and level < 10000 and level % 1 == 0 then
             button:SetFrameLevel(level + 4)
@@ -58,16 +61,15 @@ function P.Create(row)
             container:AddAuraSlot(spell.key, "HARMFUL", {
                 candidateFilters = {includeDispelTypes = {}},
                 initializeFrame = function(indicator)
-                    indicator:SetSize(12, 12)
-                    indicator:SetPoint("TOPLEFT", container, "TOPLEFT", (index - 1) * 14, 0)
+                    indicator:SetSize(size, size)
+                    indicator:SetPoint("TOPLEFT", container, "TOPLEFT", (index - 1) * (size + gap), 0)
                     indicator:EnableMouse(false)
                     indicator:SetCancelAuraButtons(nil)
-                    for inset = 3, 1, -1 do
-                        local glow = indicator:CreateTexture(nil, "ARTWORK")
-                        glow:SetPoint("TOPLEFT", indicator, "TOPLEFT", -inset, inset)
-                        glow:SetPoint("BOTTOMRIGHT", indicator, "BOTTOMRIGHT", inset, -inset)
-                        glow:SetColorTexture(1, 0.75, 0.1, 0.25)
-                    end
+                    -- One-pixel halo fits the row gap without spilling into neighbors.
+                    local glow = indicator:CreateTexture(nil, "ARTWORK")
+                    glow:SetPoint("TOPLEFT", indicator, "TOPLEFT", -1, 1)
+                    glow:SetPoint("BOTTOMRIGHT", indicator, "BOTTOMRIGHT", 1, -1)
+                    glow:SetColorTexture(1, 0.75, 0.1, 0.85)
                 end,
             })
         end

@@ -11,6 +11,8 @@ for _, options in ipairs({{might=true}, {cleanse=true}, {class="PRIEST"}, {known
                 for index, button in ipairs(row.cleanseButtons) do
                     local learned = index == 1 and m.known or index == 2 and m.cleanse
                     assert(button.parent == row and button.point[2] == row.health)
+                    assert(button.width == row.height and button.height == row.height and button.point[5] == 0)
+                    assert(button.point[4] == 2 + (index - 1) * (row.height + 2))
                     assert(button.template == "SecureActionButtonTemplate" and not button.scripts.OnClick)
                     assert(button.attributes.unit == row.unit and button.attributes.useOnKeyDown == false)
                     assert(button.clicks[1] == "LeftButtonUp")
@@ -20,11 +22,13 @@ for _, options in ipairs({{might=true}, {cleanse=true}, {class="PRIEST"}, {known
                         assert(button.attributes[prefix .. "type1"] == "")
                     end
                 end
+                assert(row.drinkIcon.point[4] == 2 + 2 * (row.height + 2))
                 if not options.noTemplates and not options.secretTemplates then
                     local indicator = assert(row.cleanseIndicator)
                     assert(indicator.parent == row and indicator.unit == row.unit)
                     for key, slot in pairs(indicator.slots) do
                         assert(slot.frame.mouse == false and slot.frame.parent == indicator)
+                        assert(slot.frame.width == row.height and slot.frame.height == row.height)
                         local types = slot.filters.includeDispelTypes
                         local learned = key == "purify" and m.known or key == "cleanse" and m.cleanse
                         assert((types.Poison == true) == learned and (types.Disease == true) == learned)

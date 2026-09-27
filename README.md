@@ -158,7 +158,7 @@ or shared Tank state is involved. Tank can be absent or disabled.
 ## Paladin cleansing buttons
 
 Learned Purify and Cleanse have permanent buttons to the right of each player/party
-health bar, after the drinking indicator and before the debuff strip. Left-click
+health bar, followed by the drinking indicator and the debuff strip. Left-click
 casts that spell on the row's player, including in combat. Modified clicks do
 nothing. Unlearned spells are hidden; other classes do not get these buttons.
 
@@ -167,6 +167,8 @@ disease for Purify, plus magic for Cleanse. Both can glow for poison/disease.
 The glow indicates a matching type, not guaranteed success, range or mana.
 The game chooses the effects removed; clicking a button never selects one debuff.
 Buttons stay visible with no debuffs. Native icons themselves remain display-only.
+Right-side icons are square and span the combined health and power bar height,
+aligned at both edges, with a narrow gap between icons.
 
 The earlier rejected AuraButton/secure-action composition remains unused. These
 are independent, permanently configured secure buttons and native visual siblings.

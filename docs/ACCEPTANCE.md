@@ -53,6 +53,10 @@ Focus audio request. Earlier pending entries remain detailed regression checklis
 
 ## Paladin cleansing buttons (live acceptance pending)
 
+- Owner reported the permanent buttons working in game on September 27; this is
+  not an assertion that every combat, modifier and aura-type case below was tested.
+- Follow-up full-height icon sizing needs a reload and visual review of top/bottom
+  alignment and spacing on player/party rows, including active glow and drinking.
 - The old composite AuraButton/secure-action failed in game. It remains unused.
 - Reload DEV as a Paladin. Learned Purify and Cleanse buttons should remain visible
   on all existing player/party rows even with no debuffs; unlearned spells stay hidden.
