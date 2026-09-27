@@ -267,8 +267,8 @@ item/release source with mocked engine functions; live acceptance is still neede
 ## Fixed target frame (70009)
 
 A separate anonymous SecureActionButtonTemplate uses immutable unit=target and
-native target-only left click, with [@target,exists] visibility in all group modes.
-It stays outside healing bindings, range polling, buff scans and party preview.
+the shared native healing bindings, with [@target,exists] visibility in all group modes.
+It stays outside party range polling, buff scans and party preview.
 Its 112-logical-pixel row matches the player/party width and shares the existing health/power, font, rail and native
 incoming-heal presentation, aligned beside the player's power bar with an 18-pixel gap.
 No target event changes protected attributes, anchors or visibility.
@@ -292,7 +292,7 @@ fit require in-game acceptance, separately from mocks and matching-export checks
 
 ## Target of target (70009)
 
-The anonymous targettarget row uses a fixed native target action and independent
+The anonymous targettarget row uses fixed native healing actions and independent
 [@targettarget,exists] visibility. It is positioned once above target with a
 four-logical-pixel gap and a muted label above it. Width, colors and name sizing
 match target. The label inherits native row visibility. Top-edge position clamping
@@ -305,5 +305,19 @@ rows, while a visible-only 0.2-second OnUpdate refreshes just targettarget to
 cover unit-alias updates without scanning auras or running party healing logic.
 World exit suspends reads; world entry resumes them. Health/power and prediction
 use the existing native sinks; identity and reaction retain public-value guards.
-No GUID, inferred aggro, target selection, protected visibility mutation or
-casting logic is added. Native rendering and combat visibility remain live checks.
+No GUID, inferred aggro or protected visibility mutation is added. Native rendering
+and combat visibility remain live checks.
+
+## Healing actions on both target rows
+
+Bindings.Apply now applies the same fifteen slots and modifier-blocking matrix to
+player, party1-4, target and targettarget. The unit attributes remain immutable;
+only action attributes are applied outside combat. Saved edits, learned class
+defaults, spell ranks and item assignments share one resolution per slot. Empty
+plain Left targets only if no assignment or learned default exists; unavailable
+assigned spells remain no-op. Native secure spell/item actions receive the exact
+row unit. No helpful/hostile target detection, retargeting or casting is done in
+Lua; the client decides legality, range, cooldown and item availability at click.
+Matching-export tests exercise spell/item release dispatch on all seven frames.
+They do not prove native secure provenance, hostile-target rejection, taint or
+physical-click behavior in game; these require live acceptance.

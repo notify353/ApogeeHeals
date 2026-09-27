@@ -86,7 +86,10 @@ end
 function B.Apply()
     if InCombatLockdown() then B.pending = true; return end
     B.pending = nil
-    for _, frame in ipairs(A.View.rows) do
+    local recipients = { unpack(A.View.rows) }
+    recipients[#recipients + 1] = A.View.target
+    recipients[#recipients + 1] = A.View.targetTarget
+    for _, frame in ipairs(recipients) do
         frame:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp", "Button4Up", "Button5Up")
     end
     for _, prefix in ipairs({ "", "shift-", "ctrl-", "ctrl-shift-", "alt-",
@@ -100,7 +103,7 @@ function B.Apply()
             local fallback = button == 1 and prefix == "" and id == nil and "target" or ""
             local item = info and info.itemID
             if prefix == "" and button == 1 then B.rangeSpell = info and not item and id or nil end
-            for _, frame in ipairs(A.View.rows) do
+            for _, frame in ipairs(recipients) do
                 frame:SetAttribute(prefix .. "type" .. button, info and (item and "item" or "spell") or fallback)
                 frame:SetAttribute(prefix .. "spell" .. button, info and not item and id or nil)
                 frame:SetAttribute(prefix .. "item" .. button, item and "item:" .. item or nil)

@@ -160,7 +160,7 @@ function E.Create()
                 GameTooltip:AddLine(info.name, 1, 1, 1)
                 local rank = not info.itemID and A.Access.Read(C_Spell and C_Spell.GetSpellSubtext, spell)
                 if type(rank) == "string" and rank ~= "" then GameTooltip:AddLine(rank) end
-            else GameTooltip:AddLine(reason or (id == "1" and "Empty: targets the clicked party member."
+            else GameTooltip:AddLine(reason or (id == "1" and "Empty: targets the clicked unit."
                 or "Empty: drop a learned healing spell or bandage.")) end
             if automatic then
                 GameTooltip:AddLine("Class default: highest learned rank. Drop a spell or bandage to override.", 0.8, 0.85, 0.9, true)

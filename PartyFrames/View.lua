@@ -122,7 +122,7 @@ function V.Create()
         RegisterStateDriver(row, "visibility", "[group:raid] hide; [@" .. unit .. ",exists] show; hide")
         V.rows[i] = row
     end
-    -- Separate immutable recipients; never enter healing bindings or buff scans.
+    -- Separate immutable recipients share healing bindings, but not party buff scans.
     local function targetRow(unit)
         local row = CreateFrame("Button", nil, V.root, "SecureActionButtonTemplate")
         row.unit = unit

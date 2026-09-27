@@ -225,8 +225,8 @@ do not complete any of these checks.
   may be blank and unavailable classification should use the muted stripe.
 - Check a target without power, dead targets, long names, and incoming healing.
   Drag the existing anchor out of combat and verify the target follows it.
-- Left clicking the target row only targets; party healing assignments and buff
-  reminders must remain unchanged. No game session was automated by local checks.
+- Healing assignments apply to the target row; buff reminders remain party-only.
+  No game session was automated by local checks.
 
 ## Healing editor defaults and resets — pending live acceptance
 
@@ -249,5 +249,17 @@ do not complete any of these checks.
   health and power updates; repeat in combat. Clear either target and confirm the
   row and label disappear without stale data, then reappear with current data.
 - Verify selecting yourself, dead/no-power units, NPC names, players and raid use.
-  Left click must target the displayed target-of-target through the native action.
-  No party row binding, range feedback or buff reminder should be added to it.
+  The target-of-target receives the shared healing assignments through native
+  actions; party range feedback and buff reminders remain separate.
+
+## Target healing bindings — pending live acceptance
+
+- Use a learned healing spell and a carried bandage on a friendly target and
+  target-of-target through their bars. Check plain/Shift/Ctrl with all five mouse
+  buttons, correct recipient and one release action per click.
+- Repeat in combat, switch targets and have the target change its target. Verify
+  immutable row recipients and no taint/blocked-action warnings.
+- Check hostile/dead/out-of-range targets and empty bandage stacks: native game
+  restrictions decide the result, without addon retargeting or Lua casting.
+- Clear assignments and confirm learned defaults, or plain-left native targeting
+  when no learned default exists. Existing party actions must remain unchanged.

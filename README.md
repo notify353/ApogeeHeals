@@ -261,3 +261,8 @@ the original copyright notice is retained in LICENSE.
 
 Reset positions and Factory reset are grouped last in Settings, in that order,
 with matching button dimensions and spacing across Heals and Keybinds.
+
+Healing Mouse assignments also apply to the target and target-of-target bars,
+including learned class defaults, plain/Shift/Ctrl mouse clicks and bandages.
+Each click uses that bar's recipient; native game restrictions decide whether
+its spell or item can be used. Changes to assignments remain locked in combat.
