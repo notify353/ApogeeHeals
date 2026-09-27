@@ -80,18 +80,18 @@ for _, case in ipairs(cases) do
         local count=#case.ids
         assert((row.cleanseSlotCount or 0) == count)
         assert(row.debuffContainer.point[4] == (row.unit=="target" and a.Style.sideIconGap or a.Style.sideIconOffset)
-            + count*(row.height+2))
+            + count*(a.Style.sideIconSize+2))
         if count==0 then assert(not row.cleanseButtons and not row.cleanseIndicator)
         else
             assert(#row.cleanseButtons==count)
-            assert(row.drinkIcon.point[4]==2+count*(row.height+2))
+            assert(row.drinkIcon.point[4]==2+count*(a.Style.sideIconSize+2))
             for index,button in ipairs(row.cleanseButtons) do
                 assert(button.attributes.spell1==case.ids[index] and button.attributes.type1=="spell")
                 assert(button.attributes.unit==row.unit and button.attributes.useOnKeyDown==false)
                 assert(button.clicks[1]=="LeftButtonUp" and not button.scripts.OnClick)
                 assert(button.parent==(row.supportFrame or row) and button.point[2]==row.health)
-                assert(button.width==row.height and button.height==row.height)
-                assert(button.point[4]==2+(index-1)*(row.height+2))
+                assert(button.width==a.Style.sideIconSize and button.height==a.Style.sideIconSize)
+                assert(button.point[4]==2+(index-1)*(a.Style.sideIconSize+2))
                 assert(button.icon.desaturated and button.icon.alpha==0.3 and button.driver=="show")
                 for _,prefix in ipairs({"shift-","ctrl-","alt-","ctrl-shift-","alt-shift-","alt-ctrl-","alt-ctrl-shift-"}) do
                     assert(button.attributes[prefix.."type1"]=="")

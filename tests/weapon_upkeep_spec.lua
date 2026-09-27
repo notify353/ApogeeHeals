@@ -4,7 +4,7 @@ local function setup(class, mode)
     local m = Mock.New()
     m.units.player.class = class
     local a = {View={}, Runtime={}, UnitAPI={State=function() return m.state or "alive" end}}
-    a.Style = {sideIconSize=19.5, sideIconGap=2, Text=function(parent) return parent:CreateFontString() end}
+    a.Style = {sideIconSize=18, sideIconGap=2, sideIconY=-0.75, Text=function(parent) return parent:CreateFontString() end}
     assert(loadfile("Core/Access.lua"))("ApogeeHeals", a)
     local containers, buttons = {}, {}
     C_XMLUtil = {GetTemplateInfo=function()
@@ -47,11 +47,11 @@ for _, class in ipairs({"ROGUE", "SHAMAN", "WARLOCK"}) do
     local m, a, row, containers, buttons = setup(class)
     a.WeaponUpkeep.Refresh(row, 3)
     assert(#containers == 2 and #buttons == 2 and row.weaponUpkeep.alpha == 1)
-    assert(row.weaponUpkeep.point[4] == -2 - 3 * 21.5)
+    assert(row.weaponUpkeep.point[4] == -2 - 3 * 20)
     for i, container in ipairs(containers) do
         assert(container.slot == i - 1 and container.unit == "player" and container.enabled)
-        assert(container.point[4] == -(i - 1) * 21.5 and container.width == 19.5)
-        assert(container.layout.elementHeight == 19.5 and container.layout.elementSpacing == 2)
+        assert(container.point[4] == -(i - 1) * 20 and container.width == 18)
+        assert(container.layout.elementHeight == 18 and container.layout.elementSpacing == 2)
         assert(buttons[i].cancelDisabled and buttons[i].anchor == "ANCHOR_LEFT")
         assert(buttons[i].icon and buttons[i].durationText)
     end
@@ -62,7 +62,7 @@ for _, class in ipairs({"ROGUE", "SHAMAN", "WARLOCK"}) do
     assert(not containers[1].enabled and not containers[2].enabled and #containers == 2)
     m.combat = false
     a.WeaponUpkeep.Refresh(row, 1)
-    assert(row.weaponUpkeep.point[4] == -23.5 and containers[1].enabled)
+    assert(row.weaponUpkeep.point[4] == -22 and containers[1].enabled)
     for _, unit in ipairs({"party1", "party4", "target", "targettarget"}) do
         a.WeaponUpkeep.Refresh({unit=unit}, 0); a.WeaponUpkeep.Create({unit=unit})
     end

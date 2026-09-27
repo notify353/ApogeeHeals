@@ -56,7 +56,7 @@ function W.Create(row)
                 local background = button:CreateTexture(nil, "BACKGROUND")
                 background:SetAllPoints(); background:SetColorTexture(0.08, 0.10, 0.13, 1)
                 local icon = button:CreateTexture(nil, "ARTWORK")
-                icon:SetAllPoints(); icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+                icon:SetPoint("TOPLEFT", button, "TOPLEFT", 1, -1); icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -1, 1); icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
                 button:SetIcon(icon)
                 if type(button.SetDurationText) == "function" then
                     local text = A.Style.Text(button, 8)
@@ -84,7 +84,7 @@ function W.Refresh(row, leftOffset)
     local size, gap = A.Style.sideIconSize, A.Style.sideIconGap
     if holder.leftOffset ~= leftOffset then
         holder:ClearAllPoints()
-        holder:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - leftOffset * (size + gap), 0)
+        holder:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - leftOffset * (size + gap), A.Style.sideIconY)
         holder.leftOffset = leftOffset
     end
     for _, container in ipairs(holder.containers) do container:SetEnabled(true) end

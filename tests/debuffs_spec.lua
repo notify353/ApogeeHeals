@@ -44,11 +44,11 @@ for index, container in ipairs(containers) do
     assert(container.parent == (row.supportFrame or row) and container.unit == row.unit and container.enabled)
     assert(container.filter == "HARMFUL" and container.options.maxFrameCount == 8)
     assert(container.point[2] == row.health and container.point[3] == "TOPRIGHT")
-    assert(container.point[4] == (row.unit == "target" and a.Style.sideIconGap or a.Style.sideIconOffset) and container.point[5] == 0)
-    assert(container.options.layout.elementHeight == row.height and container.options.layout.elementSpacing == 2)
+    assert(container.point[4] == (row.unit == "target" and a.Style.sideIconGap or a.Style.sideIconOffset) and container.point[5] == a.Style.sideIconY)
+    assert(container.options.layout.elementHeight == a.Style.sideIconSize and container.options.layout.elementSpacing == a.Style.sideIconGap)
 end
 for _, button in ipairs(buttons) do
-    assert(button.cancelDisabled and button.icon and button.width == a.Style.clusterHeight)
+    assert(button.cancelDisabled and button.icon and button.width == a.Style.sideIconSize)
     assert(button.tooltipAnchor == "ANCHOR_RIGHT" and button.icon.parent == button)
 end
 local reads = m.auraReads

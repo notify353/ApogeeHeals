@@ -1,5 +1,18 @@
 # Forever API authority
 
+## Inset side-icon geometry (70009, 2026-09-27)
+
+Shared icons use 18 logical pixels at the existing 2x row scale, matching the
+36px settings tiles. Two logical pixels between tiles match the settings 4px
+gap. The -0.75 top offset centers them in the 19.5-high health/power cluster;
+adjacent rows leave seven displayed pixels between tiles. Icon artwork is inset
+one logical pixel, with gold background borders contained inside the tile.
+Buff choices, reminders, cleanse siblings/indicators, native debuffs, food/drink
+and weapon displays all use this geometry. Native flow children keep their
+internal zero offset; only each strip anchor is vertically inset. No action,
+filter, protected combat layout or restricted-data contract changes. This
+supersedes the earlier full-height icon dimensions below.
+
 ## Class support (70009, 2026-09-27)
 
 See [class support and live acceptance](CLASS_SUPPORT.md). Direct cleansing now

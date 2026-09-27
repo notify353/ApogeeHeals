@@ -10,7 +10,7 @@ local function createDebuffs(row)
     local container = CreateFrame("AuraContainer", nil, row.supportFrame or row, "CustomAuraContainerTemplate")
     local size, gap = S.sideIconSize, S.sideIconGap
     local offset = (row.unit == "target" and S.sideIconGap or S.sideIconOffset) + (row.cleanseSlotCount or 0) * (size + gap)
-    container:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset, 0)
+    container:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset, A.Style.sideIconY)
     container:SetSize(8 * size + 7 * gap, size)
     container:SetUnit(row.unit)
     container:AddAuraGroup("debuffs", "HARMFUL", {
@@ -75,7 +75,7 @@ local function buildRow(row, preview, first, width)
     -- Smaller artwork in an inset dark frame, attached closely to the row.
     row.drinkIcon = CreateFrame("Frame", nil, row)
     row.drinkIcon:SetSize(S.sideIconSize, S.sideIconSize)
-    row.drinkIcon:SetPoint("TOPLEFT", row.health, "TOPRIGHT", S.sideIconGap, 0)
+    row.drinkIcon:SetPoint("TOPLEFT", row.health, "TOPRIGHT", S.sideIconGap, A.Style.sideIconY)
     row.drinkIcon:EnableMouse(false)
     local drinkBackground = row.drinkIcon:CreateTexture(nil, "BACKGROUND")
     drinkBackground:SetAllPoints(); drinkBackground:SetColorTexture(0.08, 0.10, 0.13, 1)

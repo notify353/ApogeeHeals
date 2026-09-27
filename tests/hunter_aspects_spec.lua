@@ -26,7 +26,7 @@ for index, button in ipairs(row.auraButtons) do
     assert(button.attributes.unit == "player" and button.attributes.spell1 == forms[index].id)
     assert(button.attributes.type1 == "spell" and button.attributes["shift-type1"] == "")
     assert(button.attributes.useOnKeyDown == false and button.clicks[1] == "LeftButtonUp")
-    assert(button.width == a.Style.sideIconSize and button.height == a.Style.clusterHeight)
+    assert(button.width == a.Style.sideIconSize and button.height == a.Style.sideIconSize)
     assert(button.point[4] == -a.Style.sideIconGap - (index-1)*(a.Style.sideIconSize+a.Style.sideIconGap))
     assert(button.driver == "[combat] hide; show" and not button.scripts.OnClick)
 end

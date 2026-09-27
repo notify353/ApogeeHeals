@@ -35,7 +35,7 @@ for _, case in ipairs(cases) do
                 count=count+1
                 assert(button.attributes.unit==row.unit and button.attributes.useOnKeyDown==false)
                 assert(button.clicks[1]=="LeftButtonUp" and button.attributes["ctrl-type1"]=="")
-                assert(button.width==a.Style.sideIconSize and button.height==a.Style.clusterHeight)
+                assert(button.width==a.Style.sideIconSize and button.height==a.Style.sideIconSize)
                 assert(button.driver=="[combat] hide; show")
             end
         end

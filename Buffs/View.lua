@@ -12,7 +12,7 @@ function B.Create(row)
         local button = CreateFrame("Button", nil, row.supportFrame or row, "SecureActionButtonTemplate")
         row.buffButtons[index] = button
         button:SetSize(size, size)
-        button:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - (index - 1) * (size + gap), 0)
+        button:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - (index - 1) * (size + gap), A.Style.sideIconY)
         button:SetAttribute("unit", row.unit); button:SetAttribute("useOnKeyDown", false)
         button:RegisterForClicks("LeftButtonUp")
         for _, prefix in ipairs({"shift-", "ctrl-", "ctrl-shift-", "alt-", "alt-shift-", "alt-ctrl-", "alt-ctrl-shift-"}) do
@@ -30,7 +30,7 @@ function B.Create(row)
         button:SetScript("OnLeave", function() B.HideTooltip(button) end)
         button:SetScript("OnHide", function() B.HideTooltip(button) end)
         local icon = button:CreateTexture(nil, "ARTWORK")
-        icon:SetAllPoints()
+        icon:SetPoint("TOPLEFT", button, "TOPLEFT", 1, -1); icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -1, 1)
         icon:SetTexCoord(0.07, 0.93, 0.07, 0.93); icon:Hide()
         row.buffReminders[index] = icon
     end
@@ -87,13 +87,12 @@ local function paintChoices(row, key, choices, offset, recommendedID, recommenda
             button:SetScript("OnHide", function(self) B.HideTooltip(self) end)
             if key == "blessingButtons" or key == "upkeepButtons" or key == "auraButtons" then
                 button.suggestion = button:CreateTexture(nil, "BACKGROUND")
-                button.suggestion:SetPoint("TOPLEFT", button, "TOPLEFT", -1, 1)
-                button.suggestion:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 1, -1)
+                button.suggestion:SetAllPoints(button)
                 button.suggestion:SetColorTexture(1, 0.75, 0.1, 1)
                 button.suggestion:Hide()
             end
             button.icon = button:CreateTexture(nil, "ARTWORK")
-            button.icon:SetAllPoints(); button.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+            button.icon:SetPoint("TOPLEFT", button, "TOPLEFT", 1, -1); button.icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -1, 1); button.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
         end
         if button then
             local id = entry and entry.id
@@ -106,7 +105,7 @@ local function paintChoices(row, key, choices, offset, recommendedID, recommenda
                 local position = offset + index - 1
                 if button.configuredPosition ~= position then
                     button:ClearAllPoints()
-                    button:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - position * (size + gap), 0)
+                    button:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - position * (size + gap), A.Style.sideIconY)
                     button.configuredPosition = position
                 end
                 if not button.configured or button.configuredSpell ~= id then

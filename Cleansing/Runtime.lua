@@ -60,12 +60,12 @@ function P.Create(row)
     row.cleanseSpells, row.cleanseSlotCount = spells, #spells
     row.cleanseButtons = {}
     row.drinkIcon:ClearAllPoints()
-    row.drinkIcon:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset + #spells * (size + gap), 0)
+    row.drinkIcon:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset + #spells * (size + gap), A.Style.sideIconY)
     local info = A.Access.Read(C_XMLUtil and C_XMLUtil.GetTemplateInfo, "CustomAuraContainerTemplate")
     local container
     if info and A.Access.Readable(info.type) and info.type == "AuraContainer" then
         container = CreateFrame("AuraContainer", nil, row.supportFrame or row, "CustomAuraContainerTemplate")
-        container:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset, 0)
+        container:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset, A.Style.sideIconY)
         container:SetSize(#spells * size + (#spells - 1) * gap, size)
         container:SetUnit(row.unit)
         row.cleanseIndicator = container
@@ -75,7 +75,7 @@ function P.Create(row)
         -- A permanent secure sibling, never a child of or anchored to an AuraButton.
         local button = CreateFrame("Button", nil, row.supportFrame or row, "SecureActionButtonTemplate")
         button:SetSize(size, size)
-        button:SetPoint("TOPLEFT", row.health, "TOPRIGHT", x, 0)
+        button:SetPoint("TOPLEFT", row.health, "TOPRIGHT", x, A.Style.sideIconY)
         local level = A.Access.Read(row.health.GetFrameLevel, row.health)
         local publicLevel = type(level) == "number" and level >= 0 and level < 10000 and level % 1 == 0
         if publicLevel then
@@ -87,7 +87,7 @@ function P.Create(row)
             button:SetAttribute(prefix .. "type1", "")
         end
         button.icon = button:CreateTexture(nil, "ARTWORK")
-        button.icon:SetAllPoints(); button.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+        button.icon:SetPoint("TOPLEFT", button, "TOPLEFT", 1, -1); button.icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -1, 1); button.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
         button.icon:SetDesaturated(true); button.icon:SetAlpha(0.3)
         button:SetScript("OnEnter", function()
             if InCombatLockdown() or not button.spell then return end
@@ -111,15 +111,14 @@ function P.Create(row)
                     indicator:SetPoint("TOPLEFT", container, "TOPLEFT", (index - 1) * (size + gap), 0)
                     indicator:EnableMouse(false)
                     indicator:SetCancelAuraButtons(nil)
-                    -- One-pixel halo fits the row gap without spilling into neighbors.
+                    -- Inset artwork keeps the gold border inside the clickable square.
                     local glow = indicator:CreateTexture(nil, "BACKGROUND")
-                    glow:SetPoint("TOPLEFT", indicator, "TOPLEFT", -1, 1)
-                    glow:SetPoint("BOTTOMRIGHT", indicator, "BOTTOMRIGHT", 1, -1)
+                    glow:SetAllPoints(indicator)
                     glow:SetColorTexture(1, 0.75, 0.1, 0.85)
                     -- A constant spell image, not the native aura's icon. The
                     -- secure sibling underneath retains all click handling.
                     local activeIcon = indicator:CreateTexture(nil, "ARTWORK")
-                    activeIcon:SetAllPoints(); activeIcon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+                    activeIcon:SetPoint("TOPLEFT", indicator, "TOPLEFT", 1, -1); activeIcon:SetPoint("BOTTOMRIGHT", indicator, "BOTTOMRIGHT", -1, 1); activeIcon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
                     activeIcon:SetTexture(spellInfo and spellInfo.iconID)
                 end,
             })

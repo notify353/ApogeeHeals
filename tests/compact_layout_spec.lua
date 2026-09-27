@@ -1,13 +1,15 @@
 local Mock = dofile("tests/mock.lua")
 local m=Mock.New(); local a=m.Start()
+assert(a.Style.sideIconSize * a.Style.scale == 36 and a.Style.sideIconGap * a.Style.scale == 4)
+assert((a.Style.rowHeight - a.Style.sideIconSize) * a.Style.scale == 7)
 for _, rows in ipairs({a.View.rows, a.Preview.rows}) do
     for i, row in ipairs(rows) do
         assert(row.health.point[5] == 0 and row.power.point[5] == -14.5)
         assert(row.height == 19.5)
         if i > 1 then assert(rows[i-1].point[5] - row.point[5] - row.height == 2) end
         assert(row.drinkIcon.point[2] == row.health and row.drinkIcon.point[3] == "TOPRIGHT")
-        assert(row.drinkIcon.point[5] == 0)
-        assert(row.drinkIcon.width == row.height and row.drinkIcon.height == row.height)
+        assert(row.drinkIcon.point[5] == -0.75)
+        assert(row.drinkIcon.width == 18 and row.drinkIcon.height == 18)
     end
 end
 assert(a.View.root.height == 105.5 and a.Preview.root.height == 105.5)

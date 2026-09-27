@@ -6,8 +6,11 @@ local S = { width = 112, healthHeight = 14, powerHeight = 5, barGap = 0.5,
 A.Style = S
 S.targetWidth = S.width
 S.clusterHeight = S.healthHeight + S.barGap + S.powerHeight
-S.sideIconSize = S.clusterHeight
-S.sideIconGap = 2
+-- Match 36px settings tiles / 4px gaps at the row root's 2x scale.
+-- Borders stay inside each square; vertical centering separates adjacent rows.
+S.sideIconSize = 36 / S.scale
+S.sideIconGap = 4 / S.scale
+S.sideIconY = -(S.clusterHeight - S.sideIconSize) / 2
 S.sideIconOffset = S.sideIconSize + 2 * S.sideIconGap
 S.targetGap = S.clusterHeight
 -- Reserve both target rows and a separate drag handle above them.

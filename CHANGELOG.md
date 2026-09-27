@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Match all side icons to settings-tile size and spacing, center them vertically,
+  and contain gold borders inside the tiles so stacked rows stay separated.
+
 - Add researched class upkeep, friendly Priest/Shaman/Druid/Mage cleansing,
   Hunter own-aspect choices, and native player weapon enchantment displays.
   Preserve Paladin controls and document pet/group/item interaction limits.

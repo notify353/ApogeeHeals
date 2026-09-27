@@ -11,8 +11,8 @@ for _, options in ipairs({{might=true}, {cleanse=true}, {class="ROGUE"}, {known=
                 for index, button in ipairs(row.cleanseButtons) do
                     local learned = index == 1 and m.known or index == 2 and m.cleanse
                     assert(button.parent == row and button.point[2] == row.health)
-                    assert(button.width == row.height and button.height == row.height and button.point[5] == 0)
-                    assert(button.point[4] == 2 + (index - 1) * (row.height + 2))
+                    assert(button.width == a.Style.sideIconSize and button.height == a.Style.sideIconSize and button.point[5] == a.Style.sideIconY)
+                    assert(button.point[4] == 2 + (index - 1) * (a.Style.sideIconSize + 2))
                     assert(button.template == "SecureActionButtonTemplate" and not button.scripts.OnClick)
                     assert(button.attributes.unit == row.unit and button.attributes.useOnKeyDown == false)
                     assert(button.clicks[1] == "LeftButtonUp")
@@ -23,13 +23,13 @@ for _, options in ipairs({{might=true}, {cleanse=true}, {class="ROGUE"}, {known=
                         assert(button.attributes[prefix .. "type1"] == "")
                     end
                 end
-                assert(row.drinkIcon.point[4] == 2 + 2 * (row.height + 2))
+                assert(row.drinkIcon.point[4] == 2 + 2 * (a.Style.sideIconSize + 2))
                 if not options.noTemplates and not options.secretTemplates then
                     local indicator = assert(row.cleanseIndicator)
                     assert(indicator.parent == row and indicator.unit == row.unit)
                     for key, slot in pairs(indicator.slots) do
                         assert(slot.frame.mouse == false and slot.frame.parent == indicator)
-                        assert(slot.frame.width == row.height and slot.frame.height == row.height)
+                        assert(slot.frame.width == a.Style.sideIconSize and slot.frame.height == a.Style.sideIconSize)
                         local index = key == "purify" and 1 or 2
                         assert(slot.frame:GetFrameLevel() > row.cleanseButtons[index]:GetFrameLevel())
                         local activeIcon
@@ -45,11 +45,11 @@ for _, options in ipairs({{might=true}, {cleanse=true}, {class="ROGUE"}, {known=
                     end
                 end
             end
-            assert(row.buffOverflow.point[4] == -2 - 4 * (row.height + 2))
+            assert(row.buffOverflow.point[4] == -2 - 4 * (a.Style.sideIconSize + 2))
             for index, button in ipairs(row.buffButtons) do
-                assert(button.width == row.height and button.height == row.height)
-                assert(button.point[1] == "TOPRIGHT" and button.point[3] == "TOPLEFT" and button.point[5] == 0)
-                assert(button.point[4] == -2 - (index - 1) * (row.height + 2))
+                assert(button.width == a.Style.sideIconSize and button.height == a.Style.sideIconSize)
+                assert(button.point[1] == "TOPRIGHT" and button.point[3] == "TOPLEFT" and button.point[5] == a.Style.sideIconY)
+                assert(button.point[4] == -2 - (index - 1) * (a.Style.sideIconSize + 2))
             end
         end
     end
