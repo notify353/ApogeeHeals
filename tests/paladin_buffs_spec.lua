@@ -104,9 +104,10 @@ print("PASS native exact-rank tooltip handlers, recycling, aura/roster/hide/comb
 
 -- Every variant remains selectable past the old four-reminder limit.
 m,a=setup()
-local variants = {19740,19742,20217,1038,20911,19977,1022,1044,6940,25782,25894,25898,25895,25899,25890}
+local variants = {19740,19742,20217,1038,20911,19977,25782,25894,25898,25895,25899,25890}
 C_Spell.GetSpellInfo = function(id) return {spellID=id,name="Blessing "..id,iconID=id} end
 for _,id in ipairs(variants) do m.known[id]=true end
+for _,id in ipairs({1022,5599,10278,1044,6940,20729}) do m.known[id]=true end
 for index=1,4 do m.units["party"..index]={connected=true,dead=false,auras={}} end
 m.Event("SPELLS_CHANGED");m.Flush()
 for _,row in ipairs(a.View.rows) do
@@ -118,7 +119,12 @@ for _,row in ipairs(a.View.rows) do
         assert(button.width==a.Style.sideIconSize and not button.scripts.OnClick)
     end
 end
-m.units.party2.auras={{spellId=1044,name="Freedom",sourceUnit="party3"}}
+for _,id in ipairs({1022,5599,10278,1044,6940,20729}) do
+    m.units.party2.auras={{spellId=id,name="Emergency blessing",sourceUnit="party3"}}
+    a.Buffs.Refresh()
+    assert(a.View.rows[3].blessingButtons[1].attributes.spell1==19740)
+end
+m.units.party2.auras={{spellId=19742,name="Wisdom",sourceUnit="party3"}}
 a.Buffs.Refresh()
 assert(a.View.rows[3].blessingButtons[1].driver=="hide")
 assert(a.View.rows[2].blessingButtons[1].attributes.spell1==19740)

@@ -3,22 +3,19 @@
 ## Per-recipient blessing choices (70009, 2026-09-27)
 
 A complete public out-of-combat HELPFUL scan establishes absence of any recognized
-Paladin blessing on player/party1-4. Unknown/incomplete scans suppress choices.
-Each unblessed row offers the highest learned rank of every validated blessing
-variant, with ordinary and Greater spells as separate choices, including short
-Protection, Freedom and Sacrifice variants. Existing blessing families supply
-coverage; extra candidates 10278/5599/1022, 1044, 20729/6940 are validated through
-the same native spellbook and helpful-spell checks before use. Spell databases
-provide candidate identities only; client/server support and cast restrictions
-remain authoritative. References: https://classicdb.com/?spell=20729 and
-https://www.wowhead.com/classic/spell=10278/blessing-of-protection.
+lasting Paladin blessing on player/party1-4. Unknown/incomplete scans suppress
+choices. Each unblessed row offers the highest learned rank of Might, Wisdom,
+Kings, Salvation, Sanctuary and Light, with ordinary and Greater spells as
+separate choices. Protection, Freedom and Sacrifice are emergency abilities:
+they are neither upkeep choices nor evidence of a lasting party blessing.
+Each candidate passes native spellbook and helpful-spell validation before use.
 
 This replaces the single configured blessing recommendation, while retaining
 saved reminder entries and unrelated upkeep discovery. All choices are visible,
 independent of the four-reminder cap and old reminder checkboxes. Each secure
 button has the immutable row unit, exact spell, release-only click and blocked
 modified clicks. Tooltip and native action contracts are unchanged. No automatic
-choice or casting occurs. A blessing from any caster suppresses that row's choices.
+choice or casting occurs. A lasting blessing from any caster suppresses that row's choices.
 Regular upkeep, blessing choices and the self-only aura choices share matching
 geometry without overlapping. Combat hides choices through native drivers;
 no protected attributes or layout change in combat. Mock source/package checks

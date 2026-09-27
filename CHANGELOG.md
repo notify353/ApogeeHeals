@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Limit blessing choices to lasting party buffs; exclude Protection, Freedom and Sacrifice.
+
 - Offer all learned blessing variants on each unblessed player/party row, with matching left-side geometry.
 
 - Offer learned Paladin auras beside the player buff reminders when their own aura is off, outside combat.

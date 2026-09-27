@@ -3,14 +3,14 @@ local D = { pending = true, ranks = {} }
 A.BuffDefaults = D
 -- Candidate identities, never an assertion that a spell exists/is learned on Forever.
 -- Ordinary Might/Wisdom remain seeded for saved-data compatibility; the chooser
--- offers every validated learned variant independently of reminder preferences.
+-- offers lasting party blessings independently of reminder preferences.
+-- Emergency Protection/Freedom/Sacrifice are neither choices nor upkeep coverage.
 local families = {
     might = { 25291, 19838, 19837, 19836, 19835, 19834, 19740, 25782, 25916 },
     wisdom = { 25290, 19854, 19853, 19852, 19850, 19742, 25894, 25918 },
     kings = { 20217, 25898 }, salvation = { 1038, 25895 },
     sanctuary = { 20914, 20913, 20912, 20911, 25899 },
     light = { 19979, 19978, 19977, 25890 },
-    protection = { 10278, 5599, 1022 }, freedom = { 1044 }, sacrifice = { 20729, 6940 },
 }
 local groups, seeds = {}, {}
 for group, ids in pairs(families) do for _, id in ipairs(ids) do groups[id] = group end end
@@ -57,7 +57,6 @@ end
 local choices = {
     {25291,19838,19837,19836,19835,19834,19740}, {25290,19854,19853,19852,19850,19742},
     {20217}, {1038}, {20914,20913,20912,20911}, {19979,19978,19977},
-    {10278,5599,1022}, {1044}, {20729,6940},
     {25916,25782}, {25918,25894}, {25898}, {25895}, {25899}, {25890},
 }
 function D.Choices()

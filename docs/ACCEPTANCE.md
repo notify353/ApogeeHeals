@@ -334,3 +334,8 @@ the correct recipient. Test normal and Greater variants and client-native
 reagent/range restrictions. Any blessing from any caster hides that row's choices;
 removal restores them out of combat. Check unknown/dead/offline units, preview,
 combat, zoning, and layout beside other upkeep and the self-only aura picker.
+
+Blessing scope correction: verify Protection, Freedom and Sacrifice never appear
+in the chooser, even when learned, and their active effects alone do not suppress
+lasting party-buff choices. Keep Might, Wisdom, Kings, Salvation, Sanctuary and
+Light, including learned Greater variants. Live acceptance pending.
