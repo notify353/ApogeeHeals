@@ -135,6 +135,8 @@ function V.Create()
     end
     V.target = targetRow("target")
     V.target:SetPoint("BOTTOMLEFT", V.rows[1], "TOPLEFT", 0, S.targetGap)
+    V.target.cast = bar(V.target, S.powerHeight, -(S.healthHeight + S.barGap), S.targetWidth)
+    V.target.cast:SetAlpha(0)
     RegisterStateDriver(V.target, "visibility", "[@target,exists] show; hide")
     V.targetTarget = targetRow("targettarget")
     V.targetTarget:SetPoint("BOTTOMLEFT", V.target, "TOPLEFT", 0, S.targetTargetGap)
@@ -153,6 +155,7 @@ function V.Create()
         elapsed = 0; V.RefreshTargetTarget()
     end)
     RegisterStateDriver(V.targetTarget, "visibility", "[@targettarget,exists] show; hide")
+    V.target:SetScript("OnShow", function() if not A.Runtime.suspended then V.RefreshTarget() end end)
     A.Preview.Create(V.root, buildRow)
     V.handle = CreateFrame("Button", nil, UIParent)
     V.handle:SetScale(S.scale); V.handle:SetSize(S.width, 10)
@@ -203,6 +206,7 @@ local function refreshTargetRow(row)
     A.UnitAPI.PaintTargetIdentity(row)
     -- Unknown/restricted state must not prevent native health/power display.
     if A.Access.Read(UnitExists, row.unit) == false then
+        if row.cast then V.ClearTargetCast() end
         A.UnitAPI.Clear(row.health); A.UnitAPI.Clear(row.power)
         A.IncomingHeals.Clear(row.incoming)
         return
@@ -211,6 +215,14 @@ local function refreshTargetRow(row)
         A.IncomingHeals.Paint(row.incoming, row.unit)
     else A.IncomingHeals.Clear(row.incoming) end
     A.UnitAPI.PaintPower(row.power, row.unit)
+    if row.cast then
+        local casting = not A.Runtime.suspended and A.UnitAPI.PaintCast(row.cast, row.unit)
+        row.cast:SetAlpha(casting and 1 or 0)
+        row.power:SetAlpha(casting and 0 or 1)
+    end
+end
+function V.ClearTargetCast()
+    V.target.cast:SetAlpha(0); V.target.power:SetAlpha(1)
 end
 function V.RefreshTargetTarget()
     if not A.Runtime.suspended then refreshTargetRow(V.targetTarget) end

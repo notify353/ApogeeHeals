@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Show native cast/channel progress in the selected target's existing power
+  strip, restoring power when casting stops without increasing frame height.
+
 - Display full readable player names, including surnames and hyphens.
 
 - Use the smaller NPC name font size consistently for player, party, target,

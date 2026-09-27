@@ -298,6 +298,29 @@ The existing public-value guards still blank restricted names and use ? for
 unavailable levels. Dead/offline/out-of-range statuses retain precedence.
 Only FontString presentation changes; protected layout and actions stay unchanged.
 
+### Selected-target cast strip (70009)
+
+UnitCastingInfo return 10 and UnitChannelInfo return 11 are nullable, NeverSecret
+castBarIDs. Guarded IDs, or a readable nonempty name when the ID is absent,
+establish cast/channel presence. Restricted names and timestamps never enter
+Lua comparisons or arithmetic. UnitCastingDuration/UnitChannelDuration feed
+SetTimerDuration directly, with Immediate interpolation and ElapsedTime for
+casts or RemainingTime for channels. SimpleStatusBarConstantsDocumentation.lua
+is included in the checked export inventory. Optional API/sink failure restores
+power; no timestamp-based fallback or interruptibility inference is used.
+
+An anonymous, mouse-disabled StatusBar occupies exactly the selected target's
+power strip. Alpha swaps presentation with the existing power bar; health, name,
+unit/action attributes and protected layout do not change. The native timer
+animates progress without Lua polling. Start/stop/delay/failure/interruption and
+channel events requery current target state, so stale event identities cannot
+clear a different current cast. Target changes/show and world entry refresh it;
+world exit clears the presentation. Target's target keeps its power strip.
+Native restricted-data acceptance, animation, event timing and combat rendering
+remain live acceptance checks, separate from mock/native-source verification.
+
+### Target-of-target behavior
+
 The anonymous targettarget row uses fixed native healing actions and independent
 [@targettarget,exists] visibility. It is positioned once above target with a
 four-logical-pixel gap and a muted label above it. Width, colors and name sizing

@@ -11,6 +11,9 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 - Target sits above the player with a full-row gap; target's target stays
   closely above target. Both retain their size and align with the stack's left
   edge. The drag handle sits above the pair and its caption.
+- While the selected target casts, its power strip temporarily shows amber cast
+  progress without adding height. Casts fill forward and channels drain backward;
+  normal power returns when casting stops. Health and names remain visible.
 - Default placement aligns beneath Apogee Tank's Forever bars, with a 9px gap
   below its single-target layout. No Tank dependency or frame attachment is used.
   Existing saved positions remain unchanged; use **Reset positions** to adopt it.

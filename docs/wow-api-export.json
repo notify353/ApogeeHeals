@@ -14,6 +14,7 @@
     "Blizzard_APIDocumentationGenerated/SpellBookDocumentation.lua",
     "Blizzard_ActionBar/Shared/SpellFlyout.lua",
     "Blizzard_APIDocumentationGenerated/SimpleStatusBarAPIDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/SimpleStatusBarConstantsDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/SimpleFontStringAPIDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/SimpleFrameAPIDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/InputDocumentation.lua",
