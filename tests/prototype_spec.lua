@@ -81,7 +81,7 @@ test("combat immediately clears drinking and cancels unlocked dragging safely", 
     m.combat=true; m.Event("PLAYER_REGEN_DISABLED")
     equal(a.View.rows[1].status.text, ""); equal(a.View.unlocked, false)
     equal(a.View.dragging, false); equal(a.View.handle.scripts.OnUpdate, nil)
-    equal(a.Settings.unlock.enabled, false); m.Flush()
+    equal(a.Settings.reset.enabled, false); m.Flush()
     local reads = m.auraReads; a.View.Refresh(); equal(m.auraReads, reads)
     m.combat=false; m.Event("PLAYER_REGEN_ENABLED"); m.Flush()
     equal(a.View.rows[1].drinkIcon.shown, true); equal(a.View.unlocked, false)
@@ -95,10 +95,10 @@ test("events coalesce, filter unrelated units and remain idle afterward", functi
 end)
 test("finishing a drag saves position and synchronizes the lock control", function()
     local m = Mock.New(); local a = m.Start()
-    a.View.SetUnlocked(true); a.Settings.Refresh(); equal(a.Settings.unlock.checked, true)
+    a.View.SetUnlocked(true); a.Settings.Refresh(); equal(a.Settings.unlock, nil); equal(a.Settings.bindings, nil)
     a.View.handle.scripts.OnDragStart(); a.View.handle.scripts.OnUpdate()
     a.View.handle.scripts.OnDragStop()
-    equal(a.View.unlocked, false); equal(a.Settings.unlock.checked, false)
+    equal(a.View.unlocked, false); equal(a.Settings.reset.enabled, true)
     equal(a.View.handle.scripts.OnUpdate, nil); equal(a.db.position.x, -180)
     local saved = a.db
     local m2 = Mock.New(); local a2 = m2.Load(); ApogeeHealsDB = saved

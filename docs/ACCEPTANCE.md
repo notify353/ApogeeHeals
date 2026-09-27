@@ -213,3 +213,63 @@ do not complete any of these checks.
   Check range, cooldown, skill and Recently Bandaged failures behave natively.
 - Editing stays locked in combat; spell defaults and spell range feedback remain
   intact after replacing/removing the bandage. Check for taint or blocked actions.
+
+## Target frame — pending live acceptance
+
+- Select friendly, neutral and hostile NPCs and player characters, solo and in a raid.
+  Check the matching-width row to the right of the player's power bar, matching bar heights,
+  left stripe, level/name order, full NPC titles in a smaller font and character
+  names without realms at the usual size.
+- Change and clear targets during combat. Check native visibility and current
+  health/power without blocked actions or stale stripe/name; restricted identities
+  may be blank and unavailable classification should use the muted stripe.
+- Check a target without power, dead targets, long names, and incoming healing.
+  Drag the existing anchor out of combat and verify the target follows it.
+- Healing assignments apply to the target row; buff reminders remain party-only.
+  No game session was automated by local checks.
+
+## Healing editor defaults and resets — pending live acceptance
+
+- On a fresh character or after Reset positions, verify Healing Mouse sits below
+  the default Mouse grid with aligned left edges and a small gap. Existing saved
+  dragged positions must survive updates. Repeat without Keybinds enabled.
+- Reset positions while the editor is moved: assignments and reminders remain,
+  the editor and unit frames return to defaults, and minimap placement resets.
+- Factory reset opens confirmation; Cancel/Escape preserve all saved settings.
+  Accept outside combat restores available class defaults and clears only this
+  character's Heals data. Verify after reload and when switching DEV/PROD.
+- Both controls are disabled in combat; entering combat with confirmation open
+  must prevent a later acceptance from resetting data or protected actions.
+
+## Target of target — pending live acceptance
+
+- Select a target with a friendly or hostile target. Verify the matching-width row
+  appears above your target, left-aligned with a small gap and Target's target label.
+- Change the selected target's target, damage/heal it and check timely identity,
+  health and power updates; repeat in combat. Clear either target and confirm the
+  row and label disappear without stale data, then reappear with current data.
+- Verify selecting yourself, dead/no-power units, NPC names, players and raid use.
+  The target-of-target receives the shared healing assignments through native
+  actions; party range feedback and buff reminders remain separate.
+
+## Target healing bindings — pending live acceptance
+
+- Use a learned healing spell and a carried bandage on a friendly target and
+  target-of-target through their bars. Check plain/Shift/Ctrl with all five mouse
+  buttons, correct recipient and one release action per click.
+- Repeat in combat, switch targets and have the target change its target. Verify
+  immutable row recipients and no taint/blocked-action warnings.
+- Check hostile/dead/out-of-range targets and empty bandage stacks: native game
+  restrictions decide the result, without addon retargeting or Lua casting.
+- Clear assignments and confirm learned defaults, or plain-left native targeting
+  when no learned default exists. Existing party actions must remain unchanged.
+
+## Healing Mouse input feedback — pending live acceptance
+
+- Open Healing Mouse and click player, party, target and target-of-target bars.
+  Verify the correct plain/Shift/Ctrl tile flashes blue briefly, matching Keybinds.
+- Test all five mouse buttons, rapid repeats, unavailable/empty assignments and
+  bandages. The flash reports input, not success; native actions still fire once.
+- Direct editor clicks flash without casting; drag/drop and removing assignments
+  still work. Close/reopen the editor and enter combat: no stuck flash, unsolicited
+  editor opening or blocked-action/taint warning should occur.

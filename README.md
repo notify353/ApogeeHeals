@@ -10,7 +10,7 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
   while solo; native visibility hides missing units and all rows in raids.
 - Default placement aligns beneath Apogee Tank's Forever bars, with a 9px gap
   below its single-target layout. No Tank dependency or frame attachment is used.
-  Existing saved positions remain unchanged; use **Reset position** to adopt it.
+  Existing saved positions remain unchanged; use **Reset positions** to adopt it.
 - Apogee Tank styling with taller health bars: 112x14 health, 112x5 power, at 2x scale.
   First names only use Blizzard's native class colors, left-aligned inside health bars with the
   original readable game font and dark shadow, shown only outside
@@ -31,17 +31,9 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 - Native left-click targeting when unassigned, with healing click bindings on Left, Right,
   Middle, Mouse 4 and Mouse 5 (plain, Shift and Ctrl). No global binding overrides.
   Standard native target actions also retain the client's spell/item cursor behavior.
-- Escape -> Options -> AddOns -> Apogee Heals: Unlock frames and Reset position.
-  Unlock also shows a five-member sample party, even while solo, with health,
-  power, drinking and incoming-heal examples. Preview rows cannot target anyone.
-  Each unlock starts at full health and power for three seconds, then smoothly
-  cycles through damage, resource use, incoming heals and recovery back to full.
-  It also demonstrates an out-of-range Rogue, an offline Druid and a dead Priest.
-  Out-of-range fading is a preview example only; live range detection remains deferred.
-  The twelve-second loop stops immediately when locked or combat begins.
-  Drag the handle above the stack. Releasing the drag locks it; combat also locks it.
-  Locking ends the preview and restores the live party display.
-  Position and healing assignments are saved per character. Reload starts locked.
+- Escape -> Options -> AddOns -> Apogee Heals: Reset positions, Buff reminders
+  and Factory reset. Position and healing assignments are saved
+  per character.
 
 ### Healing bindings
 
@@ -53,8 +45,7 @@ followed by Keybinds in the middle and Tank below-right. Historical saved angles
 are retained but ignored. The orbit
 is circular, with radius half the larger minimap dimension plus 16 pixels,
 including resized or rectangular maps. It updates on map resize and UI scale
-changes. The button locks during combat. The existing
-**Options > AddOns > Apogee Heals > Edit healing bindings** shortcut also works.
+changes. The button locks during combat.
 Drop a learned
 friendly spell from the player spellbook onto one of fifteen mouse/modifier slots.
 Pickup followed by clicking a slot also works. The selected spell ID/rank is kept;
@@ -170,12 +161,16 @@ design requires explicit agreement; settings report the unavailable feature.
 
 ## Healing Mouse placement
 
-With Keybinds available, Healing Mouse opens eight logical pixels to the right of its Weapons
-header with aligned tops. The optional anchor follows the Weapons position even
-when its configuration panel is hidden; opening Heals does not show Keybinds.
-Without that anchor, Healing Mouse opens centered. Dragging its header overrides
-the default and saves a separate per-character editor position. Existing party
-frame placement is unchanged. DEV only uses the DEV Keybinds anchor.
+Healing Mouse opens directly below Keybinds' default Mouse grid, aligned on the
+left with a small gap. It also works independently with Keybinds absent or hidden.
+Dragging the header saves a per-character position; updates preserve it.
+
+In **Options > AddOns > Apogee Heals**, **Reset positions** restores the party/target
+bars, Healing Mouse and minimap button without changing assignments or reminders.
+**Factory reset** asks for confirmation, then clears this character's
+Heals assignments, reminders and positions and restores available class defaults.
+Other characters, other addons and WoW keybindings are unchanged. Both controls
+are locked during combat; confirming an already-open dialog in combat does nothing.
 
 ## Spell range
 
@@ -263,3 +258,11 @@ Follow docs/ACCEPTANCE.md before calling this prototype playable or releasing it
 MIT licensed. Tank style/access/display patterns and the original Party Health
 Bars drink identity list are adapted from notify353's MIT-licensed addons;
 the original copyright notice is retained in LICENSE.
+
+Reset positions and Factory reset are grouped last in Settings, in that order,
+with matching button dimensions and spacing across Heals and Keybinds.
+
+Healing Mouse assignments also apply to the target and target-of-target bars,
+including learned class defaults, plain/Shift/Ctrl mouse clicks and bandages.
+Each click uses that bar's recipient; native game restrictions decide whether
+its spell or item can be used. Changes to assignments remain locked in combat.

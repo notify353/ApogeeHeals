@@ -19,12 +19,8 @@ function E.Place()
         E.frame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", saved.x, saved.y)
         return
     end
-    -- Optional public anchor only; never access Keybinds' namespace or saved data.
-    -- Central DEV generation rewrites this explicitly audited cross-addon identity.
-    local header = _G["ApogeeKeybindsWeaponsHeader"]
-    if A.Access.Readable(header) and type(header) == "table" then
-        E.frame:SetPoint("TOPLEFT", header, "TOPRIGHT", 8, 0)
-    else E.frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0) end
+    local position = A.Storage.DefaultEditorPosition()
+    E.frame:SetPoint("TOPLEFT", UIParent, "CENTER", position.x, position.y)
 end
 function E.StopMoving()
     if not E.frame then return end
@@ -42,6 +38,13 @@ function E.StopMoving()
         if finite(x) and finite(y) then A.db.editorPosition = { x = x, y = y } end
     end
 end
+function E.ResetPosition()
+    if InCombatLockdown() then return end
+    E.StopMoving()
+    E.customPosition = nil
+    A.db.editorPosition = nil
+    E.Place()
+end
 function E.Cancel()
     E.source = nil
     if E.frame then E.Refresh() end
@@ -51,6 +54,23 @@ function E.Close()
     E.StopMoving()
     if E.frame then E.frame:Hide() end
     if GameTooltip then GameTooltip:Hide() end
+end
+function E.FlashInput(id)
+    if not E.frame or not E.frame:IsShown() then return end
+    local button = E.buttons[id]
+    if not button then return end
+    button.inputFlashSerial = (button.inputFlashSerial or 0) + 1
+    local serial = button.inputFlashSerial
+    button.inputFlash:Show()
+    C_Timer.After(0.15, function()
+        if button.inputFlashSerial == serial then button.inputFlash:Hide() end
+    end)
+end
+function E.ClearFlashes()
+    for _, button in pairs(E.buttons) do
+        button.inputFlashSerial = (button.inputFlashSerial or 0) + 1
+        button.inputFlash:Hide()
+    end
 end
 function E.Refresh()
     if not E.frame then return end
@@ -126,12 +146,17 @@ function E.Create()
         button.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
         text(button, ({ "", "S-", "C-" })[slot.row]
             .. ({ "L", "R", "M", "4", "5" })[slot.button], 2, -2, 9)
+        button.inputFlash = button:CreateTexture(nil, "OVERLAY")
+        button.inputFlash:SetAllPoints(button)
+        button.inputFlash:SetColorTexture(0.35, 0.75, 1, 0.4)
+        button.inputFlash:Hide()
         button:SetHighlightTexture("Interface/Buttons/ButtonHilight-Square")
         button:RegisterForClicks("LeftButtonUp"); button:RegisterForDrag("LeftButton")
         button:SetScript("OnReceiveDrag", function() E.Drop(id) end)
         button:SetScript("OnClick", function()
             if E.suppressClick then E.suppressClick = nil; return end
-            if E.source or GetCursorInfo() then E.Drop(id) end
+            if E.source or GetCursorInfo() then E.Drop(id)
+            else E.FlashInput(id) end
         end)
         button:SetScript("OnDragStart", function()
             if not InCombatLockdown() and A.db.bindings[id] and not GetCursorInfo() then
@@ -157,7 +182,7 @@ function E.Create()
                 GameTooltip:AddLine(info.name, 1, 1, 1)
                 local rank = not info.itemID and A.Access.Read(C_Spell and C_Spell.GetSpellSubtext, spell)
                 if type(rank) == "string" and rank ~= "" then GameTooltip:AddLine(rank) end
-            else GameTooltip:AddLine(reason or (id == "1" and "Empty: targets the clicked party member."
+            else GameTooltip:AddLine(reason or (id == "1" and "Empty: targets the clicked unit."
                 or "Empty: drop a learned healing spell or bandage.")) end
             if automatic then
                 GameTooltip:AddLine("Class default: highest learned rank. Drop a spell or bandage to override.", 0.8, 0.85, 0.9, true)
@@ -173,7 +198,7 @@ function E.Create()
         remove:SetScript("OnClick", function() E.Cancel(); A.Bindings.Put(id, nil) end)
     end
     frame:SetScript("OnHide", function()
-        E.Cancel(); E.StopMoving(); GameTooltip:Hide()
+        E.ClearFlashes(); E.Cancel(); E.StopMoving(); GameTooltip:Hide()
         A.Minimap.Refresh()
     end)
     frame:SetScript("OnShow", function() E.Place(); A.Minimap.Refresh() end)

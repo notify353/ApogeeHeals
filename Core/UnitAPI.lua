@@ -33,6 +33,8 @@ end
 function U.PaintPower(bar, unit)
     local kind = R(UnitPowerType, unit)
     if type(kind) ~= "number" then U.Clear(bar); return end
+    local maximum = R(UnitPowerMax, unit, kind)
+    if type(maximum) == "number" and maximum <= 0 then U.Clear(bar); return end
     local ok = pcall(function()
         bar:SetMinMaxValues(0, UnitPowerMax(unit, kind)); bar:SetValue(UnitPower(unit, kind))
         bar:SetStatusBarColor(A.Style.PowerColor(kind))
@@ -86,4 +88,30 @@ function U.PaintLevel(label, unit)
     local level = R(UnitLevel, unit)
     if type(level) == "number" and level > 0 then label:SetFormattedText("%d", level)
     else label:SetText("?") end
+end
+
+function U.PaintTargetIdentity(row)
+    local unit = row.unit
+    local player = R(UnitIsPlayer, unit)
+    local font, _, flags = row.name:GetFont()
+    row.name:SetFont(font, player == false and 6 or 8, flags)
+    row.name:SetText(""); row.level:SetText("")
+    row.name:SetTextColor(1, 1, 1, 1)
+    row.classStrip:SetColorTexture(unpack(A.Style.muted))
+    if R(UnitExists, unit) == false then return end
+    -- UnitName separates the realm in its second return. Preserve the entire
+    -- first return, including spaces, NPC titles and character surnames.
+    local name = R(UnitName, unit)
+    if type(name) == "string" then row.name:SetText(name) end
+    U.PaintLevel(row.level, unit)
+    if player == true then
+        local ok, _, classToken = pcall(UnitClass, unit)
+        if ok then U.PaintClassStrip(row.classStrip, classToken) end
+    elseif player == false then
+        local reaction = R(UnitReaction, unit, "player")
+        if type(reaction) ~= "number" then return end
+        if reaction >= 5 then row.classStrip:SetColorTexture(0.28, 0.74, 0.46, 1)
+        elseif reaction == 4 then row.classStrip:SetColorTexture(0.90, 0.74, 0.22, 1)
+        elseif reaction >= 1 then row.classStrip:SetColorTexture(0.86, 0.30, 0.30, 1) end
+    end
 end

@@ -11,6 +11,8 @@ local function definition(text, name)
 end
 local source = read("Blizzard_FrameXML/SecureTemplates.lua")
 local m = dofile("tests/mock.lua").New(); local a = m.Start()
+local recipients = {unpack(a.View.rows)}
+recipients[#recipients+1]=a.View.target; recipients[#recipients+1]=a.View.targetTarget
 local env = setmetatable({}, {__index = _G})
 local invoked, targeted = 0, nil
 env.SecureButton_GetAttribute = function(frame, key) return frame.attributes[key] end
@@ -23,17 +25,17 @@ env.OnActionButtonPressAndHoldRelease = function() error("unexpected press-and-h
 local code = definition(source, "SecureActionButton_ShouldUseOnKeyDown") .. "\n"
     .. definition(source, "SecureActionButton_OnClick")
 local chunk = assert(loadstring(code)); setfenv(chunk, env); chunk()
-for _, row in ipairs(a.View.rows) do
+for _, row in ipairs(recipients) do
     assert(env.SecureActionButton_OnClick(row, "LeftButton", false) == true)
 end
-assert(invoked == 5)
+assert(invoked == 7)
 local action = assert(source:match("SECURE_ACTIONS%.target%s*=%s*(function.-\n    end);"))
 env.SpellIsTargeting = function() return false end
 env.CursorHasItem = function() return false end
 env.TargetUnit = function(unit) targeted = unit end
 chunk = assert(loadstring("return " .. action)); setfenv(chunk, env)
 local target = chunk()
-for _, row in ipairs(a.View.rows) do target(row, row.unit, "LeftButton"); assert(targeted == row.unit) end
+for _, row in ipairs(recipients) do target(row, row.unit, "LeftButton"); assert(targeted == row.unit) end
 
 -- Execute the matching client's actual spell action and release dispatcher.
 -- This proves the source contract, not secure provenance or physical input routing.
@@ -48,7 +50,7 @@ env.CastSpellByName = function() error("spell rank identity was lost") end
 chunk = assert(loadstring("return " .. spellAction)); setfenv(chunk, env)
 local cast = chunk()
 env.OnActionButtonClick = function(frame, button) cast(frame, frame.unit, button) end
-for _, row in ipairs(a.View.rows) do
+for _, row in ipairs(recipients) do
     row.attributes.spell2 = 2050
     for _, keyDown in ipairs({false, true}) do
         env.GetCVarBool = function() return keyDown end
@@ -113,7 +115,7 @@ local itemEnv = setmetatable({
 chunk = assert(loadstring("return " .. itemAction)); setfenv(chunk, itemEnv)
 local useItem = chunk()
 env.OnActionButtonClick = function(frame, button) useItem(frame, frame.attributes.unit, button) end
-for _, row in ipairs(a.View.rows) do
+for _, row in ipairs(recipients) do
     row.attributes.type2 = "item"; row.attributes.item2 = "item:1251"
     for _, down in ipairs({false, true}) do
         env.GetCVarBool = function() return down end

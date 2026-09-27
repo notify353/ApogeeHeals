@@ -40,17 +40,22 @@ Relevant current signatures and native dispatch remain compatible with the
 reviewed behavior. The old manifest did not store hashes, so this is a contract
 review and current-source execution, not a claim of byte-identical exports.
 
-## Optional editor anchor
+## Healing editor default and resets
 
-Healing Mouse can anchor TOPLEFT to the public ApogeeKeybindsWeaponsHeader
-TOPRIGHT at x=8, y=0. The existing Keybinds header retains its own lifecycle;
-Heals neither reads its private namespace/storage nor changes its visibility.
-Central generation explicitly rewrites this foreign identity to the DEV header
-for the DEV consumer. Missing/inaccessible anchor falls back to center; queued
-load/login/combat-exit checks handle delayed creation without polling. Saved
-editorPosition overrides docking. Drag coordinates use guarded finite GetLeft,
-GetBottom and effective-scale results before conversion to UIParent coordinates.
-No protected gameplay layout is affected. Existing screen clamping remains active.
+Healing Mouse anchors TOPLEFT to UIParent CENTER at (-270, -232), matching
+Keybinds' default Mouse grid left edge and leaving ten logical pixels below it.
+It neither reads sibling globals nor depends on sibling load order or visibility.
+Saved editorPosition wins; reset clears the saved and transient drag overrides.
+Drag coordinates retain public finite/scale guards. All positioning defers in combat.
+
+Reset positions restores the party/target anchor, healing editor and session
+minimap placement without changing bindings or buff reminders. Factory reset
+uses the matching Blizzard_StaticPopup contract (OnAccept, Cancel, hideOnEscape,
+whileDead and timeout=0), with a family-specific dialog identity in DEV. Acceptance
+rechecks combat before replacing only this character's Heals store with fresh
+validated defaults, canceling transient edits/discovery and reapplying native
+bindings and learned class buff defaults. No other addon or WoW bindings change.
+No automatic reset runs during upgrade. Live dialog/layout acceptance is pending.
 
 ## Left-click spell range (70009)
 
@@ -258,3 +263,78 @@ stacks remain assigned; native inventory resolution, range, cooldowns, skill and
 Recently Bandaged restrictions decide whether physical input succeeds. Item
 assignments disable the spell-only range indicator. Tests execute matching native
 item/release source with mocked engine functions; live acceptance is still needed.
+
+## Fixed target frame (70009)
+
+A separate anonymous SecureActionButtonTemplate uses immutable unit=target and
+the shared native healing bindings, with [@target,exists] visibility in all group modes.
+It stays outside party range polling, buff scans and party preview.
+Its 112-logical-pixel row matches the player/party width and shares the existing health/power, font, rail and native
+incoming-heal presentation, aligned beside the player's power bar with an 18-pixel gap.
+No target event changes protected attributes, anchors or visibility.
+
+UnitDocumentation confirms UnitName returns unitName and unitServer separately.
+The target uses the entire readable first return, preserving NPC titles and player
+character surnames/spaces. Restricted identity remains blank; no string splitting
+or restricted-value comparison occurs. Existing party-name behavior is unchanged.
+UnitIsPlayer and UnitReaction(target, player) pass through Access.Read before Lua
+branching; public player class tokens use the existing class-color helper, and
+public NPC reactions use friendly (5+), neutral (4), hostile (1-3) stripe colors.
+Unknown/restricted classification resets the stripe to muted. Level reads retain
+the guarded ? fallback. Target names remain visible in combat when readable. NPC names use a 6-pixel
+font; player/unknown target names retain the usual 8-pixel font. The name is
+never split or shortened in Lua.
+Health and power quantities stay in native display sinks. A public nonpositive
+maximum power clears the fill; restricted maxima are never compared in Lua.
+PLAYER_TARGET_CHANGED and target unit updates refresh identity and bars; native
+visibility owns disappearance. Live rendering, combat switching and long-name
+fit require in-game acceptance, separately from mocks and matching-export checks.
+
+## Target of target (70009)
+
+The anonymous targettarget row uses fixed native healing actions and independent
+[@targettarget,exists] visibility. It is positioned once above target with a
+four-logical-pixel gap and a muted label above it. Width, colors and name sizing
+match target. The label inherits native row visibility. Top-edge position clamping
+reserves space for the added row and label; no combat layout writes occur.
+
+UnitDocumentation defines synchronous UNIT_TARGET with a unit token payload.
+Matching Blizzard_UnitFrame/Mainline/TargetFrame.lua refreshes its target-of-target
+on UNIT_TARGET and via OnUpdate. Our target/targettarget events refresh these
+rows, while a visible-only 0.2-second OnUpdate refreshes just targettarget to
+cover unit-alias updates without scanning auras or running party healing logic.
+World exit suspends reads; world entry resumes them. Health/power and prediction
+use the existing native sinks; identity and reaction retain public-value guards.
+No GUID, inferred aggro or protected visibility mutation is added. Native rendering
+and combat visibility remain live checks.
+
+## Healing actions on both target rows
+
+Bindings.Apply now applies the same fifteen slots and modifier-blocking matrix to
+player, party1-4, target and targettarget. The unit attributes remain immutable;
+only action attributes are applied outside combat. Saved edits, learned class
+defaults, spell ranks and item assignments share one resolution per slot. Empty
+plain Left targets only if no assignment or learned default exists; unavailable
+assigned spells remain no-op. Native secure spell/item actions receive the exact
+row unit. No helpful/hostile target detection, retargeting or casting is done in
+Lua; the client decides legality, range, cooldown and item availability at click.
+Matching-export tests exercise spell/item release dispatch on all seven frames.
+They do not prove native secure provenance, hostile-target rejection, taint or
+physical-click behavior in game; these require live acceptance.
+
+## Healing Mouse input feedback
+
+The native secure recipient buttons use PostClick for cosmetic feedback only,
+matching Keybinds' physical input pattern. OnClick is never replaced; no action,
+unit, visibility or layout attributes change in that callback. Readable mouse
+release and InputDocumentation IsAltKeyDown/IsControlKeyDown/IsShiftKeyDown values
+select the existing plain/Shift/Ctrl tile; Alt, combined modifiers and unavailable
+reads flash nothing. All seven fixed recipients share the same handler.
+
+The already-open editor shows Keybinds' identical blue (0.35,0.75,1,0.4) overlay
+for 0.15 seconds. A serial prevents an old timer hiding a later press. Empty or
+unavailable actions also flash, indicating input rather than cast success. Direct
+editor tile clicks flash without casting; drag/drop continues its existing edit
+behavior. Hidden/uncreated editors stay hidden; closing clears pending visuals.
+Combat retains the existing editor-close behavior. Native PostClick delivery and
+visual timing still require live acceptance; mock checks do not prove taint safety.

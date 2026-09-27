@@ -45,6 +45,10 @@ function M.DragUpdate()
     local angle = math.deg(math.atan2(dy, dx)) % 360
     if M.Position(angle) then sessionAngle = angle end
 end
+function M.ResetPosition()
+    if InCombatLockdown() then return end
+    M.StopDrag(); sessionAngle = nil; M.Position()
+end
 function M.Refresh()
     if not M.button then return end
     M.button:SetEnabled(not InCombatLockdown())
