@@ -18,6 +18,9 @@ end
 function S.Create()
     if not Settings or not Settings.RegisterCanvasLayoutCategory then return end
     local panel = CreateFrame("Frame")
+    local background = panel:CreateTexture(nil, "BACKGROUND")
+    background:SetAllPoints(panel)
+    background:SetColorTexture(0.035, 0.035, 0.045, 0.96)
     local title = A.Style.Text(panel, 16)
     title:SetPoint("TOPLEFT", 16, -16); title:SetText("Apogee Heals")
     S.buffs = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")

@@ -338,3 +338,11 @@ editor tile clicks flash without casting; drag/drop continues its existing edit
 behavior. Hidden/uncreated editors stay hidden; closing clears pending visuals.
 Combat retains the existing editor-close behavior. Native PostClick delivery and
 visual timing still require live acceptance; mock checks do not prove taint safety.
+
+## Settings background
+
+Reviewed SimpleFrame CreateTexture, SimpleTextureBase SetColorTexture and
+SimpleScriptRegionResizing SetAllPoints in the current export. The settings
+canvas owns one BACKGROUND texture, anchored to its bounds with Essentials'
+RGBA (0.035,0.035,0.045,0.96). Controls and other pages keep their alpha.
+Native UI scale/contrast remains a live check.
