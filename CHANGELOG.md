@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Remove the target-of-target helper caption and its reserved drag-handle space.
+
 - Correct Forever surname display by joining the separate name and surname
   returns, matching the client's Camelot name formatter with public-value guards.
 
@@ -17,7 +19,7 @@
 
 - Move target and target's target above the player/party stack, left-aligned
   with a full-row gap, increased after the first in-game spacing review. Keep both bar sizes and the saved party position;
-  reserve space for the caption and drag handle at the screen's top edge.
+  reserve space for the drag handle at the screen's top edge.
 
 - Match Essentials with a near-opaque dark settings background behind controls,
   preserving behavior and saved settings.

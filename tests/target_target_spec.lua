@@ -5,7 +5,7 @@ assert(row.attributes.type1=="target" and row.attributes.useOnKeyDown==false)
 assert(row.driver=="[@targettarget,exists] show; hide")
 assert(row.point[1]=="BOTTOMLEFT" and row.point[2]==a.View.target and row.point[3]=="TOPLEFT")
 assert(row.point[4]==0 and row.point[5]==4 and row.width==a.View.target.width)
-assert(row.caption.text=="Target's target" and row.caption.parent==row)
+assert(row.caption==nil)
 assert(row.health.value==0 and row.name.text=="")
 UnitIsPlayer=function(unit) return unit=="targettarget" end
 m.units.target={name="Enemy",health=90,maxHealth=100,power=0,maxPower=0,kind=0,auras={}}

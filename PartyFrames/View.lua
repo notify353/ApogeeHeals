@@ -140,11 +140,6 @@ function V.Create()
     RegisterStateDriver(V.target, "visibility", "[@target,exists] show; hide")
     V.targetTarget = targetRow("targettarget")
     V.targetTarget:SetPoint("BOTTOMLEFT", V.target, "TOPLEFT", 0, S.targetTargetGap)
-    local caption = S.CleanText(V.targetTarget, 6)
-    caption:SetPoint("BOTTOMLEFT", V.targetTarget, "TOPLEFT", 0, 2)
-    caption:SetSize(S.targetWidth, 8); caption:SetJustifyH("LEFT")
-    caption:SetTextColor(unpack(S.muted)); caption:SetText("Target's target")
-    V.targetTarget.caption = caption
     local elapsed = 0
     V.targetTarget:SetScript("OnShow", function() elapsed = 0; V.RefreshTargetTarget() end)
     V.targetTarget:SetScript("OnHide", function() elapsed = 0 end)

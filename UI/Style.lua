@@ -7,8 +7,8 @@ A.Style = S
 S.targetWidth = S.width
 S.clusterHeight = S.healthHeight + S.barGap + S.powerHeight
 S.targetGap = S.clusterHeight
--- Reserve both target rows, their caption, and a separate drag handle above them.
-S.handleOffset = S.targetGap + 2 * S.clusterHeight + S.targetTargetGap + 12
+-- Reserve both target rows and a separate drag handle above them.
+S.handleOffset = S.targetGap + 2 * S.clusterHeight + S.targetTargetGap + 2
 S.rowHeight = S.clusterHeight + S.rowGap
 S.stackHeight = S.rowHeight * 4 + S.clusterHeight
 function S.Background(parent)

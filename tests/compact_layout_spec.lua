@@ -10,10 +10,10 @@ for _, rows in ipairs({a.View.rows, a.Preview.rows}) do
     end
 end
 assert(a.View.root.height == 105.5 and a.Preview.root.height == 105.5)
--- The raised target pair, caption and drag handle must stay inside the top edge.
+-- The raised target pair and drag handle must stay inside the top edge.
 local targetTop = a.View.target.point[5] + a.View.target.height
 local pairTop = targetTop + a.View.targetTarget.point[5] + a.View.targetTarget.height
-assert(a.View.handle.point[5] >= pairTop + 10)
+assert(a.View.handle.point[5] == pairTop + 2)
 a.db.position.y = 90000; a.View.ApplyPosition()
 assert(a.db.position.y + a.View.handle.point[5] + a.View.handle.height
     <= UIParent:GetHeight() / a.Style.scale / 2)

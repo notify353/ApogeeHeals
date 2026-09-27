@@ -10,7 +10,7 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
   while solo; native visibility hides missing units and all rows in raids.
 - Target sits above the player with a full-row gap; target's target stays
   closely above target. Both retain their size and align with the stack's left
-  edge. The drag handle sits above the pair and its caption.
+  edge. The drag handle sits above the pair; no helper caption is shown.
 - While the selected target casts, its power strip temporarily shows amber cast
   progress without adding height. Casts fill forward and channels drain backward;
   normal power returns when casting stops. Health and names remain visible.

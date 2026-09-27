@@ -326,9 +326,9 @@ remain live acceptance checks, separate from mock/native-source verification.
 
 The anonymous targettarget row uses fixed native healing actions and independent
 [@targettarget,exists] visibility. It is positioned once above target with a
-four-logical-pixel gap and a muted label above it. Width, colors and name sizing
-match target. The label inherits native row visibility. Top-edge position clamping
-reserves space for both rows, the label and the drag handle above them. Dragging
+four-logical-pixel gap and no helper label. Width, colors and name sizing
+match target. Top-edge position clamping
+reserves space for both rows and the drag handle above them. Dragging
 subtracts that full handle offset to preserve the party anchor; no combat layout writes occur.
 
 UnitDocumentation defines synchronous UNIT_TARGET with a unit token payload.
