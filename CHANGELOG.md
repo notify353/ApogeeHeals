@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Display full readable player names, including surnames and hyphens.
+
 - Use the smaller NPC name font size consistently for player, party, target,
   target's target and preview names, including after changing target type.
 - Keep readable player/party names and levels visible during combat. Preserve

@@ -110,8 +110,8 @@ Native range behavior and combat presentation still require live acceptance.
   clear only the tooltip owned by that button. Combat clears presentation,
   without changing protected action attributes.
 
-- Readable player labels omit surnames using the client's surname separator,
-  with whitespace/hyphen fallback. Restricted or unavailable identities display
+- Readable player labels preserve surnames, spaces and hyphens from UnitName's
+  first return. Restricted or unavailable identities display
   blank; they never enter Lua string operations. Camelot NameUtil confirms that
   UnitName's first return can contain both first name and surname. Current-build
   live validation is pending.

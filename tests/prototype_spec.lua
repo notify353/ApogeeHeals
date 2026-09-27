@@ -48,15 +48,15 @@ test("restricted health and power reach native sinks; restricted names stay blan
     UnitHealth = function() error("unavailable") end
     a.View.Refresh(); equal(row.health.value, 0)
 end)
-test("player labels show first names only and refresh when a name changes", function()
+test("player labels preserve full names and refresh when a name changes", function()
     local m = Mock.New(); local a = m.Start(); local row = a.View.rows[1]
-    for _, example in ipairs({{"Anduin Wrynn", "Anduin"}, {"Anduin-Wrynn", "Anduin"},
-        {"Priest", "Priest"}, {"Élodie Dubois", "Élodie"}, {"", ""}}) do
+    for _, example in ipairs({{"Anduin Wrynn", "Anduin Wrynn"}, {"Anduin-Wrynn", "Anduin-Wrynn"},
+        {"Priest", "Priest"}, {"Élodie Dubois", "Élodie Dubois"}, {"", ""}}) do
         m.units.player.name = example[1]; a.View.Refresh(); equal(row.name.text, example[2])
     end
     local previous = Constants
     Constants = {CharacterNameSeparatorConsts={CHARACTERNAME_SURNAME_SEPARATOR="·"}}
-    m.units.player.name = "Anduin·Wrynn"; a.View.Refresh(); equal(row.name.text, "Anduin")
+    m.units.player.name = "Anduin·Wrynn"; a.View.Refresh(); equal(row.name.text, "Anduin·Wrynn")
     Constants = previous
 end)
 test("confirmed drinks, localized identities and unavailable auras", function()

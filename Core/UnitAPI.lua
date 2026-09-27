@@ -65,16 +65,10 @@ function U.PaintName(label, unit)
     local classOK, _, classToken = pcall(UnitClass, unit)
     if classOK then U.PaintClassColor(label, classToken)
     else label:SetTextColor(1, 1, 1, 1) end
-    -- Only shorten readable names; never inspect a restricted identity.
+    -- Preserve the full readable character name, including surname and hyphens.
     local name = R(UnitName, unit)
     if type(name) ~= "string" then label:SetText(""); return end
-    local separators = Constants and Constants.CharacterNameSeparatorConsts
-    local separator = separators and separators.CHARACTERNAME_SURNAME_SEPARATOR
-    if type(separator) == "string" and separator ~= "" then
-        local index = name:find(separator, 1, true)
-        if index then name = name:sub(1, index - 1) end
-    end
-    label:SetText(name:match("^[^%s%-]+") or "")
+    label:SetText(name)
 end
 function U.State(unit)
     if R(UnitExists, unit) ~= true then return "missing" end

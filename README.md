@@ -15,7 +15,7 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
   below its single-target layout. No Tank dependency or frame attachment is used.
   Existing saved positions remain unchanged; use **Reset positions** to adopt it.
 - Apogee Tank styling with taller health bars: 112x14 health, 112x5 power, at 2x scale.
-  First names only use Blizzard's native class colors, left-aligned inside health bars with the
+  Full character names use Blizzard's native class colors, left-aligned inside health bars with the
   original game font at the same smaller size as NPC names and dark shadow, including
   during combat. Restricted names stay blank. Long names truncate. Health-state and active-resource colors remain.
   A muted level appears immediately to the left of each name; unavailable levels
