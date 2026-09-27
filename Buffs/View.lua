@@ -6,11 +6,13 @@ function B.HideTooltip(button)
     B.tooltipButton = nil
 end
 function B.Create(row)
+    local size, gap = A.Style.sideIconSize, A.Style.sideIconGap
     row.buffReminders, row.buffButtons = {}, {}
     for index = 1, 4 do
         local button = CreateFrame("Button", nil, row, "SecureActionButtonTemplate")
         row.buffButtons[index] = button
-        button:SetSize(12, 12); button:SetPoint("RIGHT", row.health, "LEFT", -3 - (index - 1) * 14, 0)
+        button:SetSize(size, size)
+        button:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - (index - 1) * (size + gap), 0)
         button:SetAttribute("unit", row.unit); button:SetAttribute("useOnKeyDown", false)
         button:RegisterForClicks("LeftButtonUp")
         for _, prefix in ipairs({"shift-", "ctrl-", "ctrl-shift-", "alt-", "alt-shift-", "alt-ctrl-", "alt-ctrl-shift-"}) do
@@ -33,7 +35,7 @@ function B.Create(row)
         row.buffReminders[index] = icon
     end
     row.buffOverflow = A.Style.Text(row, 8)
-    row.buffOverflow:SetPoint("RIGHT", row.health, "LEFT", -61, 0); row.buffOverflow:Hide()
+    row.buffOverflow:SetPoint("RIGHT", row, "LEFT", -gap - 4 * (size + gap), 0); row.buffOverflow:Hide()
 end
 function B.Paint(row, missing)
     for index, icon in ipairs(row.buffReminders) do

@@ -6,8 +6,9 @@ The existing complete, readable HELPFUL scan still establishes drinking only
 outside combat. Its matching auraInstanceID must be public before GetAuraDuration
 is called. That native duration object passes directly to a DurationTextBinding;
 no duration fields, remaining times or text are read, calculated or stored by Lua.
-SetFormatter uses a native SecondsFormatter constrained to seconds, rounding up,
-with one-letter units and no milliseconds. The binding updates the cup's bottom
+SetFormatter uses a native NumericRuleFormatter with threshold zero, step one,
+rounding Up and format %.0f, preserving whole remaining seconds with no suffix.
+The binding updates the cup's horizontally and vertically centered
 FontString every 0.1 seconds natively; no addon OnUpdate polling is introduced.
 Zero and expired durations format as empty text. Failed/missing duration support
 retains the confirmed cup with no timer. Aura loss, incomplete scans, combat entry
@@ -273,11 +274,15 @@ attributes use native dispatch. Modified left clicks are blocked. Attributes and
 visibility drivers change only outside combat, on spell/world/preview changes.
 
 A separate CustomAuraContainerTemplate holds two HARMFUL native slots with dispel
-candidate filters. Their callbacks create only gold halo textures, disable mouse
+candidate filters. Their callbacks create gold halos and constant spell artwork, disable mouse
 input and cancellation, and replace no scripts. They never inherit a secure-action
 template. The secure buttons are neither descendants of nor anchored to native aura
 frames; both hierarchies anchor independently to public row geometry. Native slot
-visibility affects only halo artwork, never button visibility, attributes or input.
+visibility affects only the gold edge and full-color spell artwork, never button
+visibility, attributes or input. The secure sibling's idle texture is permanently
+desaturated at 30% alpha; native active artwork is mouse-disabled and above it,
+using the same guarded public frame level. It shows the cleansing spell's public
+icon, not the matched debuff's icon. No texture is read back or aura state inferred.
 No restricted aura data, slot state or visibility is read back. Spellbutton frame
 levels use public finite integer guards. Intrinsic forbidden script/input and
 layout propagation remain intact; no restriction is removed or bypassed.

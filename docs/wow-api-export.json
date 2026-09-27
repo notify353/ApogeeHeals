@@ -49,6 +49,8 @@
     "Blizzard_APIDocumentationGenerated/DurationTextBindingObjectAPIDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/StringUtilDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/SecondsFormatterAPIDocumentation.lua",
-    "Blizzard_APIDocumentationGenerated/SecondsFormatterSharedDocumentation.lua"
+    "Blizzard_APIDocumentationGenerated/SecondsFormatterSharedDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/NumericRuleFormatterAPIDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/NumericRuleFormatterSharedDocumentation.lua"
   ]
 }

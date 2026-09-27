@@ -2,17 +2,12 @@ local Mock = dofile("tests/mock.lua")
 local oldDuration, oldString = C_DurationUtil, C_StringUtil
 local m = Mock.New()
 local bindings, requests = {}, {}
-Enum.SecondsFormatterAbbreviation = {OneLetter=2}
-Enum.SecondsFormatterInterval = {Seconds=0}
-Enum.SecondsFormatterRounding = {RoundUp=0}
-C_StringUtil = {CreateSecondsFormatter=function()
+Enum.NumericRuleFormatRounding = {Up=1}
+C_StringUtil = {CreateNumericRuleFormatter=function()
     return {
-        SetDefaultAbbreviation=function(_, value) assert(value == 2) end,
-        SetMinInterval=function(_, value) assert(value == 0) end,
-        SetMaxInterval=function(_, value) assert(value == 0) end,
-        SetRounding=function(_, value) assert(value == 0) end,
-        SetMillisecondsThreshold=function(_, value) assert(value == 0) end,
-        SetDesiredUnitCount=function(_, value) assert(value == 1) end,
+        AddBreakpoint=function(_, rule)
+            assert(rule.threshold == 0 and rule.step == 1 and rule.rounding == 1 and rule.format == "%.0f")
+        end,
     }
 end}
 local nativeDuration = setmetatable({}, {__index=function() error("addon inspected native duration") end})
@@ -25,7 +20,7 @@ C_DurationUtil = {CreateDurationTextBinding=function()
     function b:SetZeroDurationText(value) assert(value == "") end
     function b:SetUpdateInterval(value) assert(value == 0.1) end
     function b:SetDuration(value) assert(value == nativeDuration); self.duration = value end
-    function b:UpdateFontString() assert(self.duration == nativeDuration); self.text:SetText("30s") end
+    function b:UpdateFontString() assert(self.duration == nativeDuration); self.text:SetText("30") end
     bindings[#bindings + 1] = b
     return b
 end}
@@ -40,7 +35,7 @@ for index, row in ipairs(a.View.rows) do
     m.units[row.unit] = m.units[row.unit] or {connected=true, dead=false, auras={}}
     m.units[row.unit].auras = {{spellId=430, name="Drink", auraInstanceID=100 + index}}
     a.Drinking.Clear(row); a.Drinking.Paint(row)
-    assert(row.drinkIcon.shown and row.drinkTimer.enabled and row.drinkTimeText.text == "30s")
+    assert(row.drinkIcon.shown and row.drinkTimer.enabled and row.drinkTimeText.text == "30")
     assert(requests[#requests][1] == row.unit and requests[#requests][2] == 100 + index)
 end
 local row = a.View.rows[1]

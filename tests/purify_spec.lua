@@ -16,6 +16,7 @@ for _, options in ipairs({{might=true}, {cleanse=true}, {class="PRIEST"}, {known
                     assert(button.template == "SecureActionButtonTemplate" and not button.scripts.OnClick)
                     assert(button.attributes.unit == row.unit and button.attributes.useOnKeyDown == false)
                     assert(button.clicks[1] == "LeftButtonUp")
+                    assert(button.icon.desaturated and button.icon.alpha == 0.3)
                     assert(button.driver == (learned and "show" or "hide"))
                     assert(button.attributes.spell1 == (learned and (index == 1 and 1152 or 4987) or nil))
                     for _, prefix in ipairs({"shift-", "ctrl-", "alt-", "ctrl-shift-", "alt-shift-", "alt-ctrl-", "alt-ctrl-shift-"}) do
@@ -29,6 +30,13 @@ for _, options in ipairs({{might=true}, {cleanse=true}, {class="PRIEST"}, {known
                     for key, slot in pairs(indicator.slots) do
                         assert(slot.frame.mouse == false and slot.frame.parent == indicator)
                         assert(slot.frame.width == row.height and slot.frame.height == row.height)
+                        local index = key == "purify" and 1 or 2
+                        assert(slot.frame:GetFrameLevel() > row.cleanseButtons[index]:GetFrameLevel())
+                        local activeIcon
+                        for _, child in ipairs(m.frames) do
+                            if child.parent == slot.frame and child.drawLayer == "ARTWORK" then activeIcon = child end
+                        end
+                        assert(activeIcon and activeIcon.texture == (index == 1 and 135949 or 135953))
                         local types = slot.filters.includeDispelTypes
                         local learned = key == "purify" and m.known or key == "cleanse" and m.cleanse
                         assert((types.Poison == true) == learned and (types.Disease == true) == learned)
@@ -37,7 +45,12 @@ for _, options in ipairs({{might=true}, {cleanse=true}, {class="PRIEST"}, {known
                     end
                 end
             end
-            assert(row.buffOverflow.point[4] == -61)
+            assert(row.buffOverflow.point[4] == -2 - 4 * (row.height + 2))
+            for index, button in ipairs(row.buffButtons) do
+                assert(button.width == row.height and button.height == row.height)
+                assert(button.point[1] == "TOPRIGHT" and button.point[3] == "TOPLEFT" and button.point[5] == 0)
+                assert(button.point[4] == -2 - (index - 1) * (row.height + 2))
+            end
         end
     end
     check()

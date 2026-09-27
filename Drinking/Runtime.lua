@@ -39,19 +39,14 @@ end
 function D.CreateTimer(row, preview)
     if preview or row.unit == "target" or row.unit == "targettarget"
         or not C_DurationUtil or not C_DurationUtil.CreateDurationTextBinding
-        or not C_StringUtil or not C_StringUtil.CreateSecondsFormatter then return end
+        or not C_StringUtil or not C_StringUtil.CreateNumericRuleFormatter then return end
     local text = A.Style.Text(row.drinkIcon, 8)
-    text:SetAllPoints(); text:SetJustifyH("CENTER"); text:SetJustifyV("BOTTOM")
+    text:SetAllPoints(); text:SetJustifyH("CENTER"); text:SetJustifyV("MIDDLE")
     text:SetShadowColor(0, 0, 0, 1); text:SetShadowOffset(1, -1)
     text:SetText("")
     local ok, binding = pcall(function()
-        local formatter = C_StringUtil.CreateSecondsFormatter()
-        formatter:SetDefaultAbbreviation(Enum.SecondsFormatterAbbreviation.OneLetter)
-        formatter:SetMinInterval(Enum.SecondsFormatterInterval.Seconds)
-        formatter:SetMaxInterval(Enum.SecondsFormatterInterval.Seconds)
-        formatter:SetRounding(Enum.SecondsFormatterRounding.RoundUp)
-        formatter:SetMillisecondsThreshold(0)
-        formatter:SetDesiredUnitCount(1)
+        local formatter = C_StringUtil.CreateNumericRuleFormatter()
+        formatter:AddBreakpoint({threshold=0, step=1, rounding=Enum.NumericRuleFormatRounding.Up, format="%.0f"})
         local result = C_DurationUtil.CreateDurationTextBinding()
         result:SetEnabled(false)
         result:SetFontString(text); result:SetFormatter(formatter)

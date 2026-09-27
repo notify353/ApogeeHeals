@@ -281,15 +281,26 @@ do not complete any of these checks.
 - Direct editor clicks flash without casting; drag/drop and removing assignments
   still work. Close/reopen the editor and enter combat: no stuck flash, unsolicited
   editor opening or blocked-action/taint warning should occur.
-# Native debuff strip (live acceptance pending)
-
 ## Drinking countdown (live acceptance pending)
 
+- Owner confirmed the initial countdown working in game. Centered numeric-only
+  formatting is a follow-up change that still needs visual acceptance.
 - Reload, then drink on player and party rows. The cup should remain in its
-  existing outside position and show seconds remaining along its bottom edge.
+  existing outside position and show a centered integer without a seconds suffix.
 - Check countdown progression, stopping early, expiry, replacement drinks,
   combat entry, zoning and party members leaving. No stale numbers should remain.
 - Missing/unavailable duration should leave the confirmed cup without a number.
+
+## Matching buff and cleansing artwork (live acceptance pending)
+
+- Check left buff reminders match the right cleansing icons' full row height,
+  top alignment and spacing, including the overflow label after four reminders.
+- Without matching debuffs, cleansing icons should be gray and faint. Apply a
+  matching type: its spell image should become full color with a gold edge.
+- Test physical clicks through the active mouse-disabled artwork in and out of
+  combat; each release must still cast once on the fixed player with no taint warning.
+
+## Native debuff strip (live acceptance pending)
 
 - Reload DEV. Apply/remove harmful effects on player and party1-4; icons should
   update beside the corresponding health bar in and out of combat.

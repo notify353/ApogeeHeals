@@ -36,6 +36,7 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
   indicates confirmed drinking outside combat, with smaller artwork in a dark inset frame.
   Its countdown shows seconds remaining on the current drink aura when the client
   supplies its duration. Stopping early clears the icon and timer.
+  The number is centered on the cup without a seconds suffix.
 - Red rage and yellow energy fills use softer tones; the preview handle is shorter
   with smaller, muted lettering. Native class-name colors remain unchanged.
 - Incoming heals from all healers appear as a pale-green segment immediately
@@ -167,9 +168,11 @@ nothing. Unlearned spells are hidden; other classes do not get these buttons.
 A separate native gold halo appears for matching harmful-aura types: poison and
 disease for Purify, plus magic for Cleanse. Both can glow for poison/disease.
 The glow indicates a matching type, not guaranteed success, range or mana.
+Idle cleansing icons are gray at 30% opacity. A matching native indicator adds
+the full-color spell image and gold edge without changing the button's action.
 The game chooses the effects removed; clicking a button never selects one debuff.
 Buttons stay visible with no debuffs. Native icons themselves remain display-only.
-Right-side icons are square and span the combined health and power bar height,
+Buff reminders on the left and right-side icons are square and span the combined health and power bar height,
 aligned at both edges, with a narrow gap between icons.
 
 The earlier rejected AuraButton/secure-action composition remains unused. These

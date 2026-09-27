@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Center the drinking countdown without a seconds suffix, dim idle cleansing
+  buttons, and match left-side buff reminder size and spacing to the right side.
+
 - Show native seconds remaining on the drinking cup without changing its position.
 
 - Align right-side icons with the full health-plus-power height using square

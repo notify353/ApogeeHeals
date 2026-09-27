@@ -35,7 +35,8 @@ function P.Create(row)
         button:SetSize(size, size)
         button:SetPoint("TOPLEFT", row.health, "TOPRIGHT", x, 0)
         local level = A.Access.Read(row.health.GetFrameLevel, row.health)
-        if type(level) == "number" and level >= 0 and level < 10000 and level % 1 == 0 then
+        local publicLevel = type(level) == "number" and level >= 0 and level < 10000 and level % 1 == 0
+        if publicLevel then
             button:SetFrameLevel(level + 4)
         end
         button:SetAttribute("unit", row.unit); button:SetAttribute("useOnKeyDown", false)
@@ -45,6 +46,7 @@ function P.Create(row)
         end
         button.icon = button:CreateTexture(nil, "ARTWORK")
         button.icon:SetAllPoints(); button.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+        button.icon:SetDesaturated(true); button.icon:SetAlpha(0.3)
         button:SetScript("OnEnter", function()
             if InCombatLockdown() or not button.spell then return end
             P.HideTooltip(); P.tooltip = button
@@ -56,20 +58,27 @@ function P.Create(row)
         button:SetScript("OnHide", P.HideTooltip)
         row.cleanseButtons[index] = button
         if container then
-            -- Native visibility drives only this mouse-disabled halo. No native
+            local spellInfo = A.Buffs.Info(spell.id)
+            -- Native visibility drives only this mouse-disabled artwork. No native
             -- aura object, visibility or selection is observed by addon code.
             container:AddAuraSlot(spell.key, "HARMFUL", {
                 candidateFilters = {includeDispelTypes = {}},
                 initializeFrame = function(indicator)
                     indicator:SetSize(size, size)
+                    if publicLevel then indicator:SetFrameLevel(level + 5) end
                     indicator:SetPoint("TOPLEFT", container, "TOPLEFT", (index - 1) * (size + gap), 0)
                     indicator:EnableMouse(false)
                     indicator:SetCancelAuraButtons(nil)
                     -- One-pixel halo fits the row gap without spilling into neighbors.
-                    local glow = indicator:CreateTexture(nil, "ARTWORK")
+                    local glow = indicator:CreateTexture(nil, "BACKGROUND")
                     glow:SetPoint("TOPLEFT", indicator, "TOPLEFT", -1, 1)
                     glow:SetPoint("BOTTOMRIGHT", indicator, "BOTTOMRIGHT", 1, -1)
                     glow:SetColorTexture(1, 0.75, 0.1, 0.85)
+                    -- A constant spell image, not the native aura's icon. The
+                    -- secure sibling underneath retains all click handling.
+                    local activeIcon = indicator:CreateTexture(nil, "ARTWORK")
+                    activeIcon:SetAllPoints(); activeIcon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+                    activeIcon:SetTexture(spellInfo and spellInfo.iconID)
                 end,
             })
         end
