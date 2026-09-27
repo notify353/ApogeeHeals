@@ -91,6 +91,9 @@ function U.PaintLevel(label, unit)
 end
 
 function U.PaintTargetIdentity(row)
+    local player = R(UnitIsPlayer, "target")
+    local font, _, flags = row.name:GetFont()
+    row.name:SetFont(font, player == false and 6 or 8, flags)
     row.name:SetText(""); row.level:SetText("")
     row.name:SetTextColor(1, 1, 1, 1)
     row.classStrip:SetColorTexture(unpack(A.Style.muted))
@@ -100,7 +103,6 @@ function U.PaintTargetIdentity(row)
     local name = R(UnitName, "target")
     if type(name) == "string" then row.name:SetText(name) end
     U.PaintLevel(row.level, "target")
-    local player = R(UnitIsPlayer, "target")
     if player == true then
         local ok, _, classToken = pcall(UnitClass, "target")
         if ok then U.PaintClassStrip(row.classStrip, classToken) end

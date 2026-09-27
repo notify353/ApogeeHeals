@@ -264,7 +264,7 @@ item/release source with mocked engine functions; live acceptance is still neede
 A separate anonymous SecureActionButtonTemplate uses immutable unit=target and
 native target-only left click, with [@target,exists] visibility in all group modes.
 It stays outside healing bindings, range polling, buff scans and party preview.
-Its 180-logical-pixel row shares the existing health/power, font, rail and native
+Its 112-logical-pixel row matches the player/party width and shares the existing health/power, font, rail and native
 incoming-heal presentation, aligned beside the player's power bar with an 18-pixel gap.
 No target event changes protected attributes, anchors or visibility.
 
@@ -276,7 +276,9 @@ UnitIsPlayer and UnitReaction(target, player) pass through Access.Read before Lu
 branching; public player class tokens use the existing class-color helper, and
 public NPC reactions use friendly (5+), neutral (4), hostile (1-3) stripe colors.
 Unknown/restricted classification resets the stripe to muted. Level reads retain
-the guarded ? fallback. Target names remain visible in combat when readable.
+the guarded ? fallback. Target names remain visible in combat when readable. NPC names use a 6-pixel
+font; player/unknown target names retain the usual 8-pixel font. The name is
+never split or shortened in Lua.
 Health and power quantities stay in native display sinks. A public nonpositive
 maximum power clears the fill; restricted maxima are never compared in Lua.
 PLAYER_TARGET_CHANGED and target unit updates refresh identity and bars; native

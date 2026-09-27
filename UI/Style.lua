@@ -1,9 +1,10 @@
 -- Tank's accepted dimensions and palette, copied locally with MIT attribution.
 local _, A = ...
 local S = { width = 112, healthHeight = 14, powerHeight = 5, barGap = 0.5,
-    rowGap = 2, scale = 2, targetWidth = 180, targetGap = 18,
+    rowGap = 2, scale = 2, targetGap = 18,
     background = { 0.06, 0.075, 0.1, 0.94 }, muted = { 0.65, 0.70, 0.78, 1 } }
 A.Style = S
+S.targetWidth = S.width
 S.clusterHeight = S.healthHeight + S.barGap + S.powerHeight
 S.rowHeight = S.clusterHeight + S.rowGap
 S.stackHeight = S.rowHeight * 4 + S.clusterHeight

@@ -217,8 +217,9 @@ do not complete any of these checks.
 ## Target frame — pending live acceptance
 
 - Select friendly, neutral and hostile NPCs and player characters, solo and in a raid.
-  Check the wider row to the right of the player's power bar, matching bar heights,
-  left stripe, level/name order, full NPC titles and character names without realms.
+  Check the matching-width row to the right of the player's power bar, matching bar heights,
+  left stripe, level/name order, full NPC titles in a smaller font and character
+  names without realms at the usual size.
 - Change and clear targets during combat. Check native visibility and current
   health/power without blocked actions or stale stripe/name; restricted identities
   may be blank and unavailable classification should use the muted stripe.
