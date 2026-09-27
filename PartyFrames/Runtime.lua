@@ -62,9 +62,9 @@ function R.Start()
             A.Buffs.Stop()
             A.BindingEditor.Close()
             A.View.Lock(); A.Settings.Refresh()
-            -- Hide names and clear drinking immediately, before the coalesced refresh.
+            -- Clear drinking immediately; combat alone does not hide unit identity.
             for _, row in ipairs(A.View.rows) do
-                row.status:SetText(""); row.name:Hide(); row.level:Hide(); row.drinkIcon:Hide()
+                row.drinkIcon:Hide()
             end
         elseif event == "PLAYER_REGEN_ENABLED" then
             A.Cleansing.pending = true

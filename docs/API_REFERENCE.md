@@ -118,7 +118,7 @@ Native range behavior and combat presentation still require live acceptance.
 
 - Blizzard_Fonts_Shared/Shared/GameFonts.xml defines Number12Font, a native
   locale-aware sans-serif family used for preview-handle text. Names retain the
-  original GameFontHighlightSmall font at 8 logical pixels for readability.
+  original GameFontHighlightSmall font at 6 logical pixels, consistently for all units.
 - UnitClass's class filename is passed to C_ClassColor.GetClassColor only when
   readable. The returned ColorMixin supplies GetRGB for name text. Unknown,
   restricted or unavailable classes reset to white, preventing stale slot colors.
@@ -282,8 +282,8 @@ UnitIsPlayer and UnitReaction(target, player) pass through Access.Read before Lu
 branching; public player class tokens use the existing class-color helper, and
 public NPC reactions use friendly (5+), neutral (4), hostile (1-3) stripe colors.
 Unknown/restricted classification resets the stripe to muted. Level reads retain
-the guarded ? fallback. Target names remain visible in combat when readable. NPC names use a 6-pixel
-font; player/unknown target names retain the usual 8-pixel font. The name is
+the guarded ? fallback. Target names remain visible in combat when readable. All unit names use
+the same 6-pixel font, including player, party, preview and unknown targets. The name is
 never split or shortened in Lua.
 Health and power quantities stay in native display sinks. A public nonpositive
 maximum power clears the fill; restricted maxima are never compared in Lua.
@@ -292,6 +292,11 @@ visibility owns disappearance. Live rendering, combat switching and long-name
 fit require in-game acceptance, separately from mocks and matching-export checks.
 
 ## Target of target (70009)
+
+Player/party name and level labels now remain visible during combat as well.
+The existing public-value guards still blank restricted names and use ? for
+unavailable levels. Dead/offline/out-of-range statuses retain precedence.
+Only FontString presentation changes; protected layout and actions stay unchanged.
 
 The anonymous targettarget row uses fixed native healing actions and independent
 [@targettarget,exists] visibility. It is positioned once above target with a

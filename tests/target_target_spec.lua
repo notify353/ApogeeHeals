@@ -13,6 +13,7 @@ m.units.targettarget={name="Friendly Player",health=70,maxHealth=100,power=40,ma
     kind=0,class="MAGE",auras={}}
 m.Event("UNIT_TARGET","target")
 assert(row.name.text=="Friendly Player" and row.health.value==70 and row.power.value==40)
+assert(row.name.font[2]==6 and a.View.target.name.font[2]==6)
 assert(a.View.target.name.text=="Enemy" and row.classStrip.color[1]==0.25)
 m.units.targettarget.health=55
 m.Event("UNIT_HEALTH","targettarget"); assert(row.health.value==55)

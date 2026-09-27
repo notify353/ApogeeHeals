@@ -93,8 +93,6 @@ end
 function U.PaintTargetIdentity(row)
     local unit = row.unit
     local player = R(UnitIsPlayer, unit)
-    local font, _, flags = row.name:GetFont()
-    row.name:SetFont(font, player == false and 6 or 8, flags)
     row.name:SetText(""); row.level:SetText("")
     row.name:SetTextColor(1, 1, 1, 1)
     row.classStrip:SetColorTexture(unpack(A.Style.muted))

@@ -21,7 +21,7 @@ m.reaction=2; m.Event("UNIT_FACTION", "target"); assert(row.classStrip.color[1] 
 m.targetPlayer=true
 UnitName=function(unit) if unit == "target" then return "Jane Silver Moon", "OtherRealm" end return "Priest" end
 m.Event("PLAYER_TARGET_CHANGED"); m.Flush()
-assert(row.name.text == "Jane Silver Moon" and row.classStrip.color[1] == 0.25 and row.name.font[2] == 8)
+assert(row.name.text == "Jane Silver Moon" and row.classStrip.color[1] == 0.25 and row.name.font[2] == 6)
 m.combat=true; m.Event("PLAYER_REGEN_DISABLED"); m.Flush()
 assert(row.name.text == "Jane Silver Moon")
 m.units.target.health=m.Secret(); m.units.target.maxHealth=m.Secret()
@@ -33,7 +33,7 @@ assert(row.health.value == m.units.target.health and row.power.value == m.units.
 assert(row.name.text == "" and row.classStrip.color[1] == a.Style.muted[1])
 assert(row.name.font[2] == 6)
 m.targetPlayer=m.Secret(); m.Event("UNIT_NAME_UPDATE", "target")
-assert(row.name.font[2] == 8)
+assert(row.name.font[2] == 6)
 m.units.target.maxPower=0; m.Event("UNIT_MAXPOWER", "target")
 assert(row.power.value == 0 and row.power.max == 1)
 m.units.target=nil; m.Event("PLAYER_TARGET_CHANGED"); m.Flush()

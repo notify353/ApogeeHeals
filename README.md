@@ -16,10 +16,11 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
   Existing saved positions remain unchanged; use **Reset positions** to adopt it.
 - Apogee Tank styling with taller health bars: 112x14 health, 112x5 power, at 2x scale.
   First names only use Blizzard's native class colors, left-aligned inside health bars with the
-  original readable game font and dark shadow, shown only outside
-  combat. Restricted names stay blank. Long names truncate. Health-state and active-resource colors remain.
+  original game font at the same smaller size as NPC names and dark shadow, including
+  during combat. Restricted names stay blank. Long names truncate. Health-state and active-resource colors remain.
   A muted level appears immediately to the left of each name; unavailable levels
-  show a question mark. Levels hide together with names in combat and status states.
+  show a question mark. Names and levels remain visible in combat; status messages
+  still replace them for dead, offline or out-of-range units.
 - A fine opaque rule divides health from power. A slim Blizzard class-color strip sits flush inside each row's left
   edge, spanning health and power with a dark separator. It remains visible in combat.
   Fully transparent spaces separate

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Use the smaller NPC name font size consistently for player, party, target,
+  target's target and preview names, including after changing target type.
+- Keep readable player/party names and levels visible during combat. Preserve
+  restricted-value handling and dead/offline/out-of-range status presentation.
+
 - Move target and target's target above the player/party stack, left-aligned
   with a full-row gap, increased after the first in-game spacing review. Keep both bar sizes and the saved party position;
   reserve space for the caption and drag handle at the screen's top edge.
