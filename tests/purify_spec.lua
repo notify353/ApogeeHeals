@@ -1,11 +1,11 @@
 local Fixture = dofile("tests/purify_fixture.lua")
-for _, options in ipairs({{might=true}, {cleanse=true}, {class="PRIEST"}, {known=false},
+for _, options in ipairs({{might=true}, {cleanse=true}, {class="ROGUE"}, {known=false},
     {noTemplates=true}, {secretTemplates=true}}) do
     local m, a = Fixture.New(options)
     local function check()
         assert(m.xmlWarnings == 0)
         for _, row in ipairs(a.View.rows) do
-            if options.class == "PRIEST" then assert(not row.cleanseButtons)
+            if options.class == "ROGUE" then assert(not row.cleanseButtons)
             else
                 assert(#row.cleanseButtons == 2)
                 for index, button in ipairs(row.cleanseButtons) do

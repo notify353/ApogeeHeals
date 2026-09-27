@@ -1,5 +1,28 @@
 # Forever API authority
 
+## Class support (70009, 2026-09-27)
+
+See [class support and live acceptance](CLASS_SUPPORT.md). Direct cleansing now
+uses class-specific public action counts and exact learned ranks. Priest Dispel
+Magic alone permits dual helpful/harmful classification in a cleansing-local
+resolver; healing assignment validation is unchanged. Native HARMFUL filters and
+permanent secure siblings retain the existing no-readback contract.
+
+Independent curated upkeep uses complete public scans and exact family IDs.
+Resolution is cached only within one refresh, including failures. Hunter aspects
+reuse the matching StanceBar contract; native own selection, not another aura,
+controls the player-only picker. Repeated unchanged choice rendering does not
+rewrite protected visibility/attributes.
+
+WeaponUpkeep uses CustomAuraContainer AddItemEnchantment with the exported
+MainHand/OffHand constants, fixed player ownership, native inventory tooltip and
+SetDurationText. It never reads enchantment fields, visibility or duration. A
+native combat visibility parent hides the two fixed containers; inbound disable
+clears their presentation on world exit/combat. No item application is added.
+The enchantment implementation and PaperDollInfo documentation are now freshness
+inputs. SecureTemplates pet action has fixed-unit dispatch but no expected-spell
+identity gate for the slot; Devour Magic remains deferred.
+
 ## Friendly target support controls (70009, 2026-09-27)
 
 The selected target (not targettarget) now shares upkeep reminders, Paladin

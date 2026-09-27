@@ -9,7 +9,7 @@ local function createDebuffs(row)
     if not info or not A.Access.Readable(info.type) or info.type ~= "AuraContainer" then return end
     local container = CreateFrame("AuraContainer", nil, row.supportFrame or row, "CustomAuraContainerTemplate")
     local size, gap = S.sideIconSize, S.sideIconGap
-    local offset = (row.unit == "target" and S.sideIconGap or S.sideIconOffset) + (row.cleanseButtons and 2 * (size + gap) or 0)
+    local offset = (row.unit == "target" and S.sideIconGap or S.sideIconOffset) + (row.cleanseSlotCount or 0) * (size + gap)
     container:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset, 0)
     container:SetSize(8 * size + 7 * gap, size)
     container:SetUnit(row.unit)

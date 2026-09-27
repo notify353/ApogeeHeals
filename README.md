@@ -6,6 +6,9 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 
 ## Prototype
 
+See [class support](docs/CLASS_SUPPORT.md) for the buff/cleanse matrix, yellow
+guidance, native weapon displays, limitations and live acceptance checks.
+
 - Player-first vertical stack followed by party1 through party4. Player remains
   while solo; native visibility hides missing units and all rows in raids.
 - Up to eight native debuff icons extend right of each player/party health bar,

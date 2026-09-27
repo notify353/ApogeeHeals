@@ -60,6 +60,7 @@ function R.Start()
             A.View.RefreshTargetAuras()
             A.Buffs.HideTooltip(A.Buffs.tooltipButton); A.Cleansing.HideTooltip()
             A.Buffs.Paint(A.View.target, {}); A.Buffs.PaintBlessings(A.View.target, {}, 0)
+            A.Buffs.PaintCatalog(A.View.target, {}, 0, 0)
         elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
             A.Buffs.OnCast(unit, spellID)
         elseif event == "GROUP_ROSTER_UPDATE" then

@@ -35,6 +35,8 @@ function B.ForParty(entry)
     return entry.party == true
 end
 function B.Learn(aura, unit)
+    if (A.BuffCatalog and A.BuffCatalog.Recognized(aura.spellId))
+        or (B.modeIDs and B.modeIDs[aura.spellId]) then return end
     if not B.candidates[aura.spellId] or not A.Access.Readable(aura.duration, aura.sourceUnit)
         or type(aura.duration) ~= "number" or aura.duration ~= aura.duration
         or aura.duration < 300 or aura.duration >= math.huge
@@ -58,26 +60,28 @@ function B.Learn(aura, unit)
         A.db.buffs[#A.db.buffs + 1] = { id = learnedID, enabled = true, party = unit ~= "player" }
     end
 end
--- Paladin's own native stance state distinguishes their aura from another
--- Paladin's party buff. Unknown or incomplete state never means "no aura".
+-- Native own stance state distinguishes a Paladin aura or Hunter aspect from
+-- another player's effect. Unknown/incomplete state never means "missing".
 function B.AuraChoices()
+    B.modeIDs = {}
     if InCombatLockdown() or B.suspended or A.View.unlocked then return {} end
     local ok, _, class = pcall(UnitClass, "player")
-    if not ok or not A.Access.Readable(class) or class ~= "PALADIN" then return {} end
+    if not ok or not A.Access.Readable(class) or (class ~= "PALADIN" and class ~= "HUNTER") then return {} end
     local count = A.Access.Read(GetNumShapeshiftForms)
     if type(count) ~= "number" or count < 0 or count > 32 or count % 1 ~= 0
         or type(GetShapeshiftFormInfo) ~= "function" then return {} end
-    local choices = {}
+    local choices, selected = {}, false
     for index = 1, count do
         local readable, _, active, _, id = pcall(GetShapeshiftFormInfo, index)
         if not readable or not A.Access.Readable(active, id) or type(active) ~= "boolean"
             or type(id) ~= "number" then return {} end
-        if active then return {} end
+        if active then selected = true end
+        B.modeIDs[id] = true
         local info = A.Bindings.Resolve(id)
         if not info then return {} end
         choices[#choices + 1] = {id=id, icon=info.iconID}
     end
-    return choices
+    return selected and {} or choices
 end
 function B.Refresh()
     if InCombatLockdown() or B.suspended then return end
@@ -86,7 +90,7 @@ function B.Refresh()
     for id, expires in pairs(B.candidates) do if expires < now then B.candidates[id] = nil end end
     local auraChoices = B.AuraChoices()
     local blessingChoices = A.BuffDefaults.Choices()
-    local snapshots = {}
+    local snapshots, catalogCache = {}, {}
     for index, row in ipairs(A.View.supportRows or A.View.rows) do
         local auras = B.Scan(row.unit); snapshots[index] = auras
         if auras and row.unit ~= "target" then for _, aura in ipairs(auras) do B.Learn(aura, row.unit) end end
@@ -94,7 +98,8 @@ function B.Refresh()
     local watched = {}
     for _, entry in ipairs(A.db.buffs) do
         local info = entry.enabled and A.Bindings.Resolve(entry.id)
-        if info then watched[#watched + 1] = { entry = entry, info = info, party = B.ForParty(entry) } end
+        if info and not (A.BuffCatalog and A.BuffCatalog.Recognized(entry.id))
+            and not B.modeIDs[entry.id] then watched[#watched + 1] = { entry = entry, info = info, party = B.ForParty(entry) } end
     end
     for index, row in ipairs(A.View.supportRows or A.View.rows) do
         local missing, blessings = {}, {}
@@ -117,7 +122,20 @@ function B.Refresh()
         end
         B.Paint(row, missing)
         B.PaintBlessings(row, blessings, #missing)
-        if row.unit == "player" then B.PaintAuras(row, snapshots[index] and auraChoices or {}, #missing, #blessings) end
+        local upkeep, suggested, reason = {}, nil, nil
+        if A.BuffCatalog and not A.View.unlocked then
+            upkeep, suggested, reason = A.BuffCatalog.Choices(row.unit, snapshots[index], catalogCache)
+        end
+        B.PaintCatalog(row, upkeep, #missing, #blessings, suggested, reason)
+        if row.unit == "player" then
+            local modes = snapshots[index] and auraChoices or {}
+            B.PaintAuras(row, modes, #missing, #blessings + #upkeep)
+            if A.WeaponUpkeep then
+                local offset = math.min(#missing, 4) + (#missing > 4 and 1 or 0)
+                    + #blessings + #upkeep + #modes
+                A.WeaponUpkeep.Refresh(row, offset)
+            end
+        end
     end
     if B.picker and B.picker:IsShown() then B.RefreshPicker() end
 end
@@ -126,7 +144,9 @@ function B.Stop()
     for _, row in ipairs(A.View.supportRows or A.View.rows) do
         B.Paint(row, {})
         B.PaintBlessings(row, {}, 0)
+        B.PaintCatalog(row, {}, 0, 0)
         if row.unit == "player" then B.PaintAuras(row, {}, 0) end
     end
+    if A.WeaponUpkeep then A.WeaponUpkeep.Stop() end
     if B.picker then B.picker:Hide() end
 end

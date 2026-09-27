@@ -2,6 +2,7 @@ local Mock = dofile("tests/mock.lua")
 local previousXMLUtil = C_XMLUtil
 local function setup(mode)
     local m = Mock.New()
+    m.units.player.class = "ROGUE" -- No class cleanse: isolate native debuff display.
     local containers, buttons = {}, {}
     C_XMLUtil = {GetTemplateInfo=function()
         if mode == "missing" then return nil end

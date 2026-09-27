@@ -85,7 +85,7 @@ local function paintChoices(row, key, choices, offset, recommendedID, recommenda
             end)
             button:SetScript("OnLeave", function(self) B.HideTooltip(self) end)
             button:SetScript("OnHide", function(self) B.HideTooltip(self) end)
-            if key == "blessingButtons" then
+            if key == "blessingButtons" or key == "upkeepButtons" or key == "auraButtons" then
                 button.suggestion = button:CreateTexture(nil, "BACKGROUND")
                 button.suggestion:SetPoint("TOPLEFT", button, "TOPLEFT", -1, 1)
                 button.suggestion:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 1, -1)
@@ -103,11 +103,18 @@ local function paintChoices(row, key, choices, offset, recommendedID, recommenda
             if button.suggestion then button.suggestion:SetShown(reason ~= nil) end
             button.icon:SetTexture(entry and entry.icon); button.icon:SetShown(entry ~= nil)
             if not InCombatLockdown() then
-                button:ClearAllPoints()
-                button:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - (offset + index - 1) * (size + gap), 0)
-                button:SetAttribute("type1", entry and "spell" or "")
-                button:SetAttribute("spell1", id)
-                RegisterStateDriver(button, "visibility", entry and "[combat] hide; show" or "hide")
+                local position = offset + index - 1
+                if button.configuredPosition ~= position then
+                    button:ClearAllPoints()
+                    button:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - position * (size + gap), 0)
+                    button.configuredPosition = position
+                end
+                if not button.configured or button.configuredSpell ~= id then
+                    button:SetAttribute("type1", entry and "spell" or "")
+                    button:SetAttribute("spell1", id)
+                    RegisterStateDriver(button, "visibility", entry and "[combat] hide; show" or "hide")
+                    button.configured, button.configuredSpell = true, id
+                end
             end
         end
     end
@@ -117,9 +124,29 @@ function B.PaintBlessings(row, choices, missingCount)
     local id, reason = A.BuffDefaults.Recommend(row.unit, choices)
     paintChoices(row, "blessingButtons", choices, offset, id, reason)
 end
+function B.PaintCatalog(row, choices, missingCount, blessingCount, id, reason)
+    local offset = math.min(missingCount, 4) + (missingCount > 4 and 1 or 0) + (blessingCount or 0)
+    paintChoices(row, "upkeepButtons", choices, offset, id, reason)
+end
 function B.PaintAuras(row, choices, missingCount, blessingCount)
     local offset = math.min(missingCount, 4) + (missingCount > 4 and 1 or 0) + (blessingCount or 0)
-    paintChoices(row, "auraButtons", choices, offset)
+    -- A cautious ranged-play hint, not a claim about the Hunter's specialization.
+    local id, reason
+    local ok, _, class = pcall(UnitClass, "player")
+    if ok and A.Access.Readable(class) and class == "HUNTER" then
+        local role = A.Access.Read(UnitGroupRolesAssigned, "player")
+        local hawk = {[13165]=true,[14318]=true,[14319]=true,[14320]=true,[14321]=true,[14322]=true,[25296]=true}
+        for _, entry in ipairs(choices) do
+            if role == "TANK" and entry.id == 13163 then
+                id, reason = entry.id, "Suggested: personal dodge (assigned tank)."
+                break
+            elseif role ~= "TANK" and role ~= "HEALER" and hawk[entry.id] then
+                id, reason = entry.id, "Suggested for ranged attacks (Hunter class fallback; combat style unknown)."
+                break
+            end
+        end
+    end
+    paintChoices(row, "auraButtons", choices, offset, id, reason)
 end
 function B.RefreshPicker()
     if not B.picker then return end

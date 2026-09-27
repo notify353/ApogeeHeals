@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add researched class upkeep, friendly Priest/Shaman/Druid/Mage cleansing,
+  Hunter own-aspect choices, and native player weapon enchantment displays.
+  Preserve Paladin controls and document pet/group/item interaction limits.
+
 - Add buff choices, recommendations, cleansing and native debuffs to the friendly selected target.
 
 - Highlight a role-first, class-fallback blessing suggestion in yellow, with a tooltip explanation.
