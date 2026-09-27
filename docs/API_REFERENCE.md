@@ -321,3 +321,20 @@ Lua; the client decides legality, range, cooldown and item availability at click
 Matching-export tests exercise spell/item release dispatch on all seven frames.
 They do not prove native secure provenance, hostile-target rejection, taint or
 physical-click behavior in game; these require live acceptance.
+
+## Healing Mouse input feedback
+
+The native secure recipient buttons use PostClick for cosmetic feedback only,
+matching Keybinds' physical input pattern. OnClick is never replaced; no action,
+unit, visibility or layout attributes change in that callback. Readable mouse
+release and InputDocumentation IsAltKeyDown/IsControlKeyDown/IsShiftKeyDown values
+select the existing plain/Shift/Ctrl tile; Alt, combined modifiers and unavailable
+reads flash nothing. All seven fixed recipients share the same handler.
+
+The already-open editor shows Keybinds' identical blue (0.35,0.75,1,0.4) overlay
+for 0.15 seconds. A serial prevents an old timer hiding a later press. Empty or
+unavailable actions also flash, indicating input rather than cast success. Direct
+editor tile clicks flash without casting; drag/drop continues its existing edit
+behavior. Hidden/uncreated editors stay hidden; closing clears pending visuals.
+Combat retains the existing editor-close behavior. Native PostClick delivery and
+visual timing still require live acceptance; mock checks do not prove taint safety.

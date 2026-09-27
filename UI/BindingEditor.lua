@@ -55,6 +55,23 @@ function E.Close()
     if E.frame then E.frame:Hide() end
     if GameTooltip then GameTooltip:Hide() end
 end
+function E.FlashInput(id)
+    if not E.frame or not E.frame:IsShown() then return end
+    local button = E.buttons[id]
+    if not button then return end
+    button.inputFlashSerial = (button.inputFlashSerial or 0) + 1
+    local serial = button.inputFlashSerial
+    button.inputFlash:Show()
+    C_Timer.After(0.15, function()
+        if button.inputFlashSerial == serial then button.inputFlash:Hide() end
+    end)
+end
+function E.ClearFlashes()
+    for _, button in pairs(E.buttons) do
+        button.inputFlashSerial = (button.inputFlashSerial or 0) + 1
+        button.inputFlash:Hide()
+    end
+end
 function E.Refresh()
     if not E.frame then return end
     for id, button in pairs(E.buttons) do
@@ -129,12 +146,17 @@ function E.Create()
         button.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
         text(button, ({ "", "S-", "C-" })[slot.row]
             .. ({ "L", "R", "M", "4", "5" })[slot.button], 2, -2, 9)
+        button.inputFlash = button:CreateTexture(nil, "OVERLAY")
+        button.inputFlash:SetAllPoints(button)
+        button.inputFlash:SetColorTexture(0.35, 0.75, 1, 0.4)
+        button.inputFlash:Hide()
         button:SetHighlightTexture("Interface/Buttons/ButtonHilight-Square")
         button:RegisterForClicks("LeftButtonUp"); button:RegisterForDrag("LeftButton")
         button:SetScript("OnReceiveDrag", function() E.Drop(id) end)
         button:SetScript("OnClick", function()
             if E.suppressClick then E.suppressClick = nil; return end
-            if E.source or GetCursorInfo() then E.Drop(id) end
+            if E.source or GetCursorInfo() then E.Drop(id)
+            else E.FlashInput(id) end
         end)
         button:SetScript("OnDragStart", function()
             if not InCombatLockdown() and A.db.bindings[id] and not GetCursorInfo() then
@@ -176,7 +198,7 @@ function E.Create()
         remove:SetScript("OnClick", function() E.Cancel(); A.Bindings.Put(id, nil) end)
     end
     frame:SetScript("OnHide", function()
-        E.Cancel(); E.StopMoving(); GameTooltip:Hide()
+        E.ClearFlashes(); E.Cancel(); E.StopMoving(); GameTooltip:Hide()
         A.Minimap.Refresh()
     end)
     frame:SetScript("OnShow", function() E.Place(); A.Minimap.Refresh() end)

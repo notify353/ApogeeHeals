@@ -263,3 +263,13 @@ do not complete any of these checks.
   restrictions decide the result, without addon retargeting or Lua casting.
 - Clear assignments and confirm learned defaults, or plain-left native targeting
   when no learned default exists. Existing party actions must remain unchanged.
+
+## Healing Mouse input feedback — pending live acceptance
+
+- Open Healing Mouse and click player, party, target and target-of-target bars.
+  Verify the correct plain/Shift/Ctrl tile flashes blue briefly, matching Keybinds.
+- Test all five mouse buttons, rapid repeats, unavailable/empty assignments and
+  bandages. The flash reports input, not success; native actions still fire once.
+- Direct editor clicks flash without casting; drag/drop and removing assignments
+  still work. Close/reopen the editor and enter combat: no stuck flash, unsolicited
+  editor opening or blocked-action/taint warning should occur.

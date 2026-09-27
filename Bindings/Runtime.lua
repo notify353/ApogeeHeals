@@ -83,6 +83,19 @@ function B.Effective(slot)
     local id = A.BindingDefaults.Spell(slot)
     return id, id ~= nil
 end
+local mouseButtons = { LeftButton=1, RightButton=2, MiddleButton=3, Button4=4, Button5=5 }
+function B.Feedback(_, mouseButton, down)
+    if not A.Access.Readable(mouseButton, down) or down == true then return end
+    local button = mouseButtons[mouseButton]
+    if not button then return end
+    local alt = A.Access.Read(IsAltKeyDown)
+    local ctrl = A.Access.Read(IsControlKeyDown)
+    local shift = A.Access.Read(IsShiftKeyDown)
+    if alt ~= false or type(ctrl) ~= "boolean" or type(shift) ~= "boolean"
+        or (ctrl and shift) then return end
+    local prefix = ctrl and "ctrl-" or shift and "shift-" or ""
+    A.BindingEditor.FlashInput(prefix .. button)
+end
 function B.Apply()
     if InCombatLockdown() then B.pending = true; return end
     B.pending = nil
@@ -91,6 +104,7 @@ function B.Apply()
     recipients[#recipients + 1] = A.View.targetTarget
     for _, frame in ipairs(recipients) do
         frame:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp", "Button4Up", "Button5Up")
+        frame:SetScript("PostClick", B.Feedback)
     end
     for _, prefix in ipairs({ "", "shift-", "ctrl-", "ctrl-shift-", "alt-",
         "alt-shift-", "alt-ctrl-", "alt-ctrl-shift-" }) do

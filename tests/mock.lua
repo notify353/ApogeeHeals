@@ -98,6 +98,9 @@ function M.New()
     GetCursorPosition = function() return m.cursorX, m.cursorY end
     CreateFrame = object
     InCombatLockdown = function() return m.combat end
+    IsAltKeyDown = function() return m.alt or false end
+    IsControlKeyDown = function() return m.ctrl or false end
+    IsShiftKeyDown = function() return m.shift or false end
     GetTime = function() return m.time or 0 end
     UnitIsUnit = function(a, b) return a == b end
     WOW_PROJECT_ID = 1
