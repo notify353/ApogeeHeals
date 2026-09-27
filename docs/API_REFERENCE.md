@@ -40,17 +40,22 @@ Relevant current signatures and native dispatch remain compatible with the
 reviewed behavior. The old manifest did not store hashes, so this is a contract
 review and current-source execution, not a claim of byte-identical exports.
 
-## Optional editor anchor
+## Healing editor default and resets
 
-Healing Mouse can anchor TOPLEFT to the public ApogeeKeybindsWeaponsHeader
-TOPRIGHT at x=8, y=0. The existing Keybinds header retains its own lifecycle;
-Heals neither reads its private namespace/storage nor changes its visibility.
-Central generation explicitly rewrites this foreign identity to the DEV header
-for the DEV consumer. Missing/inaccessible anchor falls back to center; queued
-load/login/combat-exit checks handle delayed creation without polling. Saved
-editorPosition overrides docking. Drag coordinates use guarded finite GetLeft,
-GetBottom and effective-scale results before conversion to UIParent coordinates.
-No protected gameplay layout is affected. Existing screen clamping remains active.
+Healing Mouse anchors TOPLEFT to UIParent CENTER at (-270, -232), matching
+Keybinds' default Mouse grid left edge and leaving ten logical pixels below it.
+It neither reads sibling globals nor depends on sibling load order or visibility.
+Saved editorPosition wins; reset clears the saved and transient drag overrides.
+Drag coordinates retain public finite/scale guards. All positioning defers in combat.
+
+Reset positions restores the party/target anchor, healing editor and session
+minimap placement without changing bindings or buff reminders. Factory reset
+uses the matching Blizzard_StaticPopup contract (OnAccept, Cancel, hideOnEscape,
+whileDead and timeout=0), with a family-specific dialog identity in DEV. Acceptance
+rechecks combat before replacing only this character's Heals store with fresh
+validated defaults, canceling transient edits/discovery and reapplying native
+bindings and learned class buff defaults. No other addon or WoW bindings change.
+No automatic reset runs during upgrade. Live dialog/layout acceptance is pending.
 
 ## Left-click spell range (70009)
 

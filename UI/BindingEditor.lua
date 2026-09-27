@@ -19,12 +19,8 @@ function E.Place()
         E.frame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", saved.x, saved.y)
         return
     end
-    -- Optional public anchor only; never access Keybinds' namespace or saved data.
-    -- Central DEV generation rewrites this explicitly audited cross-addon identity.
-    local header = _G["ApogeeKeybindsWeaponsHeader"]
-    if A.Access.Readable(header) and type(header) == "table" then
-        E.frame:SetPoint("TOPLEFT", header, "TOPRIGHT", 8, 0)
-    else E.frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0) end
+    local position = A.Storage.DefaultEditorPosition()
+    E.frame:SetPoint("TOPLEFT", UIParent, "CENTER", position.x, position.y)
 end
 function E.StopMoving()
     if not E.frame then return end
@@ -41,6 +37,13 @@ function E.StopMoving()
         x, y = x * scale / parentScale, y * scale / parentScale
         if finite(x) and finite(y) then A.db.editorPosition = { x = x, y = y } end
     end
+end
+function E.ResetPosition()
+    if InCombatLockdown() then return end
+    E.StopMoving()
+    E.customPosition = nil
+    A.db.editorPosition = nil
+    E.Place()
 end
 function E.Cancel()
     E.source = nil

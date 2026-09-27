@@ -6,6 +6,11 @@ function A.Storage.DefaultPosition()
     -- this starts at y=-90, leaving a 9px gap without a runtime dependency.
     return { x = 70.5, y = -45 }
 end
+function A.Storage.DefaultEditorPosition()
+    -- Match Keybinds' default Mouse grid: left edge -270, bottom -222.
+    -- Ten logical pixels below it, independent of sibling load/visibility.
+    return { x = -270, y = -232 }
+end
 local function finite(value)
     return type(value) == "number" and value == value and math.abs(value) < 100000
 end

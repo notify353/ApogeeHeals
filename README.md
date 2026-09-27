@@ -10,7 +10,7 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
   while solo; native visibility hides missing units and all rows in raids.
 - Default placement aligns beneath Apogee Tank's Forever bars, with a 9px gap
   below its single-target layout. No Tank dependency or frame attachment is used.
-  Existing saved positions remain unchanged; use **Reset position** to adopt it.
+  Existing saved positions remain unchanged; use **Reset positions** to adopt it.
 - Apogee Tank styling with taller health bars: 112x14 health, 112x5 power, at 2x scale.
   First names only use Blizzard's native class colors, left-aligned inside health bars with the
   original readable game font and dark shadow, shown only outside
@@ -31,7 +31,7 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 - Native left-click targeting when unassigned, with healing click bindings on Left, Right,
   Middle, Mouse 4 and Mouse 5 (plain, Shift and Ctrl). No global binding overrides.
   Standard native target actions also retain the client's spell/item cursor behavior.
-- Escape -> Options -> AddOns -> Apogee Heals: Unlock frames and Reset position.
+- Escape -> Options -> AddOns -> Apogee Heals: Unlock frames, Reset positions and Factory reset this character.
   Unlock also shows a five-member sample party, even while solo, with health,
   power, drinking and incoming-heal examples. Preview rows cannot target anyone.
   Each unlock starts at full health and power for three seconds, then smoothly
@@ -170,12 +170,16 @@ design requires explicit agreement; settings report the unavailable feature.
 
 ## Healing Mouse placement
 
-With Keybinds available, Healing Mouse opens eight logical pixels to the right of its Weapons
-header with aligned tops. The optional anchor follows the Weapons position even
-when its configuration panel is hidden; opening Heals does not show Keybinds.
-Without that anchor, Healing Mouse opens centered. Dragging its header overrides
-the default and saves a separate per-character editor position. Existing party
-frame placement is unchanged. DEV only uses the DEV Keybinds anchor.
+Healing Mouse opens directly below Keybinds' default Mouse grid, aligned on the
+left with a small gap. It also works independently with Keybinds absent or hidden.
+Dragging the header saves a per-character position; updates preserve it.
+
+In **Options > AddOns > Apogee Heals**, **Reset positions** restores the party/target
+bars, Healing Mouse and minimap button without changing assignments or reminders.
+**Factory reset this character** asks for confirmation, then clears this character's
+Heals assignments, reminders and positions and restores available class defaults.
+Other characters, other addons and WoW keybindings are unchanged. Both controls
+are locked during combat; confirming an already-open dialog in combat does nothing.
 
 ## Spell range
 

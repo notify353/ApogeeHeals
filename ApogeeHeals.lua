@@ -1,6 +1,16 @@
 local name, A = ...
 local loader = CreateFrame("Frame")
 loader:RegisterEvent("ADDON_LOADED")
+function A.ResetCharacter()
+    if not A.started or not A.db or InCombatLockdown() then return false end
+    A.BindingEditor.Close(); A.View.Lock(); A.Buffs.Stop()
+    A.db = A.Storage.Open(nil)
+    ApogeeHealsDB = A.db
+    A.BuffDefaults.pending = true
+    A.Settings.ResetPositions()
+    A.Bindings.Apply(); A.Buffs.Refresh(); A.Settings.Refresh()
+    return true
+end
 local function start()
     if A.started or InCombatLockdown() then return end
     A.started = true

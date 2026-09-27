@@ -1,12 +1,19 @@
 local _, A = ...
 local S = {}
 A.Settings = S
+function S.ResetPositions()
+    if InCombatLockdown() then return end
+    A.View.Lock(); A.View.pendingPosition = nil
+    A.View.ResetPosition(); A.BindingEditor.ResetPosition(); A.Minimap.ResetPosition()
+    S.Refresh()
+end
 function S.Refresh()
     A.Minimap.Refresh()
     if not S.unlock then return end
     S.unlock:SetChecked(A.View.unlocked)
     S.unlock:SetEnabled(not InCombatLockdown())
     S.reset:SetEnabled(not InCombatLockdown())
+    if S.factoryReset then S.factoryReset:SetEnabled(not InCombatLockdown()) end
     S.bindings:SetEnabled(not InCombatLockdown())
     S.buffs:SetEnabled(not InCombatLockdown())
     S.cleanseStatus:SetText(A.Cleansing.status or "Purify configuration is pending.")
@@ -26,7 +33,7 @@ function S.Create()
     end)
     S.reset = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
     S.reset:SetPoint("TOPLEFT", 16, -88); S.reset:SetSize(160, 24)
-    S.reset:SetText("Reset position"); S.reset:SetScript("OnClick", A.View.ResetPosition)
+    S.reset:SetText("Reset positions"); S.reset:SetScript("OnClick", S.ResetPositions)
     S.bindings = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
     S.bindings:SetPoint("TOPLEFT", 16, -124); S.bindings:SetSize(180, 24)
     S.bindings:SetText("Edit healing bindings")
@@ -37,6 +44,21 @@ function S.Create()
     S.buffs:SetScript("OnClick", function() A.Buffs.OpenPicker() end)
     S.cleanseStatus = A.Style.Text(panel, 11)
     S.cleanseStatus:SetPoint("TOPLEFT", 16, -200)
+    StaticPopupDialogs.APOGEE_HEALS_RESET_CHARACTER = {
+        text = "Factory reset Apogee Heals for this character?\n\nClears healing assignments, buff reminders and positions and restores defaults. This cannot be undone.\n\nOther characters, other addons and WoW keybindings are unchanged.",
+        button1 = "Factory reset", button2 = CANCEL or "Cancel",
+        timeout = 0, whileDead = true, hideOnEscape = true,
+        OnAccept = function() A.ResetCharacter() end,
+    }
+    S.factoryReset = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+    S.factoryReset:SetPoint("TOPLEFT", 16, -240); S.factoryReset:SetSize(250, 24)
+    S.factoryReset:SetText("Factory reset this character")
+    S.factoryReset:SetScript("OnClick", function()
+        if not InCombatLockdown() then StaticPopup_Show("APOGEE_HEALS_RESET_CHARACTER") end
+    end)
+    local resetHelp = A.Style.Text(panel, 11)
+    resetHelp:SetPoint("TOPLEFT", 16, -280)
+    resetHelp:SetText("Reset positions keeps your assignments and buff reminders.")
     panel:SetScript("OnShow", S.Refresh)
     S.category = Settings.RegisterCanvasLayoutCategory(panel, "Apogee Heals")
     Settings.RegisterAddOnCategory(S.category); S.Refresh()

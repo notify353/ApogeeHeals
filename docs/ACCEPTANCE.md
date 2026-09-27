@@ -227,3 +227,16 @@ do not complete any of these checks.
   Drag the existing anchor out of combat and verify the target follows it.
 - Left clicking the target row only targets; party healing assignments and buff
   reminders must remain unchanged. No game session was automated by local checks.
+
+## Healing editor defaults and resets — pending live acceptance
+
+- On a fresh character or after Reset positions, verify Healing Mouse sits below
+  the default Mouse grid with aligned left edges and a small gap. Existing saved
+  dragged positions must survive updates. Repeat without Keybinds enabled.
+- Reset positions while the editor is moved: assignments and reminders remain,
+  the editor and unit frames return to defaults, and minimap placement resets.
+- Factory reset opens confirmation; Cancel/Escape preserve all saved settings.
+  Accept outside combat restores available class defaults and clears only this
+  character's Heals data. Verify after reload and when switching DEV/PROD.
+- Both controls are disabled in combat; entering combat with confirmation open
+  must prevent a later acceptance from resetting data or protected actions.

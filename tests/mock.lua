@@ -186,6 +186,8 @@ function M.New()
     }
     ApogeeHealsDB = nil
     UISpecialFrames = {}
+    StaticPopupDialogs = {}
+    StaticPopup_Show = function(key) m.popup = key; return StaticPopupDialogs[key] end
     GetCursorInfo = function() if m.cursor then return unpack(m.cursor) end end
     ClearCursor = function() m.cursor = nil end
     GameTooltip = { Hide=function(self) self.shown=false;self.owner=nil end,

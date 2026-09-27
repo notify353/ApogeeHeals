@@ -11,11 +11,11 @@ local function setup(saved,anchor)
 end
 local m,a,e=setup(nil,true)
 local header=_G[headerName]
-assert(e.frame.point[1]=="TOPLEFT" and e.frame.point[2]==header
-    and e.frame.point[3]=="TOPRIGHT" and e.frame.point[4]==8 and e.frame.point[5]==0)
+assert(e.frame.point[1]=="TOPLEFT" and e.frame.point[2]==UIParent
+    and e.frame.point[3]=="CENTER" and e.frame.point[4]==-270 and e.frame.point[5]==-232)
 header:Hide();e.Close();e.Open()
-assert(e.frame.shown and not header.shown and e.frame.point[2]==header)
--- Default docking does not write saved coordinates or copy Keybinds state.
+assert(e.frame.shown and not header.shown and e.frame.point[2]==UIParent)
+-- Default placement does not write saved coordinates or depend on Keybinds state.
 assert(a.db.editorPosition==nil)
 e.handle.scripts.OnDragStart();e.frame.left=430;e.frame.bottom=270
 local movingPoint=e.frame.point;m.Event("UI_SCALE_CHANGED");m.Flush()
@@ -36,18 +36,18 @@ e.handle.scripts.OnDragStart();e.frame.left=m.Secret();e.handle.scripts.OnDragSt
 assert(a.db.editorPosition==prior)
 m,a,e=setup(nil,false)
 CreateFrame("Button",otherName,UIParent);e.Place()
-assert(e.frame.point[1]=="CENTER" and e.frame.point[2]==UIParent)
--- Late Keybinds construction after the event is observed on the queued callback.
+assert(e.frame.point[1]=="TOPLEFT" and e.frame.point[2]==UIParent)
+-- Late/hidden/inaccessible sibling frames do not affect the independent default.
 m.Event("ADDON_LOADED","optional addon")
 header=CreateFrame("Button",headerName,UIParent);m.Flush()
-assert(e.frame.point[2]==header)
-_G[headerName]=m.InaccessibleTable();e.Place();assert(e.frame.point[1]=="CENTER")
+assert(e.frame.point[2]==UIParent)
+_G[headerName]=m.InaccessibleTable();e.Place();assert(e.frame.point[1]=="TOPLEFT")
 _G[headerName]=header
 m.combat=true;local before=e.frame.point;e.Place();assert(e.frame.point==before)
-m.combat=false;m.Event("PLAYER_REGEN_ENABLED");m.Flush();assert(e.frame.point[2]==header)
+m.combat=false;m.Event("PLAYER_REGEN_ENABLED");m.Flush();assert(e.frame.point[2]==UIParent)
 for _,position in ipairs({{}, {x=0/0,y=1}, {x=math.huge,y=1}, {x="2",y=1}}) do
     m,a,e=setup({version=3,editorPosition=position},true)
     assert(a.db.editorPosition==nil and e.frame.point[1]=="TOPLEFT")
 end
 _G[headerName]=nil;_G[otherName]=nil
-print("PASS optional same-family header docking, hidden/late/absent anchor, saved/custom/scale guards and combat deferral")
+print("PASS independent under-Mouse default, saved/custom/scale guards and combat deferral")
