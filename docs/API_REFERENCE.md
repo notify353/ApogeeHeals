@@ -289,3 +289,21 @@ maximum power clears the fill; restricted maxima are never compared in Lua.
 PLAYER_TARGET_CHANGED and target unit updates refresh identity and bars; native
 visibility owns disappearance. Live rendering, combat switching and long-name
 fit require in-game acceptance, separately from mocks and matching-export checks.
+
+## Target of target (70009)
+
+The anonymous targettarget row uses a fixed native target action and independent
+[@targettarget,exists] visibility. It is positioned once above target with a
+four-logical-pixel gap and a muted label above it. Width, colors and name sizing
+match target. The label inherits native row visibility. Top-edge position clamping
+reserves space for the added row and label; no combat layout writes occur.
+
+UnitDocumentation defines synchronous UNIT_TARGET with a unit token payload.
+Matching Blizzard_UnitFrame/Mainline/TargetFrame.lua refreshes its target-of-target
+on UNIT_TARGET and via OnUpdate. Our target/targettarget events refresh these
+rows, while a visible-only 0.2-second OnUpdate refreshes just targettarget to
+cover unit-alias updates without scanning auras or running party healing logic.
+World exit suspends reads; world entry resumes them. Health/power and prediction
+use the existing native sinks; identity and reaction retain public-value guards.
+No GUID, inferred aggro, target selection, protected visibility mutation or
+casting logic is added. Native rendering and combat visibility remain live checks.

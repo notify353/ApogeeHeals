@@ -240,3 +240,14 @@ do not complete any of these checks.
   character's Heals data. Verify after reload and when switching DEV/PROD.
 - Both controls are disabled in combat; entering combat with confirmation open
   must prevent a later acceptance from resetting data or protected actions.
+
+## Target of target — pending live acceptance
+
+- Select a target with a friendly or hostile target. Verify the matching-width row
+  appears above your target, left-aligned with a small gap and Target's target label.
+- Change the selected target's target, damage/heal it and check timely identity,
+  health and power updates; repeat in combat. Clear either target and confirm the
+  row and label disappear without stale data, then reappear with current data.
+- Verify selecting yourself, dead/no-power units, NPC names, players and raid use.
+  Left click must target the displayed target-of-target through the native action.
+  No party row binding, range feedback or buff reminder should be added to it.

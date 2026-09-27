@@ -91,23 +91,24 @@ function U.PaintLevel(label, unit)
 end
 
 function U.PaintTargetIdentity(row)
-    local player = R(UnitIsPlayer, "target")
+    local unit = row.unit
+    local player = R(UnitIsPlayer, unit)
     local font, _, flags = row.name:GetFont()
     row.name:SetFont(font, player == false and 6 or 8, flags)
     row.name:SetText(""); row.level:SetText("")
     row.name:SetTextColor(1, 1, 1, 1)
     row.classStrip:SetColorTexture(unpack(A.Style.muted))
-    if R(UnitExists, "target") == false then return end
+    if R(UnitExists, unit) == false then return end
     -- UnitName separates the realm in its second return. Preserve the entire
     -- first return, including spaces, NPC titles and character surnames.
-    local name = R(UnitName, "target")
+    local name = R(UnitName, unit)
     if type(name) == "string" then row.name:SetText(name) end
-    U.PaintLevel(row.level, "target")
+    U.PaintLevel(row.level, unit)
     if player == true then
-        local ok, _, classToken = pcall(UnitClass, "target")
+        local ok, _, classToken = pcall(UnitClass, unit)
         if ok then U.PaintClassStrip(row.classStrip, classToken) end
     elseif player == false then
-        local reaction = R(UnitReaction, "target", "player")
+        local reaction = R(UnitReaction, unit, "player")
         if type(reaction) ~= "number" then return end
         if reaction >= 5 then row.classStrip:SetColorTexture(0.28, 0.74, 0.46, 1)
         elseif reaction == 4 then row.classStrip:SetColorTexture(0.90, 0.74, 0.22, 1)

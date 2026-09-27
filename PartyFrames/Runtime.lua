@@ -30,7 +30,7 @@ function R.Start()
     for _, event in ipairs({ "PLAYER_ENTERING_WORLD", "GROUP_ROSTER_UPDATE",
         "UNIT_HEALTH", "UNIT_MAXHEALTH", "UNIT_POWER_UPDATE", "UNIT_MAXPOWER",
         "UNIT_DISPLAYPOWER", "UNIT_FLAGS", "UNIT_CONNECTION", "UNIT_NAME_UPDATE",
-        "UNIT_LEVEL", "PLAYER_TARGET_CHANGED", "UNIT_FACTION",
+        "UNIT_LEVEL", "PLAYER_TARGET_CHANGED", "UNIT_FACTION", "UNIT_TARGET",
         "UNIT_AURA", "PLAYER_DEAD", "PLAYER_ALIVE", "PLAYER_UNGHOST",
         "UNIT_SPELLCAST_SUCCEEDED", "PLAYER_LEAVING_WORLD",
         "UNIT_HEAL_PREDICTION", "UNIT_HEAL_ABSORB_AMOUNT_CHANGED",
@@ -40,7 +40,9 @@ function R.Start()
         if event:match("^UNIT_") then
             if not A.Access.Readable(unit) then return end
             if unit ~= "player" and unit ~= "party1" and unit ~= "party2"
-                and unit ~= "party3" and unit ~= "party4" and unit ~= "target" then return end
+                and unit ~= "party3" and unit ~= "party4" and unit ~= "target"
+                and unit ~= "targettarget" then return end
+            if unit == "targettarget" then A.View.RefreshTargetTarget(); return end
             if unit == "target" then
                 if not R.suspended then A.View.RefreshTarget() end
                 return
