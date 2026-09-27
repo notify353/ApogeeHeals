@@ -59,6 +59,48 @@ function B.Paint(row, missing)
     row.buffOverflow:SetText(#missing > 4 and "+" .. (#missing - 4) or "")
     row.buffOverflow:SetShown(#missing > 4)
 end
+function B.PaintAuras(row, choices, missingCount)
+    row.auraButtons = row.auraButtons or {}
+    local size, gap = A.Style.sideIconSize, A.Style.sideIconGap
+    local offset = math.min(missingCount, 4) + (missingCount > 4 and 1 or 0)
+    for index = 1, math.max(#choices, #row.auraButtons) do
+        local entry, button = choices[index], row.auraButtons[index]
+        if not button and not InCombatLockdown() then
+            button = CreateFrame("Button", nil, row, "SecureActionButtonTemplate")
+            row.auraButtons[index] = button
+            button:SetSize(size, size)
+            button:SetAttribute("unit", "player"); button:SetAttribute("useOnKeyDown", false)
+            button:RegisterForClicks("LeftButtonUp")
+            for _, prefix in ipairs({"shift-", "ctrl-", "ctrl-shift-", "alt-", "alt-shift-", "alt-ctrl-", "alt-ctrl-shift-"}) do
+                button:SetAttribute(prefix .. "type1", "")
+            end
+            button:SetHighlightTexture("Interface/Buttons/ButtonHilight-Square")
+            button:SetScript("OnEnter", function(self)
+                if InCombatLockdown() or not self.reminderSpell then return end
+                GameTooltip:SetOwner(self, "ANCHOR_LEFT"); B.tooltipButton = self
+                if GameTooltip:SetSpellByID(self.reminderSpell, false, true) then GameTooltip:Show()
+                else B.HideTooltip(self) end
+            end)
+            button:SetScript("OnLeave", function(self) B.HideTooltip(self) end)
+            button:SetScript("OnHide", function(self) B.HideTooltip(self) end)
+            button.icon = button:CreateTexture(nil, "ARTWORK")
+            button.icon:SetAllPoints(); button.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+        end
+        if button then
+            local id = entry and entry.id
+            if button.reminderSpell ~= id then B.HideTooltip(button) end
+            button.reminderSpell = id
+            button.icon:SetTexture(entry and entry.icon); button.icon:SetShown(entry ~= nil)
+            if not InCombatLockdown() then
+                button:ClearAllPoints()
+                button:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - (offset + index - 1) * (size + gap), 0)
+                button:SetAttribute("type1", entry and "spell" or "")
+                button:SetAttribute("spell1", id)
+                RegisterStateDriver(button, "visibility", entry and "[combat] hide; show" or "hide")
+            end
+        end
+    end
+end
 function B.RefreshPicker()
     if not B.picker then return end
     B.empty:SetShown(#A.db.buffs == 0)

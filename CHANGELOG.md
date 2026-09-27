@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Offer learned Paladin auras beside the player buff reminders when their own aura is off, outside combat.
+
+- Detect eating as well as drinking and show the active aura native tooltip on hover.
+
 - Center the drinking countdown without a seconds suffix, dim idle cleansing
   buttons, and match left-side buff reminder size and spacing to the right side.
 

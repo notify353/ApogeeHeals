@@ -29,6 +29,14 @@ C_UnitAuras.GetAuraDuration = function(unit, instance)
     if m.failDuration then error("expired aura") end
     return nativeDuration
 end
+local spellInfo = C_Spell.GetSpellInfo
+C_Spell.GetSpellInfo = function(id)
+    if id == 433 then return {name="Food", spellID=id} end
+    return spellInfo(id)
+end
+GameTooltip.SetUnitAuraByAuraInstanceID = function(self, unit, instance)
+    self.auraUnit, self.auraInstance, self.shown = unit, instance, true
+end
 local a = m.Start()
 assert(#bindings == 5 and not a.Preview.rows[1].drinkTimer and not a.View.target.drinkTimer)
 for index, row in ipairs(a.View.rows) do
@@ -42,6 +50,37 @@ local row = a.View.rows[1]
 local function refresh()
     a.Drinking.Clear(row); a.Drinking.Paint(row)
 end
+-- Food-only, localized-name coverage, fixed-unit tooltip and no stale ownership.
+m.units.player.auras = {{spellId=433, name="Food", auraInstanceID=202}}
+refresh()
+assert(row.drinkIcon.shown and row.drinkTimer.enabled)
+assert(row.drinkArtwork.texture == "Interface\\Icons\\INV_Misc_Fork&Knife")
+row.drinkIcon.scripts.OnEnter()
+assert(GameTooltip.shown and GameTooltip.auraUnit == "player" and GameTooltip.auraInstance == 202)
+a.View.Refresh()
+assert(GameTooltip.shown and GameTooltip:IsOwned(row.drinkIcon))
+m.units.player.auras = {{spellId=9999, name="Food", auraInstanceID=203}}
+a.Drinking.Paint(row)
+assert(GameTooltip.auraInstance == 203)
+row.drinkIcon.scripts.OnLeave()
+assert(not GameTooltip.shown)
+row.drinkIcon.scripts.OnEnter()
+local otherOwner = {}
+GameTooltip:SetOwner(otherOwner)
+a.Drinking.Clear(row)
+assert(GameTooltip:IsOwned(otherOwner))
+refresh(); row.drinkIcon.scripts.OnEnter()
+m.units.player.auras = {}; a.Drinking.Paint(row)
+assert(not GameTooltip.shown and not row.drinkIcon.shown)
+m.units.player.auras = {{spellId=9998, name="Well Fed", auraInstanceID=204}}
+a.Drinking.Paint(row)
+assert(not row.drinkIcon.shown)
+m.units.player.auras = {{spellId=430, name="Drink", auraInstanceID=101}, {spellId=433, name="Food", auraInstanceID=202}}
+refresh(); row.drinkIcon.scripts.OnEnter()
+assert(GameTooltip.auraInstance == 101)
+m.combat = true; m.Event("PLAYER_REGEN_DISABLED")
+assert(not GameTooltip.shown)
+m.combat = false
 m.failDuration = true; refresh()
 assert(row.drinkIcon.shown and not row.drinkTimer.enabled and row.drinkTimeText.text == "")
 m.failDuration = false

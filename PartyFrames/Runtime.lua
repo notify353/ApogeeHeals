@@ -38,7 +38,8 @@ function R.Start()
         "UNIT_SPELLCAST_SUCCEEDED", "PLAYER_LEAVING_WORLD",
         "UNIT_HEAL_PREDICTION", "UNIT_HEAL_ABSORB_AMOUNT_CHANGED",
         "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "SPELLS_CHANGED",
-        "UI_SCALE_CHANGED", "DISPLAY_SIZE_CHANGED", "GET_ITEM_INFO_RECEIVED" }) do driver:RegisterEvent(event) end
+        "UI_SCALE_CHANGED", "DISPLAY_SIZE_CHANGED", "GET_ITEM_INFO_RECEIVED",
+        "UPDATE_SHAPESHIFT_FORM", "UPDATE_SHAPESHIFT_FORMS" }) do driver:RegisterEvent(event) end
     driver:SetScript("OnEvent", function(_, event, unit, castGUID, spellID)
         if event:match("^UNIT_") then
             if not A.Access.Readable(unit) then return end

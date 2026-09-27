@@ -3,6 +3,9 @@
   "interface": 16001,
   "reviewedOn": "2026-09-24",
   "requiredFiles": [
+    "Blizzard_ActionBar/Shared/StanceBar.lua",
+    "Blizzard_BuffFrame/BuffFrame.lua",
+    "Blizzard_SharedXMLGame/Tooltip/TooltipDataHandler.lua",
     "Blizzard_APIDocumentationGenerated/FrameScriptDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/UnitDocumentation.lua",
     "Blizzard_FrameXMLUtil/Blizzard_FrameXMLUtil.toc",

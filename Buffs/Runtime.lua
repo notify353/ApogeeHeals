@@ -57,11 +57,33 @@ function B.Learn(aura, unit)
         A.db.buffs[#A.db.buffs + 1] = { id = learnedID, enabled = true, party = unit ~= "player" }
     end
 end
+-- Paladin's own native stance state distinguishes their aura from another
+-- Paladin's party buff. Unknown or incomplete state never means "no aura".
+function B.AuraChoices()
+    if InCombatLockdown() or B.suspended or A.View.unlocked then return {} end
+    local ok, _, class = pcall(UnitClass, "player")
+    if not ok or not A.Access.Readable(class) or class ~= "PALADIN" then return {} end
+    local count = A.Access.Read(GetNumShapeshiftForms)
+    if type(count) ~= "number" or count < 0 or count > 32 or count % 1 ~= 0
+        or type(GetShapeshiftFormInfo) ~= "function" then return {} end
+    local choices = {}
+    for index = 1, count do
+        local readable, _, active, _, id = pcall(GetShapeshiftFormInfo, index)
+        if not readable or not A.Access.Readable(active, id) or type(active) ~= "boolean"
+            or type(id) ~= "number" then return {} end
+        if active then return {} end
+        local info = A.Bindings.Resolve(id)
+        if not info then return {} end
+        choices[#choices + 1] = {id=id, icon=info.iconID}
+    end
+    return choices
+end
 function B.Refresh()
     if InCombatLockdown() or B.suspended then return end
     A.BuffDefaults.Seed()
     local now = GetTime()
     for id, expires in pairs(B.candidates) do if expires < now then B.candidates[id] = nil end end
+    local auraChoices = B.AuraChoices()
     local snapshots = {}
     for index, row in ipairs(A.View.rows) do
         local auras = B.Scan(row.unit); snapshots[index] = auras
@@ -91,11 +113,15 @@ function B.Refresh()
             end
         end
         B.Paint(row, missing)
+        if row.unit == "player" then B.PaintAuras(row, snapshots[index] and auraChoices or {}, #missing) end
     end
     if B.picker and B.picker:IsShown() then B.RefreshPicker() end
 end
 function B.Stop()
     B.candidates = {}
-    for _, row in ipairs(A.View.rows) do B.Paint(row, {}) end
+    for _, row in ipairs(A.View.rows) do
+        B.Paint(row, {})
+        if row.unit == "player" then B.PaintAuras(row, {}, 0) end
+    end
     if B.picker then B.picker:Hide() end
 end

@@ -1,5 +1,44 @@
 # Forever API authority
 
+## Paladin own-aura picker (70009, 2026-09-27)
+
+Matching Blizzard_ActionBar/Shared/StanceBar.lua consumes GetNumShapeshiftForms
+and GetShapeshiftFormInfo (texture, isActive, isCastable, spellID). Out of combat,
+readable bounded form count, boolean active state and public spell IDs establish
+whether the player's own Paladin aura is off. Any unreadable/incomplete result
+suppresses choices. Each offered spell also passes the existing learned helpful
+spell validation. Another Paladin's aura buff is not the player's selected stance.
+
+Only the player row creates normal secure spell buttons for these choices,
+with fixed player unit, LeftButtonUp and blocked modified clicks. Buttons match
+the side icon geometry and follow up to four buff reminders (plus overflow space).
+Native visibility drivers hide them in combat; combat cleanup changes artwork
+only. Form events, normal aura refresh, spell changes and combat exit reevaluate
+outside combat. Preview/world exit suppress the picker. Native spell tooltip and
+cast dispatch follow the existing buff-button contract. No automatic selection,
+restricted aura calculation, combat attribute/layout change or new setting.
+Mock checks are not native physical-click/stance-event acceptance.
+
+## Food/drink indicator tooltip (70009, 2026-09-27)
+
+Resolve ordinary Food candidate IDs 433, 434, 435, 1127, 1129 and 1131 on the
+client using the same guarded spell-name validation as Drink. The complete
+readable out-of-combat HELPFUL scan accepts either category; Well Fed is not
+an eating signal. When both are active the first matching aura in native scan
+order supplies the artwork, timer and tooltip. Server-specific coverage needs
+live acceptance. Food candidates are cross-checked against
+https://wow-forever.gg/db/spells/1131-food/ and validated on the current client.
+
+The normal frame enables hover only for live player/party indicators. OnEnter
+rescans for a current public aura instance and calls GameTooltip:SetOwner then
+SetUnitAuraByAuraInstanceID, matching Blizzard_BuffFrame/BuffFrame.lua and the
+TooltipDataHandler method map. Native code populates the actual aura tooltip;
+no tooltip fields are inspected. Refresh updates an owned tooltip without hiding
+and reshowing the indicator. OnLeave/OnHide, aura loss, combat and world exit
+clear only this indicator's owned tooltip. No cancel action or cast is added.
+Mocks cover food-only and drink, fresh tooltip identity, ownership and cleanup;
+actual hover rendering and food coverage remain in-game checks.
+
 ## Drinking countdown (70009, 2026-09-27)
 
 The existing complete, readable HELPFUL scan still establishes drinking only

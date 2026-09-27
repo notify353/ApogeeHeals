@@ -309,3 +309,19 @@ do not complete any of these checks.
 - Check the drinking cup does not overlap icons, group members leaving/rejoining,
   raid hiding and opening/closing preview. Existing health-bar clicks must work.
 - Offline mocks/export checks do not establish these native results.
+
+## Food/drink tooltip follow-up
+
+Pending live: eat without drinking, drink without eating, then use both together.
+Verify the active icon, centered countdown and native hover tooltip on player
+and party rows. With both active, the first matching aura supplies the one icon.
+Stop consuming, enter combat and zone; the owned tooltip and indicator should
+clear. Well Fed alone must not keep the food indicator visible.
+
+## Paladin aura picker
+
+Pending live: with no own aura, show every learned aura beside the player buffs,
+matching size/gap. Click one and verify one self cast and picker disappearance.
+Another Paladin's aura must not suppress the choices. Check native tooltips,
+newly learned aura ranks, missing buff coexistence, preview, zoning, and combat
+entry/exit. Combat hides the choices; changes wait until combat ends.
