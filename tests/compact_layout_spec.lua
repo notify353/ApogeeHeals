@@ -10,6 +10,20 @@ for _, rows in ipairs({a.View.rows, a.Preview.rows}) do
     end
 end
 assert(a.View.root.height == 105.5 and a.Preview.root.height == 105.5)
+-- The raised target pair, caption and drag handle must stay inside the top edge.
+local targetTop = a.View.target.point[5] + a.View.target.height
+local pairTop = targetTop + a.View.targetTarget.point[5] + a.View.targetTarget.height
+assert(a.View.handle.point[5] >= pairTop + 10)
+a.db.position.y = 90000; a.View.ApplyPosition()
+assert(a.db.position.y + a.View.handle.point[5] + a.View.handle.height
+    <= UIParent:GetHeight() / a.Style.scale / 2)
+a.View.ResetPosition()
+-- Moving the handle must preserve its vertical distance from the party anchor.
+a.View.SetUnlocked(true); a.View.handle.scripts.OnDragStart()
+a.View.handle.scripts.OnUpdate()
+assert(a.View.root.point[5] == a.View.handle:GetBottom() - a.Style.handleOffset
+    - UIParent:GetHeight() / (2 * a.Style.scale))
+a.View.handle.scripts.OnDragStop(); a.View.ResetPosition()
 local row=a.View.rows[1]
 m.units.player.auras={{spellId=430,name="Drink"}}; a.View.Refresh()
 assert(row.drinkIcon.shown and row.status.text == "" and row.name.shown)

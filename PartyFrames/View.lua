@@ -62,8 +62,8 @@ function V.ApplyPosition()
     if InCombatLockdown() then return end
     local p = A.db.position
     local minX = -math.max(0, UIParent:GetWidth() / S.scale / 2 - S.width - 15)
-    local maxX = math.max(minX, UIParent:GetWidth() / S.scale / 2 - S.width - S.targetGap - S.targetWidth - 15)
-    local maxY = math.max(0, UIParent:GetHeight() / S.scale / 2 - S.clusterHeight - S.targetTargetGap - 12)
+    local maxX = math.max(minX, UIParent:GetWidth() / S.scale / 2 - S.width - 15)
+    local maxY = math.max(0, UIParent:GetHeight() / S.scale / 2 - S.handleOffset - 10)
     local minY = math.min(maxY, -UIParent:GetHeight() / S.scale / 2 + S.stackHeight)
     p.x = math.max(minX, math.min(maxX, p.x))
     p.y = math.max(minY, math.min(maxY, p.y))
@@ -93,12 +93,12 @@ local function followHandle()
     if InCombatLockdown() then return end
     local ratio = V.handle:GetEffectiveScale() / UIParent:GetEffectiveScale()
     local x = V.handle:GetLeft() - UIParent:GetWidth() / (2 * ratio)
-    local y = V.handle:GetBottom() - 2 - UIParent:GetHeight() / (2 * ratio)
+    local y = V.handle:GetBottom() - S.handleOffset - UIParent:GetHeight() / (2 * ratio)
     V.root:ClearAllPoints(); V.root:SetPoint("TOPLEFT", UIParent, "CENTER", x, y)
 end
 local function anchorHandle()
     V.handle:ClearAllPoints()
-    V.handle:SetPoint("BOTTOMLEFT", V.root, "TOPLEFT", 0, 2)
+    V.handle:SetPoint("BOTTOMLEFT", V.root, "TOPLEFT", 0, S.handleOffset)
 end
 function V.ResetPosition()
     if InCombatLockdown() then return end
@@ -134,7 +134,7 @@ function V.Create()
         return row
     end
     V.target = targetRow("target")
-    V.target:SetPoint("BOTTOMLEFT", V.rows[1].power, "BOTTOMRIGHT", S.targetGap, 0)
+    V.target:SetPoint("BOTTOMLEFT", V.rows[1], "TOPLEFT", 0, S.targetGap)
     RegisterStateDriver(V.target, "visibility", "[@target,exists] show; hide")
     V.targetTarget = targetRow("targettarget")
     V.targetTarget:SetPoint("BOTTOMLEFT", V.target, "TOPLEFT", 0, S.targetTargetGap)

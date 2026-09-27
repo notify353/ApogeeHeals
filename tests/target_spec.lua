@@ -5,7 +5,8 @@ UnitIsPlayer = function() return m.targetPlayer end
 UnitReaction = function() return m.reaction end
 assert(row.unit == "target" and row.attributes.unit == "target")
 assert(row.attributes.type1 == "target" and row.driver == "[@target,exists] show; hide")
-assert(row.point[2] == a.View.rows[1].power and row.point[3] == "BOTTOMRIGHT")
+assert(row.point[1] == "BOTTOMLEFT" and row.point[2] == a.View.rows[1] and row.point[3] == "TOPLEFT")
+assert(row.point[4] == 0 and row.point[5] == row.height / 2)
 assert(row.width == a.Style.width and row.health.width == a.Style.width and row.incoming.bar.width == a.Style.width)
 assert(row.power.width == a.Style.width and row.name.width == 89.5)
 assert(row.name.text == "" and row.health.value == 0)
