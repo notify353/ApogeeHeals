@@ -51,17 +51,21 @@ Focus audio request. Earlier pending entries remain detailed regression checklis
 - Existing bindings and position survive schema migration. Tank's files and
   saved data remain untouched. Source/mock checks do not establish live behavior.
 
-## Purify (live failure; requested feature unresolved)
+## Paladin cleansing buttons (live acceptance pending)
 
-- The 70009 live candidate failed with five forbidden OnClick replacement
-  warnings from SecureTemplates.xml:8. Do not repeat that rejected composition.
-- After corrective DEV installation, reload outside combat and confirm those
-  warnings no longer appear; no Purify icon or hit target is created. Confirm
-  existing Might reminders/tooltips and circular minimap behavior still work.
-- Offline regression checks establish zero attempted construction and preserved
-  buff layout, not live correction acceptance. The requested poison-triggered,
-  fixed-unit combat cast remains blocked. An alternative visible-action design
-  needs explicit agreement; release acceptance remains held.
+- The old composite AuraButton/secure-action failed in game. It remains unused.
+- Reload DEV as a Paladin. Learned Purify and Cleanse buttons should remain visible
+  on all existing player/party rows even with no debuffs; unlearned spells stay hidden.
+- Poison/disease should light both learned buttons; magic should light only Cleanse.
+  Curses, bleeds and no debuffs must not light either. Check gain/removal in combat.
+- Left-click each button on all five recipients. Confirm the native spell targets
+  the correct player once on release and modified clicks do nothing. No automatic
+  cast or specific-aura selection should occur. Test range/mana failure normally.
+- Verify glow is visible around the icon without intercepting clicks, debuff strip
+  stays farther right, no forbidden-script warnings, and preview/raid/roster hiding.
+- Learning a spell updates outside combat; deferred spellbook changes apply after
+  combat. Existing buff reminders and health-bar bindings remain independent.
+- Mocks and matching-export dispatch checks do not establish live acceptance.
 
 ## Healing Mouse placement (live acceptance pending)
 
@@ -214,7 +218,7 @@ do not complete any of these checks.
 - Editing stays locked in combat; spell defaults and spell range feedback remain
   intact after replacing/removing the bandage. Check for taint or blocked actions.
 
-## Target frame — pending live acceptance
+## Target frame â€” pending live acceptance
 
 - Select friendly, neutral and hostile NPCs and player characters, solo and in a raid.
   Check the matching-width row to the right of the player's power bar, matching bar heights,
@@ -228,7 +232,7 @@ do not complete any of these checks.
 - Healing assignments apply to the target row; buff reminders remain party-only.
   No game session was automated by local checks.
 
-## Healing editor defaults and resets — pending live acceptance
+## Healing editor defaults and resets â€” pending live acceptance
 
 - On a fresh character or after Reset positions, verify Healing Mouse sits below
   the default Mouse grid with aligned left edges and a small gap. Existing saved
@@ -241,7 +245,7 @@ do not complete any of these checks.
 - Both controls are disabled in combat; entering combat with confirmation open
   must prevent a later acceptance from resetting data or protected actions.
 
-## Target of target — pending live acceptance
+## Target of target â€” pending live acceptance
 
 - Select a target with a friendly or hostile target. Verify the matching-width row
   appears above your target, left-aligned with a small gap and Target's target label.
@@ -252,7 +256,7 @@ do not complete any of these checks.
   The target-of-target receives the shared healing assignments through native
   actions; party range feedback and buff reminders remain separate.
 
-## Target healing bindings — pending live acceptance
+## Target healing bindings â€” pending live acceptance
 
 - Use a learned healing spell and a carried bandage on a friendly target and
   target-of-target through their bars. Check plain/Shift/Ctrl with all five mouse
@@ -264,7 +268,7 @@ do not complete any of these checks.
 - Clear assignments and confirm learned defaults, or plain-left native targeting
   when no learned default exists. Existing party actions must remain unchanged.
 
-## Healing Mouse input feedback — pending live acceptance
+## Healing Mouse input feedback â€” pending live acceptance
 
 - Open Healing Mouse and click player, party, target and target-of-target bars.
   Verify the correct plain/Shift/Ctrl tile flashes blue briefly, matching Keybinds.

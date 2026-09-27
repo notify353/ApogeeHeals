@@ -16,7 +16,7 @@ The native container owns UNIT_AURA registration, filtering, assignment, icon
 visibility and flow layout. Its group applies UntrustedLayoutScriptExecution;
 no addon frame is anchored to its changing bounds. The container is anchored
 once to the health bar's right edge with a fixed 16-pixel gap reserving the
-existing drinking indicator. Native children inherit row visibility/alpha;
+existing drinking indicator (46 pixels on Paladins reserves cleansing buttons). Native children inherit row visibility/alpha;
 target rows and synthetic previews create no containers. Missing or unreadable
 template metadata disables this optional display without blocking health bars.
 No Lua aura scans, duration calculations, overflow counts, protected attributes
@@ -244,21 +244,31 @@ attempts to assign SecureActionButton_OnClick. Public template discovery and
 initialization hooks do not establish composability. The warning does not throw
 a Lua exception, so pcall is not a capability check for this failure.
 
-Cleansing/Runtime.lua now only reports unavailability. It constructs no native
-aura container or secure Purify action, reads no aura state, and reserves no buff
-strip space. Existing fixed-unit buff actions are unaffected. Reload is required
-to discard frames from the failed candidate. The exact requested feature remains
-blocked, with no automatic substitute or restriction bypass.
+The revised, explicitly requested UI uses permanent secure buttons with separate
+native visual siblings. Each Paladin row creates ordinary SecureActionButtonTemplate
+buttons anchored directly to the health bar. Each learned spell is resolved through
+existing guarded player spellbook/helpful checks; Purify 1152 admits Poison/Disease,
+Cleanse 4987 also admits Magic. LeftButtonUp/useOnKeyDown=false and fixed unit/spell
+attributes use native dispatch. Modified left clicks are blocked. Attributes and
+visibility drivers change only outside combat, on spell/world/preview changes.
 
-Matching-export tests retain the separate native poison filter and secret display
-contracts, and check the conflicting handlers. Intrinsic OnClick only supports
-aura/enchantment cancellation. Forbidden script/input aspects propagate to child
-frames; a child button is not an established workaround. No supported secure
-poison-only visibility/action bridge was found in this export. A permanent visible
-fixed-unit action beside a native poison indicator would change the requested UI
-and needs agreement before implementation. Mocks verify zero attempted/repeated
-construction across startup, spell/world/roster events, preview and combat exit;
-they do not claim native combat cleansing acceptance.
+A separate CustomAuraContainerTemplate holds two HARMFUL native slots with dispel
+candidate filters. Their callbacks create only gold halo textures, disable mouse
+input and cancellation, and replace no scripts. They never inherit a secure-action
+template. The secure buttons are neither descendants of nor anchored to native aura
+frames; both hierarchies anchor independently to public row geometry. Native slot
+visibility affects only halo artwork, never button visibility, attributes or input.
+No restricted aura data, slot state or visibility is read back. Spellbutton frame
+levels use public finite integer guards. Intrinsic forbidden script/input and
+layout propagation remain intact; no restriction is removed or bypassed.
+
+Purify and Cleanse show only if learned; both remain visible without matching auras.
+A matching type does not promise removability, range, mana or cast success. Native
+spell execution chooses effects, not an addon-selected aura. The new layout reserves
+two spell positions before the eight-icon debuff strip on Paladins only. Mocks and
+matching native filtering/release-dispatch checks cover all five fixed recipients;
+actual engine permissions, visual layering, physical clicks and combat glow require
+live acceptance. The old failed composition is never constructed.
 
 ```powershell
 pwsh ./scripts/test-local.ps1 -ForeverExportPath 'C:/Program Files (x86)/World of Warcraft/_classic_beta_/BlizzardInterfaceCode/Interface/AddOns'

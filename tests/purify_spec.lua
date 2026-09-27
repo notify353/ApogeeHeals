@@ -1,31 +1,60 @@
-local Fixture=dofile("tests/purify_fixture.lua")
-for _,options in ipairs({{might=true},{class="PRIEST"},{known=false},{noTemplates=true},{secretTemplates=true}}) do
-    local m,a=Fixture.New(options)
-    local function unchanged()
-        assert(#m.cleanseContainers==0 and m.xmlWarnings==0)
-        assert(a.Cleansing.status:find("unavailable",1,true))
-        for _,row in ipairs(a.View.rows) do
-            assert(not row.cleanseHost and not row.cleanseButton)
-            assert(row.buffOverflow.point[4]==-61)
+local Fixture = dofile("tests/purify_fixture.lua")
+for _, options in ipairs({{might=true}, {cleanse=true}, {class="PRIEST"}, {known=false},
+    {noTemplates=true}, {secretTemplates=true}}) do
+    local m, a = Fixture.New(options)
+    local function check()
+        assert(m.xmlWarnings == 0)
+        for _, row in ipairs(a.View.rows) do
+            if options.class == "PRIEST" then assert(not row.cleanseButtons)
+            else
+                assert(#row.cleanseButtons == 2)
+                for index, button in ipairs(row.cleanseButtons) do
+                    local learned = index == 1 and m.known or index == 2 and m.cleanse
+                    assert(button.parent == row and button.point[2] == row.health)
+                    assert(button.template == "SecureActionButtonTemplate" and not button.scripts.OnClick)
+                    assert(button.attributes.unit == row.unit and button.attributes.useOnKeyDown == false)
+                    assert(button.clicks[1] == "LeftButtonUp")
+                    assert(button.driver == (learned and "show" or "hide"))
+                    assert(button.attributes.spell1 == (learned and (index == 1 and 1152 or 4987) or nil))
+                    for _, prefix in ipairs({"shift-", "ctrl-", "alt-", "ctrl-shift-", "alt-shift-", "alt-ctrl-", "alt-ctrl-shift-"}) do
+                        assert(button.attributes[prefix .. "type1"] == "")
+                    end
+                end
+                if not options.noTemplates and not options.secretTemplates then
+                    local indicator = assert(row.cleanseIndicator)
+                    assert(indicator.parent == row and indicator.unit == row.unit)
+                    for key, slot in pairs(indicator.slots) do
+                        assert(slot.frame.mouse == false and slot.frame.parent == indicator)
+                        local types = slot.filters.includeDispelTypes
+                        local learned = key == "purify" and m.known or key == "cleanse" and m.cleanse
+                        assert((types.Poison == true) == learned and (types.Disease == true) == learned)
+                        assert((types.Magic == true) == (key == "cleanse" and learned))
+                        assert(not types.Curse)
+                    end
+                end
+            end
+            assert(row.buffOverflow.point[4] == -61)
         end
     end
-    unchanged()
-    if options.might then
-        assert(a.View.rows[1].buffReminders[1].shown)
-        assert(a.View.rows[1].buffButtons[1].point[4]==-3)
+    check()
+    a.View.SetUnlocked(true)
+    if a.View.rows[1].cleanseButtons then
+        for _, button in ipairs(a.View.rows[1].cleanseButtons) do assert(button.driver == "hide") end
     end
-    for iteration=1,3 do
-        for _,event in ipairs({"SPELLS_CHANGED","PLAYER_ENTERING_WORLD","GROUP_ROSTER_UPDATE"}) do
-            m.Event(event);m.Flush();unchanged()
-        end
-        a.View.SetUnlocked(true);a.View.SetUnlocked(false);unchanged()
-        m.combat=true;m.Event("PLAYER_REGEN_DISABLED");m.Flush()
-        local reads=m.auraReads
-        a.Cleansing.pending=true;a.Cleansing.Refresh()
-        assert(a.Cleansing.pending and m.auraReads==reads);unchanged()
-        m.combat=false;m.Event("PLAYER_REGEN_ENABLED");m.Flush()
-        assert(not a.Cleansing.pending);unchanged()
+    a.View.SetUnlocked(false); check()
+    m.combat = true; m.Event("PLAYER_REGEN_DISABLED"); m.Flush()
+    local reads = m.auraReads
+    for _, event in ipairs({"GROUP_ROSTER_UPDATE", "UNIT_AURA", "SPELLS_CHANGED"}) do
+        m.Event(event, "player"); m.Flush(); check()
     end
-    m.known=true;m.Event("SPELLS_CHANGED");m.Flush();unchanged()
+    assert(m.auraReads == reads)
+    m.cleanse = true
+    m.Event("SPELLS_CHANGED"); m.Flush()
+    if a.View.rows[1].cleanseButtons then
+        assert(a.View.rows[1].cleanseButtons[2].driver == (options.cleanse and "show" or "hide"))
+    end
+    m.combat = false; m.Event("PLAYER_REGEN_ENABLED"); m.Flush(); check()
+    m.known, m.cleanse = false, false
+    m.Event("SPELLS_CHANGED"); m.Flush(); check()
 end
-print("PASS rejected Purify composition never constructed/retried; no XML warnings or fallback hitbox; buff layout preserved")
+print("PASS permanent learned cleansing actions, separate native halos, type filters, modifiers, preview, spellbook changes and combat deferral")

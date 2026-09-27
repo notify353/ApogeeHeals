@@ -11,7 +11,7 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 - Up to eight native debuff icons extend right of each player/party health bar,
   after the reserved drinking-icon space. Hover for the native aura tooltip.
   All harmful aura types qualify, including effects you cannot dispel. Native
-  code owns ordering, updates and combat display; no debuff casting is added.
+  code owns ordering, updates and combat display; the icons themselves do not cast.
 - Target sits above the player with a full-row gap; target's target stays
   closely above target. Both retain their size and align with the stack's left
   edge. The drag handle sits above the pair; no helper caption is shown.
@@ -155,20 +155,22 @@ reminder. Choices persist across reloads and relearning. The list supports up to
 there is no manual scope setting. No duration countdown, automatic casting, party chat alerts
 or shared Tank state is involved. Tank can be absent or disabled.
 
-## Purify (blocked by live native restriction)
+## Paladin cleansing buttons
 
-The live 70009 client rejected the poison-triggered secure-button candidate with
-five `Cannot assign script handler for 'onclick' (cannot replace a forbidden
-script handler)` warnings from SecureTemplates.xml:8. The candidate is disabled:
-Heals no longer constructs its native aura containers, buttons or hit areas.
-Reload after installing the correction to remove the previously created frames.
-Existing buff reminders, spell tooltips and minimap behavior remain available.
+Learned Purify and Cleanse have permanent buttons to the right of each player/party
+health bar, after the drinking indicator and before the debuff strip. Left-click
+casts that spell on the row's player, including in combat. Modified clicks do
+nothing. Unlearned spells are hidden; other classes do not get these buttons.
 
-Poison-triggered, fixed-unit Purify during combat remains unfulfilled. Native
-poison display works independently, but its intrinsic click handler cannot be
-replaced by the secure spell-action handler. No indicator-only, permanent-button
-or invisible-hitbox substitute has been enabled. A different visible-action
-design requires explicit agreement; settings report the unavailable feature.
+A separate native gold halo appears for matching harmful-aura types: poison and
+disease for Purify, plus magic for Cleanse. Both can glow for poison/disease.
+The glow indicates a matching type, not guaranteed success, range or mana.
+The game chooses the effects removed; clicking a button never selects one debuff.
+Buttons stay visible with no debuffs. Native icons themselves remain display-only.
+
+The earlier rejected AuraButton/secure-action composition remains unused. These
+are independent, permanently configured secure buttons and native visual siblings.
+Native clicks, glow layering and combat behavior require in-game acceptance.
 
 ## Healing Mouse placement
 

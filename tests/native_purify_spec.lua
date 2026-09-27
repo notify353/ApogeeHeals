@@ -50,6 +50,36 @@ local click=definition(read("Blizzard_AuraContainer/Blizzard_AuraButton.lua"),
 assert(click:find("CancelAuraByInstanceID",1,true))
 assert(click:find("CancelTemporaryEnchantment",1,true))
 assert(not click:find("CastSpell",1,true))
-local m,a=dofile("tests/purify_fixture.lua").New({might=true})
-assert(#a.View.rows==5 and #m.cleanseContainers==0 and m.xmlWarnings==0)
-print("PASS matching-export native poison display and conflicting intrinsic click contracts; rejected control disabled")
+local m,a=dofile("tests/purify_fixture.lua").New({might=true,cleanse=true})
+assert(#a.View.rows==5 and #m.cleanseContainers==10 and m.xmlWarnings==0)
+-- Never combine the intrinsic AuraButton with a secure action template. Instead,
+-- the permanent actions are ordinary siblings of the native halo container.
+for _, row in ipairs(a.View.rows) do
+    for _, button in ipairs(row.cleanseButtons) do
+        assert(button.parent == row and button.point[2] == row.health)
+        assert(button.parent ~= row.cleanseIndicator and not button.scripts.OnClick)
+    end
+end
+local source = read("Blizzard_FrameXML/SecureTemplates.lua")
+local casts, lastID, lastUnit = 0
+env.SecureButton_GetAttribute = function(frame, key) return frame.attributes[key] end
+env.SecureButton_GetModifiedAttribute = function(frame, key) return frame.attributes[key .. "1"] end
+env.CastSpellByID = function(id, unit) casts, lastID, lastUnit = casts + 1, id, unit end
+env.CastSpellByName = function() error("lost exact spell ID") end
+env.GetCVarBool = function() return true end
+env.OnActionButtonPressAndHoldRelease = function() error("unexpected held action") end
+local action = assert(source:match("SECURE_ACTIONS%.spell%s*=%s*(function.-\n    end);"))
+local cast = execute("return " .. action, env)
+env.OnActionButtonClick = function(frame, button) cast(frame, frame.attributes.unit, button) end
+execute(definition(source, "SecureActionButton_ShouldUseOnKeyDown") .. "\n"
+    .. definition(source, "SecureActionButton_OnClick"), env)
+for _, row in ipairs(a.View.rows) do
+    for index, button in ipairs(row.cleanseButtons) do
+        local before = casts
+        env.SecureActionButton_OnClick(button, "LeftButton", true)
+        assert(casts == before)
+        env.SecureActionButton_OnClick(button, "LeftButton", false)
+        assert(casts == before + 1 and lastID == (index == 1 and 1152 or 4987) and lastUnit == row.unit)
+    end
+end
+print("PASS matching-export native poison display; forbidden intrinsic composition remains absent with separate permanent actions")

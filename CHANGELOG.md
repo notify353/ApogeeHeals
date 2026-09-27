@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add permanent learned Purify/Cleanse buttons beside Paladin player/party bars,
+  with independent native gold glows for matching debuff types and fixed-unit clicks.
+
 - Display up to eight native harmful-aura icons to the right of player/party
   health bars, with native tooltips and space for the drinking indicator.
 
