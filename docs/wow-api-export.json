@@ -39,6 +39,8 @@
     "Blizzard_APIDocumentationGenerated/ItemDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/ItemConstantsDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/GameCursorDocumentation.lua",
-    "Blizzard_ArtifactUI/Blizzard_ArtifactPerks.lua"
+    "Blizzard_ArtifactUI/Blizzard_ArtifactPerks.lua",
+    "Blizzard_APIDocumentationGenerated/SimpleTextureBaseAPIDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/SimpleScriptRegionResizingAPIDocumentation.lua"
   ]
 }

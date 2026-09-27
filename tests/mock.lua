@@ -68,9 +68,9 @@ function M.New()
     function methods:RegisterEvent(e) self.events[e] = true end
     function methods:UnregisterEvent(e) self.events[e] = nil end
     function methods:UnregisterAllEvents() self.events = {} end
-    function methods:CreateTexture() return object("Texture", nil, self) end
+    function methods:CreateTexture(_, layer) local t=object("Texture", nil, self); t.drawLayer=layer; return t end
     function methods:CreateFontString() return object("FontString", nil, self) end
-    function methods:SetAllPoints() end
+    function methods:SetAllPoints(relative) self.allPoints=relative or self.parent end
     function methods:SetColorTexture(...) self.color = {...} end
     function methods:SetTexture(value) self.texture = value end
     function methods:SetTexCoord(...) self.texCoord = {...} end

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Match Essentials with a near-opaque dark settings background behind controls,
+  preserving behavior and saved settings.
+
 - Allow bag bandages on Healing Mouse tiles, with saved item identity, icons,
   drag/swap/remove and native secure use on the clicked party member.
 
