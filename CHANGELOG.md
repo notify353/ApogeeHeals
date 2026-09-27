@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Highlight a role-first, class-fallback blessing suggestion in yellow, with a tooltip explanation.
+
 - Limit blessing choices to lasting party buffs; exclude Protection, Freedom and Sacrifice.
 
 - Offer all learned blessing variants on each unblessed player/party row, with matching left-side geometry.

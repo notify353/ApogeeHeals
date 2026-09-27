@@ -339,3 +339,12 @@ Blessing scope correction: verify Protection, Freedom and Sacrifice never appear
 in the chooser, even when learned, and their active effects alone do not suppress
 lasting party-buff choices. Keep Might, Wisdom, Kings, Salvation, Sanctuary and
 Light, including learned Greater variants. Live acceptance pending.
+
+## Beginner blessing guidance
+
+Pending live: on each unblessed recipient, verify at most one steady yellow border
+and a readable suggestion reason in its native spell tooltip. Assign tank/healer
+roles and verify the border moves outside combat. Test unknown-role classes,
+unlearned preferred blessings, normal versus Greater versions, and combat entry
+and exit. Alternatives must remain clickable with the same fixed recipient.
+No Salvation or emergency ability should be automatically suggested.

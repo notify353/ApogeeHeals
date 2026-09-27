@@ -59,7 +59,7 @@ function B.Paint(row, missing)
     row.buffOverflow:SetText(#missing > 4 and "+" .. (#missing - 4) or "")
     row.buffOverflow:SetShown(#missing > 4)
 end
-local function paintChoices(row, key, choices, offset)
+local function paintChoices(row, key, choices, offset, recommendedID, recommendation)
     row[key] = row[key] or {}
     local buttons = row[key]
     local size, gap = A.Style.sideIconSize, A.Style.sideIconGap
@@ -78,18 +78,29 @@ local function paintChoices(row, key, choices, offset)
             button:SetScript("OnEnter", function(self)
                 if InCombatLockdown() or not self.reminderSpell then return end
                 GameTooltip:SetOwner(self, "ANCHOR_LEFT"); B.tooltipButton = self
-                if GameTooltip:SetSpellByID(self.reminderSpell, false, true) then GameTooltip:Show()
+                if GameTooltip:SetSpellByID(self.reminderSpell, false, true) then
+                    if self.recommendation then GameTooltip:AddLine(self.recommendation, 1, 0.8, 0.2, true) end
+                    GameTooltip:Show()
                 else B.HideTooltip(self) end
             end)
             button:SetScript("OnLeave", function(self) B.HideTooltip(self) end)
             button:SetScript("OnHide", function(self) B.HideTooltip(self) end)
+            if key == "blessingButtons" then
+                button.suggestion = button:CreateTexture(nil, "BACKGROUND")
+                button.suggestion:SetPoint("TOPLEFT", button, "TOPLEFT", -1, 1)
+                button.suggestion:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 1, -1)
+                button.suggestion:SetColorTexture(1, 0.75, 0.1, 1)
+                button.suggestion:Hide()
+            end
             button.icon = button:CreateTexture(nil, "ARTWORK")
             button.icon:SetAllPoints(); button.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
         end
         if button then
             local id = entry and entry.id
-            if button.reminderSpell ~= id then B.HideTooltip(button) end
-            button.reminderSpell = id
+            local reason = id and id == recommendedID and recommendation or nil
+            if button.reminderSpell ~= id or button.recommendation ~= reason then B.HideTooltip(button) end
+            button.reminderSpell, button.recommendation = id, reason
+            if button.suggestion then button.suggestion:SetShown(reason ~= nil) end
             button.icon:SetTexture(entry and entry.icon); button.icon:SetShown(entry ~= nil)
             if not InCombatLockdown() then
                 button:ClearAllPoints()
@@ -103,7 +114,8 @@ local function paintChoices(row, key, choices, offset)
 end
 function B.PaintBlessings(row, choices, missingCount)
     local offset = math.min(missingCount, 4) + (missingCount > 4 and 1 or 0)
-    paintChoices(row, "blessingButtons", choices, offset)
+    local id, reason = A.BuffDefaults.Recommend(row.unit, choices)
+    paintChoices(row, "blessingButtons", choices, offset, id, reason)
 end
 function B.PaintAuras(row, choices, missingCount, blessingCount)
     local offset = math.min(missingCount, 4) + (missingCount > 4 and 1 or 0) + (blessingCount or 0)

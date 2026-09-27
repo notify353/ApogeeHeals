@@ -1,5 +1,19 @@
 # Forever API authority
 
+## Blessing suggestion border (70009, 2026-09-27)
+
+See [research and decision table](BLESSING_GUIDANCE.md). UnitGroupRolesAssigned
+uses guarded Access.Read before any role comparison; UnitClass tokens also pass
+readability checks. Assigned tank/healer overrides class; absent/unknown/restricted
+roles use public class defaults. The local UnitDocumentation, PartyInfoDocumentation
+PLAYER_ROLES_ASSIGNED event and CompactUnitFrame usage are freshness-checked.
+Only one suitable offered spell is suggested. Normal versions precede Greater;
+no Salvation, Light, Sanctuary or emergency spell is a generic fallback.
+A one-pixel yellow texture and tooltip explanation affect presentation only.
+Role changes use the existing out-of-combat refresh; combat clears artwork and
+never updates secure attributes. Unknown aura snapshots show no choices/highlight.
+Physical rendering/clicks and actual role delivery remain live checks.
+
 ## Per-recipient blessing choices (70009, 2026-09-27)
 
 A complete public out-of-combat HELPFUL scan establishes absence of any recognized

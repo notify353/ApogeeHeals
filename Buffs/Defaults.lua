@@ -70,3 +70,41 @@ function D.Choices()
     end
     return result
 end
+
+-- Conservative novice guidance, not an optimizer. See docs/BLESSING_GUIDANCE.md.
+function D.Recommend(unit, available)
+    if InCombatLockdown() or not D.active or #available == 0 then return end
+    local role = A.Access.Read(UnitGroupRolesAssigned, unit)
+    local ok, _, class = pcall(UnitClass, unit)
+    if not ok or not A.Access.Readable(class) or type(class) ~= "string" then class = nil end
+    local order, basis
+    if role == "TANK" then
+        basis = "assigned tank"
+        if class == "PALADIN" then order = {"kings", "wisdom"}
+        elseif class == "WARRIOR" or class == "DRUID" then order = {"kings", "might"}
+        else order = {"kings"} end
+    elseif role == "HEALER" then
+        order, basis = {"wisdom", "kings"}, "assigned healer"
+    elseif class == "WARRIOR" or class == "ROGUE"
+        or (role == "DAMAGER" and class == "PALADIN") then
+        order, basis = {"might", "kings"}, role == "DAMAGER" and "melee damage role" or "melee class fallback"
+    elseif class == "MAGE" or class == "PRIEST" or class == "WARLOCK" then
+        order, basis = {"wisdom", "kings"}, "caster class"
+    elseif class == "HUNTER" then
+        order, basis = {"kings", "wisdom"}, "hunter class; combat style unknown"
+    elseif class == "PALADIN" or class == "DRUID" or class == "SHAMAN" then
+        order, basis = {"kings", "wisdom"}, "hybrid class; specialization unknown"
+    else
+        order, basis = {"kings"}, "general stat benefit; role/class unavailable"
+    end
+    local benefits = {kings="broad stat support", wisdom="mana regeneration", might="melee attack power"}
+    -- Choices list ordinary variants before Greater variants, keeping a per-row
+    -- suggestion targeted to that player when both versions are learned.
+    for _, group in ipairs(order) do
+        for _, entry in ipairs(available) do
+            if D.Group(entry.id) == group then
+                return entry.id, "Suggested: " .. benefits[group] .. " (" .. basis .. ")."
+            end
+        end
+    end
+end
