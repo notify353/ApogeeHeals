@@ -283,6 +283,14 @@ do not complete any of these checks.
   editor opening or blocked-action/taint warning should occur.
 # Native debuff strip (live acceptance pending)
 
+## Drinking countdown (live acceptance pending)
+
+- Reload, then drink on player and party rows. The cup should remain in its
+  existing outside position and show seconds remaining along its bottom edge.
+- Check countdown progression, stopping early, expiry, replacement drinks,
+  combat entry, zoning and party members leaving. No stale numbers should remain.
+- Missing/unavailable duration should leave the confirmed cup without a number.
+
 - Reload DEV. Apply/remove harmful effects on player and party1-4; icons should
   update beside the corresponding health bar in and out of combat.
 - Check multiple simultaneous debuffs (including nondispellable effects), the

@@ -1,5 +1,22 @@
 # Forever API authority
 
+## Drinking countdown (70009, 2026-09-27)
+
+The existing complete, readable HELPFUL scan still establishes drinking only
+outside combat. Its matching auraInstanceID must be public before GetAuraDuration
+is called. That native duration object passes directly to a DurationTextBinding;
+no duration fields, remaining times or text are read, calculated or stored by Lua.
+SetFormatter uses a native SecondsFormatter constrained to seconds, rounding up,
+with one-letter units and no milliseconds. The binding updates the cup's bottom
+FontString every 0.1 seconds natively; no addon OnUpdate polling is introduced.
+Zero and expired durations format as empty text. Failed/missing duration support
+retains the confirmed cup with no timer. Aura loss, incomplete scans, combat entry
+and world exit disable the binding and clear its text. Preview and target rows
+create no bindings. The cup remains outside the bar at the user's revised request.
+
+Mock checks cover fixed recipients, native-object passthrough and lifecycle cleanup.
+Actual countdown formatting, alignment and early-stop timing remain live checks.
+
 ## Player/party debuff display (70009, 2026-09-27)
 
 CustomAuraContainerTemplate exposes an untainted inbound AuraContainer with

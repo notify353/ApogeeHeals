@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Show native seconds remaining on the drinking cup without changing its position.
+
 - Align right-side icons with the full health-plus-power height using square
   artwork and consistent spacing; keep cleansing glows within the row gaps.
 

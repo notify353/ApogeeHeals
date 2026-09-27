@@ -44,6 +44,11 @@
     "Blizzard_APIDocumentationGenerated/GameCursorDocumentation.lua",
     "Blizzard_ArtifactUI/Blizzard_ArtifactPerks.lua",
     "Blizzard_APIDocumentationGenerated/SimpleTextureBaseAPIDocumentation.lua",
-    "Blizzard_APIDocumentationGenerated/SimpleScriptRegionResizingAPIDocumentation.lua"
+    "Blizzard_APIDocumentationGenerated/SimpleScriptRegionResizingAPIDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/DurationUtilDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/DurationTextBindingObjectAPIDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/StringUtilDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/SecondsFormatterAPIDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/SecondsFormatterSharedDocumentation.lua"
   ]
 }

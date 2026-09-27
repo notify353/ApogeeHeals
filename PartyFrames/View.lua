@@ -84,6 +84,7 @@ local function buildRow(row, preview, first, width)
     drinkArtwork:SetTexture("Interface\\Icons\\INV_Drink_07")
     drinkArtwork:SetTexCoord(0.07, 0.93, 0.07, 0.93)
     row.drinkIcon:Hide()
+    A.Drinking.CreateTimer(row, preview)
     row.power = bar(row, S.powerHeight, -(S.healthHeight + S.barGap), width)
     S.RowEdges(row, first, width)
 end
@@ -265,7 +266,7 @@ function V.Refresh()
         if not classOK then classToken = nil end
         A.UnitAPI.PaintClassStrip(row.classStrip, classToken)
         row.name:SetText(""); row.level:SetText(""); row.status:SetText("")
-        row.drinkIcon:Hide()
+        A.Drinking.Clear(row)
         local showName = state ~= "missing" and state ~= "dead" and state ~= "offline"
         row.name:SetShown(showName)
         row.level:SetShown(showName)
@@ -278,7 +279,7 @@ function V.Refresh()
                 A.IncomingHeals.Paint(row.incoming, row.unit)
             else A.IncomingHeals.Clear(row.incoming) end
             A.UnitAPI.PaintPower(row.power, row.unit)
-            row.drinkIcon:SetShown(A.Drinking.IsDrinking(row.unit))
+            A.Drinking.Paint(row)
         else
             A.UnitAPI.Clear(row.health); A.UnitAPI.Clear(row.power)
             A.IncomingHeals.Clear(row.incoming)

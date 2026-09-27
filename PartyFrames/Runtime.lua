@@ -57,6 +57,7 @@ function R.Start()
             A.Buffs.HideTooltip(A.Buffs.tooltipButton)
         elseif event == "PLAYER_LEAVING_WORLD" then
             R.suspended = true
+            for _, row in ipairs(A.View.rows) do A.Drinking.Clear(row) end
             A.View.ClearTargetCast()
             A.Buffs.suspended = true
             A.Buffs.Stop()
@@ -68,7 +69,7 @@ function R.Start()
             A.View.Lock(); A.Settings.Refresh()
             -- Clear drinking immediately; combat alone does not hide unit identity.
             for _, row in ipairs(A.View.rows) do
-                row.drinkIcon:Hide()
+                A.Drinking.Clear(row)
             end
         elseif event == "PLAYER_REGEN_ENABLED" then
             A.Cleansing.pending = true

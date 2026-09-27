@@ -34,6 +34,8 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
   players, with no outer border or header lane. OFFLINE and DEAD
   replace the name inside the empty health bar. A small cup beside the health bar
   indicates confirmed drinking outside combat, with smaller artwork in a dark inset frame.
+  Its countdown shows seconds remaining on the current drink aura when the client
+  supplies its duration. Stopping early clears the icon and timer.
 - Red rage and yellow energy fills use softer tones; the preview handle is shorter
   with smaller, muted lettering. Native class-name colors remain unchanged.
 - Incoming heals from all healers appear as a pale-green segment immediately
