@@ -1,5 +1,199 @@
 # Forever API authority
 
+## Inset side-icon geometry (70009, 2026-09-27)
+
+Shared icons use 18 logical pixels at the existing 2x row scale, matching the
+36px settings tiles. Two logical pixels between tiles match the settings 4px
+gap. The -0.75 top offset centers them in the 19.5-high health/power cluster;
+adjacent rows leave seven displayed pixels between tiles. Icon artwork is inset
+one logical pixel, with gold background borders contained inside the tile.
+Buff choices, reminders, cleanse siblings/indicators, native debuffs, food/drink
+and weapon displays all use this geometry. Native flow children keep their
+internal zero offset; only each strip anchor is vertically inset. No action,
+filter, protected combat layout or restricted-data contract changes. This
+supersedes the earlier full-height icon dimensions below.
+
+## Class support (70009, 2026-09-27)
+
+See [class support and live acceptance](CLASS_SUPPORT.md). Direct cleansing now
+uses class-specific public action counts and exact learned ranks. Priest Dispel
+Magic alone permits dual helpful/harmful classification in a cleansing-local
+resolver; healing assignment validation is unchanged. Native HARMFUL filters and
+permanent secure siblings retain the existing no-readback contract.
+
+Independent curated upkeep uses complete public scans and exact family IDs.
+Resolution is cached only within one refresh, including failures. Hunter aspects
+reuse the matching StanceBar contract; native own selection, not another aura,
+controls the player-only picker. Repeated unchanged choice rendering does not
+rewrite protected visibility/attributes.
+
+WeaponUpkeep uses CustomAuraContainer AddItemEnchantment with the exported
+MainHand/OffHand constants, fixed player ownership, native inventory tooltip and
+SetDurationText. It never reads enchantment fields, visibility or duration. A
+native combat visibility parent hides the two fixed containers; inbound disable
+clears their presentation on world exit/combat. No item application is added.
+The enchantment implementation and PaperDollInfo documentation are now freshness
+inputs. SecureTemplates pet action has fixed-unit dispatch but no expected-spell
+identity gate for the slot; Devour Magic remains deferred.
+
+## Friendly target support controls (70009, 2026-09-27)
+
+The selected target (not targettarget) now shares upkeep reminders, Paladin
+blessing choices/recommendations, learned cleansing actions and native debuff
+icons. A SecureHandlerStateTemplate parent uses the fixed native visibility
+condition [@target,help,nodead] show; hide. The health bar remains independently
+visible for hostile targets. All support children inherit the friendly gate;
+Blizzard owns combat visibility. No Lua friendship comparison changes protected
+layout, visibility or action attributes in combat.
+
+Out-of-combat target buff scanning requires guarded UnitCanAssist(player,target)
+true plus the existing alive/readable-complete-scan checks. Unknown/hostile/dead
+state yields no suggestions. Target is a fixed action unit, never copied from a
+name or GUID. Learned party upkeep is offered, and self-only upkeep is allowed
+only when readable UnitIsUnit(target,player) is true. Target scans do not expand
+saved buff discovery. The personal aura picker stays solely on the player row.
+No target drinking indicator is introduced; target debuffs sit immediately after
+cleansing buttons, without reserving a cup gap.
+
+Target UNIT_AURA/faction/flags/connection events request the existing refresh.
+PLAYER_TARGET_CHANGED immediately clears owned buff/cleanse tooltips and old
+buff artwork, then refreshes choices outside combat. It invokes native inbound
+UpdateAllAuras on both target containers, including during combat, without
+reading native aura state. The matching ManagedAuraContainer shared method
+marks a FullAuraRebuild; AuraContainer explicitly documents external refresh for
+target changes. Cleansing actions remain fixed-target secure siblings with
+separate native indicators. Spell and preview changes still defer in combat.
+Matching-source cast tests now exercise the selected target as well as party.
+
+Source/package mocks verify parenting, help/nodead driver expression, target
+switches, unknown/dead cleanup and native refresh requests. They do not prove
+native engine visibility, restricted aura handling or physical input. Verify
+friendly-to-hostile-to-friendly switches in/out of combat on the actual client.
+
+## Blessing suggestion border (70009, 2026-09-27)
+
+See [research and decision table](BLESSING_GUIDANCE.md). UnitGroupRolesAssigned
+uses guarded Access.Read before any role comparison; UnitClass tokens also pass
+readability checks. Assigned tank/healer overrides class; absent/unknown/restricted
+roles use public class defaults. The local UnitDocumentation, PartyInfoDocumentation
+PLAYER_ROLES_ASSIGNED event and CompactUnitFrame usage are freshness-checked.
+Only one suitable offered spell is suggested. Normal versions precede Greater;
+no Salvation, Light, Sanctuary or emergency spell is a generic fallback.
+A one-pixel yellow texture and tooltip explanation affect presentation only.
+Role changes use the existing out-of-combat refresh; combat clears artwork and
+never updates secure attributes. Unknown aura snapshots show no choices/highlight.
+Physical rendering/clicks and actual role delivery remain live checks.
+
+## Per-recipient blessing choices (70009, 2026-09-27)
+
+A complete public out-of-combat HELPFUL scan establishes absence of any recognized
+lasting Paladin blessing on player/party1-4. Unknown/incomplete scans suppress
+choices. Each unblessed row offers the highest learned rank of Might, Wisdom,
+Kings, Salvation, Sanctuary and Light, with ordinary and Greater spells as
+separate choices. Protection, Freedom and Sacrifice are emergency abilities:
+they are neither upkeep choices nor evidence of a lasting party blessing.
+Each candidate passes native spellbook and helpful-spell validation before use.
+
+This replaces the single configured blessing recommendation, while retaining
+saved reminder entries and unrelated upkeep discovery. All choices are visible,
+independent of the four-reminder cap and old reminder checkboxes. Each secure
+button has the immutable row unit, exact spell, release-only click and blocked
+modified clicks. Tooltip and native action contracts are unchanged. No automatic
+choice or casting occurs. A lasting blessing from any caster suppresses that row's choices.
+Regular upkeep, blessing choices and the self-only aura choices share matching
+geometry without overlapping. Combat hides choices through native drivers;
+no protected attributes or layout change in combat. Mock source/package checks
+cover five recipients, rank updates, all variants, unknown reads and cleanup;
+physical input, native appearance and server coverage remain live checks.
+
+## Paladin own-aura picker (70009, 2026-09-27)
+
+Matching Blizzard_ActionBar/Shared/StanceBar.lua consumes GetNumShapeshiftForms
+and GetShapeshiftFormInfo (texture, isActive, isCastable, spellID). Out of combat,
+readable bounded form count, boolean active state and public spell IDs establish
+whether the player's own Paladin aura is off. Any unreadable/incomplete result
+suppresses choices. Each offered spell also passes the existing learned helpful
+spell validation. Another Paladin's aura buff is not the player's selected stance.
+
+Only the player row creates normal secure spell buttons for these choices,
+with fixed player unit, LeftButtonUp and blocked modified clicks. Buttons match
+the side icon geometry and follow up to four buff reminders (plus overflow space).
+Native visibility drivers hide them in combat; combat cleanup changes artwork
+only. Form events, normal aura refresh, spell changes and combat exit reevaluate
+outside combat. Preview/world exit suppress the picker. Native spell tooltip and
+cast dispatch follow the existing buff-button contract. No automatic selection,
+restricted aura calculation, combat attribute/layout change or new setting.
+Mock checks are not native physical-click/stance-event acceptance.
+
+## Food/drink indicator tooltip (70009, 2026-09-27)
+
+Resolve ordinary Food candidate IDs 433, 434, 435, 1127, 1129 and 1131 on the
+client using the same guarded spell-name validation as Drink. The complete
+readable out-of-combat HELPFUL scan accepts either category; Well Fed is not
+an eating signal. When both are active the first matching aura in native scan
+order supplies the artwork, timer and tooltip. Server-specific coverage needs
+live acceptance. Food candidates are cross-checked against
+https://wow-forever.gg/db/spells/1131-food/ and validated on the current client.
+
+The normal frame enables hover only for live player/party indicators. OnEnter
+rescans for a current public aura instance and calls GameTooltip:SetOwner then
+SetUnitAuraByAuraInstanceID, matching Blizzard_BuffFrame/BuffFrame.lua and the
+TooltipDataHandler method map. Native code populates the actual aura tooltip;
+no tooltip fields are inspected. Refresh updates an owned tooltip without hiding
+and reshowing the indicator. OnLeave/OnHide, aura loss, combat and world exit
+clear only this indicator's owned tooltip. No cancel action or cast is added.
+Mocks cover food-only and drink, fresh tooltip identity, ownership and cleanup;
+actual hover rendering and food coverage remain in-game checks.
+
+## Drinking countdown (70009, 2026-09-27)
+
+The existing complete, readable HELPFUL scan still establishes drinking only
+outside combat. Its matching auraInstanceID must be public before GetAuraDuration
+is called. That native duration object passes directly to a DurationTextBinding;
+no duration fields, remaining times or text are read, calculated or stored by Lua.
+SetFormatter uses a native NumericRuleFormatter with threshold zero, step one,
+rounding Up and format %.0f, preserving whole remaining seconds with no suffix.
+The binding updates the cup's horizontally and vertically centered
+FontString every 0.1 seconds natively; no addon OnUpdate polling is introduced.
+Zero and expired durations format as empty text. Failed/missing duration support
+retains the confirmed cup with no timer. Aura loss, incomplete scans, combat entry
+and world exit disable the binding and clear its text. Preview and target rows
+create no bindings. The cup remains outside the bar at the user's revised request.
+
+Mock checks cover fixed recipients, native-object passthrough and lifecycle cleanup.
+Actual countdown formatting, alignment and early-stop timing remain live checks.
+
+## Player/party debuff display (70009, 2026-09-27)
+
+CustomAuraContainerTemplate exposes an untainted inbound AuraContainer with
+SetUnit, AddAuraGroup and SetEnabled. Each live player/party row creates one
+container outside combat, fixed to that row's unit. A HARMFUL group admits all
+debuff types with a maximum of eight icons and the default native ordering.
+The native group provider preallocates ten CustomAuraButtonTemplate frames and
+applies DenyTaintedAccessWhenAurasAreSecret after the initialization callback.
+The addon initializes only size, artwork, native SetIcon, tooltip anchor and
+SetCancelAuraButtons(nil). It retains no aura button references, observes no
+aura state, supplies no extra templates and replaces no intrinsic handlers.
+
+The native container owns UNIT_AURA registration, filtering, assignment, icon
+visibility and flow layout. Its group applies UntrustedLayoutScriptExecution;
+no addon frame is anchored to its changing bounds. The container is anchored
+once to the health bar's right edge with fixed spacing reserving the drinking
+indicator and, on Paladins, cleansing buttons. Icon size derives from the public
+health-plus-power cluster height (19.5 logical pixels); native flow element sizes
+match it, with two-pixel gaps and top alignment. Cleansing halo artwork extends
+one pixel, fitting within the row gap. Native children inherit row visibility/alpha;
+target rows and synthetic previews create no containers. Missing or unreadable
+template metadata disables this optional display without blocking health bars.
+No Lua aura scans, duration calculations, overflow counts, protected attributes
+or combat layout writes are introduced. This uses the native display alone,
+not the previously rejected AuraButton/SecureActionButton composition.
+
+Mocks verify configuration/lifecycle and execute the matching exported group
+setup. They cannot establish native engine permissions, tooltips, rendering or
+combat acceptance. Verify acquisition/removal, roster changes, raid hiding,
+preview transitions and combat on all five recipients after DEV reload.
+
 Matching local source:
 `C:/Program Files (x86)/World of Warcraft/_classic_beta_/BlizzardInterfaceCode/Interface/AddOns`.
 Build 1.60.1.70009, project 1, interface 16001; checked 2026-09-24.
@@ -216,21 +410,35 @@ attempts to assign SecureActionButton_OnClick. Public template discovery and
 initialization hooks do not establish composability. The warning does not throw
 a Lua exception, so pcall is not a capability check for this failure.
 
-Cleansing/Runtime.lua now only reports unavailability. It constructs no native
-aura container or secure Purify action, reads no aura state, and reserves no buff
-strip space. Existing fixed-unit buff actions are unaffected. Reload is required
-to discard frames from the failed candidate. The exact requested feature remains
-blocked, with no automatic substitute or restriction bypass.
+The revised, explicitly requested UI uses permanent secure buttons with separate
+native visual siblings. Each Paladin row creates ordinary SecureActionButtonTemplate
+buttons anchored directly to the health bar. Each learned spell is resolved through
+existing guarded player spellbook/helpful checks; Purify 1152 admits Poison/Disease,
+Cleanse 4987 also admits Magic. LeftButtonUp/useOnKeyDown=false and fixed unit/spell
+attributes use native dispatch. Modified left clicks are blocked. Attributes and
+visibility drivers change only outside combat, on spell/world/preview changes.
 
-Matching-export tests retain the separate native poison filter and secret display
-contracts, and check the conflicting handlers. Intrinsic OnClick only supports
-aura/enchantment cancellation. Forbidden script/input aspects propagate to child
-frames; a child button is not an established workaround. No supported secure
-poison-only visibility/action bridge was found in this export. A permanent visible
-fixed-unit action beside a native poison indicator would change the requested UI
-and needs agreement before implementation. Mocks verify zero attempted/repeated
-construction across startup, spell/world/roster events, preview and combat exit;
-they do not claim native combat cleansing acceptance.
+A separate CustomAuraContainerTemplate holds two HARMFUL native slots with dispel
+candidate filters. Their callbacks create gold halos and constant spell artwork, disable mouse
+input and cancellation, and replace no scripts. They never inherit a secure-action
+template. The secure buttons are neither descendants of nor anchored to native aura
+frames; both hierarchies anchor independently to public row geometry. Native slot
+visibility affects only the gold edge and full-color spell artwork, never button
+visibility, attributes or input. The secure sibling's idle texture is permanently
+desaturated at 30% alpha; native active artwork is mouse-disabled and above it,
+using the same guarded public frame level. It shows the cleansing spell's public
+icon, not the matched debuff's icon. No texture is read back or aura state inferred.
+No restricted aura data, slot state or visibility is read back. Spellbutton frame
+levels use public finite integer guards. Intrinsic forbidden script/input and
+layout propagation remain intact; no restriction is removed or bypassed.
+
+Purify and Cleanse show only if learned; both remain visible without matching auras.
+A matching type does not promise removability, range, mana or cast success. Native
+spell execution chooses effects, not an addon-selected aura. The new layout reserves
+two spell positions before the eight-icon debuff strip on Paladins only. Mocks and
+matching native filtering/release-dispatch checks cover all five fixed recipients;
+actual engine permissions, visual layering, physical clicks and combat glow require
+live acceptance. The old failed composition is never constructed.
 
 ```powershell
 pwsh ./scripts/test-local.ps1 -ForeverExportPath 'C:/Program Files (x86)/World of Warcraft/_classic_beta_/BlizzardInterfaceCode/Interface/AddOns'

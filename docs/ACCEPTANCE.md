@@ -51,17 +51,25 @@ Focus audio request. Earlier pending entries remain detailed regression checklis
 - Existing bindings and position survive schema migration. Tank's files and
   saved data remain untouched. Source/mock checks do not establish live behavior.
 
-## Purify (live failure; requested feature unresolved)
+## Paladin cleansing buttons (live acceptance pending)
 
-- The 70009 live candidate failed with five forbidden OnClick replacement
-  warnings from SecureTemplates.xml:8. Do not repeat that rejected composition.
-- After corrective DEV installation, reload outside combat and confirm those
-  warnings no longer appear; no Purify icon or hit target is created. Confirm
-  existing Might reminders/tooltips and circular minimap behavior still work.
-- Offline regression checks establish zero attempted construction and preserved
-  buff layout, not live correction acceptance. The requested poison-triggered,
-  fixed-unit combat cast remains blocked. An alternative visible-action design
-  needs explicit agreement; release acceptance remains held.
+- Owner reported the permanent buttons working in game on September 27; this is
+  not an assertion that every combat, modifier and aura-type case below was tested.
+- Follow-up full-height icon sizing needs a reload and visual review of top/bottom
+  alignment and spacing on player/party rows, including active glow and drinking.
+- The old composite AuraButton/secure-action failed in game. It remains unused.
+- Reload DEV as a Paladin. Learned Purify and Cleanse buttons should remain visible
+  on all existing player/party rows even with no debuffs; unlearned spells stay hidden.
+- Poison/disease should light both learned buttons; magic should light only Cleanse.
+  Curses, bleeds and no debuffs must not light either. Check gain/removal in combat.
+- Left-click each button on all five recipients. Confirm the native spell targets
+  the correct player once on release and modified clicks do nothing. No automatic
+  cast or specific-aura selection should occur. Test range/mana failure normally.
+- Verify glow is visible around the icon without intercepting clicks, debuff strip
+  stays farther right, no forbidden-script warnings, and preview/raid/roster hiding.
+- Learning a spell updates outside combat; deferred spellbook changes apply after
+  combat. Existing buff reminders and health-bar bindings remain independent.
+- Mocks and matching-export dispatch checks do not establish live acceptance.
 
 ## Healing Mouse placement (live acceptance pending)
 
@@ -214,7 +222,7 @@ do not complete any of these checks.
 - Editing stays locked in combat; spell defaults and spell range feedback remain
   intact after replacing/removing the bandage. Check for taint or blocked actions.
 
-## Target frame — pending live acceptance
+## Target frame â€” pending live acceptance
 
 - Select friendly, neutral and hostile NPCs and player characters, solo and in a raid.
   Check the matching-width row to the right of the player's power bar, matching bar heights,
@@ -228,7 +236,7 @@ do not complete any of these checks.
 - Healing assignments apply to the target row; buff reminders remain party-only.
   No game session was automated by local checks.
 
-## Healing editor defaults and resets — pending live acceptance
+## Healing editor defaults and resets â€” pending live acceptance
 
 - On a fresh character or after Reset positions, verify Healing Mouse sits below
   the default Mouse grid with aligned left edges and a small gap. Existing saved
@@ -241,7 +249,7 @@ do not complete any of these checks.
 - Both controls are disabled in combat; entering combat with confirmation open
   must prevent a later acceptance from resetting data or protected actions.
 
-## Target of target — pending live acceptance
+## Target of target â€” pending live acceptance
 
 - Select a target with a friendly or hostile target. Verify the matching-width row
   appears above your target, left-aligned with a small gap and Target's target label.
@@ -252,7 +260,7 @@ do not complete any of these checks.
   The target-of-target receives the shared healing assignments through native
   actions; party range feedback and buff reminders remain separate.
 
-## Target healing bindings — pending live acceptance
+## Target healing bindings â€” pending live acceptance
 
 - Use a learned healing spell and a carried bandage on a friendly target and
   target-of-target through their bars. Check plain/Shift/Ctrl with all five mouse
@@ -264,7 +272,7 @@ do not complete any of these checks.
 - Clear assignments and confirm learned defaults, or plain-left native targeting
   when no learned default exists. Existing party actions must remain unchanged.
 
-## Healing Mouse input feedback — pending live acceptance
+## Healing Mouse input feedback â€” pending live acceptance
 
 - Open Healing Mouse and click player, party, target and target-of-target bars.
   Verify the correct plain/Shift/Ctrl tile flashes blue briefly, matching Keybinds.
@@ -273,3 +281,81 @@ do not complete any of these checks.
 - Direct editor clicks flash without casting; drag/drop and removing assignments
   still work. Close/reopen the editor and enter combat: no stuck flash, unsolicited
   editor opening or blocked-action/taint warning should occur.
+## Drinking countdown (live acceptance pending)
+
+- Owner confirmed the initial countdown working in game. Centered numeric-only
+  formatting is a follow-up change that still needs visual acceptance.
+- Reload, then drink on player and party rows. The cup should remain in its
+  existing outside position and show a centered integer without a seconds suffix.
+- Check countdown progression, stopping early, expiry, replacement drinks,
+  combat entry, zoning and party members leaving. No stale numbers should remain.
+- Missing/unavailable duration should leave the confirmed cup without a number.
+
+## Matching buff and cleansing artwork (live acceptance pending)
+
+- Check left buff reminders match the right cleansing icons' full row height,
+  top alignment and spacing, including the overflow label after four reminders.
+- Without matching debuffs, cleansing icons should be gray and faint. Apply a
+  matching type: its spell image should become full color with a gold edge.
+- Test physical clicks through the active mouse-disabled artwork in and out of
+  combat; each release must still cast once on the fixed player with no taint warning.
+
+## Native debuff strip (live acceptance pending)
+
+- Reload DEV. Apply/remove harmful effects on player and party1-4; icons should
+  update beside the corresponding health bar in and out of combat.
+- Check multiple simultaneous debuffs (including nondispellable effects), the
+  eight-icon limit, native hover tooltips and no forbidden-script warnings.
+- Check the drinking cup does not overlap icons, group members leaving/rejoining,
+  raid hiding and opening/closing preview. Existing health-bar clicks must work.
+- Offline mocks/export checks do not establish these native results.
+
+## Food/drink tooltip follow-up
+
+Pending live: eat without drinking, drink without eating, then use both together.
+Verify the active icon, centered countdown and native hover tooltip on player
+and party rows. With both active, the first matching aura supplies the one icon.
+Stop consuming, enter combat and zone; the owned tooltip and indicator should
+clear. Well Fed alone must not keep the food indicator visible.
+
+## Paladin aura picker
+
+Pending live: with no own aura, show every learned aura beside the player buffs,
+matching size/gap. Click one and verify one self cast and picker disappearance.
+Another Paladin's aura must not suppress the choices. Check native tooltips,
+newly learned aura ranks, missing buff coexistence, preview, zoning, and combat
+entry/exit. Combat hides the choices; changes wait until combat ends.
+
+## Per-player blessing chooser
+
+Pending live: an unblessed player and party1-4 each offer all learned blessing
+variants with native tooltips, highest learned ranks and one physical click on
+the correct recipient. Test normal and Greater variants and client-native
+reagent/range restrictions. Any blessing from any caster hides that row's choices;
+removal restores them out of combat. Check unknown/dead/offline units, preview,
+combat, zoning, and layout beside other upkeep and the self-only aura picker.
+
+Blessing scope correction: verify Protection, Freedom and Sacrifice never appear
+in the chooser, even when learned, and their active effects alone do not suppress
+lasting party-buff choices. Keep Might, Wisdom, Kings, Salvation, Sanctuary and
+Light, including learned Greater variants. Live acceptance pending.
+
+## Beginner blessing guidance
+
+Pending live: on each unblessed recipient, verify at most one steady yellow border
+and a readable suggestion reason in its native spell tooltip. Assign tank/healer
+roles and verify the border moves outside combat. Test unknown-role classes,
+unlearned preferred blessings, normal versus Greater versions, and combat entry
+and exit. Alternatives must remain clickable with the same fixed recipient.
+No Salvation or emergency ability should be automatically suggested.
+
+## Friendly selected target support
+
+Pending live: target an assistable living player outside the party and verify
+learned cleansing buttons/native debuffs plus missing buffs and the blessing
+suggestion. Each physical click must use the current target. Switch between
+friendly, hostile, dead and no target; support controls should only be visible
+on friendly living targets. Repeat target changes during combat: cleansing
+remains available for friends, buffs stay hidden, no protected warnings occur.
+Verify debuffs/glows refresh even when two friendly targets have different auras.
+Check buff expiration/removal, preview, zoning and fixed targettarget exclusion.

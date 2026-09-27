@@ -73,6 +73,7 @@ function M.New()
     function methods:SetAllPoints(relative) self.allPoints=relative or self.parent end
     function methods:SetColorTexture(...) self.color = {...} end
     function methods:SetTexture(value) self.texture = value end
+    function methods:SetDesaturated(value) self.desaturated = value end
     function methods:SetTexCoord(...) self.texCoord = {...} end
     function methods:SetStatusBarColor(...) self.color = {...} end
     function methods:SetStatusBarTexture(v) self.texture = v; self.fill = object("Texture", nil, self) end

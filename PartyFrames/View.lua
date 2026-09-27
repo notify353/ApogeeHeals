@@ -2,6 +2,36 @@ local _, A = ...
 local V, S = {}, A.Style
 A.View = V
 local units = { "player", "party1", "party2", "party3", "party4" }
+local function createDebuffs(row)
+    -- All aura selection, ordering, visibility and updates stay in native code.
+    -- Never retain or inspect the native aura buttons after initialization.
+    local info = A.Access.Read(C_XMLUtil and C_XMLUtil.GetTemplateInfo, "CustomAuraContainerTemplate")
+    if not info or not A.Access.Readable(info.type) or info.type ~= "AuraContainer" then return end
+    local container = CreateFrame("AuraContainer", nil, row.supportFrame or row, "CustomAuraContainerTemplate")
+    local size, gap = S.sideIconSize, S.sideIconGap
+    local offset = (row.unit == "target" and S.sideIconGap or S.sideIconOffset) + (row.cleanseSlotCount or 0) * (size + gap)
+    container:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset, A.Style.sideIconY)
+    container:SetSize(8 * size + 7 * gap, size)
+    container:SetUnit(row.unit)
+    container:AddAuraGroup("debuffs", "HARMFUL", {
+        maxFrameCount = 8,
+        layout = { elementSpacing = gap, elementWidth = size, elementHeight = size },
+        initializeFrame = function(button)
+            button:SetSize(size, size)
+            button:SetCancelAuraButtons(nil)
+            button:SetTooltipAnchorPoint("ANCHOR_RIGHT")
+            local background = button:CreateTexture(nil, "BACKGROUND")
+            background:SetAllPoints(); background:SetColorTexture(0.35, 0.08, 0.08, 1)
+            local icon = button:CreateTexture(nil, "ARTWORK")
+            icon:SetPoint("TOPLEFT", button, "TOPLEFT", 1, -1)
+            icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -1, 1)
+            icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+            button:SetIcon(icon)
+        end,
+    })
+    container:SetEnabled(true)
+    row.debuffContainer = container
+end
 local function bar(parent, height, y, width)
     local result = CreateFrame("StatusBar", nil, parent)
     result:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, y)
@@ -44,8 +74,8 @@ local function buildRow(row, preview, first, width)
     row.rangeStatus:Hide()
     -- Smaller artwork in an inset dark frame, attached closely to the row.
     row.drinkIcon = CreateFrame("Frame", nil, row)
-    row.drinkIcon:SetSize(12, 12)
-    row.drinkIcon:SetPoint("LEFT", row.health, "RIGHT", 2, 0)
+    row.drinkIcon:SetSize(S.sideIconSize, S.sideIconSize)
+    row.drinkIcon:SetPoint("TOPLEFT", row.health, "TOPRIGHT", S.sideIconGap, A.Style.sideIconY)
     row.drinkIcon:EnableMouse(false)
     local drinkBackground = row.drinkIcon:CreateTexture(nil, "BACKGROUND")
     drinkBackground:SetAllPoints(); drinkBackground:SetColorTexture(0.08, 0.10, 0.13, 1)
@@ -54,7 +84,10 @@ local function buildRow(row, preview, first, width)
     drinkArtwork:SetPoint("BOTTOMRIGHT", row.drinkIcon, "BOTTOMRIGHT", -1, 1)
     drinkArtwork:SetTexture("Interface\\Icons\\INV_Drink_07")
     drinkArtwork:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+    row.drinkArtwork = drinkArtwork
     row.drinkIcon:Hide()
+    A.Drinking.CreateTooltip(row, preview)
+    A.Drinking.CreateTimer(row, preview)
     row.power = bar(row, S.powerHeight, -(S.healthHeight + S.barGap), width)
     S.RowEdges(row, first, width)
 end
@@ -117,6 +150,8 @@ function V.Create()
         row:SetAttribute("useOnKeyDown", false)
         row:SetAttribute("unit", unit); row:SetAttribute("type1", "target")
         buildRow(row, false, i == 1)
+        A.Cleansing.Create(row)
+        createDebuffs(row)
         A.Buffs.Create(row)
         row:Hide()
         RegisterStateDriver(row, "visibility", "[group:raid] hide; [@" .. unit .. ",exists] show; hide")
@@ -134,6 +169,15 @@ function V.Create()
         return row
     end
     V.target = targetRow("target")
+    V.target.supportFrame = CreateFrame("Frame", nil, V.target, "SecureHandlerStateTemplate")
+    V.target.supportFrame:SetAllPoints(V.target)
+    V.target.supportFrame:EnableMouse(false)
+    RegisterStateDriver(V.target.supportFrame, "visibility", "[@target,help,nodead] show; hide")
+    A.Cleansing.Create(V.target)
+    createDebuffs(V.target)
+    A.Buffs.Create(V.target)
+    V.supportRows = {unpack(V.rows)}
+    V.supportRows[#V.supportRows + 1] = V.target
     V.target:SetPoint("BOTTOMLEFT", V.rows[1], "TOPLEFT", 0, S.targetGap)
     V.target.cast = bar(V.target, S.powerHeight, -(S.healthHeight + S.barGap), S.targetWidth)
     V.target.cast:SetAlpha(0)
@@ -222,6 +266,13 @@ end
 function V.RefreshTargetTarget()
     if not A.Runtime.suspended then refreshTargetRow(V.targetTarget) end
 end
+function V.RefreshTargetAuras()
+    -- Only invoke the public inbound refresh; never inspect native aura state.
+    for _, key in ipairs({"debuffContainer", "cleanseIndicator"}) do
+        local container = V.target[key]
+        if container and type(container.UpdateAllAuras) == "function" then container:UpdateAllAuras() end
+    end
+end
 function V.RefreshTarget()
     refreshTargetRow(V.target)
     V.RefreshTargetTarget()
@@ -234,7 +285,6 @@ function V.Refresh()
         if not classOK then classToken = nil end
         A.UnitAPI.PaintClassStrip(row.classStrip, classToken)
         row.name:SetText(""); row.level:SetText(""); row.status:SetText("")
-        row.drinkIcon:Hide()
         local showName = state ~= "missing" and state ~= "dead" and state ~= "offline"
         row.name:SetShown(showName)
         row.level:SetShown(showName)
@@ -247,8 +297,9 @@ function V.Refresh()
                 A.IncomingHeals.Paint(row.incoming, row.unit)
             else A.IncomingHeals.Clear(row.incoming) end
             A.UnitAPI.PaintPower(row.power, row.unit)
-            row.drinkIcon:SetShown(A.Drinking.IsDrinking(row.unit))
+            A.Drinking.Paint(row)
         else
+            A.Drinking.Clear(row)
             A.UnitAPI.Clear(row.health); A.UnitAPI.Clear(row.power)
             A.IncomingHeals.Clear(row.incoming)
             if state == "offline" then row.status:SetText("OFFLINE")

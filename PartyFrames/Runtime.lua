@@ -38,7 +38,8 @@ function R.Start()
         "UNIT_SPELLCAST_SUCCEEDED", "PLAYER_LEAVING_WORLD",
         "UNIT_HEAL_PREDICTION", "UNIT_HEAL_ABSORB_AMOUNT_CHANGED",
         "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "SPELLS_CHANGED",
-        "UI_SCALE_CHANGED", "DISPLAY_SIZE_CHANGED", "GET_ITEM_INFO_RECEIVED" }) do driver:RegisterEvent(event) end
+        "UI_SCALE_CHANGED", "DISPLAY_SIZE_CHANGED", "GET_ITEM_INFO_RECEIVED",
+        "UPDATE_SHAPESHIFT_FORM", "UPDATE_SHAPESHIFT_FORMS", "PLAYER_ROLES_ASSIGNED" }) do driver:RegisterEvent(event) end
     driver:SetScript("OnEvent", function(_, event, unit, castGUID, spellID)
         if event:match("^UNIT_") then
             if not A.Access.Readable(unit) then return end
@@ -47,16 +48,26 @@ function R.Start()
                 and unit ~= "targettarget" then return end
             if unit == "targettarget" then A.View.RefreshTargetTarget(); return end
             if unit == "target" then
-                if not R.suspended then A.View.RefreshTarget() end
+                if not R.suspended then
+                    A.View.RefreshTarget()
+                    if event == "UNIT_AURA" or event == "UNIT_FACTION" or event == "UNIT_FLAGS"
+                        or event == "UNIT_CONNECTION" then R.Request() end
+                end
                 return
             end
         end
-        if event == "UNIT_SPELLCAST_SUCCEEDED" then
+        if event == "PLAYER_TARGET_CHANGED" then
+            A.View.RefreshTargetAuras()
+            A.Buffs.HideTooltip(A.Buffs.tooltipButton); A.Cleansing.HideTooltip()
+            A.Buffs.Paint(A.View.target, {}); A.Buffs.PaintBlessings(A.View.target, {}, 0)
+            A.Buffs.PaintCatalog(A.View.target, {}, 0, 0)
+        elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
             A.Buffs.OnCast(unit, spellID)
         elseif event == "GROUP_ROSTER_UPDATE" then
             A.Buffs.HideTooltip(A.Buffs.tooltipButton)
         elseif event == "PLAYER_LEAVING_WORLD" then
             R.suspended = true
+            for _, row in ipairs(A.View.rows) do A.Drinking.Clear(row) end
             A.View.ClearTargetCast()
             A.Buffs.suspended = true
             A.Buffs.Stop()
@@ -68,7 +79,7 @@ function R.Start()
             A.View.Lock(); A.Settings.Refresh()
             -- Clear drinking immediately; combat alone does not hide unit identity.
             for _, row in ipairs(A.View.rows) do
-                row.drinkIcon:Hide()
+                A.Drinking.Clear(row)
             end
         elseif event == "PLAYER_REGEN_ENABLED" then
             A.Cleansing.pending = true

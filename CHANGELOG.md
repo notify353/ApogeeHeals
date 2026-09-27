@@ -2,6 +2,39 @@
 
 ## Unreleased
 
+- Match all side icons to settings-tile size and spacing, center them vertically,
+  and contain gold borders inside the tiles so stacked rows stay separated.
+
+- Add researched class upkeep, friendly Priest/Shaman/Druid/Mage cleansing,
+  Hunter own-aspect choices, and native player weapon enchantment displays.
+  Preserve Paladin controls and document pet/group/item interaction limits.
+
+- Add buff choices, recommendations, cleansing and native debuffs to the friendly selected target.
+
+- Highlight a role-first, class-fallback blessing suggestion in yellow, with a tooltip explanation.
+
+- Limit blessing choices to lasting party buffs; exclude Protection, Freedom and Sacrifice.
+
+- Offer all learned blessing variants on each unblessed player/party row, with matching left-side geometry.
+
+- Offer learned Paladin auras beside the player buff reminders when their own aura is off, outside combat.
+
+- Detect eating as well as drinking and show the active aura native tooltip on hover.
+
+- Center the drinking countdown without a seconds suffix, dim idle cleansing
+  buttons, and match left-side buff reminder size and spacing to the right side.
+
+- Show native seconds remaining on the drinking cup without changing its position.
+
+- Align right-side icons with the full health-plus-power height using square
+  artwork and consistent spacing; keep cleansing glows within the row gaps.
+
+- Add permanent learned Purify/Cleanse buttons beside Paladin player/party bars,
+  with independent native gold glows for matching debuff types and fixed-unit clicks.
+
+- Display up to eight native harmful-aura icons to the right of player/party
+  health bars, with native tooltips and space for the drinking indicator.
+
 - Remove the target-of-target helper caption and its reserved drag-handle space.
 
 - Correct Forever surname display by joining the separate name and surname

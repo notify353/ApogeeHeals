@@ -1,10 +1,15 @@
 {
   "clientVersion": "1.60.1.70009",
   "interface": 16001,
-  "reviewedOn": "2026-09-24",
+  "reviewedOn": "2026-09-27",
   "requiredFiles": [
+    "Blizzard_ActionBar/Shared/StanceBar.lua",
+    "Blizzard_BuffFrame/BuffFrame.lua",
+    "Blizzard_SharedXMLGame/Tooltip/TooltipDataHandler.lua",
     "Blizzard_APIDocumentationGenerated/FrameScriptDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/UnitDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/PartyInfoDocumentation.lua",
+    "Blizzard_UnitFrame/Shared/CompactUnitFrame.lua",
     "Blizzard_FrameXMLUtil/Blizzard_FrameXMLUtil.toc",
     "Blizzard_FrameXMLUtil/Camelot/NameUtil.lua",
     "Blizzard_APIDocumentationGenerated/ClassColorDocumentation.lua",
@@ -24,6 +29,7 @@
     "Blizzard_APIDocumentationGenerated/ForbiddenAspectConstantsDocumentation.lua",
     "Blizzard_AuraContainer/Blizzard_AuraContainer.toc",
     "Blizzard_AuraContainer/Blizzard_AuraContainer.lua",
+    "Blizzard_AuraContainer/Blizzard_ManagedAuraContainer.lua",
     "Blizzard_AuraContainer/Blizzard_AuraContainerShared.lua",
     "Blizzard_AuraContainer/Blizzard_AuraContainerUtil.lua",
     "Blizzard_AuraContainer/Blizzard_AuraContainerFrameProviders.lua",
@@ -39,11 +45,21 @@
     "Blizzard_FrameXML/SecureTemplates.lua",
     "Blizzard_FrameXML/SecureTemplates.xml",
     "Blizzard_RestrictedAddOnEnvironment/SecureStateDriver.lua",
+    "Blizzard_RestrictedAddOnEnvironment/SecureHandlerTemplates.xml",
     "Blizzard_APIDocumentationGenerated/ItemDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/ItemConstantsDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/GameCursorDocumentation.lua",
     "Blizzard_ArtifactUI/Blizzard_ArtifactPerks.lua",
     "Blizzard_APIDocumentationGenerated/SimpleTextureBaseAPIDocumentation.lua",
-    "Blizzard_APIDocumentationGenerated/SimpleScriptRegionResizingAPIDocumentation.lua"
+    "Blizzard_APIDocumentationGenerated/SimpleScriptRegionResizingAPIDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/DurationUtilDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/DurationTextBindingObjectAPIDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/StringUtilDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/SecondsFormatterAPIDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/SecondsFormatterSharedDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/NumericRuleFormatterAPIDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/NumericRuleFormatterSharedDocumentation.lua",
+    "Blizzard_AuraContainer/Blizzard_AuraContainerEnchantments.lua",
+    "Blizzard_APIDocumentationGenerated/PaperDollInfoDocumentation.lua"
   ]
 }

@@ -33,7 +33,7 @@ print(string.format("100 refreshes: aura reads=%d, spell reads=%d, scope reads=%
 if not baseline then
     assert(drivers == 0, "Unchanged reminders must not re-register secure visibility")
     assert(bindingReads == 1, "One assignment is resolved once for all five fixed recipients")
-    assert(spells == 100 and scopes == 100, "Resolve each watch once per refresh; skip hidden picker")
+    assert(spells == 500 and scopes == 100, "Resolve one watch and four distinct Mage catalog choices once per refresh; skip hidden picker")
 end
 -- Bursts keep one refresh without deferring updates beyond the existing callback.
 local reads = m.auraReads
