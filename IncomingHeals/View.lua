@@ -5,10 +5,10 @@ function H.Clear(view)
     view.bar:SetMinMaxValues(0, 1)
     view.bar:SetValue(0)
 end
-function H.Create(health, preview)
+function H.Create(health, preview, width)
     health:SetClipsChildren(true)
     local bar = CreateFrame("StatusBar", nil, health)
-    bar:SetSize(A.Style.width, A.Style.healthHeight)
+    bar:SetSize(width or A.Style.width, A.Style.healthHeight)
     -- Let native anchoring track the restricted fill edge; never calculate its width.
     bar:SetPoint("TOPLEFT", health:GetStatusBarTexture(), "TOPRIGHT", 0, 0)
     bar:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")

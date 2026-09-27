@@ -2,18 +2,19 @@ local _, A = ...
 local V, S = {}, A.Style
 A.View = V
 local units = { "player", "party1", "party2", "party3", "party4" }
-local function bar(parent, height, y)
+local function bar(parent, height, y, width)
     local result = CreateFrame("StatusBar", nil, parent)
     result:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, y)
-    result:SetSize(S.width, height); result:EnableMouse(false)
+    result:SetSize(width or S.width, height); result:EnableMouse(false)
     result:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
     S.Background(result); A.UnitAPI.Clear(result)
     return result
 end
-local function buildRow(row, preview, first)
-    row:SetSize(S.width, S.clusterHeight)
-    row.health = bar(row, S.healthHeight, 0)
-    row.incoming = A.IncomingHeals.Create(row.health, preview)
+local function buildRow(row, preview, first, width)
+    width = width or S.width
+    row:SetSize(width, S.clusterHeight)
+    row.health = bar(row, S.healthHeight, 0, width)
+    row.incoming = A.IncomingHeals.Create(row.health, preview, width)
     -- A separate text layer stays above both the health fill and incoming heals.
     row.nameLayer = CreateFrame("Frame", nil, row.health)
     row.nameLayer:SetAllPoints(row.health)
@@ -27,12 +28,12 @@ local function buildRow(row, preview, first)
     row.level:SetShadowColor(0, 0, 0, 1); row.level:SetShadowOffset(1, -1)
     row.name = S.Text(row.nameLayer, 8)
     row.name:SetPoint("LEFT", row.health, "LEFT", 18.5, 0)
-    row.name:SetSize(S.width - 22.5, S.healthHeight)
+    row.name:SetSize(width - 22.5, S.healthHeight)
     row.name:SetJustifyH("LEFT"); row.name:SetJustifyV("MIDDLE")
     row.name:SetShadowColor(0, 0, 0, 1); row.name:SetShadowOffset(1, -1)
     row.status = S.Text(row.nameLayer, 8)
     row.status:SetPoint("CENTER", row.health, "CENTER", 0, 0)
-    row.status:SetSize(S.width - 8, S.healthHeight)
+    row.status:SetSize(width - 8, S.healthHeight)
     row.status:SetJustifyH("CENTER"); row.status:SetJustifyV("MIDDLE")
     row.status:SetTextColor(unpack(S.muted))
     row.status:SetShadowColor(0, 0, 0, 1); row.status:SetShadowOffset(1, -1)
@@ -54,16 +55,17 @@ local function buildRow(row, preview, first)
     drinkArtwork:SetTexture("Interface\\Icons\\INV_Drink_07")
     drinkArtwork:SetTexCoord(0.07, 0.93, 0.07, 0.93)
     row.drinkIcon:Hide()
-    row.power = bar(row, S.powerHeight, -(S.healthHeight + S.barGap))
-    S.RowEdges(row, first)
+    row.power = bar(row, S.powerHeight, -(S.healthHeight + S.barGap), width)
+    S.RowEdges(row, first, width)
 end
 function V.ApplyPosition()
     if InCombatLockdown() then return end
     local p = A.db.position
-    local maxX = math.max(0, UIParent:GetWidth() / S.scale / 2 - S.width - 15)
+    local minX = -math.max(0, UIParent:GetWidth() / S.scale / 2 - S.width - 15)
+    local maxX = math.max(minX, UIParent:GetWidth() / S.scale / 2 - S.width - S.targetGap - S.targetWidth - 15)
     local maxY = math.max(0, UIParent:GetHeight() / S.scale / 2 - 18)
     local minY = math.min(maxY, -UIParent:GetHeight() / S.scale / 2 + S.stackHeight)
-    p.x = math.max(-maxX, math.min(maxX, p.x))
+    p.x = math.max(minX, math.min(maxX, p.x))
     p.y = math.max(minY, math.min(maxY, p.y))
     V.root:ClearAllPoints(); V.root:SetPoint("TOPLEFT", UIParent, "CENTER", p.x, p.y)
 end
@@ -120,6 +122,16 @@ function V.Create()
         RegisterStateDriver(row, "visibility", "[group:raid] hide; [@" .. unit .. ",exists] show; hide")
         V.rows[i] = row
     end
+    -- Independent fixed target: never enters party healing bindings or buff scans.
+    V.target = CreateFrame("Button", nil, V.root, "SecureActionButtonTemplate")
+    V.target.unit = "target"
+    buildRow(V.target, false, false, S.targetWidth)
+    V.target:SetPoint("BOTTOMLEFT", V.rows[1].power, "BOTTOMRIGHT", S.targetGap, 0)
+    V.target:RegisterForClicks("LeftButtonUp")
+    V.target:SetAttribute("useOnKeyDown", false)
+    V.target:SetAttribute("unit", "target"); V.target:SetAttribute("type1", "target")
+    V.target:Hide()
+    RegisterStateDriver(V.target, "visibility", "[@target,exists] show; hide")
     A.Preview.Create(V.root, buildRow)
     V.handle = CreateFrame("Button", nil, UIParent)
     V.handle:SetScale(S.scale); V.handle:SetSize(S.width, 10)
@@ -167,7 +179,22 @@ end
 function V.RefreshRange()
     for _, row in ipairs(V.rows) do V.PaintRange(row, A.UnitAPI.State(row.unit)) end
 end
+function V.RefreshTarget()
+    local row = V.target
+    A.UnitAPI.PaintTargetIdentity(row)
+    -- Unknown/restricted state must not prevent native health/power display.
+    if A.Access.Read(UnitExists, "target") == false then
+        A.UnitAPI.Clear(row.health); A.UnitAPI.Clear(row.power)
+        A.IncomingHeals.Clear(row.incoming)
+        return
+    end
+    if A.UnitAPI.PaintHealth(row.health, "target", V.curve) then
+        A.IncomingHeals.Paint(row.incoming, "target")
+    else A.IncomingHeals.Clear(row.incoming) end
+    A.UnitAPI.PaintPower(row.power, "target")
+end
 function V.Refresh()
+    V.RefreshTarget()
     for _, row in ipairs(V.rows) do
         local state = A.UnitAPI.State(row.unit)
         local classOK, _, classToken = pcall(UnitClass, row.unit)

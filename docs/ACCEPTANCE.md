@@ -213,3 +213,16 @@ do not complete any of these checks.
   Check range, cooldown, skill and Recently Bandaged failures behave natively.
 - Editing stays locked in combat; spell defaults and spell range feedback remain
   intact after replacing/removing the bandage. Check for taint or blocked actions.
+
+## Target frame — pending live acceptance
+
+- Select friendly, neutral and hostile NPCs and player characters, solo and in a raid.
+  Check the wider row to the right of the player's power bar, matching bar heights,
+  left stripe, level/name order, full NPC titles and character names without realms.
+- Change and clear targets during combat. Check native visibility and current
+  health/power without blocked actions or stale stripe/name; restricted identities
+  may be blank and unavailable classification should use the muted stripe.
+- Check a target without power, dead targets, long names, and incoming healing.
+  Drag the existing anchor out of combat and verify the target follows it.
+- Left clicking the target row only targets; party healing assignments and buff
+  reminders must remain unchanged. No game session was automated by local checks.

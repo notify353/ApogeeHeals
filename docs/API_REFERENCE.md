@@ -258,3 +258,27 @@ stacks remain assigned; native inventory resolution, range, cooldowns, skill and
 Recently Bandaged restrictions decide whether physical input succeeds. Item
 assignments disable the spell-only range indicator. Tests execute matching native
 item/release source with mocked engine functions; live acceptance is still needed.
+
+## Fixed target frame (70009)
+
+A separate anonymous SecureActionButtonTemplate uses immutable unit=target and
+native target-only left click, with [@target,exists] visibility in all group modes.
+It stays outside healing bindings, range polling, buff scans and party preview.
+Its 180-logical-pixel row shares the existing health/power, font, rail and native
+incoming-heal presentation, aligned beside the player's power bar with an 18-pixel gap.
+No target event changes protected attributes, anchors or visibility.
+
+UnitDocumentation confirms UnitName returns unitName and unitServer separately.
+The target uses the entire readable first return, preserving NPC titles and player
+character surnames/spaces. Restricted identity remains blank; no string splitting
+or restricted-value comparison occurs. Existing party-name behavior is unchanged.
+UnitIsPlayer and UnitReaction(target, player) pass through Access.Read before Lua
+branching; public player class tokens use the existing class-color helper, and
+public NPC reactions use friendly (5+), neutral (4), hostile (1-3) stripe colors.
+Unknown/restricted classification resets the stripe to muted. Level reads retain
+the guarded ? fallback. Target names remain visible in combat when readable.
+Health and power quantities stay in native display sinks. A public nonpositive
+maximum power clears the fill; restricted maxima are never compared in Lua.
+PLAYER_TARGET_CHANGED and target unit updates refresh identity and bars; native
+visibility owns disappearance. Live rendering, combat switching and long-name
+fit require in-game acceptance, separately from mocks and matching-export checks.

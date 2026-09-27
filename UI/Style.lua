@@ -1,7 +1,7 @@
 -- Tank's accepted dimensions and palette, copied locally with MIT attribution.
 local _, A = ...
 local S = { width = 112, healthHeight = 14, powerHeight = 5, barGap = 0.5,
-    rowGap = 2, scale = 2,
+    rowGap = 2, scale = 2, targetWidth = 180, targetGap = 18,
     background = { 0.06, 0.075, 0.1, 0.94 }, muted = { 0.65, 0.70, 0.78, 1 } }
 A.Style = S
 S.clusterHeight = S.healthHeight + S.barGap + S.powerHeight
@@ -35,14 +35,14 @@ function S.PowerColor(kind)
     if color then return color.r, color.g, color.b, 1 end
     return 0.7, 0.7, 0.7, 1
 end
-function S.RowEdges(row, first)
+function S.RowEdges(row, first, width)
     -- Internal rule and flush class rail; inter-player space stays empty.
     local layer = CreateFrame("Frame", nil, row)
     layer:SetAllPoints(row)
     layer:SetFrameLevel(row.nameLayer:GetFrameLevel() + 1)
     layer:EnableMouse(false)
     local texture = layer:CreateTexture(nil, "OVERLAY")
-    texture:SetSize(S.width, S.barGap)
+    texture:SetSize(width or S.width, S.barGap)
     texture:SetPoint("TOPLEFT", row, "TOPLEFT", 0, -S.healthHeight)
     texture:SetColorTexture(0.08, 0.10, 0.13, 1)
     local seam = layer:CreateTexture(nil, "OVERLAY")
