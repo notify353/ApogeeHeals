@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Offer all learned blessing variants on each unblessed player/party row, with matching left-side geometry.
+
 - Offer learned Paladin auras beside the player buff reminders when their own aura is off, outside combat.
 
 - Detect eating as well as drinking and show the active aura native tooltip on hover.

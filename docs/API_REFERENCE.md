@@ -1,5 +1,30 @@
 # Forever API authority
 
+## Per-recipient blessing choices (70009, 2026-09-27)
+
+A complete public out-of-combat HELPFUL scan establishes absence of any recognized
+Paladin blessing on player/party1-4. Unknown/incomplete scans suppress choices.
+Each unblessed row offers the highest learned rank of every validated blessing
+variant, with ordinary and Greater spells as separate choices, including short
+Protection, Freedom and Sacrifice variants. Existing blessing families supply
+coverage; extra candidates 10278/5599/1022, 1044, 20729/6940 are validated through
+the same native spellbook and helpful-spell checks before use. Spell databases
+provide candidate identities only; client/server support and cast restrictions
+remain authoritative. References: https://classicdb.com/?spell=20729 and
+https://www.wowhead.com/classic/spell=10278/blessing-of-protection.
+
+This replaces the single configured blessing recommendation, while retaining
+saved reminder entries and unrelated upkeep discovery. All choices are visible,
+independent of the four-reminder cap and old reminder checkboxes. Each secure
+button has the immutable row unit, exact spell, release-only click and blocked
+modified clicks. Tooltip and native action contracts are unchanged. No automatic
+choice or casting occurs. A blessing from any caster suppresses that row's choices.
+Regular upkeep, blessing choices and the self-only aura choices share matching
+geometry without overlapping. Combat hides choices through native drivers;
+no protected attributes or layout change in combat. Mock source/package checks
+cover five recipients, rank updates, all variants, unknown reads and cleanup;
+physical input, native appearance and server coverage remain live checks.
+
 ## Paladin own-aura picker (70009, 2026-09-27)
 
 Matching Blizzard_ActionBar/Shared/StanceBar.lua consumes GetNumShapeshiftForms

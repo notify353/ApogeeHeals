@@ -84,6 +84,7 @@ function B.Refresh()
     local now = GetTime()
     for id, expires in pairs(B.candidates) do if expires < now then B.candidates[id] = nil end end
     local auraChoices = B.AuraChoices()
+    local blessingChoices = A.BuffDefaults.Choices()
     local snapshots = {}
     for index, row in ipairs(A.View.rows) do
         local auras = B.Scan(row.unit); snapshots[index] = auras
@@ -95,25 +96,26 @@ function B.Refresh()
         if info then watched[#watched + 1] = { entry = entry, info = info, party = B.ForParty(entry) } end
     end
     for index, row in ipairs(A.View.rows) do
-        local missing = {}
+        local missing, blessings = {}, {}
         if snapshots[index] and not A.View.unlocked then
             local names, ids, blessed = {}, {}, false
             for _, aura in ipairs(snapshots[index]) do
                 names[aura.name] = true; ids[aura.spellId] = true
                 if A.BuffDefaults.Group(aura.spellId) then blessed = true end
             end
-            local blessing = A.BuffDefaults.Choose(watched, row.unit)
+            if not blessed then blessings = blessingChoices end
             for _, watch in ipairs(watched) do
                 local grouped = A.BuffDefaults.active and A.BuffDefaults.Group(watch.entry.id)
                 if (row.unit == "player" or watch.party)
-                    and (not grouped or (watch == blessing and not blessed))
+                    and not grouped
                     and not ids[watch.entry.id] and not names[watch.info.name] then
                     missing[#missing + 1] = { id = watch.entry.id, icon = watch.info.iconID }
                 end
             end
         end
         B.Paint(row, missing)
-        if row.unit == "player" then B.PaintAuras(row, snapshots[index] and auraChoices or {}, #missing) end
+        B.PaintBlessings(row, blessings, #missing)
+        if row.unit == "player" then B.PaintAuras(row, snapshots[index] and auraChoices or {}, #missing, #blessings) end
     end
     if B.picker and B.picker:IsShown() then B.RefreshPicker() end
 end
@@ -121,6 +123,7 @@ function B.Stop()
     B.candidates = {}
     for _, row in ipairs(A.View.rows) do
         B.Paint(row, {})
+        B.PaintBlessings(row, {}, 0)
         if row.unit == "player" then B.PaintAuras(row, {}, 0) end
     end
     if B.picker then B.picker:Hide() end

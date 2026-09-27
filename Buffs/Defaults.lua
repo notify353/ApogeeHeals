@@ -2,14 +2,15 @@ local _, A = ...
 local D = { pending = true, ranks = {} }
 A.BuffDefaults = D
 -- Candidate identities, never an assertion that a spell exists/is learned on Forever.
--- Only ordinary Might/Wisdom are seeded; the remaining blessing identities prevent
--- mutually exclusive reminders for effects learned through ordinary discovery.
+-- Ordinary Might/Wisdom remain seeded for saved-data compatibility; the chooser
+-- offers every validated learned variant independently of reminder preferences.
 local families = {
     might = { 25291, 19838, 19837, 19836, 19835, 19834, 19740, 25782, 25916 },
     wisdom = { 25290, 19854, 19853, 19852, 19850, 19742, 25894, 25918 },
     kings = { 20217, 25898 }, salvation = { 1038, 25895 },
     sanctuary = { 20914, 20913, 20912, 20911, 25899 },
     light = { 19979, 19978, 19977, 25890 },
+    protection = { 10278, 5599, 1022 }, freedom = { 1044 }, sacrifice = { 20729, 6940 },
 }
 local groups, seeds = {}, {}
 for group, ids in pairs(families) do for _, id in ipairs(ids) do groups[id] = group end end
@@ -51,12 +52,22 @@ function D.Seed()
         end
     end
 end
-function D.Choose(watched, unit)
-    if not D.active then return nil end
-    -- Preserve existing watch order; appended defaults never supersede a prior
-    -- enabled blessing. No class, resource or guessed role optimization.
-    for _, watch in ipairs(watched) do
-        local group = D.Group(watch.entry.id)
-        if group and (unit == "player" or watch.party) then return watch end
+-- Each row is one selectable variant, highest rank first. Greater variants
+-- remain separate explicit choices; native casting owns reagents and targeting.
+local choices = {
+    {25291,19838,19837,19836,19835,19834,19740}, {25290,19854,19853,19852,19850,19742},
+    {20217}, {1038}, {20914,20913,20912,20911}, {19979,19978,19977},
+    {10278,5599,1022}, {1044}, {20729,6940},
+    {25916,25782}, {25918,25894}, {25898}, {25895}, {25899}, {25890},
+}
+function D.Choices()
+    local result = {}
+    if not D.active or InCombatLockdown() then return result end
+    for _, ranks in ipairs(choices) do
+        for _, id in ipairs(ranks) do
+            local info = A.Bindings.Resolve(id)
+            if info then result[#result + 1] = {id=id, icon=info.iconID}; break end
+        end
     end
+    return result
 end

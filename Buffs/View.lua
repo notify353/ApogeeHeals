@@ -59,17 +59,17 @@ function B.Paint(row, missing)
     row.buffOverflow:SetText(#missing > 4 and "+" .. (#missing - 4) or "")
     row.buffOverflow:SetShown(#missing > 4)
 end
-function B.PaintAuras(row, choices, missingCount)
-    row.auraButtons = row.auraButtons or {}
+local function paintChoices(row, key, choices, offset)
+    row[key] = row[key] or {}
+    local buttons = row[key]
     local size, gap = A.Style.sideIconSize, A.Style.sideIconGap
-    local offset = math.min(missingCount, 4) + (missingCount > 4 and 1 or 0)
-    for index = 1, math.max(#choices, #row.auraButtons) do
-        local entry, button = choices[index], row.auraButtons[index]
+    for index = 1, math.max(#choices, #buttons) do
+        local entry, button = choices[index], buttons[index]
         if not button and not InCombatLockdown() then
             button = CreateFrame("Button", nil, row, "SecureActionButtonTemplate")
-            row.auraButtons[index] = button
+            buttons[index] = button
             button:SetSize(size, size)
-            button:SetAttribute("unit", "player"); button:SetAttribute("useOnKeyDown", false)
+            button:SetAttribute("unit", row.unit); button:SetAttribute("useOnKeyDown", false)
             button:RegisterForClicks("LeftButtonUp")
             for _, prefix in ipairs({"shift-", "ctrl-", "ctrl-shift-", "alt-", "alt-shift-", "alt-ctrl-", "alt-ctrl-shift-"}) do
                 button:SetAttribute(prefix .. "type1", "")
@@ -100,6 +100,14 @@ function B.PaintAuras(row, choices, missingCount)
             end
         end
     end
+end
+function B.PaintBlessings(row, choices, missingCount)
+    local offset = math.min(missingCount, 4) + (missingCount > 4 and 1 or 0)
+    paintChoices(row, "blessingButtons", choices, offset)
+end
+function B.PaintAuras(row, choices, missingCount, blessingCount)
+    local offset = math.min(missingCount, 4) + (missingCount > 4 and 1 or 0) + (blessingCount or 0)
+    paintChoices(row, "auraButtons", choices, offset)
 end
 function B.RefreshPicker()
     if not B.picker then return end

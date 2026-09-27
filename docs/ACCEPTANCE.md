@@ -325,3 +325,12 @@ matching size/gap. Click one and verify one self cast and picker disappearance.
 Another Paladin's aura must not suppress the choices. Check native tooltips,
 newly learned aura ranks, missing buff coexistence, preview, zoning, and combat
 entry/exit. Combat hides the choices; changes wait until combat ends.
+
+## Per-player blessing chooser
+
+Pending live: an unblessed player and party1-4 each offer all learned blessing
+variants with native tooltips, highest learned ranks and one physical click on
+the correct recipient. Test normal and Greater variants and client-native
+reagent/range restrictions. Any blessing from any caster hides that row's choices;
+removal restores them out of combat. Check unknown/dead/offline units, preview,
+combat, zoning, and layout beside other upkeep and the self-only aura picker.
