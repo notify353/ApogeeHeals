@@ -31,17 +31,9 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 - Native left-click targeting when unassigned, with healing click bindings on Left, Right,
   Middle, Mouse 4 and Mouse 5 (plain, Shift and Ctrl). No global binding overrides.
   Standard native target actions also retain the client's spell/item cursor behavior.
-- Escape -> Options -> AddOns -> Apogee Heals: Unlock frames, Reset positions and Factory reset this character.
-  Unlock also shows a five-member sample party, even while solo, with health,
-  power, drinking and incoming-heal examples. Preview rows cannot target anyone.
-  Each unlock starts at full health and power for three seconds, then smoothly
-  cycles through damage, resource use, incoming heals and recovery back to full.
-  It also demonstrates an out-of-range Rogue, an offline Druid and a dead Priest.
-  Out-of-range fading is a preview example only; live range detection remains deferred.
-  The twelve-second loop stops immediately when locked or combat begins.
-  Drag the handle above the stack. Releasing the drag locks it; combat also locks it.
-  Locking ends the preview and restores the live party display.
-  Position and healing assignments are saved per character. Reload starts locked.
+- Escape -> Options -> AddOns -> Apogee Heals: Reset positions, Buff reminders
+  and Factory reset this character. Position and healing assignments are saved
+  per character.
 
 ### Healing bindings
 
@@ -53,8 +45,7 @@ followed by Keybinds in the middle and Tank below-right. Historical saved angles
 are retained but ignored. The orbit
 is circular, with radius half the larger minimap dimension plus 16 pixels,
 including resized or rectangular maps. It updates on map resize and UI scale
-changes. The button locks during combat. The existing
-**Options > AddOns > Apogee Heals > Edit healing bindings** shortcut also works.
+changes. The button locks during combat.
 Drop a learned
 friendly spell from the player spellbook onto one of fifteen mouse/modifier slots.
 Pickup followed by clicking a slot also works. The selected spell ID/rank is kept;
