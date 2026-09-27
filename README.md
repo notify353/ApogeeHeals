@@ -32,7 +32,7 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
   Middle, Mouse 4 and Mouse 5 (plain, Shift and Ctrl). No global binding overrides.
   Standard native target actions also retain the client's spell/item cursor behavior.
 - Escape -> Options -> AddOns -> Apogee Heals: Reset positions, Buff reminders
-  and Factory reset this character. Position and healing assignments are saved
+  and Factory reset. Position and healing assignments are saved
   per character.
 
 ### Healing bindings
@@ -167,7 +167,7 @@ Dragging the header saves a per-character position; updates preserve it.
 
 In **Options > AddOns > Apogee Heals**, **Reset positions** restores the party/target
 bars, Healing Mouse and minimap button without changing assignments or reminders.
-**Factory reset this character** asks for confirmation, then clears this character's
+**Factory reset** asks for confirmation, then clears this character's
 Heals assignments, reminders and positions and restores available class defaults.
 Other characters, other addons and WoW keybindings are unchanged. Both controls
 are locked during combat; confirming an already-open dialog in combat does nothing.
@@ -258,3 +258,6 @@ Follow docs/ACCEPTANCE.md before calling this prototype playable or releasing it
 MIT licensed. Tank style/access/display patterns and the original Party Health
 Bars drink identity list are adapted from notify353's MIT-licensed addons;
 the original copyright notice is retained in LICENSE.
+
+Reset positions and Factory reset are grouped last in Settings, in that order,
+with matching button dimensions and spacing across Heals and Keybinds.
