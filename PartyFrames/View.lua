@@ -26,7 +26,7 @@ local function buildRow(row, preview, first, width)
     row.level:SetJustifyH("LEFT"); row.level:SetJustifyV("MIDDLE")
     row.level:SetTextColor(unpack(S.muted))
     row.level:SetShadowColor(0, 0, 0, 1); row.level:SetShadowOffset(1, -1)
-    row.name = S.Text(row.nameLayer, 8)
+    row.name = S.Text(row.nameLayer, 6)
     row.name:SetPoint("LEFT", row.health, "LEFT", 18.5, 0)
     row.name:SetSize(width - 22.5, S.healthHeight)
     row.name:SetJustifyH("LEFT"); row.name:SetJustifyV("MIDDLE")
@@ -62,8 +62,8 @@ function V.ApplyPosition()
     if InCombatLockdown() then return end
     local p = A.db.position
     local minX = -math.max(0, UIParent:GetWidth() / S.scale / 2 - S.width - 15)
-    local maxX = math.max(minX, UIParent:GetWidth() / S.scale / 2 - S.width - S.targetGap - S.targetWidth - 15)
-    local maxY = math.max(0, UIParent:GetHeight() / S.scale / 2 - S.clusterHeight - S.targetTargetGap - 12)
+    local maxX = math.max(minX, UIParent:GetWidth() / S.scale / 2 - S.width - 15)
+    local maxY = math.max(0, UIParent:GetHeight() / S.scale / 2 - S.handleOffset - 10)
     local minY = math.min(maxY, -UIParent:GetHeight() / S.scale / 2 + S.stackHeight)
     p.x = math.max(minX, math.min(maxX, p.x))
     p.y = math.max(minY, math.min(maxY, p.y))
@@ -93,12 +93,12 @@ local function followHandle()
     if InCombatLockdown() then return end
     local ratio = V.handle:GetEffectiveScale() / UIParent:GetEffectiveScale()
     local x = V.handle:GetLeft() - UIParent:GetWidth() / (2 * ratio)
-    local y = V.handle:GetBottom() - 2 - UIParent:GetHeight() / (2 * ratio)
+    local y = V.handle:GetBottom() - S.handleOffset - UIParent:GetHeight() / (2 * ratio)
     V.root:ClearAllPoints(); V.root:SetPoint("TOPLEFT", UIParent, "CENTER", x, y)
 end
 local function anchorHandle()
     V.handle:ClearAllPoints()
-    V.handle:SetPoint("BOTTOMLEFT", V.root, "TOPLEFT", 0, 2)
+    V.handle:SetPoint("BOTTOMLEFT", V.root, "TOPLEFT", 0, S.handleOffset)
 end
 function V.ResetPosition()
     if InCombatLockdown() then return end
@@ -134,15 +134,12 @@ function V.Create()
         return row
     end
     V.target = targetRow("target")
-    V.target:SetPoint("BOTTOMLEFT", V.rows[1].power, "BOTTOMRIGHT", S.targetGap, 0)
+    V.target:SetPoint("BOTTOMLEFT", V.rows[1], "TOPLEFT", 0, S.targetGap)
+    V.target.cast = bar(V.target, S.powerHeight, -(S.healthHeight + S.barGap), S.targetWidth)
+    V.target.cast:SetAlpha(0)
     RegisterStateDriver(V.target, "visibility", "[@target,exists] show; hide")
     V.targetTarget = targetRow("targettarget")
     V.targetTarget:SetPoint("BOTTOMLEFT", V.target, "TOPLEFT", 0, S.targetTargetGap)
-    local caption = S.CleanText(V.targetTarget, 6)
-    caption:SetPoint("BOTTOMLEFT", V.targetTarget, "TOPLEFT", 0, 2)
-    caption:SetSize(S.targetWidth, 8); caption:SetJustifyH("LEFT")
-    caption:SetTextColor(unpack(S.muted)); caption:SetText("Target's target")
-    V.targetTarget.caption = caption
     local elapsed = 0
     V.targetTarget:SetScript("OnShow", function() elapsed = 0; V.RefreshTargetTarget() end)
     V.targetTarget:SetScript("OnHide", function() elapsed = 0 end)
@@ -153,6 +150,7 @@ function V.Create()
         elapsed = 0; V.RefreshTargetTarget()
     end)
     RegisterStateDriver(V.targetTarget, "visibility", "[@targettarget,exists] show; hide")
+    V.target:SetScript("OnShow", function() if not A.Runtime.suspended then V.RefreshTarget() end end)
     A.Preview.Create(V.root, buildRow)
     V.handle = CreateFrame("Button", nil, UIParent)
     V.handle:SetScale(S.scale); V.handle:SetSize(S.width, 10)
@@ -194,7 +192,6 @@ function V.PaintRange(row, state)
     row.rangeStatus:SetShown(outside)
     row:SetAlpha(V.unlocked and 0 or (outside and 0.45 or 1))
     local showName = not outside and state ~= "missing" and state ~= "dead" and state ~= "offline"
-        and not InCombatLockdown()
     row.name:SetShown(showName); row.level:SetShown(showName)
 end
 function V.RefreshRange()
@@ -204,6 +201,7 @@ local function refreshTargetRow(row)
     A.UnitAPI.PaintTargetIdentity(row)
     -- Unknown/restricted state must not prevent native health/power display.
     if A.Access.Read(UnitExists, row.unit) == false then
+        if row.cast then V.ClearTargetCast() end
         A.UnitAPI.Clear(row.health); A.UnitAPI.Clear(row.power)
         A.IncomingHeals.Clear(row.incoming)
         return
@@ -212,6 +210,14 @@ local function refreshTargetRow(row)
         A.IncomingHeals.Paint(row.incoming, row.unit)
     else A.IncomingHeals.Clear(row.incoming) end
     A.UnitAPI.PaintPower(row.power, row.unit)
+    if row.cast then
+        local casting = not A.Runtime.suspended and A.UnitAPI.PaintCast(row.cast, row.unit)
+        row.cast:SetAlpha(casting and 1 or 0)
+        row.power:SetAlpha(casting and 0 or 1)
+    end
+end
+function V.ClearTargetCast()
+    V.target.cast:SetAlpha(0); V.target.power:SetAlpha(1)
 end
 function V.RefreshTargetTarget()
     if not A.Runtime.suspended then refreshTargetRow(V.targetTarget) end
@@ -230,7 +236,6 @@ function V.Refresh()
         row.name:SetText(""); row.level:SetText(""); row.status:SetText("")
         row.drinkIcon:Hide()
         local showName = state ~= "missing" and state ~= "dead" and state ~= "offline"
-            and not InCombatLockdown()
         row.name:SetShown(showName)
         row.level:SetShown(showName)
         if showName then

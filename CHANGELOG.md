@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+- Remove the target-of-target helper caption and its reserved drag-handle space.
+
+- Correct Forever surname display by joining the separate name and surname
+  returns, matching the client's Camelot name formatter with public-value guards.
+
+- Show native cast/channel progress in the selected target's existing power
+  strip, restoring power when casting stops without increasing frame height.
+
+- Display full readable player names, including surnames and hyphens.
+
+- Use the smaller NPC name font size consistently for player, party, target,
+  target's target and preview names, including after changing target type.
+- Keep readable player/party names and levels visible during combat. Preserve
+  restricted-value handling and dead/offline/out-of-range status presentation.
+
+- Move target and target's target above the player/party stack, left-aligned
+  with a full-row gap, increased after the first in-game spacing review. Keep both bar sizes and the saved party position;
+  reserve space for the drag handle at the screen's top edge.
+
 - Match Essentials with a near-opaque dark settings background behind controls,
   preserving behavior and saved settings.
 

@@ -33,6 +33,7 @@ dofile = function(path)
     return Mock
 end
 for _, path in ipairs({ "tests/input_feedback_spec.lua", "tests/target_bindings_spec.lua", "tests/native_contract_spec.lua", "tests/target_spec.lua", "tests/target_target_spec.lua", "tests/reset_spec.lua", "tests/items_spec.lua", "tests/bindings_spec.lua", "tests/buffs_spec.lua", "tests/paladin_buffs_spec.lua", "tests/minimap_spec.lua",
+    "tests/names_spec.lua", "tests/full_names_spec.lua", "tests/class_names_spec.lua", "tests/compact_layout_spec.lua", "tests/target_cast_spec.lua",
     "tests/purify_spec.lua", "tests/native_purify_spec.lua", "tests/range_spec.lua", "tests/editor_position_spec.lua" }) do
     local fixtureTest = read(path):gsub("ApogeeHeals", name)
         :gsub("APOGEE_HEALS_RESET_CHARACTER", "APOGEE_HEALS_DEV_RESET_CHARACTER")

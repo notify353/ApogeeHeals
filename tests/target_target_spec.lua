@@ -5,7 +5,7 @@ assert(row.attributes.type1=="target" and row.attributes.useOnKeyDown==false)
 assert(row.driver=="[@targettarget,exists] show; hide")
 assert(row.point[1]=="BOTTOMLEFT" and row.point[2]==a.View.target and row.point[3]=="TOPLEFT")
 assert(row.point[4]==0 and row.point[5]==4 and row.width==a.View.target.width)
-assert(row.caption.text=="Target's target" and row.caption.parent==row)
+assert(row.caption==nil)
 assert(row.health.value==0 and row.name.text=="")
 UnitIsPlayer=function(unit) return unit=="targettarget" end
 m.units.target={name="Enemy",health=90,maxHealth=100,power=0,maxPower=0,kind=0,auras={}}
@@ -13,6 +13,7 @@ m.units.targettarget={name="Friendly Player",health=70,maxHealth=100,power=40,ma
     kind=0,class="MAGE",auras={}}
 m.Event("UNIT_TARGET","target")
 assert(row.name.text=="Friendly Player" and row.health.value==70 and row.power.value==40)
+assert(row.name.font[2]==6 and a.View.target.name.font[2]==6)
 assert(a.View.target.name.text=="Enemy" and row.classStrip.color[1]==0.25)
 m.units.targettarget.health=55
 m.Event("UNIT_HEALTH","targettarget"); assert(row.health.value==55)

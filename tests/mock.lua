@@ -79,6 +79,11 @@ function M.New()
     function methods:GetStatusBarTexture() return self.fill end
     function methods:SetMinMaxValues(lo, hi) assert(hi ~= nil); self.min, self.max = lo, hi end
     function methods:SetValue(v) assert(v ~= nil); self.value = v end
+    function methods:SetTimerDuration(duration, interpolation, direction)
+        assert(duration ~= nil)
+        if m.timerError then error("native timer unavailable") end
+        self.duration, self.interpolation, self.direction = duration, interpolation, direction
+    end
     function methods:SetText(v) self.text = v end
     function methods:SetFormattedText(pattern, ...) self.text = string.format(pattern, ...) end
     function methods:SetTextColor(...) self.color = {...} end
@@ -122,6 +127,8 @@ function M.New()
     end
     canaccesstable = function(value) return not secrets[value] and not inaccessibleTables[value] end
     UnitExists = function(u) return m.units[u] ~= nil end
+    Constants = {CharacterNameSeparatorConsts={CHARACTERNAME_SURNAME_SEPARATOR=" "}}
+    UnitCastingInfo, UnitChannelInfo, UnitCastingDuration, UnitChannelDuration = nil, nil, nil, nil
     UnitLevel = function(u) return m.units[u] and (m.units[u].level or 60) end
     UnitClass = function(u) return "Localized class", m.units[u] and (m.units[u].class or "PRIEST") end
     m.classColors = { PRIEST={1,1,1}, WARRIOR={0.78,0.61,0.43}, MAGE={0.25,0.78,0.92},
@@ -137,9 +144,12 @@ function M.New()
         _G[api] = function(u) return m.units[u] and m.units[u][key] end
     end
     UnitHealthPercent = function() return { GetRGBA = function() return 0.28, 0.74, 0.46, 1 end } end
+    UnitName = function(u) local unit=m.units[u]; if unit then return unit.name, unit.surname end end
     PowerBarColor = { [1] = {r = 1, g = 0, b = 0}, [3] = {r = 1, g = 1, b = 0} }
     CreateColor = function(...) return {...} end
     Enum = { LuaCurveType = { Step = 1 } }
+    Enum.StatusBarTimerDirection = { ElapsedTime = 0, RemainingTime = 1 }
+    Enum.StatusBarInterpolation = { Immediate = 0 }
     Enum.UnitMaximumHealthMode = { Default = 0 }
     Enum.UnitIncomingHealClampMode = { MissingHealth = 0 }
     Enum.UnitHealAbsorbMode = { ReducedByIncomingHeals = 0 }

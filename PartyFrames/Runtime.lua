@@ -31,6 +31,9 @@ function R.Start()
         "UNIT_HEALTH", "UNIT_MAXHEALTH", "UNIT_POWER_UPDATE", "UNIT_MAXPOWER",
         "UNIT_DISPLAYPOWER", "UNIT_FLAGS", "UNIT_CONNECTION", "UNIT_NAME_UPDATE",
         "UNIT_LEVEL", "PLAYER_TARGET_CHANGED", "UNIT_FACTION", "UNIT_TARGET",
+        "UNIT_SPELLCAST_START", "UNIT_SPELLCAST_STOP", "UNIT_SPELLCAST_DELAYED",
+        "UNIT_SPELLCAST_FAILED", "UNIT_SPELLCAST_FAILED_QUIET", "UNIT_SPELLCAST_INTERRUPTED",
+        "UNIT_SPELLCAST_CHANNEL_START", "UNIT_SPELLCAST_CHANNEL_UPDATE", "UNIT_SPELLCAST_CHANNEL_STOP",
         "UNIT_AURA", "PLAYER_DEAD", "PLAYER_ALIVE", "PLAYER_UNGHOST",
         "UNIT_SPELLCAST_SUCCEEDED", "PLAYER_LEAVING_WORLD",
         "UNIT_HEAL_PREDICTION", "UNIT_HEAL_ABSORB_AMOUNT_CHANGED",
@@ -54,6 +57,7 @@ function R.Start()
             A.Buffs.HideTooltip(A.Buffs.tooltipButton)
         elseif event == "PLAYER_LEAVING_WORLD" then
             R.suspended = true
+            A.View.ClearTargetCast()
             A.Buffs.suspended = true
             A.Buffs.Stop()
             R.RangePolling()
@@ -62,9 +66,9 @@ function R.Start()
             A.Buffs.Stop()
             A.BindingEditor.Close()
             A.View.Lock(); A.Settings.Refresh()
-            -- Hide names and clear drinking immediately, before the coalesced refresh.
+            -- Clear drinking immediately; combat alone does not hide unit identity.
             for _, row in ipairs(A.View.rows) do
-                row.status:SetText(""); row.name:Hide(); row.level:Hide(); row.drinkIcon:Hide()
+                row.drinkIcon:Hide()
             end
         elseif event == "PLAYER_REGEN_ENABLED" then
             A.Cleansing.pending = true

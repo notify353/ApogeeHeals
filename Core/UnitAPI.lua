@@ -50,6 +50,36 @@ function U.PaintClassColor(label, classToken)
         if A.Access.Readable(color) and color then label:SetTextColor(color:GetRGB()) end
     end)
 end
+local function hasCast(info, unit, idIndex)
+    if type(info) ~= "function" then return false end
+    local ok, active = pcall(function()
+        local values = { info(unit) }
+        -- Cast-bar IDs are documented NeverSecret; still guard before branching.
+        local id = values[idIndex]
+        if A.Access.Readable(id) and id ~= nil then return true end
+        local name = values[1]
+        return A.Access.Readable(name) and type(name) == "string" and name ~= ""
+    end)
+    return ok and active == true
+end
+function U.PaintCast(bar, unit)
+    local directions = Enum and Enum.StatusBarTimerDirection
+    local interpolation = Enum and Enum.StatusBarInterpolation
+    if not directions or not interpolation or type(bar.SetTimerDuration) ~= "function" then return false end
+    local duration, direction
+    if hasCast(UnitCastingInfo, unit, 10) then
+        duration, direction = UnitCastingDuration, directions.ElapsedTime
+    elseif hasCast(UnitChannelInfo, unit, 11) then
+        duration, direction = UnitChannelDuration, directions.RemainingTime
+    end
+    if type(duration) ~= "function" or direction == nil then return false end
+    -- Pass the duration directly to the native timer sink; never read timestamps
+    -- or do arithmetic/comparisons on restricted cast data. Failure leaves power.
+    return pcall(function()
+        bar:SetTimerDuration(duration(unit), interpolation.Immediate, direction)
+        bar:SetStatusBarColor(0.95, 0.65, 0.20, 1)
+    end)
+end
 function U.PaintClassStrip(strip, classToken)
     strip:SetColorTexture(unpack(A.Style.muted))
     if not A.Access.Readable(classToken) or type(classToken) ~= "string" then return end
@@ -61,20 +91,21 @@ function U.PaintClassStrip(strip, classToken)
         end
     end)
 end
+function U.FullName(unit)
+    -- Forever's Camelot NameUtil joins UnitName's separate name and surname.
+    local ok, name, surname = pcall(UnitName, unit)
+    if not ok or not A.Access.Readable(name, surname) or type(name) ~= "string" then return "" end
+    if type(surname) ~= "string" or surname == "" then return name end
+    local constants = Constants and Constants.CharacterNameSeparatorConsts
+    local separator = constants and constants.CHARACTERNAME_SURNAME_SEPARATOR
+    if not A.Access.Readable(separator) or type(separator) ~= "string" then separator = " " end
+    return name .. separator .. surname
+end
 function U.PaintName(label, unit)
     local classOK, _, classToken = pcall(UnitClass, unit)
     if classOK then U.PaintClassColor(label, classToken)
     else label:SetTextColor(1, 1, 1, 1) end
-    -- Only shorten readable names; never inspect a restricted identity.
-    local name = R(UnitName, unit)
-    if type(name) ~= "string" then label:SetText(""); return end
-    local separators = Constants and Constants.CharacterNameSeparatorConsts
-    local separator = separators and separators.CHARACTERNAME_SURNAME_SEPARATOR
-    if type(separator) == "string" and separator ~= "" then
-        local index = name:find(separator, 1, true)
-        if index then name = name:sub(1, index - 1) end
-    end
-    label:SetText(name:match("^[^%s%-]+") or "")
+    label:SetText(U.FullName(unit))
 end
 function U.State(unit)
     if R(UnitExists, unit) ~= true then return "missing" end
@@ -93,16 +124,11 @@ end
 function U.PaintTargetIdentity(row)
     local unit = row.unit
     local player = R(UnitIsPlayer, unit)
-    local font, _, flags = row.name:GetFont()
-    row.name:SetFont(font, player == false and 6 or 8, flags)
     row.name:SetText(""); row.level:SetText("")
     row.name:SetTextColor(1, 1, 1, 1)
     row.classStrip:SetColorTexture(unpack(A.Style.muted))
     if R(UnitExists, unit) == false then return end
-    -- UnitName separates the realm in its second return. Preserve the entire
-    -- first return, including spaces, NPC titles and character surnames.
-    local name = R(UnitName, unit)
-    if type(name) == "string" then row.name:SetText(name) end
+    row.name:SetText(U.FullName(unit))
     U.PaintLevel(row.level, unit)
     if player == true then
         local ok, _, classToken = pcall(UnitClass, unit)

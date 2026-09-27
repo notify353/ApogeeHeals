@@ -5,7 +5,8 @@ UnitIsPlayer = function() return m.targetPlayer end
 UnitReaction = function() return m.reaction end
 assert(row.unit == "target" and row.attributes.unit == "target")
 assert(row.attributes.type1 == "target" and row.driver == "[@target,exists] show; hide")
-assert(row.point[2] == a.View.rows[1].power and row.point[3] == "BOTTOMRIGHT")
+assert(row.point[1] == "BOTTOMLEFT" and row.point[2] == a.View.rows[1] and row.point[3] == "TOPLEFT")
+assert(row.point[4] == 0 and row.point[5] == row.height)
 assert(row.width == a.Style.width and row.health.width == a.Style.width and row.incoming.bar.width == a.Style.width)
 assert(row.power.width == a.Style.width and row.name.width == 89.5)
 assert(row.name.text == "" and row.health.value == 0)
@@ -18,9 +19,9 @@ assert(row.health.value == 80 and row.power.value == 20 and row.classStrip.color
 m.reaction=4; m.Event("UNIT_FACTION", "target"); assert(row.classStrip.color[1] == 0.90)
 m.reaction=2; m.Event("UNIT_FACTION", "target"); assert(row.classStrip.color[1] == 0.86)
 m.targetPlayer=true
-UnitName=function(unit) if unit == "target" then return "Jane Silver Moon", "OtherRealm" end return "Priest" end
+UnitName=function(unit) if unit == "target" then return "Jane", "Silver Moon" end return "Priest" end
 m.Event("PLAYER_TARGET_CHANGED"); m.Flush()
-assert(row.name.text == "Jane Silver Moon" and row.classStrip.color[1] == 0.25 and row.name.font[2] == 8)
+assert(row.name.text == "Jane Silver Moon" and row.classStrip.color[1] == 0.25 and row.name.font[2] == 6)
 m.combat=true; m.Event("PLAYER_REGEN_DISABLED"); m.Flush()
 assert(row.name.text == "Jane Silver Moon")
 m.units.target.health=m.Secret(); m.units.target.maxHealth=m.Secret()
@@ -32,7 +33,7 @@ assert(row.health.value == m.units.target.health and row.power.value == m.units.
 assert(row.name.text == "" and row.classStrip.color[1] == a.Style.muted[1])
 assert(row.name.font[2] == 6)
 m.targetPlayer=m.Secret(); m.Event("UNIT_NAME_UPDATE", "target")
-assert(row.name.font[2] == 8)
+assert(row.name.font[2] == 6)
 m.units.target.maxPower=0; m.Event("UNIT_MAXPOWER", "target")
 assert(row.power.value == 0 and row.power.max == 1)
 m.units.target=nil; m.Event("PLAYER_TARGET_CHANGED"); m.Flush()

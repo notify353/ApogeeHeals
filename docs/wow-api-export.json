@@ -5,6 +5,8 @@
   "requiredFiles": [
     "Blizzard_APIDocumentationGenerated/FrameScriptDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/UnitDocumentation.lua",
+    "Blizzard_FrameXMLUtil/Blizzard_FrameXMLUtil.toc",
+    "Blizzard_FrameXMLUtil/Camelot/NameUtil.lua",
     "Blizzard_APIDocumentationGenerated/ClassColorDocumentation.lua",
     "Blizzard_Fonts_Shared/Shared/GameFonts.xml",
     "Blizzard_APIDocumentationGenerated/UnitHealPredictionCalculatorAPIDocumentation.lua",
@@ -14,6 +16,7 @@
     "Blizzard_APIDocumentationGenerated/SpellBookDocumentation.lua",
     "Blizzard_ActionBar/Shared/SpellFlyout.lua",
     "Blizzard_APIDocumentationGenerated/SimpleStatusBarAPIDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/SimpleStatusBarConstantsDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/SimpleFontStringAPIDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/SimpleFrameAPIDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/InputDocumentation.lua",

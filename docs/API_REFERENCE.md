@@ -110,15 +110,17 @@ Native range behavior and combat presentation still require live acceptance.
   clear only the tooltip owned by that button. Combat clears presentation,
   without changing protected action attributes.
 
-- Readable player labels omit surnames using the client's surname separator,
-  with whitespace/hyphen fallback. Restricted or unavailable identities display
-  blank; they never enter Lua string operations. Camelot NameUtil confirms that
-  UnitName's first return can contain both first name and surname. Current-build
-  live validation is pending.
+- Readable labels join UnitName's separate first-name and surname returns using
+  CHARACTERNAME_SURNAME_SEPARATOR, matching Camelot NameUtil.FormatUnitNameForDisplay.
+  The generic generated API labels the second return unitServer, but the selected
+  Camelot implementation uses it as surname. Both parts must pass public-value
+  guards before concatenation. Missing/empty surnames leave the first return intact;
+  restricted identities stay blank. The loader TOC and Camelot NameUtil source
+  are checked export inputs, and a matching-source test compares composition.
 
 - Blizzard_Fonts_Shared/Shared/GameFonts.xml defines Number12Font, a native
   locale-aware sans-serif family used for preview-handle text. Names retain the
-  original GameFontHighlightSmall font at 8 logical pixels for readability.
+  original GameFontHighlightSmall font at 6 logical pixels, consistently for all units.
 - UnitClass's class filename is passed to C_ClassColor.GetClassColor only when
   readable. The returned ColorMixin supplies GetRGB for name text. Unknown,
   restricted or unavailable classes reset to white, preventing stale slot colors.
@@ -270,19 +272,21 @@ A separate anonymous SecureActionButtonTemplate uses immutable unit=target and
 the shared native healing bindings, with [@target,exists] visibility in all group modes.
 It stays outside party range polling, buff scans and party preview.
 Its 112-logical-pixel row matches the player/party width and shares the existing health/power, font, rail and native
-incoming-heal presentation, aligned beside the player's power bar with an 18-pixel gap.
+incoming-heal presentation, left-aligned above the player with a full-row
+(19.5 logical pixel) gap. Both target rows retain their existing dimensions.
 No target event changes protected attributes, anchors or visibility.
 
-UnitDocumentation confirms UnitName returns unitName and unitServer separately.
-The target uses the entire readable first return, preserving NPC titles and player
-character surnames/spaces. Restricted identity remains blank; no string splitting
-or restricted-value comparison occurs. Existing party-name behavior is unchanged.
+The selected Camelot NameUtil uses UnitName's two returns as name and surname,
+despite the generic UnitDocumentation unitServer label. Target and party labels
+share guarded composition, preserving NPC titles and both character-name parts.
+Restricted identity remains blank; no string splitting or restricted-value
+comparison occurs.
 UnitIsPlayer and UnitReaction(target, player) pass through Access.Read before Lua
 branching; public player class tokens use the existing class-color helper, and
 public NPC reactions use friendly (5+), neutral (4), hostile (1-3) stripe colors.
 Unknown/restricted classification resets the stripe to muted. Level reads retain
-the guarded ? fallback. Target names remain visible in combat when readable. NPC names use a 6-pixel
-font; player/unknown target names retain the usual 8-pixel font. The name is
+the guarded ? fallback. Target names remain visible in combat when readable. All unit names use
+the same 6-pixel font, including player, party, preview and unknown targets. The name is
 never split or shortened in Lua.
 Health and power quantities stay in native display sinks. A public nonpositive
 maximum power clears the fill; restricted maxima are never compared in Lua.
@@ -292,11 +296,40 @@ fit require in-game acceptance, separately from mocks and matching-export checks
 
 ## Target of target (70009)
 
+Player/party name and level labels now remain visible during combat as well.
+The existing public-value guards still blank restricted names and use ? for
+unavailable levels. Dead/offline/out-of-range statuses retain precedence.
+Only FontString presentation changes; protected layout and actions stay unchanged.
+
+### Selected-target cast strip (70009)
+
+UnitCastingInfo return 10 and UnitChannelInfo return 11 are nullable, NeverSecret
+castBarIDs. Guarded IDs, or a readable nonempty name when the ID is absent,
+establish cast/channel presence. Restricted names and timestamps never enter
+Lua comparisons or arithmetic. UnitCastingDuration/UnitChannelDuration feed
+SetTimerDuration directly, with Immediate interpolation and ElapsedTime for
+casts or RemainingTime for channels. SimpleStatusBarConstantsDocumentation.lua
+is included in the checked export inventory. Optional API/sink failure restores
+power; no timestamp-based fallback or interruptibility inference is used.
+
+An anonymous, mouse-disabled StatusBar occupies exactly the selected target's
+power strip. Alpha swaps presentation with the existing power bar; health, name,
+unit/action attributes and protected layout do not change. The native timer
+animates progress without Lua polling. Start/stop/delay/failure/interruption and
+channel events requery current target state, so stale event identities cannot
+clear a different current cast. Target changes/show and world entry refresh it;
+world exit clears the presentation. Target's target keeps its power strip.
+Native restricted-data acceptance, animation, event timing and combat rendering
+remain live acceptance checks, separate from mock/native-source verification.
+
+### Target-of-target behavior
+
 The anonymous targettarget row uses fixed native healing actions and independent
 [@targettarget,exists] visibility. It is positioned once above target with a
-four-logical-pixel gap and a muted label above it. Width, colors and name sizing
-match target. The label inherits native row visibility. Top-edge position clamping
-reserves space for the added row and label; no combat layout writes occur.
+four-logical-pixel gap and no helper label. Width, colors and name sizing
+match target. Top-edge position clamping
+reserves space for both rows and the drag handle above them. Dragging
+subtracts that full handle offset to preserve the party anchor; no combat layout writes occur.
 
 UnitDocumentation defines synchronous UNIT_TARGET with a unit token payload.
 Matching Blizzard_UnitFrame/Mainline/TargetFrame.lua refreshes its target-of-target

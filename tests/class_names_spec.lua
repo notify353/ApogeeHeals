@@ -10,7 +10,7 @@ local m2=dofile("tests/mock.lua").New(); local a2=m2.Start()
 assert(a2.Preview.rows[2].name.color[1] == m2.classColors.WARRIOR[1])
 assert(a2.Preview.rows[5].name.color[2] == m2.classColors.DRUID[2])
 m2.combat=true; m2.Event("PLAYER_REGEN_DISABLED"); m2.Flush()
-assert(not a2.View.rows[1].name.shown)
+assert(a2.View.rows[1].name.shown)
 print("PASS native class-name colors, preview parity and unavailable-class fallback")
 
 local strip = a2.View.rows[1].classStrip

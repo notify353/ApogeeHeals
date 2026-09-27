@@ -8,15 +8,22 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 
 - Player-first vertical stack followed by party1 through party4. Player remains
   while solo; native visibility hides missing units and all rows in raids.
+- Target sits above the player with a full-row gap; target's target stays
+  closely above target. Both retain their size and align with the stack's left
+  edge. The drag handle sits above the pair; no helper caption is shown.
+- While the selected target casts, its power strip temporarily shows amber cast
+  progress without adding height. Casts fill forward and channels drain backward;
+  normal power returns when casting stops. Health and names remain visible.
 - Default placement aligns beneath Apogee Tank's Forever bars, with a 9px gap
   below its single-target layout. No Tank dependency or frame attachment is used.
   Existing saved positions remain unchanged; use **Reset positions** to adopt it.
 - Apogee Tank styling with taller health bars: 112x14 health, 112x5 power, at 2x scale.
-  First names only use Blizzard's native class colors, left-aligned inside health bars with the
-  original readable game font and dark shadow, shown only outside
-  combat. Restricted names stay blank. Long names truncate. Health-state and active-resource colors remain.
+  Full character names use Blizzard's native class colors, left-aligned inside health bars with the
+  original game font at the same smaller size as NPC names and dark shadow, including
+  during combat. Restricted names stay blank. Long names truncate. Health-state and active-resource colors remain.
   A muted level appears immediately to the left of each name; unavailable levels
-  show a question mark. Levels hide together with names in combat and status states.
+  show a question mark. Names and levels remain visible in combat; status messages
+  still replace them for dead, offline or out-of-range units.
 - A fine opaque rule divides health from power. A slim Blizzard class-color strip sits flush inside each row's left
   edge, spanning health and power with a dark separator. It remains visible in combat.
   Fully transparent spaces separate
