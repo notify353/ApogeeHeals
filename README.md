@@ -8,7 +8,7 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 
 - Player-first vertical stack followed by party1 through party4. Player remains
   while solo; native visibility hides missing units and all rows in raids.
-- Target sits above the player with a half-row gap; target's target stays
+- Target sits above the player with a full-row gap; target's target stays
   closely above target. Both retain their size and align with the stack's left
   edge. The drag handle sits above the pair and its caption.
 - Default placement aligns beneath Apogee Tank's Forever bars, with a 9px gap

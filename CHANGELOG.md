@@ -3,7 +3,7 @@
 ## Unreleased
 
 - Move target and target's target above the player/party stack, left-aligned
-  with a half-row gap. Keep both bar sizes and the saved party position;
+  with a full-row gap, increased after the first in-game spacing review. Keep both bar sizes and the saved party position;
   reserve space for the caption and drag handle at the screen's top edge.
 
 - Match Essentials with a near-opaque dark settings background behind controls,

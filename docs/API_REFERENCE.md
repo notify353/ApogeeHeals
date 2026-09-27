@@ -270,8 +270,8 @@ A separate anonymous SecureActionButtonTemplate uses immutable unit=target and
 the shared native healing bindings, with [@target,exists] visibility in all group modes.
 It stays outside party range polling, buff scans and party preview.
 Its 112-logical-pixel row matches the player/party width and shares the existing health/power, font, rail and native
-incoming-heal presentation, left-aligned above the player with a half-row
-(9.75 logical pixel) gap. Both target rows retain their existing dimensions.
+incoming-heal presentation, left-aligned above the player with a full-row
+(19.5 logical pixel) gap. Both target rows retain their existing dimensions.
 No target event changes protected attributes, anchors or visibility.
 
 UnitDocumentation confirms UnitName returns unitName and unitServer separately.
