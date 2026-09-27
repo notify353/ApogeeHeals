@@ -22,7 +22,7 @@ function P.Create(row)
     local info = A.Access.Read(C_XMLUtil and C_XMLUtil.GetTemplateInfo, "CustomAuraContainerTemplate")
     local container
     if info and A.Access.Readable(info.type) and info.type == "AuraContainer" then
-        container = CreateFrame("AuraContainer", nil, row, "CustomAuraContainerTemplate")
+        container = CreateFrame("AuraContainer", nil, row.supportFrame or row, "CustomAuraContainerTemplate")
         container:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset, 0)
         container:SetSize(2 * size + gap, size)
         container:SetUnit(row.unit)
@@ -31,7 +31,7 @@ function P.Create(row)
     for index, spell in ipairs(spells) do
         local x = offset + (index - 1) * (size + gap)
         -- A permanent secure sibling, never a child of or anchored to an AuraButton.
-        local button = CreateFrame("Button", nil, row, "SecureActionButtonTemplate")
+        local button = CreateFrame("Button", nil, row.supportFrame or row, "SecureActionButtonTemplate")
         button:SetSize(size, size)
         button:SetPoint("TOPLEFT", row.health, "TOPRIGHT", x, 0)
         local level = A.Access.Read(row.health.GetFrameLevel, row.health)
@@ -95,7 +95,7 @@ function P.Refresh()
         resolved[index] = isPaladin and A.Bindings.Resolve(spell.id) or nil
     end
     local hasGlow = false
-    for _, row in ipairs(A.View.rows) do
+    for _, row in ipairs(A.View.supportRows or A.View.rows) do
         if row.cleanseButtons then
             for index, button in ipairs(row.cleanseButtons) do
                 local spell, info = spells[index], resolved[index]

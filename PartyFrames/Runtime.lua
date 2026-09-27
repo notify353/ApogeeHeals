@@ -48,11 +48,19 @@ function R.Start()
                 and unit ~= "targettarget" then return end
             if unit == "targettarget" then A.View.RefreshTargetTarget(); return end
             if unit == "target" then
-                if not R.suspended then A.View.RefreshTarget() end
+                if not R.suspended then
+                    A.View.RefreshTarget()
+                    if event == "UNIT_AURA" or event == "UNIT_FACTION" or event == "UNIT_FLAGS"
+                        or event == "UNIT_CONNECTION" then R.Request() end
+                end
                 return
             end
         end
-        if event == "UNIT_SPELLCAST_SUCCEEDED" then
+        if event == "PLAYER_TARGET_CHANGED" then
+            A.View.RefreshTargetAuras()
+            A.Buffs.HideTooltip(A.Buffs.tooltipButton); A.Cleansing.HideTooltip()
+            A.Buffs.Paint(A.View.target, {}); A.Buffs.PaintBlessings(A.View.target, {}, 0)
+        elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
             A.Buffs.OnCast(unit, spellID)
         elseif event == "GROUP_ROSTER_UPDATE" then
             A.Buffs.HideTooltip(A.Buffs.tooltipButton)

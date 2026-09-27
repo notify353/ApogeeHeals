@@ -51,12 +51,12 @@ assert(click:find("CancelAuraByInstanceID",1,true))
 assert(click:find("CancelTemporaryEnchantment",1,true))
 assert(not click:find("CastSpell",1,true))
 local m,a=dofile("tests/purify_fixture.lua").New({might=true,cleanse=true})
-assert(#a.View.rows==5 and #m.cleanseContainers==10 and m.xmlWarnings==0)
+assert(#a.View.rows==5 and #m.cleanseContainers==12 and m.xmlWarnings==0)
 -- Never combine the intrinsic AuraButton with a secure action template. Instead,
 -- the permanent actions are ordinary siblings of the native halo container.
-for _, row in ipairs(a.View.rows) do
+for _, row in ipairs(a.View.supportRows) do
     for _, button in ipairs(row.cleanseButtons) do
-        assert(button.parent == row and button.point[2] == row.health)
+        assert(button.parent == (row.supportFrame or row) and button.point[2] == row.health)
         assert(button.parent ~= row.cleanseIndicator and not button.scripts.OnClick)
     end
 end
@@ -73,7 +73,7 @@ local cast = execute("return " .. action, env)
 env.OnActionButtonClick = function(frame, button) cast(frame, frame.attributes.unit, button) end
 execute(definition(source, "SecureActionButton_ShouldUseOnKeyDown") .. "\n"
     .. definition(source, "SecureActionButton_OnClick"), env)
-for _, row in ipairs(a.View.rows) do
+for _, row in ipairs(a.View.supportRows) do
     for index, button in ipairs(row.cleanseButtons) do
         local before = casts
         env.SecureActionButton_OnClick(button, "LeftButton", true)

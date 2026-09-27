@@ -37,13 +37,13 @@ local function setup(mode)
 end
 local m, containers, buttons = setup()
 local a = m.Start()
-assert(#containers == 5 and #buttons == 50)
+assert(#containers == 6 and #buttons == 60)
 for index, container in ipairs(containers) do
-    local row = a.View.rows[index]
-    assert(container.parent == row and container.unit == row.unit and container.enabled)
+    local row = a.View.supportRows[index]
+    assert(container.parent == (row.supportFrame or row) and container.unit == row.unit and container.enabled)
     assert(container.filter == "HARMFUL" and container.options.maxFrameCount == 8)
     assert(container.point[2] == row.health and container.point[3] == "TOPRIGHT")
-    assert(container.point[4] == a.Style.sideIconOffset and container.point[5] == 0)
+    assert(container.point[4] == (row.unit == "target" and a.Style.sideIconGap or a.Style.sideIconOffset) and container.point[5] == 0)
     assert(container.options.layout.elementHeight == row.height and container.options.layout.elementSpacing == 2)
 end
 for _, button in ipairs(buttons) do
@@ -55,12 +55,12 @@ m.combat = true
 for _, event in ipairs({"PLAYER_REGEN_DISABLED", "GROUP_ROSTER_UPDATE", "UNIT_AURA"}) do
     m.Event(event, "party1"); m.Flush()
 end
-assert(m.auraReads == reads and #containers == 5 and #buttons == 50)
+assert(m.auraReads == reads and #containers == 6 and #buttons == 60)
 m.Event("PLAYER_LEAVING_WORLD"); m.Flush()
 m.combat = false
 m.Event("PLAYER_ENTERING_WORLD"); m.Flush()
 a.View.SetUnlocked(true); a.View.SetUnlocked(false)
-assert(#containers == 5 and #buttons == 50)
+assert(#containers == 6 and #buttons == 60)
 for _, mode in ipairs({"missing", "restricted"}) do
     local other, absent = setup(mode)
     assert(other.Start().started and #absent == 0)
@@ -70,7 +70,7 @@ deferred.combat = true
 local pending = deferred.Load(); deferred.Event("ADDON_LOADED", "ApogeeHeals")
 assert(not pending.started and #deferredContainers == 0)
 deferred.combat = false; deferred.Event("PLAYER_REGEN_ENABLED"); deferred.Flush()
-assert(#deferredContainers == 5)
+assert(#deferredContainers == 6)
 C_XMLUtil = previousXMLUtil
 print("PASS native debuff configuration, fixed party units, no action/script overrides, combat initialization deferral and optional API guards")
 

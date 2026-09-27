@@ -7,9 +7,9 @@ local function createDebuffs(row)
     -- Never retain or inspect the native aura buttons after initialization.
     local info = A.Access.Read(C_XMLUtil and C_XMLUtil.GetTemplateInfo, "CustomAuraContainerTemplate")
     if not info or not A.Access.Readable(info.type) or info.type ~= "AuraContainer" then return end
-    local container = CreateFrame("AuraContainer", nil, row, "CustomAuraContainerTemplate")
+    local container = CreateFrame("AuraContainer", nil, row.supportFrame or row, "CustomAuraContainerTemplate")
     local size, gap = S.sideIconSize, S.sideIconGap
-    local offset = S.sideIconOffset + (row.cleanseButtons and 2 * (size + gap) or 0)
+    local offset = (row.unit == "target" and S.sideIconGap or S.sideIconOffset) + (row.cleanseButtons and 2 * (size + gap) or 0)
     container:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset, 0)
     container:SetSize(8 * size + 7 * gap, size)
     container:SetUnit(row.unit)
@@ -30,6 +30,7 @@ local function createDebuffs(row)
         end,
     })
     container:SetEnabled(true)
+    row.debuffContainer = container
 end
 local function bar(parent, height, y, width)
     local result = CreateFrame("StatusBar", nil, parent)
@@ -168,6 +169,15 @@ function V.Create()
         return row
     end
     V.target = targetRow("target")
+    V.target.supportFrame = CreateFrame("Frame", nil, V.target, "SecureHandlerStateTemplate")
+    V.target.supportFrame:SetAllPoints(V.target)
+    V.target.supportFrame:EnableMouse(false)
+    RegisterStateDriver(V.target.supportFrame, "visibility", "[@target,help,nodead] show; hide")
+    A.Cleansing.Create(V.target)
+    createDebuffs(V.target)
+    A.Buffs.Create(V.target)
+    V.supportRows = {unpack(V.rows)}
+    V.supportRows[#V.supportRows + 1] = V.target
     V.target:SetPoint("BOTTOMLEFT", V.rows[1], "TOPLEFT", 0, S.targetGap)
     V.target.cast = bar(V.target, S.powerHeight, -(S.healthHeight + S.barGap), S.targetWidth)
     V.target.cast:SetAlpha(0)
@@ -255,6 +265,13 @@ function V.ClearTargetCast()
 end
 function V.RefreshTargetTarget()
     if not A.Runtime.suspended then refreshTargetRow(V.targetTarget) end
+end
+function V.RefreshTargetAuras()
+    -- Only invoke the public inbound refresh; never inspect native aura state.
+    for _, key in ipairs({"debuffContainer", "cleanseIndicator"}) do
+        local container = V.target[key]
+        if container and type(container.UpdateAllAuras) == "function" then container:UpdateAllAuras() end
+    end
 end
 function V.RefreshTarget()
     refreshTargetRow(V.target)

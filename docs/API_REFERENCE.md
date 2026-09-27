@@ -1,5 +1,39 @@
 # Forever API authority
 
+## Friendly target support controls (70009, 2026-09-27)
+
+The selected target (not targettarget) now shares upkeep reminders, Paladin
+blessing choices/recommendations, learned cleansing actions and native debuff
+icons. A SecureHandlerStateTemplate parent uses the fixed native visibility
+condition [@target,help,nodead] show; hide. The health bar remains independently
+visible for hostile targets. All support children inherit the friendly gate;
+Blizzard owns combat visibility. No Lua friendship comparison changes protected
+layout, visibility or action attributes in combat.
+
+Out-of-combat target buff scanning requires guarded UnitCanAssist(player,target)
+true plus the existing alive/readable-complete-scan checks. Unknown/hostile/dead
+state yields no suggestions. Target is a fixed action unit, never copied from a
+name or GUID. Learned party upkeep is offered, and self-only upkeep is allowed
+only when readable UnitIsUnit(target,player) is true. Target scans do not expand
+saved buff discovery. The personal aura picker stays solely on the player row.
+No target drinking indicator is introduced; target debuffs sit immediately after
+cleansing buttons, without reserving a cup gap.
+
+Target UNIT_AURA/faction/flags/connection events request the existing refresh.
+PLAYER_TARGET_CHANGED immediately clears owned buff/cleanse tooltips and old
+buff artwork, then refreshes choices outside combat. It invokes native inbound
+UpdateAllAuras on both target containers, including during combat, without
+reading native aura state. The matching ManagedAuraContainer shared method
+marks a FullAuraRebuild; AuraContainer explicitly documents external refresh for
+target changes. Cleansing actions remain fixed-target secure siblings with
+separate native indicators. Spell and preview changes still defer in combat.
+Matching-source cast tests now exercise the selected target as well as party.
+
+Source/package mocks verify parenting, help/nodead driver expression, target
+switches, unknown/dead cleanup and native refresh requests. They do not prove
+native engine visibility, restricted aura handling or physical input. Verify
+friendly-to-hostile-to-friendly switches in/out of combat on the actual client.
+
 ## Blessing suggestion border (70009, 2026-09-27)
 
 See [research and decision table](BLESSING_GUIDANCE.md). UnitGroupRolesAssigned

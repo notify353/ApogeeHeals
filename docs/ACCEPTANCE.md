@@ -348,3 +348,14 @@ roles and verify the border moves outside combat. Test unknown-role classes,
 unlearned preferred blessings, normal versus Greater versions, and combat entry
 and exit. Alternatives must remain clickable with the same fixed recipient.
 No Salvation or emergency ability should be automatically suggested.
+
+## Friendly selected target support
+
+Pending live: target an assistable living player outside the party and verify
+learned cleansing buttons/native debuffs plus missing buffs and the blessing
+suggestion. Each physical click must use the current target. Switch between
+friendly, hostile, dead and no target; support controls should only be visible
+on friendly living targets. Repeat target changes during combat: cleansing
+remains available for friends, buffs stay hidden, no protected warnings occur.
+Verify debuffs/glows refresh even when two friendly targets have different auras.
+Check buff expiration/removal, preview, zoning and fixed targettarget exclusion.

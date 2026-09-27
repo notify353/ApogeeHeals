@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add buff choices, recommendations, cleansing and native debuffs to the friendly selected target.
+
 - Highlight a role-first, class-fallback blessing suggestion in yellow, with a tooltip explanation.
 
 - Limit blessing choices to lasting party buffs; exclude Protection, Freedom and Sacrifice.

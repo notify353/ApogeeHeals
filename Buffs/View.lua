@@ -9,7 +9,7 @@ function B.Create(row)
     local size, gap = A.Style.sideIconSize, A.Style.sideIconGap
     row.buffReminders, row.buffButtons = {}, {}
     for index = 1, 4 do
-        local button = CreateFrame("Button", nil, row, "SecureActionButtonTemplate")
+        local button = CreateFrame("Button", nil, row.supportFrame or row, "SecureActionButtonTemplate")
         row.buffButtons[index] = button
         button:SetSize(size, size)
         button:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - (index - 1) * (size + gap), 0)
@@ -34,7 +34,7 @@ function B.Create(row)
         icon:SetTexCoord(0.07, 0.93, 0.07, 0.93); icon:Hide()
         row.buffReminders[index] = icon
     end
-    row.buffOverflow = A.Style.Text(row, 8)
+    row.buffOverflow = A.Style.Text(row.supportFrame or row, 8)
     row.buffOverflow:SetPoint("RIGHT", row, "LEFT", -gap - 4 * (size + gap), 0); row.buffOverflow:Hide()
 end
 function B.Paint(row, missing)
@@ -66,7 +66,7 @@ local function paintChoices(row, key, choices, offset, recommendedID, recommenda
     for index = 1, math.max(#choices, #buttons) do
         local entry, button = choices[index], buttons[index]
         if not button and not InCombatLockdown() then
-            button = CreateFrame("Button", nil, row, "SecureActionButtonTemplate")
+            button = CreateFrame("Button", nil, row.supportFrame or row, "SecureActionButtonTemplate")
             buttons[index] = button
             button:SetSize(size, size)
             button:SetAttribute("unit", row.unit); button:SetAttribute("useOnKeyDown", false)
