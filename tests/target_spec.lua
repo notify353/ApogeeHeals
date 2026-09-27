@@ -19,7 +19,7 @@ assert(row.health.value == 80 and row.power.value == 20 and row.classStrip.color
 m.reaction=4; m.Event("UNIT_FACTION", "target"); assert(row.classStrip.color[1] == 0.90)
 m.reaction=2; m.Event("UNIT_FACTION", "target"); assert(row.classStrip.color[1] == 0.86)
 m.targetPlayer=true
-UnitName=function(unit) if unit == "target" then return "Jane Silver Moon", "OtherRealm" end return "Priest" end
+UnitName=function(unit) if unit == "target" then return "Jane", "Silver Moon" end return "Priest" end
 m.Event("PLAYER_TARGET_CHANGED"); m.Flush()
 assert(row.name.text == "Jane Silver Moon" and row.classStrip.color[1] == 0.25 and row.name.font[2] == 6)
 m.combat=true; m.Event("PLAYER_REGEN_DISABLED"); m.Flush()

@@ -91,14 +91,21 @@ function U.PaintClassStrip(strip, classToken)
         end
     end)
 end
+function U.FullName(unit)
+    -- Forever's Camelot NameUtil joins UnitName's separate name and surname.
+    local ok, name, surname = pcall(UnitName, unit)
+    if not ok or not A.Access.Readable(name, surname) or type(name) ~= "string" then return "" end
+    if type(surname) ~= "string" or surname == "" then return name end
+    local constants = Constants and Constants.CharacterNameSeparatorConsts
+    local separator = constants and constants.CHARACTERNAME_SURNAME_SEPARATOR
+    if not A.Access.Readable(separator) or type(separator) ~= "string" then separator = " " end
+    return name .. separator .. surname
+end
 function U.PaintName(label, unit)
     local classOK, _, classToken = pcall(UnitClass, unit)
     if classOK then U.PaintClassColor(label, classToken)
     else label:SetTextColor(1, 1, 1, 1) end
-    -- Preserve the full readable character name, including surname and hyphens.
-    local name = R(UnitName, unit)
-    if type(name) ~= "string" then label:SetText(""); return end
-    label:SetText(name)
+    label:SetText(U.FullName(unit))
 end
 function U.State(unit)
     if R(UnitExists, unit) ~= true then return "missing" end
@@ -121,10 +128,7 @@ function U.PaintTargetIdentity(row)
     row.name:SetTextColor(1, 1, 1, 1)
     row.classStrip:SetColorTexture(unpack(A.Style.muted))
     if R(UnitExists, unit) == false then return end
-    -- UnitName separates the realm in its second return. Preserve the entire
-    -- first return, including spaces, NPC titles and character surnames.
-    local name = R(UnitName, unit)
-    if type(name) == "string" then row.name:SetText(name) end
+    row.name:SetText(U.FullName(unit))
     U.PaintLevel(row.level, unit)
     if player == true then
         local ok, _, classToken = pcall(UnitClass, unit)

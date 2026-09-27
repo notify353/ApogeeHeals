@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Correct Forever surname display by joining the separate name and surname
+  returns, matching the client's Camelot name formatter with public-value guards.
+
 - Show native cast/channel progress in the selected target's existing power
   strip, restoring power when casting stops without increasing frame height.
 

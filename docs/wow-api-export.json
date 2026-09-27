@@ -5,6 +5,8 @@
   "requiredFiles": [
     "Blizzard_APIDocumentationGenerated/FrameScriptDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/UnitDocumentation.lua",
+    "Blizzard_FrameXMLUtil/Blizzard_FrameXMLUtil.toc",
+    "Blizzard_FrameXMLUtil/Camelot/NameUtil.lua",
     "Blizzard_APIDocumentationGenerated/ClassColorDocumentation.lua",
     "Blizzard_Fonts_Shared/Shared/GameFonts.xml",
     "Blizzard_APIDocumentationGenerated/UnitHealPredictionCalculatorAPIDocumentation.lua",

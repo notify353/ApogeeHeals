@@ -110,11 +110,13 @@ Native range behavior and combat presentation still require live acceptance.
   clear only the tooltip owned by that button. Combat clears presentation,
   without changing protected action attributes.
 
-- Readable player labels preserve surnames, spaces and hyphens from UnitName's
-  first return. Restricted or unavailable identities display
-  blank; they never enter Lua string operations. Camelot NameUtil confirms that
-  UnitName's first return can contain both first name and surname. Current-build
-  live validation is pending.
+- Readable labels join UnitName's separate first-name and surname returns using
+  CHARACTERNAME_SURNAME_SEPARATOR, matching Camelot NameUtil.FormatUnitNameForDisplay.
+  The generic generated API labels the second return unitServer, but the selected
+  Camelot implementation uses it as surname. Both parts must pass public-value
+  guards before concatenation. Missing/empty surnames leave the first return intact;
+  restricted identities stay blank. The loader TOC and Camelot NameUtil source
+  are checked export inputs, and a matching-source test compares composition.
 
 - Blizzard_Fonts_Shared/Shared/GameFonts.xml defines Number12Font, a native
   locale-aware sans-serif family used for preview-handle text. Names retain the
@@ -274,10 +276,11 @@ incoming-heal presentation, left-aligned above the player with a full-row
 (19.5 logical pixel) gap. Both target rows retain their existing dimensions.
 No target event changes protected attributes, anchors or visibility.
 
-UnitDocumentation confirms UnitName returns unitName and unitServer separately.
-The target uses the entire readable first return, preserving NPC titles and player
-character surnames/spaces. Restricted identity remains blank; no string splitting
-or restricted-value comparison occurs. Existing party-name behavior is unchanged.
+The selected Camelot NameUtil uses UnitName's two returns as name and surname,
+despite the generic UnitDocumentation unitServer label. Target and party labels
+share guarded composition, preserving NPC titles and both character-name parts.
+Restricted identity remains blank; no string splitting or restricted-value
+comparison occurs.
 UnitIsPlayer and UnitReaction(target, player) pass through Access.Read before Lua
 branching; public player class tokens use the existing class-color helper, and
 public NPC reactions use friendly (5+), neutral (4), hostile (1-3) stripe colors.

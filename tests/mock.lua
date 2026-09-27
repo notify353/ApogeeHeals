@@ -127,6 +127,7 @@ function M.New()
     end
     canaccesstable = function(value) return not secrets[value] and not inaccessibleTables[value] end
     UnitExists = function(u) return m.units[u] ~= nil end
+    Constants = {CharacterNameSeparatorConsts={CHARACTERNAME_SURNAME_SEPARATOR=" "}}
     UnitCastingInfo, UnitChannelInfo, UnitCastingDuration, UnitChannelDuration = nil, nil, nil, nil
     UnitLevel = function(u) return m.units[u] and (m.units[u].level or 60) end
     UnitClass = function(u) return "Localized class", m.units[u] and (m.units[u].class or "PRIEST") end
@@ -143,6 +144,7 @@ function M.New()
         _G[api] = function(u) return m.units[u] and m.units[u][key] end
     end
     UnitHealthPercent = function() return { GetRGBA = function() return 0.28, 0.74, 0.46, 1 end } end
+    UnitName = function(u) local unit=m.units[u]; if unit then return unit.name, unit.surname end end
     PowerBarColor = { [1] = {r = 1, g = 0, b = 0}, [3] = {r = 1, g = 1, b = 0} }
     CreateColor = function(...) return {...} end
     Enum = { LuaCurveType = { Step = 1 } }
