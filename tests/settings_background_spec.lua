@@ -7,12 +7,12 @@ for _,f in ipairs(m.frames) do
 end
 assert(count==1 and background.drawLayer=="BACKGROUND" and background.allPoints==panel)
 assert(background.color[1]==0.035 and background.color[2]==0.035 and background.color[3]==0.045 and background.color[4]==0.96)
-assert(panel.alpha==nil and UIParent.alpha==nil and a.Settings.reset.alpha==nil)
+assert(panel.alpha==nil and UIParent.alpha==nil and a.Settings.defaults.alpha==nil)
 local frames=#m.frames
 panel:SetSize(780,620); panel.scripts.OnShow(); a.Settings.Refresh()
 assert(background.allPoints==panel and #m.frames==frames)
 m.combat=true; a.Settings.Refresh()
-assert(not a.Settings.reset.enabled and not a.Settings.buffs.enabled)
+assert(not a.Settings.defaults.enabled and not a.Settings.buffs.enabled)
 m.combat=false; a.Settings.Refresh()
-assert(a.Settings.reset.enabled and a.Settings.buffs.enabled)
+assert(a.Settings.defaults.enabled and a.Settings.buffs.enabled)
 print("PASS settings-owned background, resize/refresh stability, unchanged alpha and combat controls")

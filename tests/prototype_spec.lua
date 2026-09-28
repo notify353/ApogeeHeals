@@ -51,12 +51,12 @@ end)
 test("player labels preserve full names and refresh when a name changes", function()
     local m = Mock.New(); local a = m.Start(); local row = a.View.rows[1]
     for _, example in ipairs({{"Anduin Wrynn", "Anduin Wrynn"}, {"Anduin-Wrynn", "Anduin-Wrynn"},
-        {"Priest", "Priest"}, {"Élodie Dubois", "Élodie Dubois"}, {"", ""}}) do
+        {"Priest", "Priest"}, {"Ã‰lodie Dubois", "Ã‰lodie Dubois"}, {"", ""}}) do
         m.units.player.name = example[1]; a.View.Refresh(); equal(row.name.text, example[2])
     end
     local previous = Constants
-    Constants = {CharacterNameSeparatorConsts={CHARACTERNAME_SURNAME_SEPARATOR="·"}}
-    m.units.player.name = "Anduin·Wrynn"; a.View.Refresh(); equal(row.name.text, "Anduin·Wrynn")
+    Constants = {CharacterNameSeparatorConsts={CHARACTERNAME_SURNAME_SEPARATOR="Â·"}}
+    m.units.player.name = "AnduinÂ·Wrynn"; a.View.Refresh(); equal(row.name.text, "AnduinÂ·Wrynn")
     Constants = previous
 end)
 test("confirmed drinks, localized identities and unavailable auras", function()
@@ -81,7 +81,7 @@ test("combat immediately clears drinking and cancels unlocked dragging safely", 
     m.combat=true; m.Event("PLAYER_REGEN_DISABLED")
     equal(a.View.rows[1].status.text, ""); equal(a.View.unlocked, false)
     equal(a.View.dragging, false); equal(a.View.handle.scripts.OnUpdate, nil)
-    equal(a.Settings.reset.enabled, false); m.Flush()
+    equal(a.Settings.defaults.enabled, false); m.Flush()
     local reads = m.auraReads; a.View.Refresh(); equal(m.auraReads, reads)
     m.combat=false; m.Event("PLAYER_REGEN_ENABLED"); m.Flush()
     equal(a.View.rows[1].drinkIcon.shown, true); equal(a.View.unlocked, false)
@@ -98,7 +98,7 @@ test("finishing a drag saves position and synchronizes the lock control", functi
     a.View.SetUnlocked(true); a.Settings.Refresh(); equal(a.Settings.unlock, nil); equal(a.Settings.bindings, nil)
     a.View.handle.scripts.OnDragStart(); a.View.handle.scripts.OnUpdate()
     a.View.handle.scripts.OnDragStop()
-    equal(a.View.unlocked, false); equal(a.Settings.reset.enabled, true)
+    equal(a.View.unlocked, false); equal(a.Settings.defaults.enabled, true)
     equal(a.View.handle.scripts.OnUpdate, nil); equal(a.db.position.x, -180)
     local saved = a.db
     local m2 = Mock.New(); local a2 = m2.Load(); ApogeeHealsDB = saved

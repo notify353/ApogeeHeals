@@ -289,3 +289,8 @@ Healing Mouse assignments also apply to the target and target-of-target bars,
 including learned class defaults, plain/Shift/Ctrl mouse clicks and bandages.
 Each click uses that bar's recipient; native game restrictions decide whether
 its spell or item can be used. Changes to assignments remain locked in combat.
+
+
+### Unified Defaults
+
+Defaults clears this character's healing assignments, buff preferences and positions. Use the top-right Defaults button and confirm; changes are blocked in combat.
