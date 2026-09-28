@@ -28,7 +28,7 @@ m.units.targettarget.power=m.Secret();m.units.targettarget.maxPower=m.Secret();m
 m.units.targettarget.name=m.Secret()
 row.scripts.OnUpdate(row,0.2)
 assert(row.health.value==m.units.targettarget.health and row.power.value==m.units.targettarget.power)
-assert(row.name.text=="" and row.point==anchor and row.attributes.unit=="targettarget")
+assert(row.name.text==m.units.targettarget.name and row.point==anchor and row.attributes.unit=="targettarget")
 m.units.targettarget=nil;m.Event("UNIT_TARGET","target")
 assert(row.health.value==0 and row.power.value==0 and row.name.text=="")
 m.units.targettarget={name="Back",health=10,maxHealth=100,power=0,maxPower=0,kind=0,auras={}}

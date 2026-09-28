@@ -6,7 +6,7 @@ local cases = {
     {class="SHAMAN",ids={324},party=0,self=1},
     {class="WARLOCK",ids={687,706},party=0,self=2},
     {class="HUNTER",ids={19506},party=0,self=1},
-    {class="WARRIOR",ids={6673},party=0,self=1},
+    {class="WARRIOR",ids={6673,5242,6192,11549,11550,11551,25289},party=0,self=0},
     {class="ROGUE",ids={},party=0,self=0},
 }
 for _, case in ipairs(cases) do
@@ -53,9 +53,23 @@ for _, case in ipairs(cases) do
         assert(a.db.buffs[1].party==true)
         for _,unit in pairs(m.units) do unit.auras={{spellId=id,name="Spell"..id}} end
         a.Buffs.Refresh()
-        assert(active(a.View.rows[1])<case.self)
+        assert(active(a.View.rows[1])<case.self or case.self==0)
         for _,unit in pairs(m.units) do unit.auras={} end
         a.Buffs.Refresh()
+    end
+    if case.class=="WARRIOR" then
+        for _, id in ipairs(case.ids) do
+            a.db.buffs={{id=id,enabled=true,party=true}}
+            a.Buffs.Refresh()
+            for _, row in ipairs(a.View.supportRows) do
+                assert(active(row)==0 and row.buffButtons[1].attributes.type1=="")
+            end
+            a.db.buffs={}
+            a.Buffs.OnCast("player",id)
+            a.Buffs.Learn({spellId=id,name="Spell"..id,duration=300,sourceUnit="player"},"player")
+            assert(#a.db.buffs==0)
+            assert(a.Bindings.Resolve(id)) -- The ordinary action remains available.
+        end
     end
     m.hostile=true; m.Event("PLAYER_TARGET_CHANGED"); m.Flush()
     assert(active(a.View.target)==0)

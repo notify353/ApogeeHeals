@@ -72,7 +72,6 @@ assert(#choices("party1",{{spellId=21564},{spellId=27681},{spellId=27683}})==0)
 local selfCases={
     {class="SHAMAN",ids={324,10432},best=10432,covered=325},
     {class="WARLOCK",ids={687,696,706,11735},best=11735,covered=687,count=2},
-    {class="WARRIOR",ids={6673,25289},best=25289,covered=5242},
     {class="HUNTER",ids={19506,20906,1299348,1299346},best=20906,covered=20905},
 }
 for _, case in ipairs(selfCases) do
@@ -84,6 +83,11 @@ for _, case in ipairs(selfCases) do
     assert(not has(choices(),case.class=="WARLOCK" and 696 or case.best))
 end
 setup("HUNTER",{1299348,1299346});list,id=choices();assert(#list==1 and id==1299348)
+setup("WARRIOR",{6673,5242,6192,11549,11550,11551,25289})
+for _, rank in ipairs({6673,5242,6192,11549,11550,11551,25289}) do assert(C.Recognized(rank)) end
+for _, unit in ipairs({"player","party1","party2","party3","party4","target"}) do
+    list,id,reason=choices(unit);assert(#list==0 and id==nil and reason==nil)
+end
 setup("WARLOCK",{687,696});list,id=choices();assert(#list==1 and id==696)
 for _, class in ipairs({"ROGUE","PALADIN","UNKNOWN"}) do
     setup(class,{9885,9910,10938,19740});assert(#choices()==0)

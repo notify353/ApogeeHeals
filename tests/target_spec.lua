@@ -27,10 +27,11 @@ assert(row.name.text == "Jane Silver Moon")
 m.units.target.health=m.Secret(); m.units.target.maxHealth=m.Secret()
 m.units.target.power=m.Secret(); m.units.target.maxPower=m.Secret()
 m.secretPrediction=m.Secret(); m.reaction=m.Secret(); m.targetPlayer=false
-UnitName=function() return m.Secret() end
+local restrictedName=m.Secret()
+UnitName=function() return restrictedName end
 m.Event("UNIT_HEALTH", "target")
 assert(row.health.value == m.units.target.health and row.power.value == m.units.target.power)
-assert(row.name.text == "" and row.classStrip.color[1] == a.Style.muted[1])
+assert(row.name.text == restrictedName and row.classStrip.color[1] == a.Style.muted[1])
 assert(row.name.font[2] == 6)
 m.targetPlayer=m.Secret(); m.Event("UNIT_NAME_UPDATE", "target")
 assert(row.name.font[2] == 6)

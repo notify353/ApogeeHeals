@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Display restricted target and target-of-target names through native text sinks
+  instead of blanking them in instances; use the same safe path for party names.
+
+- Remove Battle Shout from pre-group buff suggestions, including saved generic reminders.
+
 - Match all side icons to settings-tile size and spacing, center them vertically,
   and contain gold borders inside the tiles so stacked rows stay separated.
 

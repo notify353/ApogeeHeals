@@ -24,9 +24,10 @@ m.Flush(); assert(row.name.shown and row.name.text == "Priest" and row.level.tex
 m.units.player.name="Changed Name"; m.Event("UNIT_NAME_UPDATE", "player"); m.Flush()
 assert(row.name.shown and row.name.text == "Changed Name" and row.level.shown)
 local originalName = UnitName
-UnitName = function() return m.Secret() end
+local restrictedName=m.Secret()
+UnitName = function() return restrictedName end
 m.units.player.level = m.Secret(); a.View.Refresh()
-assert(row.name.shown and row.name.text == "" and row.level.text == "?")
+assert(row.name.shown and row.name.text == restrictedName and row.level.text == "?")
 UnitName = originalName; m.units.player.level = 60
 m.combat=false; m.Event("PLAYER_REGEN_ENABLED"); m.Flush()
 assert(row.name.shown and row.name.text == "Changed Name")

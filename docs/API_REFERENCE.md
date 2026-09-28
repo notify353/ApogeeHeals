@@ -1,5 +1,22 @@
 # Forever API authority
 
+## Restricted unit names (70009, 2026-09-27)
+
+Target, target-of-target and party labels pass UnitName's first return directly
+to FontString:SetText, including restricted names. A public, nonempty surname
+uses SetFormattedText("%s%s%s", name, separator, surname) to preserve Camelot
+composition without Lua concatenation. An unreadable optional surname uses the
+first name alone; the addon cannot safely decide whether that suffix exists.
+Missing names or API/sink errors clear stale text. No text is read back.
+
+The matching SimpleFontStringAPIDocumentation marks both sinks
+AllowedWhenTainted with SecretArgumentsAddAspect Text. This supersedes the older
+blank-on-restricted identity policy below. Classification, level fallbacks,
+fixed unit tokens and protected combat layout/actions are unchanged.
+Mock tests cover restricted names on both target rows during combat, surname
+fallbacks and recovery. Matching-export checks verify the sink contracts;
+actual five-player dungeon rendering and taint remain live acceptance checks.
+
 ## Inset side-icon geometry (70009, 2026-09-27)
 
 Shared icons use 18 logical pixels at the existing 2x row scale, matching the

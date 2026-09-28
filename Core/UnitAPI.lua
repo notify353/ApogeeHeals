@@ -91,21 +91,28 @@ function U.PaintClassStrip(strip, classToken)
         end
     end)
 end
-function U.FullName(unit)
-    -- Forever's Camelot NameUtil joins UnitName's separate name and surname.
+function U.PaintFullName(label, unit)
+    label:SetText("")
+    -- Unit names may be restricted in instances. Pass them straight to native
+    -- text sinks; never concatenate, compare, or read back restricted text.
     local ok, name, surname = pcall(UnitName, unit)
-    if not ok or not A.Access.Readable(name, surname) or type(name) ~= "string" then return "" end
-    if type(surname) ~= "string" or surname == "" then return name end
+    if not ok or (A.Access.Readable(name) and type(name) ~= "string") then return end
+    -- A restricted optional surname cannot establish whether a suffix exists.
+    -- Still display the name instead of blanking the entire identity.
+    if not A.Access.Readable(surname) or type(surname) ~= "string" or surname == "" then
+        pcall(label.SetText, label, name)
+        return
+    end
     local constants = Constants and Constants.CharacterNameSeparatorConsts
     local separator = constants and constants.CHARACTERNAME_SURNAME_SEPARATOR
     if not A.Access.Readable(separator) or type(separator) ~= "string" then separator = " " end
-    return name .. separator .. surname
+    pcall(label.SetFormattedText, label, "%s%s%s", name, separator, surname)
 end
 function U.PaintName(label, unit)
     local classOK, _, classToken = pcall(UnitClass, unit)
     if classOK then U.PaintClassColor(label, classToken)
     else label:SetTextColor(1, 1, 1, 1) end
-    label:SetText(U.FullName(unit))
+    U.PaintFullName(label, unit)
 end
 function U.State(unit)
     if R(UnitExists, unit) ~= true then return "missing" end
@@ -128,7 +135,7 @@ function U.PaintTargetIdentity(row)
     row.name:SetTextColor(1, 1, 1, 1)
     row.classStrip:SetColorTexture(unpack(A.Style.muted))
     if R(UnitExists, unit) == false then return end
-    row.name:SetText(U.FullName(unit))
+    U.PaintFullName(row.name, unit)
     U.PaintLevel(row.level, unit)
     if player == true then
         local ok, _, classToken = pcall(UnitClass, unit)

@@ -13,7 +13,7 @@ action. This is a pre-combat upkeep guide, not an encounter optimizer.
 | Shaman | Self Lightning Shield; native weapon enchantment display | Cure Poison; Cure Disease |
 | Warlock | Self Demon Armor/Skin alternatives; native weapon enchantment display | Pet action not enabled; see limitation below |
 | Hunter | Own aspect picker; self-activated Trueshot upkeep if learned | No general friendly-player cleanse |
-| Warrior | Self-activated Battle Shout upkeep | No general friendly-player cleanse |
+| Warrior | No pre-group buff suggestions | No general friendly-player cleanse |
 | Rogue | Native weapon enchantment display | No class friendly-player cleanse |
 
 Every class retains native debuff icons. Cleanses use fixed player, party1-4
@@ -30,9 +30,10 @@ generic discovery. Existing saved disabled entries remain disabled across ranks.
 
 Highest learned rank is a selection policy, not a claim of greatest measured
 benefit. Mage armors and Warlock armors each form one coverage family; choices
-appear only when no member is present. Self buffs, Battle Shout and Trueshot are
+appear only when no member is present. Self buffs and Trueshot are
 player-row actions, never individual party casts. Native requirements still apply,
-including Battle Shout's rage cost. Buff choices hide in combat.
+and buff choices hide in combat. Battle Shout is excluded from pre-group upkeep,
+including saved generic reminders; ordinary Battle Shout actions are unaffected.
 
 Yellow suggestions are guidance, while the brighter cleanse indicator means a
 matching debuff type. Mark and Fortitude have broad benefits. Thorns is suggested
@@ -81,7 +82,7 @@ other-caster coverage, one physical cast per click, native tooltips, dim/bright
 cleanse artwork, simultaneous matching types, and all six fixed recipients.
 Switch friendly/hostile/dead targets in and out of combat. Check no protected
 mutation/taint warning, no stale suggestions after zoning/preview, and correct
-recovery on combat exit. Verify native Hunter aspect state, Warrior rage failure,
+recovery on combat exit. Verify native Hunter aspect state, absent Warrior buff suggestions,
 Druid/Priest form restrictions, and weapon swaps/expiration independently.
 New Lua files and a changed TOC require client discovery after reload; restart
 only if the client does not discover them. Installation is not live acceptance.
