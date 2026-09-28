@@ -37,12 +37,12 @@ test("dead, offline, missing and unknown states clear stale bars", function()
     m.units.player.connected = m.Secret(); a.View.Refresh(); equal(row.health.value, 0)
     m.units.player = nil; a.View.Refresh(); equal(row.name.text, ""); equal(row.status.text, "")
 end)
-test("restricted health and power reach native sinks; restricted names stay blank", function()
+test("restricted health, power and names reach native sinks", function()
     local m = Mock.New(); local a = m.Start()
     local secret = m.Secret()
     for _, field in ipairs({"health", "maxHealth", "power", "maxPower", "name"}) do m.units.player[field] = secret end
     a.View.Refresh(); local row = a.View.rows[1]
-    equal(row.health.value, secret); equal(row.health.max, secret); equal(row.name.text, "")
+    equal(row.health.value, secret); equal(row.health.max, secret); equal(row.name.text, secret)
     equal(row.power.value, secret)
     m.units.player.kind = secret; a.View.Refresh(); equal(row.power.value, 0)
     UnitHealth = function() error("unavailable") end
