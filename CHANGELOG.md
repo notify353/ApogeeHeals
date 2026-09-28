@@ -1,3 +1,7 @@
+## Unreleased
+
+- Add one confirmed top-right Defaults button combining settings and position resets.
+
 # Changelog
 
 ## Unreleased
@@ -120,3 +124,7 @@
 - Lua, TOC, whitespace, mocked behavior and matching-export contract validation.
   Healing click bindings and clickable buff reminders are implemented. Full live
   acceptance remains pending; live range detection remains deferred.
+
+## Defaults update
+
+- Provide one confirmed top-right Defaults control; consolidate reset controls and preserve combat safeguards.

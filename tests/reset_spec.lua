@@ -6,7 +6,7 @@ a.db.buffs = {{id=123, enabled=false, party=true}}
 a.db.position = {x=10,y=20}
 a.db.editorPosition = {x=200,y=300}; a.BindingEditor.customPosition = true
 local bindings, buffs = a.db.bindings, a.db.buffs
-a.Settings.reset.scripts.OnClick()
+a.Settings.ResetPositions()
 assert(a.db.bindings == bindings and a.db.buffs == buffs)
 assert(a.db.position.x == a.Storage.DefaultPosition().x and a.db.editorPosition == nil)
 assert(not a.BindingEditor.customPosition and a.BindingEditor.frame.point[4] == -270)
@@ -19,13 +19,13 @@ a.View.SetUnlocked(true); a.View.handle.scripts.OnDragStart()
 a.Settings.ResetPositions()
 assert(not a.View.dragging and not a.View.unlocked)
 local before = a.db
-a.Settings.factoryReset.scripts.OnClick()
+a.Settings.defaults.scripts.OnClick()
 assert(m.popup == "APOGEE_HEALS_RESET_CHARACTER" and a.db == before)
 local popup = StaticPopupDialogs[m.popup]
 assert(popup.button2 == "Cancel" and popup.hideOnEscape and popup.timeout == 0)
 -- An opened confirmation cannot reset after combat begins.
 m.combat = true; a.Settings.Refresh()
-assert(not a.Settings.reset.enabled and not a.Settings.factoryReset.enabled)
+assert(not a.Settings.defaults.enabled and not a.Settings.defaults.enabled)
 popup.OnAccept(); a.Settings.ResetPositions()
 assert(a.db == before and a.db.bindings["1"] == 999)
 m.combat = false
