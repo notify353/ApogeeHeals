@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Remove Battle Shout from pre-group buff suggestions, including saved generic reminders.
+
 - Match all side icons to settings-tile size and spacing, center them vertically,
   and contain gold borders inside the tiles so stacked rows stay separated.
 

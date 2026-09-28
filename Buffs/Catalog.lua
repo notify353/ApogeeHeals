@@ -27,10 +27,12 @@ local classes = {
         {key="demonSkin", family="demonArmor", self=true, ranks={696,687}},
     },
     -- Area effects stay on the fixed player action, never on recipient rows.
-    WARRIOR = {{key="battleShout", self=true, ranks={25289,11551,11550,11549,6192,5242,6673}}},
     HUNTER = {{key="trueshot", self=true, ranks={20906,20905,19506,1299348,1299346}}},
 }
 local recognized, families, variants = {}, {}, {}
+-- Battle Shout is not pre-group upkeep. Keep every rank recognized so saved
+-- entries and generic discovery cannot reintroduce it as a buff reminder.
+for _, id in ipairs({25289,11551,11550,11549,6192,5242,6673}) do recognized[id] = true end
 for _, definitions in pairs(classes) do
     for _, definition in ipairs(definitions) do
         for _, ids in ipairs({definition.ranks, definition.coverage or {}}) do
@@ -87,7 +89,6 @@ local function suggest(class, unit, offered)
         key = offered.demonArmor and "demonArmor" or "demonSkin"
         reason = "personal armor upkeep"
     elseif class == "SHAMAN" then key, reason = "lightningShield", "personal shield upkeep"
-    elseif class == "WARRIOR" then key, reason = "battleShout", "maintain your attack-power shout"
     elseif class == "HUNTER" then key, reason = "trueshot", "maintain your learned attack-power aura" end
     if key and offered[key] then return offered[key], "Suggested: " .. reason .. "." end
 end
