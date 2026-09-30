@@ -10,15 +10,23 @@ and runtime warning baseline now use 70124, with interface 16001 unchanged.
 UnitThreatLeadSituation(player, mob) returns 0-3: none, yellow, orange, red.
 Its documentation explicitly says red when the player is not first on threat.
 CompactUnitFrame's tank path calls this API and combines 1/2 into GAINING_THREAT_COLOR.
-The panel labels those public states WEAK LEAD, and 3 NO LEAD when the player
-still has aggro. A readable UnitDetailedThreatSituation isTanking=false with a
-valid threat status instead shows NO AGGRO. LEAD requires readable isTanking=true,
-valid participation and lead state 0; it is a native state, never a guarantee.
-Missing, failed, secret or malformed reads show UNKNOWN, never an old green state.
-A previously tracked hostile mob whose readable threat status becomes nil stays
+The panel labels those public states WEAK LEAD, and 3 NO LEAD. A readable
+UnitDetailedThreatSituation isTanking=false with a valid status shows NO AGGRO.
+Lead readings are independent of detailed readings: native state 0 shows LEAD
+even if detailed participation is unavailable. A separate AGGRO/NO AGGRO/AGGRO ?
+line prevents lead from implying aggro. Missing or malformed lead shows UNKNOWN.
+Restricted lead goes directly to SetFormattedText("RISK %.0f/3") and SetValue
+on a reverse-filled, Immediate 0-3 warning bar. This is a discrete native warning
+scale (0 none, 1 yellow, 2 orange, 3 red), not a margin or percentage. Restricted
+isTanking uses native boolean-to-alpha for separate precreated aggro labels.
+Detailed threatValue goes directly to native SetFormattedText("Threat %.0f");
+no Classic divide-by-100 scaling is applied on Forever. Failed sinks clear their
+presentation. No restricted number is formatted, compared or cached by Lua.
+A previously tracked hostile mob whose readings become unavailable stays
 in its slot as UNKNOWN; an untouched selected hostile mob also shows UNKNOWN.
 The documented MayReturnNothing contract cannot establish an exact zero threat.
-Fresh unrelated mobs with a readable nil status are not admitted to the main stack.
+Fresh mobs with a readable nil status and no lead reading are not admitted.
+An independently available lead reading establishes participation for tracking.
 Uncertain participation/hostility is conservatively shown as UNKNOWN, not classified
 as safe or silently discarded. Readable dead/friendly/missing units are cleared.
 
@@ -27,7 +35,17 @@ definition in this export. TargetFrame uses it while tanking and rawPercentage
 otherwise; that does not establish a continuous equal-threat-centered transform.
 Both numeric values and threat states may be secret. No native numeric transform
 or live dungeon test establishes the requested center semantics, so continuous
-movement is disabled. This prototype uses labeled warnings, no simulated progress.
+movement is disabled. This prototype uses labeled discrete warnings, no simulated progress.
+
+Reference review (2026-09-30): Threat Plates 13.3.0-beta3 explicitly supports
+Forever, selects the unscaled modern detailed-threat API and disables legacy
+off-tank/heuristic paths on its modern API surface. Its source is GPLv3 and was
+reviewed as a reference only; no code was copied. References:
+[Forever release](https://github.com/Backupiseasy/ThreatPlates/releases/tag/13.3.0-beta3),
+[API selection](https://github.com/Backupiseasy/ThreatPlates/blob/b585e39b31fe46eb2c6414be14f695a258da9148/Init.lua),
+[heuristic restrictions](https://github.com/Backupiseasy/ThreatPlates/blob/b585e39b31fe46eb2c6414be14f695a258da9148/Modules/Threat.lua).
+This review does not establish what the user's live solo APIs return. The
+reported UNKNOWN case remains a live retest requirement after the sink fix.
 
 Nameplate added/removed events own token lifetimes; bootstrap reads GetNamePlates
 and the matching NamePlateBaseMixin:GetUnit only after a public IsForbidden=false.

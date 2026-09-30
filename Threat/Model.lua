@@ -8,9 +8,10 @@ end
 function M.Classify(lead, tanking, status)
     -- Lead state 3 means not first on threat, NOT necessarily loss of aggro.
     -- States 1/2 are combined by Blizzard's tank nameplate presentation.
-    if not state(status) then return "unknown" end
-    if A.Access.Readable(tanking) and tanking == false then return "noAggro" end
-    if not A.Access.Readable(tanking) or tanking ~= true or not state(lead) then return "unknown" end
+    if state(status) and A.Access.Readable(tanking) and tanking == false then return "noAggro" end
+    -- Lead is an independent native reading; missing detailed data must not
+    -- discard it. Aggro availability is presented separately by the view.
+    if not state(lead) then return "unknown" end
     if lead == 3 then return "noLead" end
     if lead == 1 or lead == 2 then return "weak" end
     return "lead"
@@ -29,10 +30,13 @@ function M.Sample(unit)
         if status == nil then presence = "unengaged"
         elseif state(status) then presence = "present" end
     end
+    local leadOK, lead = pcall(UnitThreatLeadSituation, "player", unit)
+    if not leadOK then lead = nil end
+    if not A.Access.Readable(lead) then presence, lead = "unknown", nil end
+    if state(lead) then presence = "present" end
     -- Only public values leave this function. Secret results are never cached.
-    if presence == "unengaged" then return presence, "unknown" end
-    local lead = A.Access.Read(UnitThreatLeadSituation, "player", unit)
-    return presence, ok and M.Classify(lead, tanking, status) or "unknown"
+    if not ok then tanking, status = nil, nil end
+    return presence, M.Classify(lead, tanking, status)
 end
 function M.New()
     return {entries={}, slots={}, sequence=0}

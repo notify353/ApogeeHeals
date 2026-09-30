@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Preserve independent lead warnings when detailed threat is unavailable. Display
+  restricted native warning risk, threat amount and aggro through native sinks;
+  clear stale values on failure/removal. Solo and dungeon live retests remain pending.
 - Add a movable eight-row tank threat stack with stable mob slots, normal-target
   highlighting, explicit native lead/aggro warnings and conservative unknown states.
   Keep continuous centered bars disabled pending proof; live dungeon acceptance

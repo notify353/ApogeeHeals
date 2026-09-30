@@ -57,10 +57,24 @@ local function createRow(parent, index)
     local row = CreateFrame("Frame", nil, parent)
     row:SetSize(width, 14); row:SetPoint("TOPLEFT", V.root, "TOPLEFT", 0, -header-(index-1)*rowHeight)
     row:EnableMouse(false); S.Background(row)
-    row.name = S.Text(row, 6); row.name:SetPoint("LEFT", 13, 1); row.name:SetSize(93, 12)
+    row.name = S.Text(row, 6); row.name:SetPoint("LEFT", 13, 3); row.name:SetSize(85, 7)
     row.name:SetJustifyH("LEFT"); row.name:SetShadowColor(0,0,0,1); row.name:SetShadowOffset(1,-1)
-    row.warning = S.Text(row, 6); row.warning:SetPoint("RIGHT", -3, 1); row.warning:SetSize(45, 12)
+    row.warning = S.Text(row, 6); row.warning:SetPoint("RIGHT", -3, 3); row.warning:SetSize(55, 7)
     row.warning:SetJustifyH("RIGHT")
+    row.amount = S.Text(row, 5); row.amount:SetPoint("LEFT", 13, -4); row.amount:SetSize(85, 6)
+    row.amount:SetJustifyH("LEFT"); row.amount:SetTextColor(unpack(S.muted))
+    row.aggro = {}
+    for _, text in ipairs({"AGGRO", "NO AGGRO", "AGGRO ?"}) do
+        local label = S.Text(row, 5); label:SetPoint("RIGHT", -3, -4); label:SetSize(55, 6)
+        label:SetJustifyH("RIGHT"); label:SetText(text); label:SetTextColor(unpack(S.muted))
+        row.aggro[#row.aggro+1] = label
+    end
+    -- Discrete native warning scale, never a percentage or a lead margin.
+    row.risk = CreateFrame("StatusBar", nil, row); row.risk:SetSize(55, 1)
+    row.risk:SetPoint("BOTTOMRIGHT", -3, 0); row.risk:EnableMouse(false)
+    row.risk:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
+    row.risk:SetStatusBarColor(0.90,0.74,0.22,1); row.risk:SetMinMaxValues(0,3)
+    row.risk:SetReverseFill(true)
     row.marker = row:CreateTexture(nil, "ARTWORK"); row.marker:SetSize(10,10); row.marker:SetPoint("LEFT", 1, 1)
     row.marker:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcons")
     row.strip = row:CreateTexture(nil, "ARTWORK"); row.strip:SetSize(width, 1)
@@ -103,6 +117,8 @@ function V.Create()
 end
 function V.ClearRow(row)
     row:SetAlpha(0); row.name:SetText(""); row.warning:SetText("")
+    row.amount:SetText(""); row.risk:SetAlpha(0); row.risk:SetValue(0)
+    for _, label in ipairs(row.aggro) do label:SetAlpha(0) end
     row.marker:SetAlpha(0); row.selection:SetAlpha(0); row.unit = nil
 end
 function V.Clear()
@@ -110,12 +126,48 @@ function V.Clear()
     for _, gate in ipairs(V.gates) do gate:SetAlpha(1) end
     V.footer:SetText("")
 end
+local function quantity(value)
+    if not A.Access.Readable(value) then return true end
+    return type(value) == "number" and value == value and value >= 0 and value < math.huge
+end
+function V.PaintNative(row, unit)
+    row.amount:SetText(""); row.risk:SetAlpha(0); row.risk:SetValue(0)
+    for _, label in ipairs(row.aggro) do label:SetAlpha(0) end
+    row.aggro[3]:SetAlpha(1)
+    -- Requery directly at presentation time. No opaque threat value enters
+    -- tracking, arithmetic, formatting in Lua, or presentation readback.
+    if A.Access.Read(UnitCanAttack, "player", unit) ~= true then return end
+    local ok, tanking, _, _, _, amount = pcall(UnitDetailedThreatSituation, "player", unit)
+    if ok then
+        if quantity(amount) then
+            local shown = pcall(row.amount.SetFormattedText, row.amount, "Threat %.0f", amount)
+            if not shown then row.amount:SetText("") end
+        end
+        local yes = V.BooleanAlpha(row.aggro[1], tanking, 1, 0)
+        local no = V.BooleanAlpha(row.aggro[2], tanking, 0, 1)
+        if yes and no then row.aggro[3]:SetAlpha(0)
+        else row.aggro[1]:SetAlpha(0); row.aggro[2]:SetAlpha(0) end
+    end
+    local leadOK, lead = pcall(UnitThreatLeadSituation, "player", unit)
+    if leadOK and not A.Access.Readable(lead) then
+        row.warning:SetTextColor(0.65,0.70,0.78,1)
+        row.strip:SetColorTexture(0.65,0.70,0.78,1)
+        local displayed = pcall(function()
+            row.warning:SetFormattedText("RISK %.0f/3", lead)
+            row.risk:SetValue(lead); row.risk:SetAlpha(1)
+        end)
+        if not displayed then row.warning:SetText("UNKNOWN"); row.risk:SetAlpha(0); row.risk:SetValue(0) end
+    elseif leadOK and type(lead) == "number" and lead >= 0 and lead <= 3 and lead % 1 == 0 then
+        row.risk:SetValue(lead); row.risk:SetAlpha(1)
+    end
+end
 function V.Paint(row, unit, warning)
     row.unit = unit; row:SetAlpha(1)
     A.UnitAPI.PaintFullName(row.name, unit)
     local info = warnings[warning] or warnings.unknown
     row.warning:SetText(info[1]); row.warning:SetTextColor(info[2],info[3],info[4],1)
     row.strip:SetColorTexture(info[2],info[3],info[4],1)
+    V.PaintNative(row, unit)
     row.marker:SetAlpha(0)
     local marker = A.Access.Read(GetRaidTargetIndex, unit)
     if type(marker) == "number" and marker >= 1 and marker <= 8 and marker % 1 == 0 then

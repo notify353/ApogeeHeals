@@ -56,22 +56,60 @@ print("PASS tank lead warning states distinguish weakening lead, lost first plac
 for _,field in ipairs({"lead","threatStatus","tanking"}) do
     m.units[unit].lead=0; m.units[unit].threatStatus=3; m.units[unit].tanking=true
     m.units[unit][field]=m.Secret(); m.Event("UNIT_THREAT_LIST_UPDATE",unit)
-    assert(v.rows[1].warning.text=="UNKNOWN" and r.model.entries[unit].warning=="unknown")
+    local expected=field=="lead" and "UNKNOWN" or "LEAD"
+    assert(v.rows[1].warning.text==expected)
 end
 m.units[unit].threatStatus=3; m.units[unit].tanking=true
 for _,value in ipairs({-1,4,0/0,math.huge,"0"}) do
     m.units[unit].lead=value; r.Refresh(); assert(v.rows[1].warning.text=="UNKNOWN")
 end
-m.threatError=true; r.Refresh(); assert(v.rows[1].warning.text=="UNKNOWN")
+m.units[unit].lead=0
+m.threatError=true; r.Refresh(); assert(v.rows[1].warning.text=="LEAD" and v.rows[1].aggro[3].alpha==1)
 m.threatError=nil; m.units[unit].lead=0; m.leadError=true
 r.Refresh(); assert(v.rows[1].warning.text=="UNKNOWN")
 m.leadError=nil; r.Refresh(); assert(v.rows[1].warning.text=="LEAD")
 UnitCanAttack=function() return m.Secret() end
 r.Refresh(); assert(v.rows[1].warning.text=="UNKNOWN")
 UnitCanAttack=function(_,u) return m.units[u] and m.units[u].hostile==true end
-m.units[unit].threatStatus=nil; r.Refresh()
+m.units[unit].threatStatus=nil; m.units[unit].lead=nil; r.Refresh()
 assert(v.rows[1].warning.text=="UNKNOWN" and r.model.slots[1]==unit)
 print("PASS restricted, malformed and failed reads clear reassuring warnings; threat wipe remains visible")
+
+-- Native presentation boundaries record opaque inputs without Lua formatting.
+m,a,r,v=setup(); unit=m.Mob(1,true,3,0)
+local row=v.rows[1]
+local nativeFormat=row.warning.SetFormattedText
+row.warning.SetFormattedText=function(self,pattern,value)
+    if issecretvalue(value) then self.nativePattern=pattern; self.nativeValue=value; self.text="native risk"
+    else nativeFormat(self,pattern,value) end
+end
+row.amount.SetFormattedText=function(self,pattern,value)
+    if issecretvalue(value) then self.nativeValue=value; self.text="native amount"
+    else nativeFormat(self,pattern,value) end
+end
+local secretLead,secretAmount,secretAggro=m.Secret(),m.Secret(),m.Secret()
+m.units[unit].lead=secretLead; m.units[unit].amount=secretAmount; m.units[unit].tanking=secretAggro
+C_CurveUtil.EvaluateColorValueFromBoolean=function(value,yes,no)
+    assert(rawequal(value,secretAggro)); return m.Secret()
+end
+r.Refresh()
+assert(row.warning.text=="native risk" and row.warning.nativePattern=="RISK %.0f/3")
+assert(rawequal(row.risk.value,secretLead) and row.risk.alpha==1 and row.risk.reverseFill)
+assert(rawequal(row.amount.nativeValue,secretAmount) and row.amount.text=="native amount")
+assert(issecretvalue(row.aggro[1].alpha) and issecretvalue(row.aggro[2].alpha) and row.aggro[3].alpha==0)
+assert(r.model.entries[unit].warning=="unknown")
+for _,entry in pairs(r.model.entries) do for _,value in pairs(entry) do assert(not issecretvalue(value)) end end
+m.units[unit].amount=42; m.units[unit].tanking=true; m.units[unit].threatStatus=nil; m.units[unit].lead=1
+r.Refresh(); assert(row.warning.text=="WEAK LEAD" and row.amount.text=="Threat 42")
+assert(row.aggro[1].alpha==1 and row.aggro[2].alpha==0 and row.aggro[3].alpha==0)
+m.units[unit].amount=nil; m.units[unit].tanking=nil; m.units[unit].lead=nil
+r.Refresh(); assert(row.amount.text=="" and row.warning.text=="UNKNOWN" and row.risk.alpha==0 and row.risk.value==0)
+assert(row.aggro[1].alpha==0 and row.aggro[2].alpha==0 and row.aggro[3].alpha==1)
+m.units[unit].lead=secretLead; row.warning.SetFormattedText=function() error("sink unavailable") end
+r.Refresh(); assert(row.warning.text=="UNKNOWN" and row.risk.alpha==0)
+m.Event("NAME_PLATE_UNIT_REMOVED",unit)
+assert(row.amount.text=="" and row.risk.alpha==0 and row.risk.value==0 and row.aggro[3].alpha==0)
+print("PASS independent solo lead, native opaque risk/amount/aggro sinks, failures and stale-data cleanup")
 
 m,a,r,v=setup()
 for i=1,10 do m.Mob(i,true,3,0) end
@@ -132,7 +170,7 @@ assert(not v.moving and not v.root.moving)
 v.handle.scripts.OnDragStart(); assert(not v.moving)
 r.SetEnabled(false); assert(a.db.threatEnabled==nil)
 local reads=m.threatReads; r.frame.scripts.OnUpdate(r.frame,0.19); assert(m.threatReads==reads)
-r.frame.scripts.OnUpdate(r.frame,0.01); assert(m.threatReads==reads+1)
+r.frame.scripts.OnUpdate(r.frame,0.01); assert(m.threatReads==reads+2)
 for i,row in ipairs(v.rows) do assert(row.point==anchors[i] and next(row.attributes)==nil) end
 m.Event("PLAYER_LEAVING_WORLD")
 assert(next(r.model.entries)==nil and r.frame.scripts.OnUpdate==nil and not v.root.shown)
@@ -160,7 +198,7 @@ print("PASS combat-safe fixed geometry, bounded polling, zoning/bootstrap, toggl
 
 m,a,r,v=setup()
 unit=m.Mob(1,true,3,0); m.Target(unit)
-m.units[unit].threatStatus=nil; r.Refresh()
+m.units[unit].threatStatus=nil; m.units[unit].lead=nil; r.Refresh()
 assert(v.rows[1].warning.text=="UNKNOWN" and v.rows[8].warning.text=="UNKNOWN")
 m.units[unit].dead=true; r.Refresh(); assert(v.rows[1].alpha==0 and v.rows[8].alpha==0)
 m.units[unit].dead=nil; m.units[unit].hostile=false; r.Refresh(); assert(v.rows[8].alpha==0)

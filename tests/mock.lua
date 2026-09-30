@@ -80,6 +80,7 @@ function M.New()
     function methods:GetStatusBarTexture() return self.fill end
     function methods:SetMinMaxValues(lo, hi) assert(hi ~= nil); self.min, self.max = lo, hi end
     function methods:SetValue(v) assert(v ~= nil); self.value = v end
+    function methods:SetReverseFill(v) self.reverseFill = v end
     function methods:SetTimerDuration(duration, interpolation, direction)
         assert(duration ~= nil)
         if m.timerError then error("native timer unavailable") end
