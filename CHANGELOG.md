@@ -1,5 +1,11 @@
 ## Unreleased
 
+- Add a movable eight-row tank threat stack with stable mob slots, normal-target
+  highlighting, explicit native lead/aggro warnings and conservative unknown states.
+  Keep continuous centered bars disabled pending proof; live dungeon acceptance
+  is separate from mock/source checks and central DEV installation.
+- Refresh the Forever API baseline to 1.60.1.70124 and review threat/nameplate sinks.
+
 - Add one confirmed top-right Defaults button combining settings and position resets.
 
 # Changelog

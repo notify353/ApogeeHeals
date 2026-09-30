@@ -1,5 +1,68 @@
 # Forever API authority
 
+## Minimal tank threat stack (70124, 2026-09-29)
+
+Reviewed the refreshed local 1.60.1.70124 export; all required sources postdate
+the current executable. Existing native-contract tests run against this export;
+earlier sections retain their historical review dates. The freshness manifest
+and runtime warning baseline now use 70124, with interface 16001 unchanged.
+
+UnitThreatLeadSituation(player, mob) returns 0-3: none, yellow, orange, red.
+Its documentation explicitly says red when the player is not first on threat.
+CompactUnitFrame's tank path calls this API and combines 1/2 into GAINING_THREAT_COLOR.
+The panel labels those public states WEAK LEAD, and 3 NO LEAD when the player
+still has aggro. A readable UnitDetailedThreatSituation isTanking=false with a
+valid threat status instead shows NO AGGRO. LEAD requires readable isTanking=true,
+valid participation and lead state 0; it is a native state, never a guarantee.
+Missing, failed, secret or malformed reads show UNKNOWN, never an old green state.
+A previously tracked hostile mob whose readable threat status becomes nil stays
+in its slot as UNKNOWN; an untouched selected hostile mob also shows UNKNOWN.
+The documented MayReturnNothing contract cannot establish an exact zero threat.
+Fresh unrelated mobs with a readable nil status are not admitted to the main stack.
+Uncertain participation/hostility is conservatively shown as UNKNOWN, not classified
+as safe or silently discarded. Readable dead/friendly/missing units are cleared.
+
+UnitThreatPercentageOfLead is present and restriction-marked but has no numeric
+definition in this export. TargetFrame uses it while tanking and rawPercentage
+otherwise; that does not establish a continuous equal-threat-centered transform.
+Both numeric values and threat states may be secret. No native numeric transform
+or live dungeon test establishes the requested center semantics, so continuous
+movement is disabled. This prototype uses labeled warnings, no simulated progress.
+
+Nameplate added/removed events own token lifetimes; bootstrap reads GetNamePlates
+and the matching NamePlateBaseMixin:GetUnit only after a public IsForbidden=false.
+No nameplate internals, GUIDs or names serve as keys. Public acquisition sequence
+fills seven fixed slots without rearranging survivors; overflow waits in that
+sequence. A separately reserved eighth row uses fixed target and native duplicate
+suppression. Event refresh plus a bounded 0.2-second active refresh rereads current
+values; disabling/world exit clears tracking and stops polling. No restricted
+threat result is cached. Only position and the enable toggle enter SavedVariables.
+
+UnitIsUnit may return a secret boolean. EvaluateColorValueFromBoolean and SetAlpha
+are AllowedWhenTainted; conversion feeds the highlight's alpha directly. Seven
+precreated native alpha parents suppress the reserved target when any stable row
+matches, without addon boolean combination, alpha/visibility readback or combat
+layout writes. Unavailable comparisons clear highlighting and suppress the reserved
+row with Target match unknown. Exact overflow deduplication uses public matches
+only; secret matches use an honest total tracked count. UnitName reaches native
+text sinks via existing PaintFullName. GetRaidTargetIndex has SecretReturns=true:
+only a readable 1-8 index draws its marker; unavailable markers clear stale icons.
+
+Mock tests cover state distinctions, secret/malformed results, stable slots,
+normal target changes, overflow, token reuse, native boolean passthrough, polling,
+zoning, disabled state, dragging, persistence and reset isolation. Matching-source
+tests execute Blizzard's tank lead dispatch and verify the sink/event contracts.
+They do not reproduce engine restrictions or establish early-warning timing.
+
+Live acceptance after DEV activation: enable enemy nameplates, pull multiple mobs,
+Tab normally and verify the yellow target outline moves while other rows stay put.
+Observe a competitor approach and exceed your threat, then lose/recover aggro;
+compare WEAK LEAD/NO LEAD/NO AGGRO with native Blizzard indicators. Record whether
+WEAK LEAD precedes actual loss; there is no promised threshold or warning interval.
+Check target outside the first seven, restricted-name/marker/comparison behavior,
+threat wipes, dead/despawned mobs, zoning and out-of-combat dragging/reload.
+Live engine rendering, taint and warning timing remain pending owner acceptance.
+
 ## Restricted unit names (70009, 2026-09-27)
 
 Target, target-of-target and party labels pass UnitName's first return directly

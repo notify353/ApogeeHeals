@@ -1,7 +1,7 @@
 {
-  "clientVersion": "1.60.1.70009",
+  "clientVersion": "1.60.1.70124",
   "interface": 16001,
-  "reviewedOn": "2026-09-27",
+  "reviewedOn": "2026-09-29",
   "requiredFiles": [
     "Blizzard_ActionBar/Shared/StanceBar.lua",
     "Blizzard_BuffFrame/BuffFrame.lua",
@@ -60,6 +60,12 @@
     "Blizzard_APIDocumentationGenerated/NumericRuleFormatterAPIDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/NumericRuleFormatterSharedDocumentation.lua",
     "Blizzard_AuraContainer/Blizzard_AuraContainerEnchantments.lua",
-    "Blizzard_APIDocumentationGenerated/PaperDollInfoDocumentation.lua"
+    "Blizzard_APIDocumentationGenerated/PaperDollInfoDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/NamePlateDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/NamePlateManagerDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/SimpleRegionAPIDocumentation.lua",
+    "Blizzard_APIDocumentationGenerated/RaidMarkersDocumentation.lua",
+    "Blizzard_NamePlates/Blizzard_NamePlateBase.lua",
+    "Blizzard_NamePlates/Blizzard_NamePlates.lua"
   ]
 }

@@ -5,6 +5,7 @@ function S.ResetPositions()
     if InCombatLockdown() then return end
     A.View.Lock(); A.View.pendingPosition = nil
     A.View.ResetPosition(); A.BindingEditor.ResetPosition(); A.Minimap.ResetPosition()
+    if A.ThreatView.root then A.ThreatView.ResetPosition() end
     S.Refresh()
 end
 function S.Refresh()
@@ -12,6 +13,10 @@ function S.Refresh()
     if not S.defaults then return end
     S.defaults:SetEnabled(not InCombatLockdown())
     S.buffs:SetEnabled(not InCombatLockdown())
+    if S.threat then
+        S.threat:SetEnabled(not InCombatLockdown())
+        S.threat:SetChecked(A.db.threatEnabled ~= false)
+    end
     S.cleanseStatus:SetText(A.Cleansing.status or "Purify configuration is pending.")
 end
 function S.Create()
@@ -28,6 +33,11 @@ function S.Create()
     S.buffs:SetScript("OnClick", function() A.Buffs.OpenPicker() end)
     S.cleanseStatus = A.Style.Text(panel, 11)
     S.cleanseStatus:SetPoint("TOPLEFT", 16, -88)
+    S.threat = CreateFrame("CheckButton", nil, panel, "UICheckButtonTemplate")
+    S.threat:SetPoint("TOPLEFT", 12, -114); S.threat:SetSize(24, 24)
+    local threatLabel = A.Style.Text(panel, 11)
+    threatLabel:SetPoint("LEFT", S.threat, "RIGHT", 4, 0); threatLabel:SetText("Tank threat stack")
+    S.threat:SetScript("OnClick", function(button) A.Threat.SetEnabled(button:GetChecked()); S.Refresh() end)
     StaticPopupDialogs.APOGEE_HEALS_RESET_CHARACTER = {
         text = "Restore Apogee Heals defaults for this character?\n\nClears healing assignments, buff reminders and positions and restores defaults. This cannot be undone.\n\nOther characters, other addons and WoW keybindings are unchanged.",
         button1 = "Defaults", button2 = CANCEL or "Cancel",
