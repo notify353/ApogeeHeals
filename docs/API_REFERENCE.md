@@ -23,7 +23,9 @@ Detailed threatValue goes directly to native SetFormattedText("Threat %.0f");
 no Classic divide-by-100 scaling is applied on Forever. Failed sinks clear their
 presentation. No restricted number is formatted, compared or cached by Lua.
 A previously tracked hostile mob whose readings become unavailable stays
-in its slot as UNKNOWN; an untouched selected hostile mob also shows UNKNOWN.
+in its slot as UNKNOWN. The reserved selected-target row is active only during
+player combat; idle selection shows no placeholder. An untouched hostile target
+selected during combat may show UNKNOWN. Stable encounter rows remain independent.
 The documented MayReturnNothing contract cannot establish an exact zero threat.
 Fresh mobs with a readable nil status and no lead reading are not admitted.
 An independently available lead reading establishes participation for tracking.

@@ -116,6 +116,7 @@ for i=1,10 do m.Mob(i,true,3,0) end
 for i=1,7 do assert(r.model.slots[i]=="nameplate"..i) end
 assert(v.footer.text=="+3 more")
 local slots={unpack(r.model.slots)}
+m.combat=true
 for i=1,7 do
     m.Target("nameplate"..i)
     assert(v.rows[i].selection.alpha==1 and v.gates[i].alpha==0)
@@ -138,7 +139,7 @@ m.Mob(55,true,3,1); assert(r.model.entries.nameplate55.warning=="weak")
 print("PASS stable seven slots, reserved overflow target, counts, departures and token reuse without threat sorting")
 
 m,a,r,v=setup()
-unit=m.Mob(1,true,3,0); m.Target(unit)
+unit=m.Mob(1,true,3,0); m.combat=true; m.Target(unit)
 m.units[unit].name=m.Secret(); m.units[unit].marker=m.Secret(); r.Refresh()
 assert(rawequal(v.rows[1].name.text,m.units[unit].name) and v.rows[1].marker.alpha==0)
 m.units[unit].name="Marked"; m.units[unit].marker=8; r.Refresh()
@@ -197,12 +198,17 @@ m,a,r,v=setup({version=3,threatEnabled=false}); assert(not v.root.shown and r.fr
 print("PASS combat-safe fixed geometry, bounded polling, zoning/bootstrap, toggle, position persistence and reset isolation")
 
 m,a,r,v=setup()
-unit=m.Mob(1,true,3,0); m.Target(unit)
+unit=m.Mob(1,true,3,0); m.combat=true; m.Target(unit)
 m.units[unit].threatStatus=nil; m.units[unit].lead=nil; r.Refresh()
 assert(v.rows[1].warning.text=="UNKNOWN" and v.rows[8].warning.text=="UNKNOWN")
 m.units[unit].dead=true; r.Refresh(); assert(v.rows[1].alpha==0 and v.rows[8].alpha==0)
 m.units[unit].dead=nil; m.units[unit].hostile=false; r.Refresh(); assert(v.rows[8].alpha==0)
 m.units.target={name="Untouched",hostile=true,health=50,maxHealth=100,power=0,maxPower=0,kind=0,auras={}}
+m.combat=false; m.Event("PLAYER_REGEN_ENABLED")
+assert(v.rows[8].alpha==0 and v.rows[8].name.text=="" and v.rows[8].warning.text=="")
+m.Event("PLAYER_TARGET_CHANGED"); assert(v.rows[8].alpha==0)
+m.combat=true; m.Event("PLAYER_REGEN_DISABLED")
 r.Refresh(); assert(v.rows[8].warning.text=="UNKNOWN" and v.rows[8].alpha==1)
 UnitDetailedThreatSituation=nil; r.Refresh(); assert(v.rows[8].warning.text=="UNKNOWN")
-print("PASS selected untouched enemies, dead/friendly cleanup and missing API fallback")
+m.combat=false; m.Event("PLAYER_REGEN_ENABLED"); assert(v.rows[8].alpha==0)
+print("PASS idle target suppression, combat target switching, dead/friendly cleanup and missing API fallback")

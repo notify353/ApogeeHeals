@@ -30,7 +30,9 @@ function R.Refresh()
     end
     M.Fill(R.model)
     local targetPresence, targetWarning = M.Sample("target")
-    local targetActive = targetPresence ~= "absent"
+    -- The reserved row serves combat target switching, not idle selection.
+    -- Existing encounter rows retain their stable slots independently.
+    local targetActive = InCombatLockdown() and targetPresence ~= "absent"
     local comparisonsOK, comparisonsPublic, selectedStable = true, true, false
     local count, visible = 0, 0
     for _ in pairs(R.model.entries) do count = count + 1 end

@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Hide the reserved threat target row outside combat, removing the idle selection
+  UNKNOWN placeholder while keeping stable encounter rows independent.
 - Preserve independent lead warnings when detailed threat is unavailable. Display
   restricted native warning risk, threat amount and aggro through native sinks;
   clear stale values on failure/removal. Solo and dungeon live retests remain pending.

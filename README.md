@@ -10,6 +10,7 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
   slots and one reserved selected-target slot follow normal Tab targeting with
   a yellow outline; duplicate target presentation is suppressed natively.
   Drag its header outside combat. Toggle **Tank threat stack** in Heals settings.
+  The reserved target row appears only during combat; idle selection adds no row.
 - Native warnings read LEAD, WEAK LEAD, NO LEAD, NO AGGRO or UNKNOWN.
   Independent aggro and native threat amounts appear below each mob. Restricted
   lead uses a native RISK 0-3 warning display, with discrete movement toward the
