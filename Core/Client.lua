@@ -11,7 +11,7 @@ function A.CheckClient()
         if type(_G[name]) ~= "function" then return false, "Missing client API: " .. name end
     end
     if not C_Timer or type(C_Timer.After) ~= "function" then return false, "Missing timer API." end
-    if tostring(build) ~= "70124" then
+    if tostring(build) ~= "70170" then
         print("Apogee Heals: unreviewed Forever build; in-game validation is required.")
     end
     return true

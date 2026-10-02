@@ -1,5 +1,15 @@
 # Forever API authority
 
+## Default-off threat stack (70170, 2026-10-01)
+
+Reviewed current UnitDetailedThreatSituation, UnitThreatLeadSituation,
+UnitThreatPercentageOfLead and UnitIsUnit declarations in the owner's fresh
+70170 export. The restriction contracts and native warning definition remain
+as described below. Matching-source tests verify current native lead dispatch,
+secret-capable text/bar/alpha sinks and existing healing contracts. The freshness
+check covers all required files. Interface remains 16001. This changes the default
+enable decision, not threat interpretation; native acceptance on 70170 is pending.
+
 ## Minimal tank threat stack (70124, 2026-09-29)
 
 Reviewed the refreshed local 1.60.1.70124 export; all required sources postdate

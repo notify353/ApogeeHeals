@@ -111,7 +111,7 @@ function M.New()
     GetTime = function() return m.time or 0 end
     UnitIsUnit = function(a, b) return a == b end
     WOW_PROJECT_ID = 1
-    GetBuildInfo = function() return "1.60.1", "70124", "", 16001 end
+    GetBuildInfo = function() return "1.60.1", "70170", "", 16001 end
     UnitCanAttack = function(_, unit) return m.units[unit] and m.units[unit].hostile == true end
     UnitDetailedThreatSituation, UnitThreatLeadSituation, GetRaidTargetIndex, C_NamePlate = nil, nil, nil, nil
     local secrets = setmetatable({}, {__mode = "k"})

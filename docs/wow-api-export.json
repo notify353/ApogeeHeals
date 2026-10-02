@@ -1,7 +1,7 @@
 {
-  "clientVersion": "1.60.1.70124",
+  "clientVersion": "1.60.1.70170",
   "interface": 16001,
-  "reviewedOn": "2026-09-29",
+  "reviewedOn": "2026-10-01",
   "requiredFiles": [
     "Blizzard_ActionBar/Shared/StanceBar.lua",
     "Blizzard_BuffFrame/BuffFrame.lua",

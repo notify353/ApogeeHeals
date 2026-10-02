@@ -1,7 +1,7 @@
 # Apogee Heals
 
 Minimal five-player healing frames for **WoW Forever 1.60.x, interface 16001**.
-Prototype 0.1.0-dev; reviewed against local export 1.60.1.70124. The owner confirmed incoming heals and reviewed
+Prototype 0.1.0-dev; reviewed against local export 1.60.1.70170. The owner confirmed incoming heals and reviewed
 the appearance in game; full live acceptance remains pending. Not released. Classic Era is deliberately unsupported.
 
 ## Prototype
