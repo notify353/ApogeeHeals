@@ -8,6 +8,7 @@ function A.ResetCharacter()
     ApogeeHealsDB = A.db
     A.BuffDefaults.pending = true
     A.Settings.ResetPositions()
+    A.Threat.ApplyEnabled()
     A.Bindings.Apply(); A.Buffs.Refresh(); A.Settings.Refresh()
     return true
 end
@@ -16,6 +17,7 @@ local function start()
     A.started = true
     A.View.Create(); A.Bindings.Apply(); A.Drinking.Resolve(); A.Settings.Create(); A.Runtime.Start()
     A.Minimap.Create()
+    A.Threat.Start()
     loader:UnregisterAllEvents()
 end
 loader:SetScript("OnEvent", function(_, event, loaded)

@@ -1,10 +1,28 @@
 # Apogee Heals
 
 Minimal five-player healing frames for **WoW Forever 1.60.x, interface 16001**.
-Prototype 0.1.0-dev; reviewed against local export 1.60.1.70009. The owner confirmed incoming heals and reviewed
+Prototype 0.1.0-dev; reviewed against local export 1.60.1.70170. The owner confirmed incoming heals and reviewed
 the appearance in game; full live acceptance remains pending. Not released. Classic Era is deliberately unsupported.
 
 ## Prototype
+
+- Independent eight-row tank threat stack, disabled by default. Seven stable mob
+  slots and one reserved selected-target slot follow normal Tab targeting with
+  a yellow outline; duplicate target presentation is suppressed natively.
+  Drag its header outside combat. Toggle **Tank threat stack** in Heals settings.
+  The reserved target row appears only during combat; idle selection adds no row.
+- Native warnings read LEAD, WEAK LEAD, NO LEAD, NO AGGRO or UNKNOWN.
+  Independent aggro and native threat amounts appear below each mob. Restricted
+  lead uses a native RISK 0-3 warning display, with discrete movement toward the
+  left as risk increases. This is not a numeric threat margin. Names use native text; raid markers
+  appear only when their indices are readable. Overflow shows an exact extra
+  count when identities permit, otherwise a total tracked count.
+- Coverage depends on exposed hostile nameplates plus the selected target.
+  Unavailable readings are unknown; restricted readings use native display sinks.
+  Continuous equal-threat-centered bars
+  could not be verified and are disabled; warnings do not imply a guaranteed
+  reaction window. This DEV prototype's dungeon warning timing, taint and rendering
+  require [live acceptance](docs/API_REFERENCE.md#minimal-tank-threat-stack-70124-2026-09-29).
 
 See [class support](docs/CLASS_SUPPORT.md) for the buff/cleanse matrix, yellow
 guidance, native weapon displays, limitations and live acceptance checks.

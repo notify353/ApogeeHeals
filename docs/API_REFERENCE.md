@@ -1,5 +1,119 @@
 # Forever API authority
 
+## October 1 client identification correction
+
+The fresh 70170 export defines WOW_PROJECT_CAMELOT = 18 and assigns
+WOW_PROJECT_ID to it in the Camelot ProjectConstants module. Its TOC selects
+that module for the camelot game type. Project 1 is only a legacy Forever
+identification fallback when version is 1.60.x, not a mandatory current ID.
+Runtime interface and patch numbers do not expire features: native Forever
+identity is accepted across version/interface changes, followed by required API
+checks. Other client families remain unsupported. Prior project-1-only policy
+and exact-interface statements below are historical and superseded.
+
+Current export contracts were inspected for the affected identity path. In
+Keybinds' changed Spell/Unit/SlashCommands sources, spell data remains nullable
+and restricted where annotated, cast event identifiers remain guarded, and native
+command registration remains the authority. This is a current-contract review,
+not a complete old/new diff or native acceptance.
+
+
+## Default-off threat stack (70170, 2026-10-01)
+
+Reviewed current UnitDetailedThreatSituation, UnitThreatLeadSituation,
+UnitThreatPercentageOfLead and UnitIsUnit declarations in the owner's fresh
+70170 export. The restriction contracts and native warning definition remain
+as described below. Matching-source tests verify current native lead dispatch,
+secret-capable text/bar/alpha sinks and existing healing contracts. The freshness
+check covers all required files. Interface remains 16001. This changes the default
+enable decision, not threat interpretation; native acceptance on 70170 is pending.
+
+## Minimal tank threat stack (70124, 2026-09-29)
+
+Reviewed the refreshed local 1.60.1.70124 export; all required sources postdate
+the current executable. Existing native-contract tests run against this export;
+earlier sections retain their historical review dates. The freshness manifest
+and runtime warning baseline now use 70124, with interface 16001 unchanged.
+
+UnitThreatLeadSituation(player, mob) returns 0-3: none, yellow, orange, red.
+Its documentation explicitly says red when the player is not first on threat.
+CompactUnitFrame's tank path calls this API and combines 1/2 into GAINING_THREAT_COLOR.
+The panel labels those public states WEAK LEAD, and 3 NO LEAD. A readable
+UnitDetailedThreatSituation isTanking=false with a valid status shows NO AGGRO.
+Lead readings are independent of detailed readings: native state 0 shows LEAD
+even if detailed participation is unavailable. A separate AGGRO/NO AGGRO/AGGRO ?
+line prevents lead from implying aggro. Missing or malformed lead shows UNKNOWN.
+Restricted lead goes directly to SetFormattedText("RISK %.0f/3") and SetValue
+on a reverse-filled, Immediate 0-3 warning bar. This is a discrete native warning
+scale (0 none, 1 yellow, 2 orange, 3 red), not a margin or percentage. Restricted
+isTanking uses native boolean-to-alpha for separate precreated aggro labels.
+Detailed threatValue goes directly to native SetFormattedText("Threat %.0f");
+no Classic divide-by-100 scaling is applied on Forever. Failed sinks clear their
+presentation. No restricted number is formatted, compared or cached by Lua.
+A previously tracked hostile mob whose readings become unavailable stays
+in its slot as UNKNOWN. The reserved selected-target row is active only during
+player combat; idle selection shows no placeholder. An untouched hostile target
+selected during combat may show UNKNOWN. Stable encounter rows remain independent.
+The documented MayReturnNothing contract cannot establish an exact zero threat.
+Fresh mobs with a readable nil status and no lead reading are not admitted.
+An independently available lead reading establishes participation for tracking.
+Uncertain participation/hostility is conservatively shown as UNKNOWN, not classified
+as safe or silently discarded. Readable dead/friendly/missing units are cleared.
+
+UnitThreatPercentageOfLead is present and restriction-marked but has no numeric
+definition in this export. TargetFrame uses it while tanking and rawPercentage
+otherwise; that does not establish a continuous equal-threat-centered transform.
+Both numeric values and threat states may be secret. No native numeric transform
+or live dungeon test establishes the requested center semantics, so continuous
+movement is disabled. This prototype uses labeled discrete warnings, no simulated progress.
+
+Reference review (2026-09-30): Threat Plates 13.3.0-beta3 explicitly supports
+Forever, selects the unscaled modern detailed-threat API and disables legacy
+off-tank/heuristic paths on its modern API surface. Its source is GPLv3 and was
+reviewed as a reference only; no code was copied. References:
+[Forever release](https://github.com/Backupiseasy/ThreatPlates/releases/tag/13.3.0-beta3),
+[API selection](https://github.com/Backupiseasy/ThreatPlates/blob/b585e39b31fe46eb2c6414be14f695a258da9148/Init.lua),
+[heuristic restrictions](https://github.com/Backupiseasy/ThreatPlates/blob/b585e39b31fe46eb2c6414be14f695a258da9148/Modules/Threat.lua).
+This review does not establish what the user's live solo APIs return. The
+reported UNKNOWN case remains a live retest requirement after the sink fix.
+
+Nameplate added/removed events own token lifetimes; bootstrap reads GetNamePlates
+and the matching NamePlateBaseMixin:GetUnit only after a public IsForbidden=false.
+No nameplate internals, GUIDs or names serve as keys. Public acquisition sequence
+fills seven fixed slots without rearranging survivors; overflow waits in that
+sequence. A separately reserved eighth row uses fixed target and native duplicate
+suppression. Event refresh plus a bounded 0.2-second active refresh rereads current
+values; disabling/world exit clears tracking and stops polling. No restricted
+threat result is cached. Only position and the enable toggle enter SavedVariables.
+The panel defaults off. Only an explicit saved true enables tracking, presentation
+and polling; the Tank threat stack settings checkbox is unchecked by default.
+Existing explicit choices persist, and character Defaults restores the off state.
+
+UnitIsUnit may return a secret boolean. EvaluateColorValueFromBoolean and SetAlpha
+are AllowedWhenTainted; conversion feeds the highlight's alpha directly. Seven
+precreated native alpha parents suppress the reserved target when any stable row
+matches, without addon boolean combination, alpha/visibility readback or combat
+layout writes. Unavailable comparisons clear highlighting and suppress the reserved
+row with Target match unknown. Exact overflow deduplication uses public matches
+only; secret matches use an honest total tracked count. UnitName reaches native
+text sinks via existing PaintFullName. GetRaidTargetIndex has SecretReturns=true:
+only a readable 1-8 index draws its marker; unavailable markers clear stale icons.
+
+Mock tests cover state distinctions, secret/malformed results, stable slots,
+normal target changes, overflow, token reuse, native boolean passthrough, polling,
+zoning, disabled state, dragging, persistence and reset isolation. Matching-source
+tests execute Blizzard's tank lead dispatch and verify the sink/event contracts.
+They do not reproduce engine restrictions or establish early-warning timing.
+
+Live acceptance after DEV activation: enable enemy nameplates, pull multiple mobs,
+Tab normally and verify the yellow target outline moves while other rows stay put.
+Observe a competitor approach and exceed your threat, then lose/recover aggro;
+compare WEAK LEAD/NO LEAD/NO AGGRO with native Blizzard indicators. Record whether
+WEAK LEAD precedes actual loss; there is no promised threshold or warning interval.
+Check target outside the first seven, restricted-name/marker/comparison behavior,
+threat wipes, dead/despawned mobs, zoning and out-of-combat dragging/reload.
+Live engine rendering, taint and warning timing remain pending owner acceptance.
+
 ## Restricted unit names (70009, 2026-09-27)
 
 Target, target-of-target and party labels pass UnitName's first return directly

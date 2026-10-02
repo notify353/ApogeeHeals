@@ -80,6 +80,7 @@ function M.New()
     function methods:GetStatusBarTexture() return self.fill end
     function methods:SetMinMaxValues(lo, hi) assert(hi ~= nil); self.min, self.max = lo, hi end
     function methods:SetValue(v) assert(v ~= nil); self.value = v end
+    function methods:SetReverseFill(v) self.reverseFill = v end
     function methods:SetTimerDuration(duration, interpolation, direction)
         assert(duration ~= nil)
         if m.timerError then error("native timer unavailable") end
@@ -110,7 +111,9 @@ function M.New()
     GetTime = function() return m.time or 0 end
     UnitIsUnit = function(a, b) return a == b end
     WOW_PROJECT_ID = 1
-    GetBuildInfo = function() return "1.60.1", "70009", "", 16001 end
+    GetBuildInfo = function() return "1.60.1", "70170", "", 16001 end
+    UnitCanAttack = function(_, unit) return m.units[unit] and m.units[unit].hostile == true end
+    UnitDetailedThreatSituation, UnitThreatLeadSituation, GetRaidTargetIndex, C_NamePlate = nil, nil, nil, nil
     local secrets = setmetatable({}, {__mode = "k"})
     function m.Secret()
         local x = setmetatable({}, { __add = function() error("secret arithmetic") end,

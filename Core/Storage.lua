@@ -56,6 +56,12 @@ function A.Storage.Open(saved)
     -- never initializes from it or writes session drags back to it.
     local angle
     if type(saved) == "table" then angle = saved.minimapAngle end
+    local threatPosition = type(saved) == "table" and saved.threatPosition
+    if type(threatPosition) == "table" and finite(threatPosition.x) and finite(threatPosition.y) then
+        threatPosition = {x=threatPosition.x, y=threatPosition.y}
+    else threatPosition = nil end
+    local threatEnabled
+    if type(saved) == "table" and type(saved.threatEnabled) == "boolean" then threatEnabled = saved.threatEnabled end
     return { version = 3, position = { x = position.x, y = position.y }, bindings = bindings, buffs = buffs,
-        minimapAngle = angle, editorPosition = editorPosition }
+        minimapAngle = angle, editorPosition = editorPosition, threatPosition = threatPosition, threatEnabled = threatEnabled }
 end

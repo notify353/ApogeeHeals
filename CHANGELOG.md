@@ -1,5 +1,23 @@
 ## Unreleased
 
+- Recognize Forever's native Camelot project identity and retain legacy client
+  identification. Stop rejecting compatible Forever clients because their
+  interface number differs; required API and family-isolation checks remain.
+
+
+- Default the prototype threat stack off; opt in with its existing settings
+  checkbox. Disabled panels perform no threat reads or polling; explicit choices persist.
+- Hide the reserved threat target row outside combat, removing the idle selection
+  UNKNOWN placeholder while keeping stable encounter rows independent.
+- Preserve independent lead warnings when detailed threat is unavailable. Display
+  restricted native warning risk, threat amount and aggro through native sinks;
+  clear stale values on failure/removal. Solo and dungeon live retests remain pending.
+- Add a movable eight-row tank threat stack with stable mob slots, normal-target
+  highlighting, explicit native lead/aggro warnings and conservative unknown states.
+  Keep continuous centered bars disabled pending proof; live dungeon acceptance
+  is separate from mock/source checks and central DEV installation.
+- Refresh the Forever API baseline to 1.60.1.70124 and review threat/nameplate sinks.
+
 - Add one confirmed top-right Defaults button combining settings and position resets.
 
 # Changelog
