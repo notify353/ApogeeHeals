@@ -1,5 +1,9 @@
 ## Unreleased
 
+- Add a settings-enabled solo threat demo using the live row layout, scripted
+  animation and warning examples. No live threat reads or saved demo state;
+  combat closes the demo and restores the configured live meter.
+
 - Replace raw threat totals with prototype relative-threat bars using native
   tank/non-tank percentage selection, a fixed 0-200 scale and 100 reference tick.
   Preserve stable rows, targeting and independent warnings; clear unusable data.

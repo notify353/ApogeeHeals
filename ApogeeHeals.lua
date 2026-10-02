@@ -8,7 +8,7 @@ function A.ResetCharacter()
     ApogeeHealsDB = A.db
     A.BuffDefaults.pending = true
     A.Settings.ResetPositions()
-    A.Threat.ApplyEnabled()
+    A.Threat.demo = false; A.Threat.ApplyEnabled()
     A.ThreatDiagnostics.SetEnabled(false)
     A.Bindings.Apply(); A.Buffs.Refresh(); A.Settings.Refresh()
     return true

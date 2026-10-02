@@ -6,6 +6,15 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 
 ## Prototype
 
+- **Threat demo (solo preview; ends in combat)** in Heals settings previews the
+  same threat rows without a group or live threat reads. It shows strong/weak
+  leads, loss of lead/aggro, unknown/no-comparison states, raid markers and the
+  target outline. One sample bar loses and rebuilds threat over a 24-second loop.
+  The DEMO label and footer identify fictional data; its thresholds are visual
+  examples, not gameplay rules. Drag the header to review placement. Uncheck the
+  demo to restore the live meter's saved enabled state. Combat, zoning, reload
+  and Defaults end the demo. The demo toggle is not saved.
+
 - Optional **Threat checks (freeze after combat; until reload)** in Heals settings
   opens a movable diagnostic panel independently of the tank threat stack.
   Enable it before combat and select a living enemy. Seven fields show separate

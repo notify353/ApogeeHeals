@@ -194,13 +194,16 @@ function V.PaintNative(row, unit)
         row.risk:SetValue(lead); row.risk:SetAlpha(1)
     end
 end
-function V.Paint(row, unit, warning)
-    row.unit = unit; row:SetAlpha(1)
-    A.UnitAPI.PaintFullName(row.name, unit)
+function V.PaintWarning(row, warning)
     local info = warnings[warning] or warnings.unknown
     row.warning:SetText(info[1]); row.warning:SetTextColor(info[2],info[3],info[4],1)
     row.strip:SetColorTexture(info[2],info[3],info[4],1)
     row.relative:SetStatusBarColor(info[2],info[3],info[4],1)
+end
+function V.Paint(row, unit, warning)
+    row.unit = unit; row:SetAlpha(1)
+    A.UnitAPI.PaintFullName(row.name, unit)
+    V.PaintWarning(row, warning)
     V.PaintNative(row, unit)
     row.marker:SetAlpha(0)
     local marker = A.Access.Read(GetRaidTargetIndex, unit)
@@ -208,4 +211,46 @@ function V.Paint(row, unit, warning)
         local column, line = (marker-1)%4, math.floor((marker-1)/4)
         row.marker:SetTexCoord(column/4,(column+1)/4,line/2,(line+1)/2); row.marker:SetAlpha(1)
     end
+end
+
+local demoRows = {
+    {"Training Brute", "lead", 220, true},
+    {"Training Berserker", "lead", 160, true},
+    {"Training Mystic", "weak", 112, true},
+    {"Training Scout", "noLead", 95, true},
+    {"Training Hound", "noAggro", 70, false},
+    {"Unknown reading", "unknown", nil, nil},
+    {"Solo comparison", "lead", nil, true, "NO COMPARISON"},
+    {"Selected enemy", "lead", 145, true},
+}
+function V.PaintDemo(time)
+    -- Fictional animation thresholds are visual examples, never live rules.
+    local phase = (time % 24) / 12
+    local depth = phase <= 1 and phase or 2-phase
+    depth = depth*depth*(3-2*depth)
+    for i, sample in ipairs(demoRows) do
+        local row = V.rows[i]
+        V.ClearRow(row); row:SetAlpha(1); row.name:SetText(sample[1])
+        local warning, percentage, tanking = sample[2], sample[3], sample[4]
+        if i == 2 then
+            percentage = 180-110*depth
+            if percentage < 85 then warning, tanking = "noAggro", false
+            elseif percentage < 100 then warning = "noLead"
+            elseif percentage < 125 then warning = "weak" end
+        end
+        V.PaintWarning(row, warning)
+        row.amount:SetText(sample[5] or "NO DATA")
+        if percentage then
+            row.relative:SetValue(percentage); row.relative:SetAlpha(1)
+            row.amount:SetFormattedText("Relative %.0f%%", percentage)
+        end
+        row.aggro[tanking == nil and 3 or (tanking and 1 or 2)]:SetAlpha(1)
+        if i <= 5 then
+            local marker = i-1
+            row.marker:SetTexCoord((marker%4)/4,((marker%4)+1)/4,math.floor(marker/4)/2,(math.floor(marker/4)+1)/2)
+            row.marker:SetAlpha(1)
+        end
+        row.selection:SetAlpha(i == 8 and 1 or 0)
+    end
+    V.footer:SetText("DEMO - scripted values, not live threat")
 end

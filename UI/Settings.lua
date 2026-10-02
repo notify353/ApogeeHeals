@@ -22,6 +22,10 @@ function S.Refresh()
         S.threatDiagnostics:SetEnabled(not InCombatLockdown())
         S.threatDiagnostics:SetChecked(A.ThreatDiagnostics.enabled)
     end
+    if S.threatDemo then
+        S.threatDemo:SetEnabled(not InCombatLockdown())
+        S.threatDemo:SetChecked(A.Threat.demo == true)
+    end
 end
 function S.Create()
     if not Settings or not Settings.RegisterCanvasLayoutCategory then return end
@@ -50,6 +54,12 @@ function S.Create()
     S.threatDiagnostics:SetScript("OnClick", function(button)
         A.ThreatDiagnostics.SetEnabled(button:GetChecked()); S.Refresh()
     end)
+    S.threatDemo = CreateFrame("CheckButton", nil, panel, "UICheckButtonTemplate")
+    S.threatDemo:SetPoint("TOPLEFT", 12, -178); S.threatDemo:SetSize(24, 24)
+    local demoLabel = A.Style.Text(panel, 11)
+    demoLabel:SetPoint("LEFT", S.threatDemo, "RIGHT", 4, 0)
+    demoLabel:SetText("Threat demo (solo preview; ends in combat)")
+    S.threatDemo:SetScript("OnClick", function(button) A.Threat.SetDemo(button:GetChecked()) end)
     StaticPopupDialogs.APOGEE_HEALS_RESET_CHARACTER = {
         text = "Restore Apogee Heals defaults for this character?\n\nClears healing assignments, buff reminders and positions and restores defaults. This cannot be undone.\n\nOther characters, other addons and WoW keybindings are unchanged.",
         button1 = "Defaults", button2 = CANCEL or "Cancel",

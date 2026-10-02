@@ -21,7 +21,7 @@ function R.Discover()
     end
 end
 function R.Refresh()
-    if R.suspended or A.db.threatEnabled ~= true then return end
+    if R.demo or R.suspended or A.db.threatEnabled ~= true then return end
     for unit in pairs(R.exposed) do
         local presence, warning = M.Sample(unit)
         -- An API failure does not establish safety or absence. Keep an unknown
@@ -76,6 +76,15 @@ function R.Refresh()
 end
 function R.ApplyEnabled()
     R.Reset()
+    V.title:SetText(R.demo and "DEMO threat - drag to move" or "Threat - drag to move")
+    if R.demo and not R.suspended then
+        R.demoTime = 0; V.root:Show(); V.PaintDemo(0)
+        R.frame:SetScript("OnUpdate", function(_, elapsed)
+            R.demoTime = R.demoTime + elapsed; R.elapsed = R.elapsed + elapsed
+            if R.elapsed >= 0.05 then R.elapsed = 0; V.PaintDemo(R.demoTime) end
+        end)
+        return
+    end
     local enabled = A.db.threatEnabled == true and not R.suspended
     V.root:SetShown(enabled)
     R.frame:SetScript("OnUpdate", enabled and function(_, elapsed)
@@ -83,6 +92,10 @@ function R.ApplyEnabled()
         if R.elapsed >= 0.2 then R.elapsed = 0; R.Refresh() end
     end or nil)
     if enabled then R.Discover(); R.Refresh() end
+end
+function R.SetDemo(enabled)
+    if InCombatLockdown() or R.suspended then return end
+    R.demo = enabled == true; R.ApplyEnabled(); A.Settings.Refresh()
 end
 function R.SetEnabled(enabled)
     if InCombatLockdown() then return end
@@ -98,13 +111,15 @@ function R.Start()
     end
     R.frame:SetScript("OnEvent", function(_, event, unit)
         if event == "PLAYER_LEAVING_WORLD" then
-            V.StopMoving(false); R.suspended = true; R.ApplyEnabled(); return
+            V.StopMoving(false); R.demo = false; R.suspended = true; R.ApplyEnabled(); A.Settings.Refresh(); return
         elseif event == "PLAYER_ENTERING_WORLD" then
             R.suspended = nil; R.ApplyEnabled(); return
-        elseif event == "PLAYER_REGEN_DISABLED" then V.StopMoving(false)
+        elseif event == "PLAYER_REGEN_DISABLED" then
+            V.StopMoving(false)
+            if R.demo then R.demo = false; R.ApplyEnabled(); A.Settings.Refresh() end
         elseif event == "PLAYER_REGEN_ENABLED" then V.Place(); A.Settings.Refresh()
         elseif event == "UI_SCALE_CHANGED" or event == "DISPLAY_SIZE_CHANGED" then V.Place() end
-        if R.suspended or A.db.threatEnabled ~= true then return end
+        if R.demo or R.suspended or A.db.threatEnabled ~= true then return end
         if event == "NAME_PLATE_UNIT_ADDED" and nameplate(unit) then
             -- Each added lifetime is new, even if the engine reuses the token.
             M.Remove(R.model, unit); R.exposed[unit] = true
