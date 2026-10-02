@@ -1,7 +1,7 @@
 local _, A = ...
 local V, S = {}, A.Style
 A.ThreatView = V
-local width, rowHeight, header = 96, 9, 7
+local width, rowHeight, header = 96, 7.5, 7
 local warnings = {
     lead={"LEAD", 0.28,0.74,0.46}, weak={"WEAK LEAD", 0.90,0.74,0.22},
     noLead={"NO LEAD", 0.92,0.48,0.24}, noAggro={"NO AGGRO", 0.86,0.30,0.30},

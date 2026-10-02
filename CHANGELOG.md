@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Tighten live/demo threat row gaps to a thin separator without changing bar thickness.
+
 - Remove HP strips and health reads from live/demo threat rows, shortening rows
   to keep attention on centered threat, warning colors and target selection.
 
