@@ -57,6 +57,9 @@ sequence. A separately reserved eighth row uses fixed target and native duplicat
 suppression. Event refresh plus a bounded 0.2-second active refresh rereads current
 values; disabling/world exit clears tracking and stops polling. No restricted
 threat result is cached. Only position and the enable toggle enter SavedVariables.
+The panel defaults off. Only an explicit saved true enables tracking, presentation
+and polling; the Tank threat stack settings checkbox is unchecked by default.
+Existing explicit choices persist, and character Defaults restores the off state.
 
 UnitIsUnit may return a secret boolean. EvaluateColorValueFromBoolean and SetAlpha
 are AllowedWhenTainted; conversion feeds the highlight's alpha directly. Seven

@@ -21,7 +21,7 @@ function R.Discover()
     end
 end
 function R.Refresh()
-    if R.suspended or A.db.threatEnabled == false then return end
+    if R.suspended or A.db.threatEnabled ~= true then return end
     for unit in pairs(R.exposed) do
         local presence, warning = M.Sample(unit)
         -- An API failure does not establish safety or absence. Keep an unknown
@@ -76,7 +76,7 @@ function R.Refresh()
 end
 function R.ApplyEnabled()
     R.Reset()
-    local enabled = A.db.threatEnabled ~= false and not R.suspended
+    local enabled = A.db.threatEnabled == true and not R.suspended
     V.root:SetShown(enabled)
     R.frame:SetScript("OnUpdate", enabled and function(_, elapsed)
         R.elapsed = R.elapsed + elapsed
@@ -104,7 +104,7 @@ function R.Start()
         elseif event == "PLAYER_REGEN_DISABLED" then V.StopMoving(false)
         elseif event == "PLAYER_REGEN_ENABLED" then V.Place(); A.Settings.Refresh()
         elseif event == "UI_SCALE_CHANGED" or event == "DISPLAY_SIZE_CHANGED" then V.Place() end
-        if R.suspended or A.db.threatEnabled == false then return end
+        if R.suspended or A.db.threatEnabled ~= true then return end
         if event == "NAME_PLATE_UNIT_ADDED" and nameplate(unit) then
             -- Each added lifetime is new, even if the engine reuses the token.
             M.Remove(R.model, unit); R.exposed[unit] = true

@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Default the prototype threat stack off; opt in with its existing settings
+  checkbox. Disabled panels perform no threat reads or polling; explicit choices persist.
 - Hide the reserved threat target row outside combat, removing the idle selection
   UNKNOWN placeholder while keeping stable encounter rows independent.
 - Preserve independent lead warnings when detailed threat is unavailable. Display

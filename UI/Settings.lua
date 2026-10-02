@@ -15,7 +15,7 @@ function S.Refresh()
     S.buffs:SetEnabled(not InCombatLockdown())
     if S.threat then
         S.threat:SetEnabled(not InCombatLockdown())
-        S.threat:SetChecked(A.db.threatEnabled ~= false)
+        S.threat:SetChecked(A.db.threatEnabled == true)
     end
     S.cleanseStatus:SetText(A.Cleansing.status or "Purify configuration is pending.")
 end

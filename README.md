@@ -6,7 +6,7 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 
 ## Prototype
 
-- Independent eight-row tank threat stack, enabled by default. Seven stable mob
+- Independent eight-row tank threat stack, disabled by default. Seven stable mob
   slots and one reserved selected-target slot follow normal Tab targeting with
   a yellow outline; duplicate target presentation is suppressed natively.
   Drag its header outside combat. Toggle **Tank threat stack** in Heals settings.
