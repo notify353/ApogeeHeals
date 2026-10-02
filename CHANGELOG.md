@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Add optional session-only threat checks with Lua-read and native-call PASS/FAIL
+  results. Failures latch during combat and freeze afterward for screenshots.
+
 - Recognize Forever's native Camelot project identity and retain legacy client
   identification. Stop rejecting compatible Forever clients because their
   interface number differs; required API and family-isolation checks remain.

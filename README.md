@@ -6,6 +6,16 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 
 ## Prototype
 
+- Optional **Threat checks (freeze after combat; until reload)** in Heals settings
+  opens a movable diagnostic panel independently of the tank threat stack.
+  Enable it before combat and select a living enemy. Seven fields show separate
+  Lua-read and native-display-call PASS/FAIL checks. Any failure stays latched for
+  that fight, with the first Lua failure reason. Periods with no target or a
+  friendly/dead target are skipped. Results freeze after combat for screenshots; the next fight
+  starts fresh. `--` means no sample. Display PASS means the native call accepted
+  the value, not proof of rendering or correct percentage semantics. Only public
+  check outcomes are retained for this session; no threat samples are saved.
+
 - Independent eight-row tank threat stack, disabled by default. Seven stable mob
   slots and one reserved selected-target slot follow normal Tab targeting with
   a yellow outline; duplicate target presentation is suppressed natively.

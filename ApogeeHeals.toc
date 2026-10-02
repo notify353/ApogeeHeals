@@ -30,4 +30,5 @@ PartyFrames/Runtime.lua
 Threat/Model.lua
 Threat/View.lua
 Threat/Runtime.lua
+Threat/Diagnostics.lua
 ApogeeHeals.lua

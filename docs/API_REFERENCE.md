@@ -1,5 +1,24 @@
 # Forever API authority
 
+## Combat threat diagnostics (70170, 2026-10-02)
+
+Rechecked the fresh export before implementation. UnitDetailedThreatSituation
+returns isTanking, status, scaledPercentage, rawPercentage and rawThreat;
+UnitThreatLeadSituation and UnitThreatPercentageOfLead add independent values.
+Probes use fixed player/target tokens. Access.Readable guards Lua inspection;
+restricted values reach only native SetFormattedText or boolean-to-alpha sinks.
+Only public success flags and failure categories are retained, never raw values
+or native readbacks. Sinks clear immediately. Display-call PASS confirms no
+thrown exception, not rendering, taint safety or percentage semantics.
+
+The session-only setting is independent of the threat stack. Events and a
+0.2-second combat-only poll sample confirmed living attackable targets. Failures
+latch until next combat. Combat exit stops polling and freezes screenshot results.
+World exit suspends/freezes; disabling, reload and Defaults clear the session.
+Target gaps are skipped; no samples means dashes, never PASS. Mocks cover secret
+passthrough, failure latching, freeze and lifecycle. Native combat behavior and
+screenshot usability still require owner acceptance.
+
 ## October 1 client identification correction
 
 The fresh 70170 export defines WOW_PROJECT_CAMELOT = 18 and assigns
