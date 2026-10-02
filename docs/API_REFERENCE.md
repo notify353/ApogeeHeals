@@ -1,5 +1,35 @@
 # Forever API authority
 
+## Relative threat bar prototype (70170, 2026-10-02)
+
+Owner solo screenshot: 133 attempts, 119 periodic polls, 24.7 seconds combat,
+first/last attempts at 0.0/23.8 seconds, longest gap 0.9 seconds; all seven read
+and native-call checks passed. This establishes the observed solo access only.
+
+Rechecked the fresh export and native UnitFrame_UpdateThreatIndicator. Its
+numeric display selects rawPercentage, replacing it with
+UnitThreatPercentageOfLead while isTanking is true, and hides zero. Added that
+source to export freshness checks and matching-source assertions. The new
+prototype mirrors the selector only when the boolean is publicly readable.
+Restricted percentages pass directly to SetValue and SetFormattedText; restricted
+selectors leave NO DATA rather than branching. Numeric invalid/missing inputs
+clear stale fill. Tank lead zero shows NO COMPARISON, not zero threat or safety.
+
+Fixed native range 0-200, left-to-right fill and a center tick at 100 provide a
+reviewable scale without numeric transforms. The label shows the original native
+percentage above the visual cap. No equal-threat, pull threshold, competitor
+identity or seconds-to-loss claim is made from this undocumented percentage.
+Native aggro/lead warnings remain separate and determine row colors. Seven
+stable slots, target deduplication and diagnostics are unchanged. All layout is
+created outside combat; no protected actions or layout writes were added.
+
+This supersedes the earlier disabled-continuous-bar presentation, under explicit
+owner approval to build a prototype using native percentage selection. It does
+not resolve the export's missing numeric definition. Validate with a competitor
+building and losing threat, and solo/no-comparison cases; compare against native
+numeric threat. Mocks check selection, direction, cap contract, missing/secret
+fallbacks and clearing; actual rendering and group semantics remain pending.
+
 ## Combat threat diagnostics (70170, 2026-10-02)
 
 Rechecked the fresh export before implementation. UnitDetailedThreatSituation

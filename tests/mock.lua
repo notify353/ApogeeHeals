@@ -113,7 +113,7 @@ function M.New()
     WOW_PROJECT_ID = 1
     GetBuildInfo = function() return "1.60.1", "70170", "", 16001 end
     UnitCanAttack = function(_, unit) return m.units[unit] and m.units[unit].hostile == true end
-    UnitDetailedThreatSituation, UnitThreatLeadSituation, GetRaidTargetIndex, C_NamePlate = nil, nil, nil, nil
+    UnitDetailedThreatSituation, UnitThreatLeadSituation, UnitThreatPercentageOfLead, GetRaidTargetIndex, C_NamePlate = nil, nil, nil, nil, nil
     local secrets = setmetatable({}, {__mode = "k"})
     function m.Secret()
         local x = setmetatable({}, { __add = function() error("secret arithmetic") end,

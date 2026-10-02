@@ -1,5 +1,10 @@
 ## Unreleased
 
+- Replace raw threat totals with prototype relative-threat bars using native
+  tank/non-tank percentage selection, a fixed 0-200 scale and 100 reference tick.
+  Preserve stable rows, targeting and independent warnings; clear unusable data.
+  Grouped percentage semantics and live rendering remain pending acceptance.
+
 - Show frozen combat sampling coverage: total/polled samples, skipped checks,
   combat duration, first/last sample times and the longest unsampled gap.
 

@@ -47,4 +47,8 @@ for lead=0,3 do
     state=lead; assert(native({optionTable={usePlayerForAggroHighlightThreat=true},displayedUnit="nameplate1"})==lead)
 end
 assert(calls==4)
+local unitFrame=read("Blizzard_UnitFrame/Mainline/UnitFrame.lua")
+assert(unitFrame:find("local display = rawPercentage;",1,true))
+assert(unitFrame:find("display = UnitThreatPercentageOfLead(indicator.feedbackUnit, indicator.unit);",1,true))
+assert(unitFrame:find("if ( display and display ~= 0 ) then",1,true))
 print("PASS matching-export native tank lead dispatch, warning grouping, restrictions, nameplate and alpha contracts; live engine acceptance pending")

@@ -24,18 +24,24 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
   a yellow outline; duplicate target presentation is suppressed natively.
   Drag its header outside combat. Toggle **Tank threat stack** in Heals settings.
   The reserved target row appears only during combat; idle selection adds no row.
-- Native warnings read LEAD, WEAK LEAD, NO LEAD, NO AGGRO or UNKNOWN.
-  Independent aggro and native threat amounts appear below each mob. Restricted
-  lead uses a native RISK 0-3 warning display, with discrete movement toward the
-  left as risk increases. This is not a numeric threat margin. Names use native text; raid markers
-  appear only when their indices are readable. Overflow shows an exact extra
-  count when identities permit, otherwise a total tracked count.
+- Each enemy has a right-filling **relative threat** bar with a fixed prototype
+  scale: 0% left, 100% center tick, 200% full. The numeric label continues above
+  200% while the fill caps. Larger reported percentages move right; decreasing
+  percentages move left. This replaces the raw threat total. The percentage
+  selection follows Blizzard's own UI: percentage-of-lead while tanking, raw
+  percentage otherwise. The midpoint is a reference, not an aggro-loss threshold;
+  this prototype still needs grouped validation of percentage semantics.
+- Warnings remain separate: green LEAD, yellow WEAK LEAD, orange NO LEAD,
+  red NO AGGRO, gray UNKNOWN. The aggro line remains independent. A tank lead
+  reading of zero shows NO COMPARISON with no fill; missing/invalid readings or
+  an unreadable tanking selector show NO DATA. Restricted percentages go directly
+  to native display sinks, without Lua arithmetic. Restricted warning states
+  retain the native RISK 0-3 display; it is separate from the relative bar.
 - Coverage depends on exposed hostile nameplates plus the selected target.
-  Unavailable readings are unknown; restricted readings use native display sinks.
-  Continuous equal-threat-centered bars
-  could not be verified and are disabled; warnings do not imply a guaranteed
-  reaction window. This DEV prototype's dungeon warning timing, taint and rendering
-  require [live acceptance](docs/API_REFERENCE.md#minimal-tank-threat-stack-70124-2026-09-29).
+  Raid markers appear when readable. Overflow shows an exact extra count when
+  identities permit, otherwise a tracked count. Native combat rendering and
+  grouped warning/percentage behavior still require live acceptance. No bar
+  predicts time until aggro loss or guarantees a reaction window.
 
 See [class support](docs/CLASS_SUPPORT.md) for the buff/cleanse matrix, yellow
 guidance, native weapon displays, limitations and live acceptance checks.

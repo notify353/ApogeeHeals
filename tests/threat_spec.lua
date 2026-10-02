@@ -14,6 +14,10 @@ local function setup(saved, useDefaults)
         if m.leadError then error("unavailable") end
         return m.units[unit] and m.units[unit].lead
     end
+    UnitThreatPercentageOfLead = function(player, unit)
+        assert(player == "player")
+        return m.units[unit] and m.units[unit].leadPercent
+    end
     GetRaidTargetIndex = function(unit) return m.units[unit] and m.units[unit].marker end
     UnitIsUnit = function(first, second)
         m.pairReads = m.pairReads + 1
@@ -27,7 +31,7 @@ local function setup(saved, useDefaults)
     function m.Mob(index, tanking, status, lead)
         local token = "nameplate" .. index
         m.units[token] = {name="Mob " .. index, hostile=true, tanking=tanking, threatStatus=status,
-            lead=lead, health=50, maxHealth=100, power=0, maxPower=0, kind=0, auras={}}
+            lead=lead, leadPercent=150, health=50, maxHealth=100, power=0, maxPower=0, kind=0, auras={}}
         m.Event("NAME_PLATE_UNIT_ADDED", token); return token
     end
     function m.Target(token)
@@ -96,21 +100,46 @@ end
 r.Refresh()
 assert(row.warning.text=="native risk" and row.warning.nativePattern=="RISK %.0f/3")
 assert(rawequal(row.risk.value,secretLead) and row.risk.alpha==1 and row.risk.reverseFill)
-assert(rawequal(row.amount.nativeValue,secretAmount) and row.amount.text=="native amount")
+assert(row.amount.text=="NO DATA" and row.relative.alpha==0) -- secret selector cannot choose a percentage
 assert(issecretvalue(row.aggro[1].alpha) and issecretvalue(row.aggro[2].alpha) and row.aggro[3].alpha==0)
 assert(r.model.entries[unit].warning=="unknown")
 for _,entry in pairs(r.model.entries) do for _,value in pairs(entry) do assert(not issecretvalue(value)) end end
 m.units[unit].amount=42; m.units[unit].tanking=true; m.units[unit].threatStatus=nil; m.units[unit].lead=1
-r.Refresh(); assert(row.warning.text=="WEAK LEAD" and row.amount.text=="Threat 42")
+r.Refresh(); assert(row.warning.text=="WEAK LEAD" and row.amount.text=="Relative 150%")
 assert(row.aggro[1].alpha==1 and row.aggro[2].alpha==0 and row.aggro[3].alpha==0)
 m.units[unit].amount=nil; m.units[unit].tanking=nil; m.units[unit].lead=nil
-r.Refresh(); assert(row.amount.text=="" and row.warning.text=="UNKNOWN" and row.risk.alpha==0 and row.risk.value==0)
+r.Refresh(); assert(row.amount.text=="NO DATA" and row.warning.text=="UNKNOWN" and row.risk.alpha==0 and row.risk.value==0)
 assert(row.aggro[1].alpha==0 and row.aggro[2].alpha==0 and row.aggro[3].alpha==1)
 m.units[unit].lead=secretLead; row.warning.SetFormattedText=function() error("sink unavailable") end
 r.Refresh(); assert(row.warning.text=="UNKNOWN" and row.risk.alpha==0)
 m.Event("NAME_PLATE_UNIT_REMOVED",unit)
 assert(row.amount.text=="" and row.risk.alpha==0 and row.risk.value==0 and row.aggro[3].alpha==0)
-print("PASS independent solo lead, native opaque risk/amount/aggro sinks, failures and stale-data cleanup")
+print("PASS independent solo lead, native opaque risk/aggro sinks, secret selector fallback and stale-data cleanup")
+
+m,a,r,v=setup(); unit=m.Mob(1,true,3,0); row=v.rows[1]
+assert(row.relative.min==0 and row.relative.max==200 and row.relative.reverseFill==false)
+for _,percent in ipairs({90,100,125,200,350}) do
+    m.units[unit].leadPercent=percent; r.Refresh()
+    assert(row.relative.value==percent and row.relative.alpha==1)
+    assert(row.amount.text=="Relative "..percent.."%")
+end
+m.units[unit].leadPercent=0; r.Refresh()
+assert(row.amount.text=="NO COMPARISON" and row.relative.alpha==0 and row.relative.value==0)
+m.units[unit].tanking=false; m.units[unit].percent=80; m.units[unit].lead=3; r.Refresh()
+assert(row.relative.value==80 and row.warning.text=="NO AGGRO" and row.relative.color[1]==0.86)
+m.units[unit].percent=0; r.Refresh(); assert(row.relative.alpha==1 and row.amount.text=="Relative 0%")
+local opaque=m.Secret(); m.units[unit].percent=opaque
+row.amount.SetFormattedText=function(self,pattern,value)
+    assert(pattern=="Relative %.0f%%" and rawequal(value,opaque)); self.text="native relative"
+end
+r.Refresh(); assert(rawequal(row.relative.value,opaque) and row.relative.alpha==1)
+row.amount.SetFormattedText=function() error("native text rejected") end
+r.Refresh(); assert(row.relative.alpha==0 and row.relative.value==0 and row.amount.text=="NO DATA")
+m.units[unit].percent=-1; r.Refresh(); assert(row.relative.alpha==0)
+m.units[unit].percent=nil; r.Refresh(); assert(row.relative.alpha==0)
+m.units[unit].tanking=true; UnitThreatPercentageOfLead=nil; r.Refresh(); assert(row.relative.alpha==0)
+m.Event("NAME_PLATE_UNIT_REMOVED",unit); assert(row.relative.alpha==0 and row.relative.value==0)
+print("PASS native-selected relative bars: direction, fixed scale, no-comparison zero, lost aggro, opaque sinks and clearing")
 
 m,a,r,v=setup()
 for i=1,10 do m.Mob(i,true,3,0) end
