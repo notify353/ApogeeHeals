@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Show frozen combat sampling coverage: total/polled samples, skipped checks,
+  combat duration, first/last sample times and the longest unsampled gap.
+
 - Add optional session-only threat checks with Lua-read and native-call PASS/FAIL
   results. Failures latch during combat and freeze afterward for screenshots.
 

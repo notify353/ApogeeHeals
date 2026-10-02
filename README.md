@@ -15,6 +15,9 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
   starts fresh. `--` means no sample. Display PASS means the native call accepted
   the value, not proof of rendering or correct percentage semantics. Only public
   check outcomes are retained for this session; no threat samples are saved.
+  Coverage lines count API attempts (including periodic polls), skipped checks,
+  elapsed combat time, first/last sample times and the longest gap without a
+  sample. These also freeze after combat. Solo tests do not establish group access.
 
 - Independent eight-row tank threat stack, disabled by default. Seven stable mob
   slots and one reserved selected-target slot follow normal Tab targeting with

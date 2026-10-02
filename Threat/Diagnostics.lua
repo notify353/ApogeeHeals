@@ -12,10 +12,24 @@ end
 
 function D.Reset()
     D.sampled = false
+    D.duration, D.samples, D.pollSamples, D.skipped, D.longestGap = 0, 0, 0, 0, 0
+    D.firstSample, D.lastSample = nil, nil
     for _, row in ipairs(D.rows) do
         row.readable, row.native = nil, nil
         row.access:SetText("--"); row.sink:SetText("--"); row.reason:SetText("")
     end
+    D.PaintCoverage()
+end
+
+function D.PaintCoverage()
+    -- Frame elapsed time and these counters are public diagnostics, not threat data.
+    local gap = math.max(D.longestGap, D.duration - (D.lastSample or 0))
+    D.coverage:SetFormattedText("Samples: %d (%d polled) | Skipped checks: %d | Combat: %.1fs",
+        D.samples, D.pollSamples, D.skipped, D.duration)
+    if D.firstSample then
+        D.timing:SetFormattedText("First: %.1fs | Last: %.1fs into combat | Longest gap: %.1fs",
+            D.firstSample, D.lastSample, gap)
+    else D.timing:SetFormattedText("First: -- | Last: -- | Time without samples: %.1fs", D.duration) end
 end
 
 function D.Probe(row, ok, value, boolean)
@@ -50,11 +64,18 @@ function D.Probe(row, ok, value, boolean)
     D.numberSink:SetText(""); D.booleanSink:SetAlpha(0)
 end
 
-function D.Refresh()
+function D.Refresh(polled)
     if not D.enabled or D.suspended or not D.collecting or not InCombatLockdown() then return end
     -- Target gaps/friendly targets do not count as failed threat observations.
     if A.Access.Read(UnitExists, "target") ~= true or A.Access.Read(UnitCanAttack, "player", "target") ~= true
-        or A.Access.Read(UnitIsDeadOrGhost, "target") ~= false then return end
+        or A.Access.Read(UnitIsDeadOrGhost, "target") ~= false then
+        D.skipped = D.skipped + 1; D.PaintCoverage(); return
+    end
+    D.samples = D.samples + 1
+    if polled then D.pollSamples = D.pollSamples + 1 end
+    D.longestGap = math.max(D.longestGap, D.duration - (D.lastSample or 0))
+    D.firstSample = D.firstSample or D.duration
+    D.lastSample = D.duration
     D.sampled = true
     D.context:SetText("IN COMBAT - checking your threat against selected enemies")
     local ok, tanking, status, scaled, raw, amount = pcall(UnitDetailedThreatSituation, "player", "target")
@@ -67,20 +88,24 @@ function D.Refresh()
     D.Probe(D.rows[6], leadOK, lead)
     local percentOK, percent = pcall(UnitThreatPercentageOfLead, "player", "target")
     D.Probe(D.rows[7], percentOK, percent)
+    D.PaintCoverage()
 end
 
 function D.Begin()
     D.Reset(); D.collecting = true; D.elapsed = 0
     D.context:SetText("IN COMBAT - select a living enemy to check")
     D.frame:SetScript("OnUpdate", function(_, elapsed)
+        if not InCombatLockdown() then return end
+        D.duration = D.duration + elapsed
         D.elapsed = D.elapsed + elapsed
-        if D.elapsed >= 0.2 then D.elapsed = 0; D.Refresh() end
+        if D.elapsed >= 0.2 then D.elapsed = 0; D.Refresh(true) end
     end)
     D.Refresh()
 end
 
 function D.Freeze()
     D.collecting = false; D.frame:SetScript("OnUpdate", nil)
+    D.PaintCoverage()
     D.context:SetText(D.sampled and "FROZEN - ready for screenshot; next combat starts fresh"
         or "NO SAMPLES - select a living enemy during the next fight")
 end
@@ -97,7 +122,7 @@ end
 function D.Start()
     local root = CreateFrame("Frame", nil, UIParent)
     D.root = root
-    root:SetSize(530, 300); root:SetPoint("CENTER", UIParent, "CENTER", 290, 80)
+    root:SetSize(530, 360); root:SetPoint("CENTER", UIParent, "CENTER", 290, 80)
     root:SetMovable(true); root:SetClampedToScreen(true); root:EnableMouse(false)
     A.Style.Background(root)
     local function text(size, x, y, width)
@@ -125,6 +150,9 @@ function D.Start()
     end
     text(10, 12, -255, 506):SetText("FAIL = at least one failed check this fight. -- = not checked.")
     text(10, 12, -274, 506):SetText("Display PASS confirms call acceptance only, not visible rendering.")
+    D.coverage = text(11, 12, -299, 506)
+    D.timing = text(11, 12, -318, 506)
+    text(10, 12, -337, 506):SetText("Samples count API attempts. Gaps include skipped checks and frame stalls.")
     local hidden = CreateFrame("Frame", nil, root); hidden:Hide()
     D.numberSink = A.Style.Text(hidden, 11)
     D.booleanSink = hidden:CreateTexture(nil, "ARTWORK")

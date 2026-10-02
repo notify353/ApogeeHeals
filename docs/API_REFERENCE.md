@@ -19,6 +19,14 @@ Target gaps are skipped; no samples means dashes, never PASS. Mocks cover secret
 passthrough, failure latching, freeze and lifecycle. Native combat behavior and
 screenshot usability still require owner acceptance.
 
+Coverage counters use only public frame elapsed time and observation counts.
+They distinguish API attempts from skipped target gates and periodic polls from
+event samples. First/last timestamps are elapsed seconds since collection began;
+longest gaps include initial/trailing gaps and frame stalls. All freeze with the
+results. Tests simulate sustained combat, target gaps and a late API failure.
+An API attempt counts even if it returns missing/error; per-field FAIL retains
+that distinction. Solo results do not establish behavior with threat competitors.
+
 ## October 1 client identification correction
 
 The fresh 70170 export defines WOW_PROJECT_CAMELOT = 18 and assigns

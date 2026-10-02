@@ -62,4 +62,32 @@ assert(reads == before and d.rows[1].reason.text == "API error")
 d.SetEnabled(false); assert(not d.root.shown and not d.frame.scripts.OnUpdate)
 d.SetEnabled(true); a.ResetCharacter(); assert(not d.enabled)
 assert(a.db.threatDiagnostics == nil)
+m.units.target = {hostile=true, dead=false}; mode = "public"
+d.numberSink.SetFormattedText = function() end
+d.SetEnabled(true); m.combat = true; m.Event("PLAYER_REGEN_DISABLED")
+for i=1,25 do d.frame.scripts.OnUpdate(d.frame, 0.2) end
+assert(d.samples == 26 and d.pollSamples == 25 and d.skipped == 0)
+assert(math.abs(d.lastSample-5) < 0.001 and d.firstSample == 0)
+m.units.target = nil
+for i=1,10 do d.frame.scripts.OnUpdate(d.frame, 0.2) end
+assert(d.samples == 26 and d.skipped == 10 and math.abs(d.duration-7) < 0.001)
+assert(d.timing.text:find("Longest gap: 2.0s",1,true))
+m.units.target = {hostile=true, dead=false}; mode = "missing"
+d.frame.scripts.OnUpdate(d.frame, 0.2)
+assert(d.rows[1].access.text == "FAIL") -- failure well after entering combat
+mode = "public"
+for i=1,14 do d.frame.scripts.OnUpdate(d.frame, 0.2) end
+assert(d.samples == 41 and d.pollSamples == 40 and math.abs(d.lastSample-10) < 0.001)
+assert(d.rows[1].access.text == "FAIL" and math.abs(d.longestGap-2.2) < 0.001)
+m.combat = false; m.Event("PLAYER_REGEN_ENABLED")
+local frozenCoverage, frozenTiming = d.coverage.text, d.timing.text
+m.Event("PLAYER_TARGET_CHANGED"); m.Event("UNIT_THREAT_LIST_UPDATE")
+assert(d.coverage.text == frozenCoverage and d.timing.text == frozenTiming and not d.frame.scripts.OnUpdate)
+m.units.target = nil; m.combat = true; m.Event("PLAYER_REGEN_DISABLED")
+for i=1,5 do d.frame.scripts.OnUpdate(d.frame, 0.2) end
+assert(d.samples == 0 and d.pollSamples == 0 and d.skipped == 6 and d.firstSample == nil)
+assert(d.timing.text:find("Time without samples: 1.0s",1,true))
+m.combat = false; m.Event("PLAYER_REGEN_ENABLED")
+assert(d.context.text:find("NO SAMPLES",1,true))
 print("PASS threat diagnostics: combat-only, secret-safe native probes, latched failures, frozen results, reset and lifecycle")
+print("PASS combat coverage: repeated polls, late failure, target gaps, elapsed sample times and frozen screenshot counters")
