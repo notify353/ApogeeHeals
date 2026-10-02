@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Remove mob names and levels from live/demo threat rows and shrink to narrow
+  bar-only rows, retaining HP, mana rail, warnings and target outline.
+
 - Reduce threat stack width and row spacing for roughly 36% less screen area,
   retaining readable names, centered threat, thin HP and selected-target outline.
 

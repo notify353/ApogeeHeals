@@ -45,7 +45,7 @@ local unit=m.Mob(1,true,3,0)
 local row=v.rows[1]
 assert(#v.rows==8 and #v.gates==7 and not row.protected and next(row.attributes)==nil)
 assert(row.left.reverseFill and not row.right.reverseFill and row.left.width==row.right.width)
-assert(row.left.height==13 and row.health.height==2 and row.height==15.5)
+assert(row.left.height==7 and row.health.height==2 and row.height==9.5)
 assert(row.right.value==50 and row.left.value==0 and row.notice.text=="")
 for _,case in ipairs({{0,100,0},{70,30,0},{95,5,0},{100,0,0},{112,0,12},{150,0,50},{250,0,100}}) do
     assert(v.PaintCentered(row,case[1])); assert(row.left.value==case[2] and row.right.value==case[3])
@@ -82,7 +82,7 @@ print("PASS centered threat: both directions, empty equality, capped ends, indep
 m,a,r,v=setup(); unit=m.Mob(1,true,3,0); row=v.rows[1]
 assert(row.health.value==50 and row.health.max==100 and row.rail.color[1]==0.57)
 m.units[unit].maxPower=200; m.units[unit].level=20; r.Refresh()
-assert(row.rail.color[3]==0.80 and row.level.text=="20")
+assert(row.rail.color[3]==0.80 and row.level==nil and row.name==nil)
 m.units[unit].kind=1; r.Refresh(); assert(row.rail.color[1]==0.57)
 m.units[unit].kind=0; m.units[unit].maxPower=m.Secret(); r.Refresh(); assert(row.rail.color[1]==0.57)
 local health,maximum=m.Secret(),m.Secret()
@@ -91,8 +91,8 @@ assert(rawequal(row.health.value,health) and rawequal(row.health.max,maximum))
 UnitHealth=function() error("health unavailable") end
 r.Refresh(); assert(row.health.value==0)
 m.Event("NAME_PLATE_UNIT_REMOVED",unit)
-assert(row.left.value==0 and row.right.value==0 and row.health.value==0 and row.name.text=="" and row.level.text=="")
-print("PASS mob health native sinks, mana-type rail, level and stale-data cleanup")
+assert(row.left.value==0 and row.right.value==0 and row.health.value==0 and row.name==nil and row.level==nil)
+print("PASS mob health native sinks, mana-type rail and stale-data cleanup")
 
 m,a,r,v=setup()
 for i=1,10 do m.Mob(i,true,3,0) end
@@ -107,13 +107,13 @@ for i=1,7 do
     for j=1,7 do assert(r.model.slots[j]==slots[j]) end
 end
 m.Target("nameplate9")
-assert(v.rows[8].name.text=="Mob 9" and v.rows[8].selection.alpha==1 and v.footer.text=="+2 more")
+assert(v.rows[8].unit=="target" and v.rows[8].selection.alpha==1 and v.footer.text=="+2 more")
 for i=1,7 do assert(v.gates[i].alpha==1 and v.rows[i].selection.alpha==0) end
 m.units.nameplate4.lead=3; r.Refresh()
 for i=1,7 do assert(r.model.slots[i]==slots[i]) end
 m.Event("NAME_PLATE_UNIT_REMOVED","nameplate3")
 assert(r.model.entries.nameplate3==nil and r.model.slots[3]=="nameplate8")
-assert(r.model.slots[4]=="nameplate4" and v.rows[3].name.text=="Mob 8")
+assert(r.model.slots[4]=="nameplate4" and v.rows[3].unit=="nameplate8")
 m.units.nameplate3={name="Replacement", hostile=true, tanking=false, threatStatus=0,lead=3,
     health=50,maxHealth=100,power=0,maxPower=0,kind=0,auras={}}
 m.Event("NAME_PLATE_UNIT_ADDED","nameplate3")
@@ -124,7 +124,7 @@ print("PASS stable seven slots, reserved overflow target, counts, departures and
 m,a,r,v=setup()
 unit=m.Mob(1,true,3,0); m.combat=true; m.Target(unit)
 m.units[unit].name=m.Secret(); r.Refresh()
-assert(rawequal(v.rows[1].name.text,m.units[unit].name))
+assert(v.rows[1].name==nil and v.rows[1].level==nil)
 m.secretMatch=m.Secret()
 local calls=0
 C_CurveUtil.EvaluateColorValueFromBoolean=function(value,yes,no)
@@ -139,7 +139,7 @@ r.Refresh(); assert(v.rows[1].selection.alpha==0 and v.rows[8].alpha==0 and v.fo
 m.secretMatch=nil; m.matchError=true; r.Refresh()
 assert(v.rows[1].selection.alpha==0 and v.rows[8].alpha==0)
 m.matchError=nil; r.Refresh(); assert(v.rows[1].selection.alpha==1 and v.gates[1].alpha==0)
-print("PASS secret names and target comparisons use native sinks; unknown identity never guesses a target")
+print("PASS nameless rows and native secret target comparisons; unknown identity never guesses a target")
 
 m,a,r,v=setup()
 unit=m.Mob(1,true,3,0)
@@ -160,7 +160,7 @@ m.combat=false
 m.plates={{IsForbidden=function() return false end, GetUnit=function() return unit end},
     {IsForbidden=function() return true end, GetUnit=function() error("forbidden read") end}}
 m.Event("PLAYER_ENTERING_WORLD"); m.Flush()
-assert(v.root.shown and v.rows[1].name.text=="Mob 1" and r.frame.scripts.OnUpdate)
+assert(v.root.shown and v.rows[1].unit=="nameplate1" and r.frame.scripts.OnUpdate)
 r.SetEnabled(false); assert(not v.root.shown and r.frame.scripts.OnUpdate==nil and next(r.model.entries)==nil)
 reads=m.threatReads; m.Event("NAME_PLATE_UNIT_ADDED",unit); assert(m.threatReads==reads)
 r.SetEnabled(true); assert(v.root.shown and r.model.slots[1]==unit)
@@ -185,7 +185,7 @@ m.units[unit].dead=true; r.Refresh(); assert(v.rows[1].alpha==0 and v.rows[8].al
 m.units[unit].dead=nil; m.units[unit].hostile=false; r.Refresh(); assert(v.rows[8].alpha==0)
 m.units.target={name="Untouched",hostile=true,health=50,maxHealth=100,power=0,maxPower=0,kind=0,auras={}}
 m.combat=false; m.Event("PLAYER_REGEN_ENABLED")
-assert(v.rows[8].alpha==0 and v.rows[8].name.text=="" and v.rows[8].notice.text=="")
+assert(v.rows[8].alpha==0 and v.rows[8].name==nil and v.rows[8].notice.text=="")
 m.Event("PLAYER_TARGET_CHANGED"); assert(v.rows[8].alpha==0)
 m.combat=true; m.Event("PLAYER_REGEN_DISABLED")
 r.Refresh(); assert(v.rows[8].notice.text=="?" and v.rows[8].alpha==1)

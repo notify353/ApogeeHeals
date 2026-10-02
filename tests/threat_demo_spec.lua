@@ -36,7 +36,7 @@ r.SetEnabled(true); assert(v.rows[1].unit=="nameplate1")
 r.SetDemo(true); local before=reads
 r.Refresh(); r.frame.scripts.OnUpdate(r.frame,0.2); assert(reads==before)
 r.SetDemo(false)
-assert(a.db.threatEnabled==true and v.rows[1].unit=="nameplate1" and v.rows[1].name.text=="Actual enemy")
+assert(a.db.threatEnabled==true and v.rows[1].unit=="nameplate1" and v.rows[1].name==nil and v.rows[1].level==nil)
 r.SetDemo(true); m.Event("PLAYER_LEAVING_WORLD")
 assert(not r.demo and not v.root.shown and not r.frame.scripts.OnUpdate)
 m.Event("PLAYER_ENTERING_WORLD"); assert(not r.demo and v.rows[1].unit=="nameplate1")
