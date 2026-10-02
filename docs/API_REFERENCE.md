@@ -1,5 +1,27 @@
 # Forever API authority
 
+## Restricted center-origin display correction (70170, 2026-10-02)
+
+Grouped screenshot shows a tracked selected row with a green ? and empty fill.
+The public-only renderer rejects restricted tanking/percentage values, despite
+native SetValue and SetAlpha accepting them. Preserve public arithmetic for
+readable percentages; restricted values now pass directly to native controls.
+A colored left half is covered by an opaque native 0..100 left-to-right mask,
+leaving a center-origin complement visible. The right half has range 100..200.
+All geometry/ranges are public constants created out of combat. Never read back
+native values or calculate/compare restricted values in Lua.
+Two fixed native lanes receive lead and raw percentages when tanking is secret;
+EvaluateColorValueFromBoolean drives their complementary alpha sinks. Missing
+values/errors clear that lane and show ?. Public tank lead zero remains a dash.
+Opaque zero cannot be distinguished in Lua and displays through native range
+clipping; this is still a prototype percentage scale, not an aggro guarantee.
+The existing numeric meaning/center reference still needs grouped validation.
+Checked SetValue, SetMinMaxValues, SetAlpha and boolean conversion contracts in
+the fresh export. Numeric curve Evaluate is AllowedWhenUntainted and is not used.
+HP and name/level display were removed by owner request in later layout changes.
+
+
+
 ## Compact center-origin threat and mob HP (70170, 2026-10-02)
 
 Owner approved the reference-styled mock and requested implementation and DEV

@@ -60,6 +60,40 @@ local function bar(parent, w, h, point, x, y, reverse)
     b:SetMinMaxValues(0,100); b:SetValue(0); b:SetReverseFill(reverse == true)
     return b
 end
+-- Native-only complement: a left-to-right opaque mask covers a colored left
+-- half. Its uncovered portion extends from center to left as percentage falls.
+-- The right half uses native range 100..200. Neither requires Lua arithmetic.
+local function nativeLane(row)
+    local lane = CreateFrame("Frame",nil,row); lane:SetAllPoints(row); lane:EnableMouse(false)
+    lane.fill = lane:CreateTexture(nil,"BACKGROUND"); lane.fill:SetSize(46.5,7)
+    lane.fill:SetPoint("TOPLEFT",3,0)
+    lane.mask = bar(lane,46.5,7,"TOPLEFT",3,0,false)
+    lane.mask:SetStatusBarColor(S.background[1],S.background[2],S.background[3],1)
+    lane.right = bar(lane,46.5,7,"TOPRIGHT",0,0,false)
+    lane.right:SetMinMaxValues(100,200)
+    lane.notice = S.Text(lane.right,5); lane.notice:SetPoint("TOPRIGHT",-2,0)
+    lane.notice:SetSize(21,7); lane.notice:SetJustifyH("RIGHT")
+    lane:SetAlpha(0)
+    return lane
+end
+local function clearNative(row)
+    for _,lane in ipairs({row.nativeTank,row.nativeRaw}) do
+        lane:SetAlpha(0); lane.mask:SetValue(100); lane.right:SetValue(100); lane.notice:SetText("")
+    end
+end
+local function paintNative(lane, value, tanking)
+    lane.mask:SetValue(100); lane.right:SetValue(100); lane.notice:SetText("")
+    if A.Access.Readable(value) then
+        if type(value) ~= "number" or value ~= value or value < 0 or value == math.huge then
+            lane.notice:SetText("?"); return
+        end
+        if tanking and value == 0 then lane.notice:SetText("-"); return end
+    end
+    local ok = pcall(function() lane.mask:SetValue(value); lane.right:SetValue(value) end)
+    if not ok then
+        lane.mask:SetValue(100); lane.right:SetValue(100); lane.notice:SetText("?")
+    end
+end
 local function createRow(parent, index)
     local row = CreateFrame("Frame", nil, parent)
     row:SetSize(width,7); row:SetPoint("TOPLEFT",V.root,"TOPLEFT",0,-header-(index-1)*rowHeight)
@@ -67,6 +101,7 @@ local function createRow(parent, index)
     -- Immutable half-bars meet at the center. Left fills toward the left edge.
     row.left = bar(row,46.5,7,"TOPLEFT",3,0,true)
     row.right = bar(row,46.5,7,"TOPRIGHT",0,0,false)
+    row.nativeTank, row.nativeRaw = nativeLane(row), nativeLane(row)
     row.rail = row:CreateTexture(nil,"OVERLAY"); row.rail:SetSize(2,7)
     row.rail:SetPoint("TOPLEFT",0,0); row.rail:SetColorTexture(0.57,0.58,0.61,1)
     local overlay = CreateFrame("Frame",nil,row); overlay:SetAllPoints(row); overlay:EnableMouse(false)
@@ -109,6 +144,7 @@ function V.Create()
     V.Place(); V.Clear()
 end
 function V.ClearRow(row)
+    clearNative(row)
     row:SetAlpha(0); row.notice:SetText("")
     row.left:SetValue(0); row.right:SetValue(0)
     row.selection:SetAlpha(0); row.rail:SetColorTexture(0.57,0.58,0.61,1); row.unit = nil
@@ -122,6 +158,10 @@ function V.PaintWarning(row, warning)
     local info = warnings[warning] or warnings.unknown
     row.left:SetStatusBarColor(info[2],info[3],info[4],1)
     row.right:SetStatusBarColor(info[2],info[3],info[4],1)
+    for _,lane in ipairs({row.nativeTank,row.nativeRaw}) do
+        lane.fill:SetColorTexture(info[2],info[3],info[4],1)
+        lane.right:SetStatusBarColor(info[2],info[3],info[4],1)
+    end
     row.notice:SetTextColor(info[2],info[3],info[4],1)
     row.notice:SetText(warning == "noAggro" and "LOST" or (warning == "unknown" and "?" or ""))
 end
@@ -137,14 +177,31 @@ function V.PaintCentered(row, percentage)
 end
 function V.PaintRelative(row, unit, ok, tanking, rawPercentage)
     row.left:SetValue(0); row.right:SetValue(0)
-    if not ok or not A.Access.Readable(tanking) or type(tanking) ~= "boolean" then return "?" end
+    clearNative(row)
+    if not ok then return "?" end
+    if not A.Access.Readable(tanking) then
+        local leadOK, lead = pcall(UnitThreatPercentageOfLead,"player",unit)
+        if not leadOK then lead = nil end
+        paintNative(row.nativeTank,lead,true)
+        paintNative(row.nativeRaw,rawPercentage,false)
+        local tankOK = V.BooleanAlpha(row.nativeTank,tanking,1,0)
+        local rawOK = V.BooleanAlpha(row.nativeRaw,tanking,0,1)
+        if not tankOK or not rawOK then clearNative(row); return "?" end
+        return
+    end
+    if type(tanking) ~= "boolean" then return "?" end
     local percentage = rawPercentage
     if tanking then
         local leadOK, value = pcall(UnitThreatPercentageOfLead,"player",unit)
         if not leadOK then return "?" end
         percentage = value
     end
-    if tanking and A.Access.Readable(percentage) and percentage == 0 then return "-" end
+    if not A.Access.Readable(percentage) then
+        local lane = tanking and row.nativeTank or row.nativeRaw
+        paintNative(lane,percentage,tanking); lane:SetAlpha(1)
+        return
+    end
+    if tanking and percentage == 0 then return "-" end
     if not V.PaintCentered(row,percentage) then return "?" end
 end
 function V.PaintIdentity(row, unit)

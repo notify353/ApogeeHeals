@@ -64,10 +64,31 @@ m.units[unit].lead=0; r.Refresh(); assert(row.notice.text=="LOST")
 m.units[unit].tanking=true; m.units[unit].leadPercent=0; r.Refresh()
 assert(row.notice.text=="-" and row.left.value==0 and row.right.value==0)
 local opaque=m.Secret(); m.units[unit].leadPercent=opaque; r.Refresh()
-assert(row.notice.text=="?" and row.left.value==0 and row.right.value==0)
+assert(row.notice.text=="" and row.left.value==0 and row.right.value==0)
+assert(row.nativeTank.alpha==1 and rawequal(row.nativeTank.mask.value,opaque)
+    and rawequal(row.nativeTank.right.value,opaque) and row.nativeRaw.alpha==0)
 m.units[unit].leadPercent=150; m.units[unit].tanking=opaque; r.Refresh()
 assert(row.notice.text=="?" and row.left.value==0 and row.right.value==0)
-m.units[unit].tanking=true
+local nativeAlphas={m.Secret(),m.Secret()}
+C_CurveUtil.EvaluateColorValueFromBoolean=function(value,yes,no)
+    assert(rawequal(value,opaque))
+    return yes==1 and nativeAlphas[1] or nativeAlphas[2]
+end
+m.units[unit].percent=70; r.Refresh()
+assert(row.notice.text=="" and rawequal(row.nativeTank.alpha,nativeAlphas[1])
+    and rawequal(row.nativeRaw.alpha,nativeAlphas[2]))
+assert(row.nativeTank.mask.value==150 and row.nativeTank.right.value==150)
+assert(row.nativeRaw.mask.value==70 and row.nativeRaw.right.value==70)
+assert(row.nativeTank.mask.min==0 and row.nativeTank.mask.max==100)
+assert(row.nativeTank.right.min==100 and row.nativeTank.right.max==200)
+assert(not row.nativeTank.mask.reverseFill and row.nativeTank.fill.width==row.left.width)
+-- Missing data blanks only its own native lane; never reuse stale fill.
+m.units[unit].leadPercent=nil; r.Refresh()
+assert(row.nativeTank.notice.text=="?" and row.nativeTank.mask.value==100
+    and row.nativeTank.right.value==100 and row.nativeRaw.mask.value==70)
+m.units[unit].tanking=true; m.units[unit].leadPercent=150; r.Refresh()
+assert(row.nativeTank.alpha==0 and row.nativeRaw.alpha==0 and row.right.value==50)
+C_CurveUtil.EvaluateColorValueFromBoolean=nil
 for _,bad in ipairs({-1,math.huge,0/0,"150",false}) do
     m.units[unit].leadPercent=bad; r.Refresh(); assert(row.notice.text=="?" and row.right.value==0)
 end

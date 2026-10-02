@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Render restricted threat percentages through native centered masks/ranges and
+  select secret tanking lanes with native alpha sinks instead of clearing bars.
+
 - Explain empty live threat stacks with idle/no-tracked-enemies status so an
   enabled meter no longer presents only a blank Threat heading.
 
