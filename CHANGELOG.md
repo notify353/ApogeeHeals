@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Explain empty live threat stacks with idle/no-tracked-enemies status so an
+  enabled meter no longer presents only a blank Threat heading.
+
 - Tighten live/demo threat row gaps to a thin separator without changing bar thickness.
 
 - Remove HP strips and health reads from live/demo threat rows, shortening rows

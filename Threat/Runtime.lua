@@ -72,6 +72,8 @@ function R.Refresh()
     if targetActive and not comparisonsOK then
         V.rows[8]:SetAlpha(0)
         V.footer:SetText("Target match unknown")
+    elseif visible == 0 and not targetActive then
+        V.footer:SetText(InCombatLockdown() and "No tracked enemies - select one" or "Idle - no tracked enemies")
     end
 end
 function R.ApplyEnabled()

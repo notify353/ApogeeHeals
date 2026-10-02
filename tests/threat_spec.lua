@@ -202,3 +202,16 @@ assert(a.db.threatEnabled==false and not v.root.shown and r.frame.scripts.OnUpda
 local savedDisabled=a.db
 m,a,r,v=setup(savedDisabled); assert(not v.root.shown and a.Settings.threat.checked==false)
 print("PASS default-off threat has no polling/reads; settings checkbox opt-in and explicit choices persist")
+
+-- An enabled meter must explain an empty encounter instead of showing only its title.
+m,a,r,v=setup()
+assert(v.root.shown and v.footer.text=="Idle - no tracked enemies")
+m.combat=true; m.Event("PLAYER_REGEN_DISABLED")
+assert(v.footer.text=="No tracked enemies - select one")
+unit=m.Mob(1,true,3,0); m.Target(unit)
+assert(v.rows[1].alpha==1 and v.footer.text=="")
+m.units[unit].dead=true; r.Refresh()
+assert(v.footer.text=="No tracked enemies - select one")
+m.combat=false; m.Event("PLAYER_REGEN_ENABLED")
+assert(v.footer.text=="Idle - no tracked enemies")
+print("PASS empty threat state explains idle/combat and clears when an enemy is tracked")
