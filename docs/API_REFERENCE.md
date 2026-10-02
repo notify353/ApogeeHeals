@@ -1,5 +1,34 @@
 # Forever API authority
 
+## Compact center-origin threat and mob HP (70170, 2026-10-02)
+
+Owner approved the reference-styled mock and requested implementation and DEV
+installation. Two immutable 76.5-by-16 half-bars meet at the same center point.
+For a publicly readable, finite, nonnegative selected percentage p, left receives
+clamp(100-p,0,100) with reverse fill and right receives clamp(p-100,0,100).
+At p=100 both fills are empty. Native selection remains percentage-of-lead while
+publicly tanking and rawPercentage otherwise. This is a prototype numeric
+reference; earlier unresolved group/ratio semantics still require live testing.
+No threshold or time-to-loss prediction is claimed. Restricted selector/value
+results clear both halves and show ?, never arithmetic. Tank lead zero shows -.
+This supersedes the previous raw native single-bar restricted-value sink.
+
+Read and checked current UnitPowerType, UnitPowerMax, UnitHealth and UnitHealthMax
+contracts. A publicly confirmed mana type with positive readable maximum gives
+the blue rail; all other/unknown states reset gray. Mob HP uses existing native
+health min/max/value sinks without arithmetic and clears on failures. Names and
+levels reuse existing native name and guarded level helpers. Same fixed live unit
+tokens, 0.2-second active refresh and target-deduplication gates are retained.
+No protected layout/actions change. Name/level sit above bars on a separate text
+layer; rail and thin HP replace redundant text and raid markers. Confirmed lost
+aggro has a small LOST notice; warning colors remain independent of fill length.
+
+Demo uses the same centered renderer with synthetic public percentages, alternating
+mana rails and sample HP. Its animated row crosses the center and changes HP;
+no samples enter live tracking or persistence. Tests check both directions, center
+emptiness, caps, secret-safe fallback, native secret HP passthrough, mana rail
+reset and demo/live lifecycle. Appearance and group data need owner acceptance.
+
 ## Relative threat bar prototype (70170, 2026-10-02)
 
 Owner solo screenshot: 133 attempts, 119 periodic polls, 24.7 seconds combat,

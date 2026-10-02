@@ -1,5 +1,9 @@
 ## Unreleased
 
+- Adopt compact name/level threat frames with center-origin fill, mana-type left
+  rail, thin mob HP and selected-target outline in live and solo demo modes.
+  Guard centered arithmetic behind public-value checks; restricted data shows ?.
+
 - Add a settings-enabled solo threat demo using the live row layout, scripted
   animation and warning examples. No live threat reads or saved demo state;
   combat closes the demo and restores the configured live meter.

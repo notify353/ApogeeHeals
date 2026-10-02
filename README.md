@@ -8,7 +8,7 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 
 - **Threat demo (solo preview; ends in combat)** in Heals settings previews the
   same threat rows without a group or live threat reads. It shows strong/weak
-  leads, loss of lead/aggro, unknown/no-comparison states, raid markers and the
+  leads, loss of lead/aggro, unknown/no-comparison states, mana-type rails, mob HP and the
   target outline. One sample bar loses and rebuilds threat over a 24-second loop.
   The DEMO label and footer identify fictional data; its thresholds are visual
   examples, not gameplay rules. Drag the header to review placement. Uncheck the
@@ -33,24 +33,25 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
   a yellow outline; duplicate target presentation is suppressed natively.
   Drag its header outside combat. Toggle **Tank threat stack** in Heals settings.
   The reserved target row appears only during combat; idle selection adds no row.
-- Each enemy has a right-filling **relative threat** bar with a fixed prototype
-  scale: 0% left, 100% center tick, 200% full. The numeric label continues above
-  200% while the fill caps. Larger reported percentages move right; decreasing
-  percentages move left. This replaces the raw threat total. The percentage
-  selection follows Blizzard's own UI: percentage-of-lead while tanking, raw
-  percentage otherwise. The midpoint is a reference, not an aggro-loss threshold;
-  this prototype still needs grouped validation of percentage semantics.
-- Warnings remain separate: green LEAD, yellow WEAK LEAD, orange NO LEAD,
-  red NO AGGRO, gray UNKNOWN. The aggro line remains independent. A tank lead
-  reading of zero shows NO COMPARISON with no fill; missing/invalid readings or
-  an unreadable tanking selector show NO DATA. Restricted percentages go directly
-  to native display sinks, without Lua arithmetic. Restricted warning states
-  retain the native RISK 0-3 display; it is separate from the relative bar.
+- Compact threat frames use the reference style: level/name over a large threat
+  area, a thin mob-HP strip below, and a left rail that is blue for confirmed
+  mana users and gray otherwise (including unknown mana capability). The gold
+  outline identifies your selected target. Repeated warning/aggro/percentage text
+  and raid markers are removed from these compact rows.
+- Threat fill starts at the center: native relative percentage minus 100 drives
+  the right half when positive and the left half when negative. Equal-to-reference
+  leaves only the center tick. Each half caps at 100 percentage points. The native
+  selector is unchanged: percentage-of-lead when tanking, raw percentage otherwise.
+  This is a prototype reference, not a guaranteed aggro-loss threshold; grouped
+  percentage semantics still need validation.
+- Green/yellow/orange/red fill retains native lead/aggro warning colors. LOST
+  marks confirmed loss of aggro. `?` means unavailable/restricted data; `-` means
+  a tank lead reading of zero provides no usable comparison. Restricted percentages
+  never enter arithmetic: they clear both halves instead. Health still passes
+  directly to native display sinks. Diagnostics remain available for access checks.
 - Coverage depends on exposed hostile nameplates plus the selected target.
-  Raid markers appear when readable. Overflow shows an exact extra count when
-  identities permit, otherwise a tracked count. Native combat rendering and
-  grouped warning/percentage behavior still require live acceptance. No bar
-  predicts time until aggro loss or guarantees a reaction window.
+  Overflow shows an exact extra count when identities permit, otherwise a tracked
+  count. No bar predicts time until aggro loss or guarantees a reaction window.
 
 See [class support](docs/CLASS_SUPPORT.md) for the buff/cleanse matrix, yellow
 guidance, native weapon displays, limitations and live acceptance checks.

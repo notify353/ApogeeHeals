@@ -1,7 +1,7 @@
 local _, A = ...
 local V, S = {}, A.Style
 A.ThreatView = V
-local width, rowHeight, header = 156, 24, 18
+local width, rowHeight, header = 156, 22, 8
 local warnings = {
     lead={"LEAD", 0.28,0.74,0.46}, weak={"WEAK LEAD", 0.90,0.74,0.22},
     noLead={"NO LEAD", 0.92,0.48,0.24}, noAggro={"NO AGGRO", 0.86,0.30,0.30},
@@ -53,204 +53,153 @@ function V.ResetPosition()
     if InCombatLockdown() then return end
     V.StopMoving(false); A.db.threatPosition = nil; V.Place()
 end
+local function bar(parent, w, h, point, x, y, reverse)
+    local b = CreateFrame("StatusBar", nil, parent)
+    b:SetSize(w,h); b:SetPoint(point,parent,point,x,y); b:EnableMouse(false)
+    b:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
+    b:SetMinMaxValues(0,100); b:SetValue(0); b:SetReverseFill(reverse == true)
+    return b
+end
 local function createRow(parent, index)
     local row = CreateFrame("Frame", nil, parent)
-    row:SetSize(width, 22); row:SetPoint("TOPLEFT", V.root, "TOPLEFT", 0, -header-(index-1)*rowHeight)
+    row:SetSize(width,19.5); row:SetPoint("TOPLEFT",V.root,"TOPLEFT",0,-header-(index-1)*rowHeight)
     row:EnableMouse(false); S.Background(row)
-    row.name = S.Text(row, 6); row.name:SetPoint("LEFT", 13, 6); row.name:SetSize(85, 7)
+    -- Immutable half-bars meet at the center. Left fills toward the left edge.
+    row.left = bar(row,76.5,16,"TOPLEFT",3,0,true)
+    row.right = bar(row,76.5,16,"TOPRIGHT",0,0,false)
+    row.health = bar(row,153,3,"BOTTOMRIGHT",0,0,false)
+    row.health:SetStatusBarColor(0.51,0.65,0.58,1)
+    row.rail = row:CreateTexture(nil,"OVERLAY"); row.rail:SetSize(2,19.5)
+    row.rail:SetPoint("TOPLEFT",0,0); row.rail:SetColorTexture(0.57,0.58,0.61,1)
+    local overlay = CreateFrame("Frame",nil,row); overlay:SetAllPoints(row); overlay:EnableMouse(false)
+    local level = A.Access.Read(row.GetFrameLevel,row)
+    if finite(level) then overlay:SetFrameLevel(level+5) end
+    row.reference = overlay:CreateTexture(nil,"OVERLAY"); row.reference:SetSize(0.5,16)
+    row.reference:SetPoint("TOPLEFT",row,"TOPLEFT",79.5,0); row.reference:SetColorTexture(0.83,0.87,0.85,0.25)
+    row.level = S.Text(overlay,10); row.level:SetPoint("TOPLEFT",4,-3); row.level:SetSize(13,10)
+    row.level:SetJustifyH("LEFT"); row.level:SetTextColor(0.78,0.79,0.82,1)
+    row.name = S.Text(overlay,7); row.name:SetPoint("TOPLEFT",19,-4); row.name:SetSize(109,9)
     row.name:SetJustifyH("LEFT"); row.name:SetShadowColor(0,0,0,1); row.name:SetShadowOffset(1,-1)
-    row.warning = S.Text(row, 6); row.warning:SetPoint("RIGHT", -3, 6); row.warning:SetSize(55, 7)
-    row.warning:SetJustifyH("RIGHT")
-    row.amount = S.Text(row, 5); row.amount:SetPoint("LEFT", 13, -1); row.amount:SetSize(85, 6)
-    row.amount:SetJustifyH("LEFT"); row.amount:SetTextColor(unpack(S.muted))
-    row.aggro = {}
-    for _, text in ipairs({"AGGRO", "NO AGGRO", "AGGRO ?"}) do
-        local label = S.Text(row, 5); label:SetPoint("RIGHT", -3, -1); label:SetSize(55, 6)
-        label:SetJustifyH("RIGHT"); label:SetText(text); label:SetTextColor(unpack(S.muted))
-        row.aggro[#row.aggro+1] = label
-    end
-    row.relative = CreateFrame("StatusBar", nil, row)
-    row.relative:SetSize(140, 4); row.relative:SetPoint("BOTTOMLEFT", 13, 1)
-    row.relative:EnableMouse(false); row.relative:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
-    row.relative:SetMinMaxValues(0, 200); row.relative:SetReverseFill(false)
-    local track = row:CreateTexture(nil, "BACKGROUND")
-    track:SetSize(140, 4); track:SetPoint("BOTTOMLEFT", 13, 1); track:SetColorTexture(0.14,0.16,0.20,1)
-    row.reference = row.relative:CreateTexture(nil, "OVERLAY")
-    row.reference:SetSize(0.5, 4); row.reference:SetPoint("CENTER", row.relative, "CENTER")
-    row.reference:SetColorTexture(1,1,1,0.8)
-    -- Discrete native warning scale, never a percentage or a lead margin.
-    row.risk = CreateFrame("StatusBar", nil, row); row.risk:SetSize(55, 1)
-    row.risk:SetPoint("BOTTOMRIGHT", -3, 0); row.risk:EnableMouse(false)
-    row.risk:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
-    row.risk:SetStatusBarColor(0.90,0.74,0.22,1); row.risk:SetMinMaxValues(0,3)
-    row.risk:SetReverseFill(true)
-    row.marker = row:CreateTexture(nil, "ARTWORK"); row.marker:SetSize(10,10); row.marker:SetPoint("LEFT", 1, 1)
-    row.marker:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcons")
-    row.strip = row:CreateTexture(nil, "ARTWORK"); row.strip:SetSize(width, 1)
-    row.strip:SetPoint("BOTTOMLEFT", 0, 0)
-    row.selection = CreateFrame("Frame", nil, row); row.selection:SetAllPoints(row); row.selection:EnableMouse(false)
-    for _, edge in ipairs({{"TOPLEFT",width,0.5},{"BOTTOMLEFT",width,0.5},{"TOPLEFT",0.5,22},{"TOPRIGHT",0.5,22}}) do
-        local line = row.selection:CreateTexture(nil, "OVERLAY")
-        line:SetSize(edge[2], edge[3]); line:SetPoint(edge[1], row, edge[1], 0, 0)
-        line:SetColorTexture(1, 0.85, 0.25, 1)
+    row.notice = S.Text(overlay,5); row.notice:SetPoint("TOPRIGHT",-3,-5); row.notice:SetSize(22,7)
+    row.notice:SetJustifyH("RIGHT")
+    row.selection = CreateFrame("Frame",nil,overlay); row.selection:SetAllPoints(row); row.selection:EnableMouse(false)
+    for _,edge in ipairs({{"TOPLEFT",width,0.5},{"BOTTOMLEFT",width,0.5},{"TOPLEFT",0.5,19.5},{"TOPRIGHT",0.5,19.5}}) do
+        local line = row.selection:CreateTexture(nil,"OVERLAY")
+        line:SetSize(edge[2],edge[3]); line:SetPoint(edge[1],row,edge[1],0,0)
+        line:SetColorTexture(0.87,0.76,0.48,1)
     end
     row:SetAlpha(0); row.selection:SetAlpha(0)
     return row
 end
 function V.Create()
-    V.root = CreateFrame("Frame", nil, UIParent)
-    V.root:SetScale(S.scale); V.root:SetSize(width, header+8*rowHeight+9)
+    V.root = CreateFrame("Frame",nil,UIParent)
+    V.root:SetScale(S.scale); V.root:SetSize(width,header+8*rowHeight+7)
     V.root:SetMovable(true); V.root:SetClampedToScreen(true); V.root:EnableMouse(false)
-    V.handle = CreateFrame("Button", nil, V.root)
-    V.handle:EnableMouse(true)
-    V.handle:SetPoint("TOPLEFT", 0, 0); V.handle:SetSize(width, header); V.handle:RegisterForDrag("LeftButton")
-    V.title = S.CleanText(V.handle, 6); V.title:SetPoint("TOPLEFT", 0, 0); V.title:SetSize(width, 9); V.title:SetJustifyH("LEFT")
-    V.title:SetText("Threat - drag to move"); V.title:SetTextColor(unpack(S.muted))
-    local scale = S.CleanText(V.handle, 5); scale:SetPoint("BOTTOMLEFT", 0, 1); scale:SetSize(width, 7)
-    scale:SetJustifyH("LEFT"); scale:SetText("Prototype: 0%  |  middle 100%  |  full 200%")
-    V.handle:SetScript("OnDragStart", function()
+    V.handle = CreateFrame("Button",nil,V.root); V.handle:EnableMouse(true)
+    V.handle:SetPoint("TOPLEFT",0,0); V.handle:SetSize(width,header); V.handle:RegisterForDrag("LeftButton")
+    V.title = S.CleanText(V.handle,5); V.title:SetAllPoints(); V.title:SetJustifyH("LEFT")
+    V.title:SetText("Threat"); V.title:SetTextColor(unpack(S.muted))
+    V.handle:SetScript("OnDragStart",function()
         if not InCombatLockdown() then V.root:StartMoving(); V.moving = true end
     end)
-    V.handle:SetScript("OnDragStop", function() V.StopMoving(true) end)
-    V.footer = S.CleanText(V.root, 6); V.footer:SetPoint("BOTTOMLEFT", 0, 0)
-    V.footer:SetTextColor(unpack(S.muted))
+    V.handle:SetScript("OnDragStop",function() V.StopMoving(true) end)
+    V.footer = S.CleanText(V.root,5); V.footer:SetPoint("BOTTOMLEFT",0,0); V.footer:SetTextColor(unpack(S.muted))
     V.rows, V.gates = {}, {}
-    for i = 1, 7 do V.rows[i] = createRow(V.root, i) end
-    -- Seven native alpha parents implement duplicate suppression even when
-    -- target comparisons are secret. Never combine secret booleans in Lua.
+    for i=1,7 do V.rows[i] = createRow(V.root,i) end
     local parent = V.root
-    for i = 1, 7 do
-        local gate = CreateFrame("Frame", nil, parent); gate:SetAllPoints(V.root); gate:EnableMouse(false)
+    for i=1,7 do
+        local gate = CreateFrame("Frame",nil,parent); gate:SetAllPoints(V.root); gate:EnableMouse(false)
         V.gates[i], parent = gate, gate
     end
-    V.rows[8] = createRow(parent, 8)
+    V.rows[8] = createRow(parent,8)
     V.Place(); V.Clear()
 end
 function V.ClearRow(row)
-    row:SetAlpha(0); row.name:SetText(""); row.warning:SetText("")
-    row.amount:SetText(""); row.risk:SetAlpha(0); row.risk:SetValue(0)
-    row.relative:SetAlpha(0); row.relative:SetValue(0)
-    for _, label in ipairs(row.aggro) do label:SetAlpha(0) end
-    row.marker:SetAlpha(0); row.selection:SetAlpha(0); row.unit = nil
+    row:SetAlpha(0); row.name:SetText(""); row.level:SetText(""); row.notice:SetText("")
+    row.left:SetValue(0); row.right:SetValue(0); row.health:SetMinMaxValues(0,1); row.health:SetValue(0)
+    row.selection:SetAlpha(0); row.rail:SetColorTexture(0.57,0.58,0.61,1); row.unit = nil
 end
 function V.Clear()
-    for _, row in ipairs(V.rows) do V.ClearRow(row) end
-    for _, gate in ipairs(V.gates) do gate:SetAlpha(1) end
+    for _,row in ipairs(V.rows) do V.ClearRow(row) end
+    for _,gate in ipairs(V.gates) do gate:SetAlpha(1) end
     V.footer:SetText("")
-end
-local function quantity(value)
-    if not A.Access.Readable(value) then return true end
-    return type(value) == "number" and value == value and value >= 0 and value < math.huge
-end
-function V.PaintRelative(row, unit, ok, tanking, rawPercentage)
-    -- Mirror native UnitFrame selection only when the selector is public.
-    -- The percentage itself may be restricted and goes directly to native sinks.
-    row.amount:SetText("NO DATA")
-    if not ok or not A.Access.Readable(tanking) or type(tanking) ~= "boolean" then return end
-    local percentage = rawPercentage
-    if tanking then
-        local leadOK, leadPercentage = pcall(UnitThreatPercentageOfLead, "player", unit)
-        if not leadOK then return end
-        percentage = leadPercentage
-    end
-    if not quantity(percentage) then return end
-    -- Native numeric threat hides tank lead zero. It cannot establish a cushion.
-    if tanking and A.Access.Readable(percentage) and percentage == 0 then
-        row.amount:SetText("NO COMPARISON"); return
-    end
-    local displayed = pcall(function()
-        row.relative:SetValue(percentage)
-        row.amount:SetFormattedText("Relative %.0f%%", percentage)
-    end)
-    if displayed then row.relative:SetAlpha(1)
-    else row.relative:SetValue(0); row.amount:SetText("NO DATA") end
-end
-function V.PaintNative(row, unit)
-    row.amount:SetText(""); row.risk:SetAlpha(0); row.risk:SetValue(0)
-    row.relative:SetAlpha(0); row.relative:SetValue(0)
-    for _, label in ipairs(row.aggro) do label:SetAlpha(0) end
-    row.aggro[3]:SetAlpha(1)
-    -- Requery directly at presentation time. No opaque threat value enters
-    -- tracking, arithmetic, formatting in Lua, or presentation readback.
-    if A.Access.Read(UnitCanAttack, "player", unit) ~= true then return end
-    local ok, tanking, _, _, rawPercentage = pcall(UnitDetailedThreatSituation, "player", unit)
-    V.PaintRelative(row, unit, ok, tanking, rawPercentage)
-    if ok then
-        local yes = V.BooleanAlpha(row.aggro[1], tanking, 1, 0)
-        local no = V.BooleanAlpha(row.aggro[2], tanking, 0, 1)
-        if yes and no then row.aggro[3]:SetAlpha(0)
-        else row.aggro[1]:SetAlpha(0); row.aggro[2]:SetAlpha(0) end
-    end
-    local leadOK, lead = pcall(UnitThreatLeadSituation, "player", unit)
-    if leadOK and not A.Access.Readable(lead) then
-        row.warning:SetTextColor(0.65,0.70,0.78,1)
-        row.strip:SetColorTexture(0.65,0.70,0.78,1)
-        local displayed = pcall(function()
-            row.warning:SetFormattedText("RISK %.0f/3", lead)
-            row.risk:SetValue(lead); row.risk:SetAlpha(1)
-        end)
-        if not displayed then row.warning:SetText("UNKNOWN"); row.risk:SetAlpha(0); row.risk:SetValue(0) end
-    elseif leadOK and type(lead) == "number" and lead >= 0 and lead <= 3 and lead % 1 == 0 then
-        row.risk:SetValue(lead); row.risk:SetAlpha(1)
-    end
 end
 function V.PaintWarning(row, warning)
     local info = warnings[warning] or warnings.unknown
-    row.warning:SetText(info[1]); row.warning:SetTextColor(info[2],info[3],info[4],1)
-    row.strip:SetColorTexture(info[2],info[3],info[4],1)
-    row.relative:SetStatusBarColor(info[2],info[3],info[4],1)
+    row.left:SetStatusBarColor(info[2],info[3],info[4],1)
+    row.right:SetStatusBarColor(info[2],info[3],info[4],1)
+    row.notice:SetTextColor(info[2],info[3],info[4],1)
+    row.notice:SetText(warning == "noAggro" and "LOST" or (warning == "unknown" and "?" or ""))
 end
-function V.Paint(row, unit, warning)
-    row.unit = unit; row:SetAlpha(1)
-    A.UnitAPI.PaintFullName(row.name, unit)
-    V.PaintWarning(row, warning)
-    V.PaintNative(row, unit)
-    row.marker:SetAlpha(0)
-    local marker = A.Access.Read(GetRaidTargetIndex, unit)
-    if type(marker) == "number" and marker >= 1 and marker <= 8 and marker % 1 == 0 then
-        local column, line = (marker-1)%4, math.floor((marker-1)/4)
-        row.marker:SetTexCoord(column/4,(column+1)/4,line/2,(line+1)/2); row.marker:SetAlpha(1)
+function V.PaintCentered(row, percentage)
+    row.left:SetValue(0); row.right:SetValue(0)
+    -- Public-only transform. Never subtract/compare a restricted percentage.
+    if not A.Access.Readable(percentage) or type(percentage) ~= "number"
+        or percentage ~= percentage or percentage < 0 or percentage == math.huge then return false end
+    local delta = percentage-100
+    row.left:SetValue(math.min(100,math.max(0,-delta)))
+    row.right:SetValue(math.min(100,math.max(0,delta)))
+    return true
+end
+function V.PaintRelative(row, unit, ok, tanking, rawPercentage)
+    row.left:SetValue(0); row.right:SetValue(0)
+    if not ok or not A.Access.Readable(tanking) or type(tanking) ~= "boolean" then return "?" end
+    local percentage = rawPercentage
+    if tanking then
+        local leadOK, value = pcall(UnitThreatPercentageOfLead,"player",unit)
+        if not leadOK then return "?" end
+        percentage = value
+    end
+    if tanking and A.Access.Readable(percentage) and percentage == 0 then return "-" end
+    if not V.PaintCentered(row,percentage) then return "?" end
+end
+function V.PaintIdentity(row, unit)
+    A.UnitAPI.PaintFullName(row.name,unit); A.UnitAPI.PaintLevel(row.level,unit)
+    -- Health goes straight to native sinks; no arithmetic or cached health.
+    A.UnitAPI.PaintHealth(row.health,unit)
+    row.health:SetStatusBarColor(0.51,0.65,0.58,1)
+    row.rail:SetColorTexture(0.57,0.58,0.61,1)
+    local kind = A.Access.Read(UnitPowerType,unit)
+    if kind == 0 then
+        local maximum = A.Access.Read(UnitPowerMax,unit,0)
+        if type(maximum) == "number" and maximum > 0 then row.rail:SetColorTexture(0.31,0.55,0.80,1) end
     end
 end
-
+function V.Paint(row, unit, warning)
+    row.unit = unit; row:SetAlpha(1); V.PaintIdentity(row,unit); V.PaintWarning(row,warning)
+    local ok,tanking,_,_,rawPercentage = pcall(UnitDetailedThreatSituation,"player",unit)
+    local unavailable = V.PaintRelative(row,unit,ok,tanking,rawPercentage)
+    if unavailable and warning ~= "noAggro" then row.notice:SetText(unavailable) end
+end
 local demoRows = {
-    {"Training Brute", "lead", 220, true},
-    {"Training Berserker", "lead", 160, true},
-    {"Training Mystic", "weak", 112, true},
-    {"Training Scout", "noLead", 95, true},
-    {"Training Hound", "noAggro", 70, false},
-    {"Unknown reading", "unknown", nil, nil},
-    {"Solo comparison", "lead", nil, true, "NO COMPARISON"},
-    {"Selected enemy", "lead", 145, true},
+    {"War Tank", "lead", 182, false, 82},
+    {"Dark Adept", "lead", 160, true, 64},
+    {"Bloodfang Scout", "weak", 112, false, 93},
+    {"Shadow Mystic", "noLead", 95, true, 37},
+    {"Training Hound", "noAggro", 70, false, 55},
+    {"Unknown reading", "unknown", nil, false, 100},
+    {"Solo comparison", "lead", nil, false, 100, "-"},
+    {"Selected enemy", "lead", 145, true, 78},
 }
 function V.PaintDemo(time)
-    -- Fictional animation thresholds are visual examples, never live rules.
-    local phase = (time % 24) / 12
+    local phase = (time%24)/12
     local depth = phase <= 1 and phase or 2-phase
     depth = depth*depth*(3-2*depth)
-    for i, sample in ipairs(demoRows) do
+    for i,sample in ipairs(demoRows) do
         local row = V.rows[i]
-        V.ClearRow(row); row:SetAlpha(1); row.name:SetText(sample[1])
-        local warning, percentage, tanking = sample[2], sample[3], sample[4]
+        V.ClearRow(row); row:SetAlpha(1); row.name:SetText(sample[1]); row.level:SetText(tostring(19+i))
+        local warning, percentage, hp = sample[2],sample[3],sample[5]
         if i == 2 then
-            percentage = 180-110*depth
-            if percentage < 85 then warning, tanking = "noAggro", false
+            percentage = 180-110*depth; hp = 95-60*depth
+            if percentage < 85 then warning = "noAggro"
             elseif percentage < 100 then warning = "noLead"
             elseif percentage < 125 then warning = "weak" end
         end
-        V.PaintWarning(row, warning)
-        row.amount:SetText(sample[5] or "NO DATA")
-        if percentage then
-            row.relative:SetValue(percentage); row.relative:SetAlpha(1)
-            row.amount:SetFormattedText("Relative %.0f%%", percentage)
-        end
-        row.aggro[tanking == nil and 3 or (tanking and 1 or 2)]:SetAlpha(1)
-        if i <= 5 then
-            local marker = i-1
-            row.marker:SetTexCoord((marker%4)/4,((marker%4)+1)/4,math.floor(marker/4)/2,(math.floor(marker/4)+1)/2)
-            row.marker:SetAlpha(1)
-        end
+        V.PaintWarning(row,warning)
+        if not V.PaintCentered(row,percentage) then row.notice:SetText(sample[6] or "?") end
+        row.health:SetMinMaxValues(0,100); row.health:SetValue(hp)
+        if sample[4] then row.rail:SetColorTexture(0.31,0.55,0.80,1) end
         row.selection:SetAlpha(i == 8 and 1 or 0)
     end
-    V.footer:SetText("DEMO - scripted values, not live threat")
+    V.footer:SetText("DEMO")
 end

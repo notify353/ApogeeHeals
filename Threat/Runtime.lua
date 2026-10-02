@@ -76,7 +76,7 @@ function R.Refresh()
 end
 function R.ApplyEnabled()
     R.Reset()
-    V.title:SetText(R.demo and "DEMO threat - drag to move" or "Threat - drag to move")
+    V.title:SetText(R.demo and "DEMO - drag to move" or "Threat")
     if R.demo and not R.suspended then
         R.demoTime = 0; V.root:Show(); V.PaintDemo(0)
         R.frame:SetScript("OnUpdate", function(_, elapsed)
