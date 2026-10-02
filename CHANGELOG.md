@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Reduce threat stack width and row spacing for roughly 36% less screen area,
+  retaining readable names, centered threat, thin HP and selected-target outline.
+
 - Adopt compact name/level threat frames with center-origin fill, mana-type left
   rail, thin mob HP and selected-target outline in live and solo demo modes.
   Guard centered arithmetic behind public-value checks; restricted data shows ?.

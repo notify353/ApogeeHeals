@@ -45,7 +45,7 @@ local unit=m.Mob(1,true,3,0)
 local row=v.rows[1]
 assert(#v.rows==8 and #v.gates==7 and not row.protected and next(row.attributes)==nil)
 assert(row.left.reverseFill and not row.right.reverseFill and row.left.width==row.right.width)
-assert(row.left.height==16 and row.health.height==3 and row.height==19.5)
+assert(row.left.height==13 and row.health.height==2 and row.height==15.5)
 assert(row.right.value==50 and row.left.value==0 and row.notice.text=="")
 for _,case in ipairs({{0,100,0},{70,30,0},{95,5,0},{100,0,0},{112,0,12},{150,0,50},{250,0,100}}) do
     assert(v.PaintCentered(row,case[1])); assert(row.left.value==case[2] and row.right.value==case[3])
