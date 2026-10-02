@@ -1,5 +1,10 @@
 ## Unreleased
 
+- Recognize Forever's native Camelot project identity and retain legacy client
+  identification. Stop rejecting compatible Forever clients because their
+  interface number differs; required API and family-isolation checks remain.
+
+
 - Default the prototype threat stack off; opt in with its existing settings
   checkbox. Disabled panels perform no threat reads or polling; explicit choices persist.
 - Hide the reserved threat target row outside combat, removing the idle selection

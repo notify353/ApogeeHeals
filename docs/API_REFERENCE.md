@@ -1,5 +1,23 @@
 # Forever API authority
 
+## October 1 client identification correction
+
+The fresh 70170 export defines WOW_PROJECT_CAMELOT = 18 and assigns
+WOW_PROJECT_ID to it in the Camelot ProjectConstants module. Its TOC selects
+that module for the camelot game type. Project 1 is only a legacy Forever
+identification fallback when version is 1.60.x, not a mandatory current ID.
+Runtime interface and patch numbers do not expire features: native Forever
+identity is accepted across version/interface changes, followed by required API
+checks. Other client families remain unsupported. Prior project-1-only policy
+and exact-interface statements below are historical and superseded.
+
+Current export contracts were inspected for the affected identity path. In
+Keybinds' changed Spell/Unit/SlashCommands sources, spell data remains nullable
+and restricted where annotated, cast event identifiers remain guarded, and native
+command registration remains the authority. This is a current-contract review,
+not a complete old/new diff or native acceptance.
+
+
 ## Default-off threat stack (70170, 2026-10-01)
 
 Reviewed current UnitDetailedThreatSituation, UnitThreatLeadSituation,
