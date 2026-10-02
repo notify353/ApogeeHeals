@@ -45,7 +45,7 @@ local unit=m.Mob(1,true,3,0)
 local row=v.rows[1]
 assert(#v.rows==8 and #v.gates==7 and not row.protected and next(row.attributes)==nil)
 assert(row.left.reverseFill and not row.right.reverseFill and row.left.width==row.right.width)
-assert(row.left.height==7 and row.health.height==2 and row.height==9.5)
+assert(row.left.height==7 and row.health==nil and row.height==7)
 assert(row.right.value==50 and row.left.value==0 and row.notice.text=="")
 for _,case in ipairs({{0,100,0},{70,30,0},{95,5,0},{100,0,0},{112,0,12},{150,0,50},{250,0,100}}) do
     assert(v.PaintCentered(row,case[1])); assert(row.left.value==case[2] and row.right.value==case[3])
@@ -80,19 +80,14 @@ assert(a.ThreatModel.Classify(opaque,true,3)=="unknown")
 print("PASS centered threat: both directions, empty equality, capped ends, independent aggro loss and guarded restricted arithmetic")
 
 m,a,r,v=setup(); unit=m.Mob(1,true,3,0); row=v.rows[1]
-assert(row.health.value==50 and row.health.max==100 and row.rail.color[1]==0.57)
+assert(row.health==nil and row.rail.color[1]==0.57)
 m.units[unit].maxPower=200; m.units[unit].level=20; r.Refresh()
 assert(row.rail.color[3]==0.80 and row.level==nil and row.name==nil)
 m.units[unit].kind=1; r.Refresh(); assert(row.rail.color[1]==0.57)
 m.units[unit].kind=0; m.units[unit].maxPower=m.Secret(); r.Refresh(); assert(row.rail.color[1]==0.57)
-local health,maximum=m.Secret(),m.Secret()
-m.units[unit].health=health; m.units[unit].maxHealth=maximum; r.Refresh()
-assert(rawequal(row.health.value,health) and rawequal(row.health.max,maximum))
-UnitHealth=function() error("health unavailable") end
-r.Refresh(); assert(row.health.value==0)
 m.Event("NAME_PLATE_UNIT_REMOVED",unit)
-assert(row.left.value==0 and row.right.value==0 and row.health.value==0 and row.name==nil and row.level==nil)
-print("PASS mob health native sinks, mana-type rail and stale-data cleanup")
+assert(row.left.value==0 and row.right.value==0 and row.health==nil and row.name==nil and row.level==nil)
+print("PASS threat-only rows, mana-type rail and stale-data cleanup")
 
 m,a,r,v=setup()
 for i=1,10 do m.Mob(i,true,3,0) end

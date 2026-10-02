@@ -1,7 +1,7 @@
 local _, A = ...
 local V, S = {}, A.Style
 A.ThreatView = V
-local width, rowHeight, header = 96, 11, 7
+local width, rowHeight, header = 96, 9, 7
 local warnings = {
     lead={"LEAD", 0.28,0.74,0.46}, weak={"WEAK LEAD", 0.90,0.74,0.22},
     noLead={"NO LEAD", 0.92,0.48,0.24}, noAggro={"NO AGGRO", 0.86,0.30,0.30},
@@ -62,14 +62,12 @@ local function bar(parent, w, h, point, x, y, reverse)
 end
 local function createRow(parent, index)
     local row = CreateFrame("Frame", nil, parent)
-    row:SetSize(width,9.5); row:SetPoint("TOPLEFT",V.root,"TOPLEFT",0,-header-(index-1)*rowHeight)
+    row:SetSize(width,7); row:SetPoint("TOPLEFT",V.root,"TOPLEFT",0,-header-(index-1)*rowHeight)
     row:EnableMouse(false); S.Background(row)
     -- Immutable half-bars meet at the center. Left fills toward the left edge.
     row.left = bar(row,46.5,7,"TOPLEFT",3,0,true)
     row.right = bar(row,46.5,7,"TOPRIGHT",0,0,false)
-    row.health = bar(row,93,2,"BOTTOMRIGHT",0,0,false)
-    row.health:SetStatusBarColor(0.51,0.65,0.58,1)
-    row.rail = row:CreateTexture(nil,"OVERLAY"); row.rail:SetSize(2,9.5)
+    row.rail = row:CreateTexture(nil,"OVERLAY"); row.rail:SetSize(2,7)
     row.rail:SetPoint("TOPLEFT",0,0); row.rail:SetColorTexture(0.57,0.58,0.61,1)
     local overlay = CreateFrame("Frame",nil,row); overlay:SetAllPoints(row); overlay:EnableMouse(false)
     local level = A.Access.Read(row.GetFrameLevel,row)
@@ -79,7 +77,7 @@ local function createRow(parent, index)
     row.notice = S.Text(overlay,5); row.notice:SetPoint("TOPRIGHT",-2,0); row.notice:SetSize(21,7)
     row.notice:SetJustifyH("RIGHT")
     row.selection = CreateFrame("Frame",nil,overlay); row.selection:SetAllPoints(row); row.selection:EnableMouse(false)
-    for _,edge in ipairs({{"TOPLEFT",width,0.5},{"BOTTOMLEFT",width,0.5},{"TOPLEFT",0.5,9.5},{"TOPRIGHT",0.5,9.5}}) do
+    for _,edge in ipairs({{"TOPLEFT",width,0.5},{"BOTTOMLEFT",width,0.5},{"TOPLEFT",0.5,7},{"TOPRIGHT",0.5,7}}) do
         local line = row.selection:CreateTexture(nil,"OVERLAY")
         line:SetSize(edge[2],edge[3]); line:SetPoint(edge[1],row,edge[1],0,0)
         line:SetColorTexture(0.87,0.76,0.48,1)
@@ -112,7 +110,7 @@ function V.Create()
 end
 function V.ClearRow(row)
     row:SetAlpha(0); row.notice:SetText("")
-    row.left:SetValue(0); row.right:SetValue(0); row.health:SetMinMaxValues(0,1); row.health:SetValue(0)
+    row.left:SetValue(0); row.right:SetValue(0)
     row.selection:SetAlpha(0); row.rail:SetColorTexture(0.57,0.58,0.61,1); row.unit = nil
 end
 function V.Clear()
@@ -150,9 +148,6 @@ function V.PaintRelative(row, unit, ok, tanking, rawPercentage)
     if not V.PaintCentered(row,percentage) then return "?" end
 end
 function V.PaintIdentity(row, unit)
-    -- Health goes straight to native sinks; no arithmetic or cached health.
-    A.UnitAPI.PaintHealth(row.health,unit)
-    row.health:SetStatusBarColor(0.51,0.65,0.58,1)
     row.rail:SetColorTexture(0.57,0.58,0.61,1)
     local kind = A.Access.Read(UnitPowerType,unit)
     if kind == 0 then
@@ -167,14 +162,14 @@ function V.Paint(row, unit, warning)
     if unavailable and warning ~= "noAggro" then row.notice:SetText(unavailable) end
 end
 local demoRows = {
-    {"War Tank", "lead", 182, false, 82},
-    {"Dark Adept", "lead", 160, true, 64},
-    {"Bloodfang Scout", "weak", 112, false, 93},
-    {"Shadow Mystic", "noLead", 95, true, 37},
-    {"Training Hound", "noAggro", 70, false, 55},
-    {"Unknown reading", "unknown", nil, false, 100},
-    {"Solo comparison", "lead", nil, false, 100, "-"},
-    {"Selected enemy", "lead", 145, true, 78},
+    {"War Tank", "lead", 182, false},
+    {"Dark Adept", "lead", 160, true},
+    {"Bloodfang Scout", "weak", 112, false},
+    {"Shadow Mystic", "noLead", 95, true},
+    {"Training Hound", "noAggro", 70, false},
+    {"Unknown reading", "unknown", nil, false},
+    {"Solo comparison", "lead", nil, false, "-"},
+    {"Selected enemy", "lead", 145, true},
 }
 function V.PaintDemo(time)
     local phase = (time%24)/12
@@ -183,16 +178,15 @@ function V.PaintDemo(time)
     for i,sample in ipairs(demoRows) do
         local row = V.rows[i]
         V.ClearRow(row); row:SetAlpha(1)
-        local warning, percentage, hp = sample[2],sample[3],sample[5]
+        local warning, percentage = sample[2],sample[3]
         if i == 2 then
-            percentage = 180-110*depth; hp = 95-60*depth
+            percentage = 180-110*depth
             if percentage < 85 then warning = "noAggro"
             elseif percentage < 100 then warning = "noLead"
             elseif percentage < 125 then warning = "weak" end
         end
         V.PaintWarning(row,warning)
-        if not V.PaintCentered(row,percentage) then row.notice:SetText(sample[6] or "?") end
-        row.health:SetMinMaxValues(0,100); row.health:SetValue(hp)
+        if not V.PaintCentered(row,percentage) then row.notice:SetText(sample[5] or "?") end
         if sample[4] then row.rail:SetColorTexture(0.31,0.55,0.80,1) end
         row.selection:SetAlpha(i == 8 and 1 or 0)
     end

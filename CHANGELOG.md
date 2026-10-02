@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Remove HP strips and health reads from live/demo threat rows, shortening rows
+  to keep attention on centered threat, warning colors and target selection.
+
 - Remove mob names and levels from live/demo threat rows and shrink to narrow
   bar-only rows, retaining HP, mana rail, warnings and target outline.
 
