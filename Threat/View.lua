@@ -125,7 +125,7 @@ local function createRow(parent, index)
     row.demoCount=S.Text(overlay,5); row.demoCount:SetSize(7,7)
     local countFont=row.demoCount:GetFont(); row.demoCount:SetFont(countFont,5,"THICKOUTLINE")
     row.demoCount:SetPoint("TOPLEFT",row,"TOPLEFT",width+6,0)
-    row.demoCount:SetJustifyH("CENTER"); row.demoCount:SetJustifyV("MIDDLE"); row.demoCount:SetTextColor(1,0.9,0.1,1); row.demoCount:Hide()
+    row.demoCount:SetJustifyH("CENTER"); row.demoCount:SetJustifyV("MIDDLE"); row.demoCount:SetTextColor(1,1,1,1); row.demoCount:Hide()
     row:SetAlpha(0); row.selection:SetAlpha(0)
     return row
 end

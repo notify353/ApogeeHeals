@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Restore white demo Sunder counts while retaining the thick black outline.
+
 - Use bright yellow, thick-outlined demo Sunder counts for stronger contrast.
 
 - Order enemy indicators as Sunder, Thunder Clap, Demo Shout and hide unconfirmed slots.
