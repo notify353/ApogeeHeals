@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Remove the separate live target slot: all eight rows track stable nameplate
+  lifetimes, and targeting only changes the outline. Refresh client API review.
+
 - Render restricted threat percentages through native centered masks/ranges and
   select secret tanking lanes with native alpha sinks instead of clearing bars.
 

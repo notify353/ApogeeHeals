@@ -43,7 +43,7 @@ end
 local m,a,r,v=setup()
 local unit=m.Mob(1,true,3,0)
 local row=v.rows[1]
-assert(#v.rows==8 and #v.gates==7 and not row.protected and next(row.attributes)==nil)
+assert(#v.rows==8 and v.gates==nil and not row.protected and next(row.attributes)==nil)
 assert(row.left.reverseFill and not row.right.reverseFill and row.left.width==row.right.width)
 assert(row.left.height==7 and row.health==nil and row.height==7)
 assert(row.right.value==50 and row.left.value==0 and row.notice.text=="")
@@ -112,30 +112,26 @@ print("PASS threat-only rows, mana-type rail and stale-data cleanup")
 
 m,a,r,v=setup()
 for i=1,10 do m.Mob(i,true,3,0) end
-for i=1,7 do assert(r.model.slots[i]=="nameplate"..i) end
-assert(v.footer.text=="+3 more")
+for i=1,8 do assert(r.model.slots[i]=="nameplate"..i) end
+assert(v.footer.text=="+2 more")
 local slots={unpack(r.model.slots)}
 m.combat=true
-for i=1,7 do
+for i=1,8 do
     m.Target("nameplate"..i)
-    assert(v.rows[i].selection.alpha==1 and v.gates[i].alpha==0)
-    assert(v.rows[8].unit=="target")
-    for j=1,7 do assert(r.model.slots[j]==slots[j]) end
+    assert(v.rows[i].selection.alpha==1)
+    for j=1,8 do assert(r.model.slots[j]==slots[j] and v.rows[j].unit==slots[j]) end
 end
 m.Target("nameplate9")
-assert(v.rows[8].unit=="target" and v.rows[8].selection.alpha==1 and v.footer.text=="+2 more")
-for i=1,7 do assert(v.gates[i].alpha==1 and v.rows[i].selection.alpha==0) end
+assert(v.rows[8].unit=="nameplate8" and v.rows[8].selection.alpha==0 and v.footer.text=="+2 more")
 m.units.nameplate4.lead=3; r.Refresh()
-for i=1,7 do assert(r.model.slots[i]==slots[i]) end
+for i=1,8 do assert(r.model.slots[i]==slots[i]) end
 m.Event("NAME_PLATE_UNIT_REMOVED","nameplate3")
-assert(r.model.entries.nameplate3==nil and r.model.slots[3]=="nameplate8")
-assert(r.model.slots[4]=="nameplate4" and v.rows[3].unit=="nameplate8")
-m.units.nameplate3={name="Replacement", hostile=true, tanking=false, threatStatus=0,lead=3,
-    health=50,maxHealth=100,power=0,maxPower=0,kind=0,auras={}}
+assert(r.model.entries.nameplate3==nil and r.model.slots[3]=="nameplate9")
+assert(v.rows[3].selection.alpha==1 and r.model.slots[4]=="nameplate4")
+m.units.nameplate3={name="Replacement",hostile=true,tanking=false,threatStatus=0,lead=3}
 m.Event("NAME_PLATE_UNIT_ADDED","nameplate3")
 assert(r.model.entries.nameplate3.warning=="noAggro" and r.model.entries.nameplate3.order==11)
-m.Mob(55,true,3,1); assert(r.model.entries.nameplate55.warning=="weak")
-print("PASS stable seven slots, reserved overflow target, counts, departures and token reuse without threat sorting")
+print("PASS eight stable slots; selection never creates or moves rows; overflow fills only vacated slots")
 
 m,a,r,v=setup()
 unit=m.Mob(1,true,3,0); m.combat=true; m.Target(unit)
@@ -148,13 +144,13 @@ C_CurveUtil.EvaluateColorValueFromBoolean=function(value,yes,no)
     return m.Secret() -- Engine boundary only; alpha sink accepts the opaque result.
 end
 r.Refresh()
-assert(calls==2 and issecretvalue(v.rows[1].selection.alpha) and issecretvalue(v.gates[1].alpha))
+assert(calls==1 and issecretvalue(v.rows[1].selection.alpha))
 assert(r.model.slots[1]==unit and not issecretvalue(r.model.entries[unit].warning))
 C_CurveUtil.EvaluateColorValueFromBoolean=nil
 r.Refresh(); assert(v.rows[1].selection.alpha==0 and v.rows[8].alpha==0 and v.footer.text=="Target match unknown")
 m.secretMatch=nil; m.matchError=true; r.Refresh()
 assert(v.rows[1].selection.alpha==0 and v.rows[8].alpha==0)
-m.matchError=nil; r.Refresh(); assert(v.rows[1].selection.alpha==1 and v.gates[1].alpha==0)
+m.matchError=nil; r.Refresh(); assert(v.rows[1].selection.alpha==1 and v.rows[1].alpha==1)
 print("PASS nameless rows and native secret target comparisons; unknown identity never guesses a target")
 
 m,a,r,v=setup()
@@ -193,21 +189,23 @@ assert(clean.threatPosition==nil and clean.threatEnabled==nil and clean.bindings
 m,a,r,v=setup({version=3,threatEnabled=false}); assert(not v.root.shown and r.frame.scripts.OnUpdate==nil)
 print("PASS combat-safe fixed geometry, bounded polling, zoning/bootstrap, toggle, position persistence and reset isolation")
 
-m,a,r,v=setup()
-unit=m.Mob(1,true,3,0); m.combat=true; m.Target(unit)
-m.units[unit].threatStatus=nil; m.units[unit].lead=nil; r.Refresh()
-assert(v.rows[1].notice.text=="?" and v.rows[8].notice.text=="?")
-m.units[unit].dead=true; r.Refresh(); assert(v.rows[1].alpha==0 and v.rows[8].alpha==0)
-m.units[unit].dead=nil; m.units[unit].hostile=false; r.Refresh(); assert(v.rows[8].alpha==0)
-m.units.target={name="Untouched",hostile=true,health=50,maxHealth=100,power=0,maxPower=0,kind=0,auras={}}
-m.combat=false; m.Event("PLAYER_REGEN_ENABLED")
-assert(v.rows[8].alpha==0 and v.rows[8].name==nil and v.rows[8].notice.text=="")
-m.Event("PLAYER_TARGET_CHANGED"); assert(v.rows[8].alpha==0)
-m.combat=true; m.Event("PLAYER_REGEN_DISABLED")
-r.Refresh(); assert(v.rows[8].notice.text=="?" and v.rows[8].alpha==1)
-UnitDetailedThreatSituation=nil; r.Refresh(); assert(v.rows[8].notice.text=="?")
-m.combat=false; m.Event("PLAYER_REGEN_ENABLED"); assert(v.rows[8].alpha==0)
-print("PASS idle target suppression, combat target switching, dead/friendly cleanup and missing API fallback")
+-- Reproduce target-before-damage: no bottom placeholder; acquisition uses one
+-- stable row and later threat changes/target switches cannot move it.
+m,a,r,v=setup(); m.combat=true
+m.units.nameplate1={hostile=true}; m.Event("NAME_PLATE_UNIT_ADDED","nameplate1")
+m.Target("nameplate1")
+for _,row in ipairs(v.rows) do assert(row.alpha==0) end
+m.units.nameplate1.threatStatus=3; m.units.nameplate1.tanking=true
+m.units.nameplate1.lead=0; m.units.nameplate1.leadPercent=150
+m.Event("UNIT_THREAT_LIST_UPDATE","nameplate1")
+assert(v.rows[1].unit=="nameplate1" and v.rows[1].selection.alpha==1 and v.rows[8].alpha==0)
+local anchor=v.rows[1].point
+m.units.nameplate1.threatStatus=nil; m.units.nameplate1.lead=nil; r.Refresh()
+assert(v.rows[1].unit=="nameplate1" and v.rows[1].point==anchor and v.rows[1].notice.text=="?")
+m.Target(nil); assert(v.rows[1].unit=="nameplate1" and v.rows[1].selection.alpha==0)
+m.Target("nameplate1"); assert(v.rows[1].selection.alpha==1 and v.rows[1].point==anchor)
+m.units.nameplate1.dead=true; r.Refresh(); assert(v.rows[1].alpha==0)
+print("PASS target-before-damage stays on one row; missing readings and selection never relocate it")
 
 m,a,r,v=setup(nil,true)
 assert(a.db.threatEnabled==nil and not v.root.shown and a.Settings.threat.checked==false)
@@ -228,11 +226,11 @@ print("PASS default-off threat has no polling/reads; settings checkbox opt-in an
 m,a,r,v=setup()
 assert(v.root.shown and v.footer.text=="Idle - no tracked enemies")
 m.combat=true; m.Event("PLAYER_REGEN_DISABLED")
-assert(v.footer.text=="No tracked enemies - select one")
+assert(v.footer.text=="No tracked enemies - show nameplates")
 unit=m.Mob(1,true,3,0); m.Target(unit)
 assert(v.rows[1].alpha==1 and v.footer.text=="")
 m.units[unit].dead=true; r.Refresh()
-assert(v.footer.text=="No tracked enemies - select one")
+assert(v.footer.text=="No tracked enemies - show nameplates")
 m.combat=false; m.Event("PLAYER_REGEN_ENABLED")
 assert(v.footer.text=="Idle - no tracked enemies")
 print("PASS empty threat state explains idle/combat and clears when an enemy is tracked")

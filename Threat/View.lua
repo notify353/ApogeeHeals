@@ -133,14 +133,8 @@ function V.Create()
     end)
     V.handle:SetScript("OnDragStop",function() V.StopMoving(true) end)
     V.footer = S.CleanText(V.root,5); V.footer:SetPoint("BOTTOMLEFT",0,0); V.footer:SetTextColor(unpack(S.muted))
-    V.rows, V.gates = {}, {}
-    for i=1,7 do V.rows[i] = createRow(V.root,i) end
-    local parent = V.root
-    for i=1,7 do
-        local gate = CreateFrame("Frame",nil,parent); gate:SetAllPoints(V.root); gate:EnableMouse(false)
-        V.gates[i], parent = gate, gate
-    end
-    V.rows[8] = createRow(parent,8)
+    V.rows = {}
+    for i=1,8 do V.rows[i] = createRow(V.root,i) end
     V.Place(); V.Clear()
 end
 function V.ClearRow(row)
@@ -151,7 +145,6 @@ function V.ClearRow(row)
 end
 function V.Clear()
     for _,row in ipairs(V.rows) do V.ClearRow(row) end
-    for _,gate in ipairs(V.gates) do gate:SetAlpha(1) end
     V.footer:SetText("")
 end
 function V.PaintWarning(row, warning)

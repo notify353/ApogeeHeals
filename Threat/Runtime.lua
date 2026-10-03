@@ -29,51 +29,27 @@ function R.Refresh()
         M.Observe(R.model, unit, presence, warning)
     end
     M.Fill(R.model)
-    local targetPresence, targetWarning = M.Sample("target")
-    -- The reserved row serves combat target switching, not idle selection.
-    -- Existing encounter rows retain their stable slots independently.
-    local targetActive = InCombatLockdown() and targetPresence ~= "absent"
-    local comparisonsOK, comparisonsPublic, selectedStable = true, true, false
+    -- All rows belong to stable nameplate lifetimes. Selection only paints
+    -- an outline; it never creates a target placeholder or promotes a row.
+    local comparisonsOK = true
     local count, visible = 0, 0
     for _ in pairs(R.model.entries) do count = count + 1 end
-    for i = 1, 7 do
-        local unit = R.model.slots[i]
-        local row = V.rows[i]
-        V.gates[i]:SetAlpha(1)
+    for i = 1, 8 do
+        local unit, row = R.model.slots[i], V.rows[i]
         if unit then
-            visible = visible + 1; V.Paint(row, unit, R.model.entries[unit].warning)
+            visible = visible + 1; V.Paint(row,unit,R.model.entries[unit].warning)
             row.selection:SetAlpha(0)
-            if targetActive then
-                local ok, same = pcall(UnitIsUnit, unit, "target")
-                if ok then
-                    if not A.Access.Readable(same) then comparisonsPublic = false end
-                    local highlightOK = V.BooleanAlpha(row.selection, same, 1, 0)
-                    local gateOK = V.BooleanAlpha(V.gates[i], same, 0, 1)
-                    comparisonsOK = comparisonsOK and highlightOK and gateOK
-                    if A.Access.Readable(same) and same == true then selectedStable = true end
-                else comparisonsOK = false end
-            end
+            local ok, same = pcall(UnitIsUnit,unit,"target")
+            if ok then
+                if not V.BooleanAlpha(row.selection,same,1,0) then comparisonsOK = false end
+            else comparisonsOK = false end
         else V.ClearRow(row) end
     end
-    if targetActive then
-        V.Paint(V.rows[8], "target", targetWarning); V.rows[8].selection:SetAlpha(1)
-    else V.ClearRow(V.rows[8]) end
     local extra = count-visible
-    -- Subtract the reserved target only when its identity is publicly known.
-    if extra > 0 and targetActive and comparisonsPublic and not selectedStable then
-        for unit in pairs(R.model.entries) do
-            local same = A.Access.Read(UnitIsUnit, unit, "target")
-            if type(same) ~= "boolean" then comparisonsPublic = false end
-            if same == true then extra = math.max(0, extra-1); break end
-        end
-    end
-    -- A secret duplicate match cannot justify an exact hidden-row count.
-    V.footer:SetText(extra > 0 and (comparisonsPublic and ("+" .. extra .. " more") or (count .. " tracked")) or "")
-    if targetActive and not comparisonsOK then
-        V.rows[8]:SetAlpha(0)
-        V.footer:SetText("Target match unknown")
-    elseif visible == 0 and not targetActive then
-        V.footer:SetText(InCombatLockdown() and "No tracked enemies - select one" or "Idle - no tracked enemies")
+    V.footer:SetText(extra > 0 and ("+" .. extra .. " more") or "")
+    if not comparisonsOK then V.footer:SetText("Target match unknown")
+    elseif visible == 0 then
+        V.footer:SetText(InCombatLockdown() and "No tracked enemies - show nameplates" or "Idle - no tracked enemies")
     end
 end
 function R.ApplyEnabled()

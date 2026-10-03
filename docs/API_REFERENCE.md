@@ -1,5 +1,16 @@
 # Forever API authority
 
+## Stable threat rows and refreshed export (70205, 2026-10-02)
+
+Fresh owner export postdates the updated client. Reviewed native threat, unit
+comparison and nameplate contracts; matching-source checks pass. All central
+loading-safety reference hashes are unchanged. Interface remains 16001.
+All eight live rows now belong to stable nameplate lifetimes; no reserved target
+row or native duplicate gates remain. Target comparison only paints outlines.
+An unengaged selection no longer creates a bottom placeholder. Enabled enemy
+nameplates are needed to discover mobs; overflow waits for a free stable slot.
+No new protected layout changes or restricted-value Lua calculations.
+
 ## Restricted center-origin display correction (70170, 2026-10-02)
 
 Grouped screenshot shows a tracked selected row with a green ? and empty fill.

@@ -43,7 +43,7 @@ function M.New()
 end
 function M.Remove(model, unit)
     model.entries[unit] = nil
-    for i = 1, 7 do if model.slots[i] == unit then model.slots[i] = nil end end
+    for i = 1, 8 do if model.slots[i] == unit then model.slots[i] = nil end end
 end
 function M.Observe(model, unit, presence, warning)
     local entry = model.entries[unit]
@@ -57,14 +57,14 @@ function M.Observe(model, unit, presence, warning)
 end
 function M.Fill(model)
     local waiting, occupied = {}, {}
-    for i = 1, 7 do if model.slots[i] then occupied[model.slots[i]] = true end end
+    for i = 1, 8 do if model.slots[i] then occupied[model.slots[i]] = true end end
     for unit, entry in pairs(model.entries) do
         if not occupied[unit] then waiting[#waiting+1] = {unit=unit, order=entry.order} end
     end
     -- Sort acquisition sequence only; threat and selection never reorder rows.
     table.sort(waiting, function(a, b) return a.order < b.order end)
     local at = 1
-    for i = 1, 7 do
+    for i = 1, 8 do
         if not model.slots[i] and waiting[at] then model.slots[i] = waiting[at].unit; at = at + 1 end
     end
 end
