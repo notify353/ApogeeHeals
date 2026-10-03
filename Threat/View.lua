@@ -101,12 +101,12 @@ local function createRow(parent, index)
     row.notice:SetJustifyH("RIGHT"); row.notice:Hide()
     row.selection = CreateFrame("Frame",nil,overlay); row.selection:SetAllPoints(row); row.selection:EnableMouse(false)
     local marker = row.selection:CreateTexture(nil,"OVERLAY")
-    marker:SetSize(3,7); marker:SetPoint("TOPRIGHT",row,"TOPRIGHT",0,0)
+    marker:SetSize(3,7); marker:SetPoint("TOPLEFT",row,"TOPRIGHT",1,0)
     marker:SetColorTexture(0.87,0.76,0.48,1)
     row.debuffs = {}
     for i=1,3 do
         local label=S.Text(overlay,5); label:SetSize(12,7)
-        label:SetPoint("TOPLEFT",row,"TOPLEFT",width+2+(i-1)*12,0)
+        label:SetPoint("TOPLEFT",row,"TOPLEFT",width+6+(i-1)*12,0)
         label:SetJustifyH("LEFT"); row.debuffs[i]=label
     end
     row:SetAlpha(0); row.selection:SetAlpha(0)
@@ -114,7 +114,7 @@ local function createRow(parent, index)
 end
 function V.Create()
     V.root = CreateFrame("Frame",nil,UIParent)
-    V.root:SetScale(S.scale); V.root:SetSize(width+38,8*rowHeight-0.5)
+    V.root:SetScale(S.scale); V.root:SetSize(width+42,8*rowHeight-0.5)
     V.root:SetMovable(false); V.root:SetClampedToScreen(true); V.root:EnableMouse(false)
     V.handle = CreateFrame("Button",nil,V.root); V.handle:EnableMouse(false)
     V.handle:SetPoint("TOPLEFT",0,0); V.handle:SetSize(width,header)
@@ -144,7 +144,7 @@ function V.PrepareDebuffs()
                 local container=CreateFrame("AuraContainer",nil,row,"CustomAuraContainerTemplate")
                 local level=A.Access.Read(row.GetFrameLevel,row)
                 if finite(level) then container:SetFrameLevel(level+10) end
-                container:SetSize(12,7); container:SetPoint("TOPLEFT",row,"TOPLEFT",width+2+(i-1)*12,0)
+                container:SetSize(12,7); container:SetPoint("TOPLEFT",row,"TOPLEFT",width+6+(i-1)*12,0)
                 container:AddAuraGroup("own","HARMFUL|PLAYER",{
                     maxFrameCount=1, candidateFilters={includeSpellIDs=ids},
                     layout={elementWidth=12,elementHeight=7,elementSpacing=0},

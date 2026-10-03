@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Move the selection marker outside the threat fill and space debuff labels after it.
+
 - Widen the selected enemy gold marker for easier visibility.
 
 - Replace the selected enemy outline with a slim gold right-edge marker.
