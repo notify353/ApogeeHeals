@@ -1,5 +1,14 @@
 # Forever API authority
 
+## Owner acceptance of threat fixes (2026-10-03)
+
+The owner tested the installed DEV threat mana and refresh fixes and reports
+everything working. This accepts the behavior of source commit
+0cf04f26c23a060ef961db0c044702e63570c49d, installed by the central
+apogee-threat-refresh-20261003 transaction. Automated source, generated DEV and
+distribution checks passed before installation. This does not establish exact
+grouped threat-percentage semantics or separate PROD/CurseForge acceptance.
+
 ## Threat refresh sweep (70205, 2026-10-03)
 
 Reviewed threat events, UNIT_MAXPOWER/UNIT_DISPLAYPOWER, native SetValue's
