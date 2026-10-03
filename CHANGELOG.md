@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Use bright yellow, thick-outlined demo Sunder counts for stronger contrast.
+
 - Order enemy indicators as Sunder, Thunder Clap, Demo Shout and hide unconfirmed slots.
 
 - Narrow threat bars for side clearance and center demo stack counts inside icons.
