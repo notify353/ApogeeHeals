@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Hide status font regions explicitly so warning color updates cannot restore
+  LOST, question marks or dashes inside the bars.
+
 - Lock the threat stack to screen center, disable dragging, and hide header/footer
   with no reserved padding. Empty rows leave the meter transparent.
 

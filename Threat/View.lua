@@ -56,7 +56,7 @@ local function nativeLane(row)
     lane.right = bar(lane,46.5,7,"TOPRIGHT",0,0,false)
     lane.right:SetMinMaxValues(100,200)
     lane.notice = S.Text(lane.right,5); lane.notice:SetPoint("TOPRIGHT",-2,0)
-    lane.notice:SetSize(21,7); lane.notice:SetJustifyH("RIGHT"); lane.notice:SetAlpha(0)
+    lane.notice:SetSize(21,7); lane.notice:SetJustifyH("RIGHT"); lane.notice:Hide()
     lane:SetAlpha(0)
     return lane
 end
@@ -99,7 +99,7 @@ local function createRow(parent, index)
     row.reference = overlay:CreateTexture(nil,"OVERLAY"); row.reference:SetSize(0.5,7)
     row.reference:SetPoint("TOPLEFT",row,"TOPLEFT",49.5,0); row.reference:SetColorTexture(0.83,0.87,0.85,0.25)
     row.notice = S.Text(overlay,5); row.notice:SetPoint("TOPRIGHT",-2,0); row.notice:SetSize(21,7)
-    row.notice:SetJustifyH("RIGHT"); row.notice:SetAlpha(0)
+    row.notice:SetJustifyH("RIGHT"); row.notice:Hide()
     row.selection = CreateFrame("Frame",nil,overlay); row.selection:SetAllPoints(row); row.selection:EnableMouse(false)
     for _,edge in ipairs({{"TOPLEFT",width,0.5},{"BOTTOMLEFT",width,0.5},{"TOPLEFT",0.5,7},{"TOPRIGHT",0.5,7}}) do
         local line = row.selection:CreateTexture(nil,"OVERLAY")
