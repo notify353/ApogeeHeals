@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Promote approved demo icon layout, scale, and centered counts to native live enemy debuffs.
+
 - Add a subtle half-unit gap between demo debuff icon frames and retain group centering.
 
 - Match demo debuff icons to Keybinds with cropped artwork, dark inset frames, and outlined/shadowed white counts.

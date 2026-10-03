@@ -1,5 +1,13 @@
 # Forever API authority
 
+## Live icon presentation (70205, 2026-10-02)
+
+Reviewed CustomAuraButton SetIcon: native code assigns the matched aura texture.
+Use SetApplicationCount for centered white stack text; its default hides one
+application and shows counts above one. No aura texture/count is read back.
+Native button visibility owns both the inset background and icon, so inactive
+slots are fully invisible. Live layout now matches the approved demo.
+
 ## Native enemy debuff containers (70205, 2026-10-02)
 
 Read installed Threat Plates AurasWidgetMidnight as an architectural reference

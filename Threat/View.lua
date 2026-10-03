@@ -27,9 +27,8 @@ function V.BooleanAlpha(region, value, yes, no)
 end
 function V.Place()
     if InCombatLockdown() then return end
-    local demo=A.Threat and A.Threat.demo
-    local extent=width+(demo and 28 or 42)
-    V.root:SetScale(S.scale*(demo and 1.3 or 1.1))
+    local extent=width+28
+    V.root:SetScale(S.scale*1.3)
     V.root:SetSize(extent,8*rowHeight-0.5)
     V.root:ClearAllPoints()
     V.root:SetPoint("TOPLEFT", UIParent, "CENTER", -extent/2, 3.5)
@@ -166,20 +165,22 @@ function V.PrepareDebuffs()
                 local container=CreateFrame("AuraContainer",nil,row,"CustomAuraContainerTemplate")
                 local level=A.Access.Read(row.GetFrameLevel,row)
                 if finite(level) then container:SetFrameLevel(level+10) end
-                container:SetSize(12,7); container:SetPoint("TOPLEFT",row,"TOPLEFT",width+6+(i-1)*12,0)
+                container:SetSize(7,7); container:SetPoint("TOPLEFT",row,"TOPLEFT",width+6+(i-1)*7.5,0)
                 container:AddAuraGroup("own","HARMFUL|PLAYER",{
                     maxFrameCount=1, candidateFilters={includeSpellIDs=ids},
-                    layout={elementWidth=12,elementHeight=7,elementSpacing=0},
+                    layout={elementWidth=7,elementHeight=7,elementSpacing=0},
                     initializeFrame=function(button)
-                        button:SetSize(12,7); button:SetCancelAuraButtons(nil)
+                        button:SetSize(7,7); button:SetCancelAuraButtons(nil)
                         button:SetTooltipAnchorPoint("ANCHOR_RIGHT")
                         S.Background(button)
-                        local label=S.Text(button,5); label:SetPoint("TOPLEFT",0,0); label:SetSize(12,7)
-                        label:SetJustifyH("LEFT"); label:SetText(({"S","T","D"})[index])
-                        label:SetTextColor(0.28,0.85,0.46,1)
+                        local icon=button:CreateTexture(nil,"ARTWORK"); icon:SetSize(6.2,6.2)
+                        icon:SetPoint("TOPLEFT",0.4,-0.4); icon:SetTexCoord(0.07,0.93,0.07,0.93)
+                        button:SetIcon(icon)
                         if index==1 then
                             local count=S.Text(button,5); count:SetPoint("TOPLEFT",0,0); count:SetSize(7,7)
-                            count:SetJustifyH("LEFT"); count:SetTextColor(0.28,0.85,0.46,1)
+                            local font=count:GetFont(); count:SetFont(font,5,"OUTLINE")
+                            count:SetJustifyH("CENTER"); count:SetJustifyV("MIDDLE"); count:SetTextColor(1,1,1,1)
+                            count:SetShadowColor(0,0,0,0.85); count:SetShadowOffset(0.2,-0.2)
                             button:SetApplicationCount(count)
                         end
                     end,

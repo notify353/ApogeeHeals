@@ -14,6 +14,7 @@ CreateFrame=function(kind,name,parent,template)
             local button=create("AuraButton",nil,self)
             function button:SetCancelAuraButtons(value) assert(value==nil) end
             function button:SetTooltipAnchorPoint(value) self.tooltipAnchor=value end
+            function button:SetIcon(icon) self.icon=icon end
             function button:SetApplicationCount(label) self.count=label end
             options.initializeFrame(button); buttons[#buttons+1]=button
         end
@@ -32,6 +33,9 @@ assert(containers[1].options.candidateFilters.includeSpellIDs[11597])
 assert(containers[2].options.candidateFilters.includeSpellIDs[6343])
 assert(containers[3].options.candidateFilters.includeSpellIDs[1160])
 assert(buttons[1].count and not buttons[2].count)
+assert(buttons[1].icon and buttons[1].icon.texCoord[1]==0.07)
+assert(buttons[1].count.justify=="CENTER" and buttons[1].count.justifyV=="MIDDLE")
+assert(containers[1].options.layout.elementWidth==7)
 C_UnitAuras.GetAuraDataByIndex=function() error("Lua must not enumerate auras") end
 m.combat=true; local row=v.rows[1]
 a.ThreatModel.PaintDebuffs(row,"nameplate7")
