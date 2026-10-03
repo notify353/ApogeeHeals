@@ -175,7 +175,7 @@ function V.PrepareDebuffs()
                         button:SetTooltipAnchorPoint("ANCHOR_RIGHT")
                         S.Background(button)
                         local label=S.Text(button,5); label:SetPoint("TOPLEFT",0,0); label:SetSize(12,7)
-                        label:SetJustifyH("LEFT"); label:SetText(({"S","D+","T+"})[index])
+                        label:SetJustifyH("LEFT"); label:SetText(({"S","D","T"})[index])
                         label:SetTextColor(0.28,0.85,0.46,1)
                         if index==1 then
                             local count=S.Text(button,5); count:SetPoint("TOPLEFT",5,0); count:SetSize(7,7)
@@ -303,7 +303,7 @@ function V.PaintDemo(time)
         for j,label in ipairs(row.debuffs) do
             local prefix=({"S","D","T"})[j]
             local active=(i+j)%3~=0
-            label:SetText(prefix..(i==6 and "?" or (active and (j==1 and tostring(i%5+1) or "+") or "-")))
+            label:SetText(prefix..(i==6 and "?" or (active and j==1 and tostring(i%5+1) or "")))
             if i==6 then label:SetTextColor(0.65,0.70,0.78,1)
             elseif active then label:SetTextColor(0.28,0.85,0.46,1)
             else label:SetTextColor(0.42,0.45,0.50,1) end

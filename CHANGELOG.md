@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Simplify Demo Shout and Thunder Clap indicators to D/T with active green color,
+  including the demo; keep Sunder stack counts. Owner verified native indicators.
+
 - Replace enemy aura Lua scanning with native player-filtered aura containers
   and native Sunder stack text, following the current client display contract.
 
