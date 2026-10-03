@@ -29,14 +29,14 @@ for i,c in ipairs(containers) do
 end
 assert(containers[1].options.candidateFilters.includeSpellIDs[7386])
 assert(containers[1].options.candidateFilters.includeSpellIDs[11597])
-assert(containers[2].options.candidateFilters.includeSpellIDs[1160])
-assert(containers[3].options.candidateFilters.includeSpellIDs[6343])
+assert(containers[2].options.candidateFilters.includeSpellIDs[6343])
+assert(containers[3].options.candidateFilters.includeSpellIDs[1160])
 assert(buttons[1].count and not buttons[2].count)
 C_UnitAuras.GetAuraDataByIndex=function() error("Lua must not enumerate auras") end
 m.combat=true; local row=v.rows[1]
 a.ThreatModel.PaintDebuffs(row,"nameplate7")
 for _,c in ipairs(row.debuffContainers) do assert(c.unit=="nameplate7" and c.enabled) end
-assert(row.debuffs[1].text=="S" and row.debuffs[2].text=="D")
+assert(not row.debuffs[1].shown and not row.debuffs[2].shown)
 v.ClearRow(row)
 for _,c in ipairs(row.debuffContainers) do assert(not c.enabled) end
 a.ThreatModel.PaintDebuffs(row,"nameplate8")

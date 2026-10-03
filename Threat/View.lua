@@ -114,7 +114,7 @@ local function createRow(parent, index)
         label:SetJustifyH("LEFT"); row.debuffs[i]=label
     end
     row.demoIcons = {}
-    for i,id in ipairs({7386,1160,6343}) do
+    for i,id in ipairs({7386,6343,1160}) do
         local icon=overlay:CreateTexture(nil,"OVERLAY"); icon:SetSize(7,7)
         icon:SetPoint("TOPLEFT",row,"TOPLEFT",width+6+(i-1)*7,0)
         local info=A.Access.Read(C_Spell and C_Spell.GetSpellInfo,id)
@@ -146,8 +146,8 @@ end
 -- Independent implementation using Blizzard's documented native container API.
 local debuffRanks = {
     {[7386]=true,[7405]=true,[8380]=true,[11596]=true,[11597]=true},
-    {[1160]=true,[6190]=true,[11554]=true,[11555]=true,[11556]=true},
     {[6343]=true,[8198]=true,[8204]=true,[8205]=true,[11580]=true,[11581]=true},
+    {[1160]=true,[6190]=true,[11554]=true,[11555]=true,[11556]=true},
 }
 function V.PrepareDebuffs()
     if InCombatLockdown() then return end
@@ -170,7 +170,7 @@ function V.PrepareDebuffs()
                         button:SetTooltipAnchorPoint("ANCHOR_RIGHT")
                         S.Background(button)
                         local label=S.Text(button,5); label:SetPoint("TOPLEFT",0,0); label:SetSize(12,7)
-                        label:SetJustifyH("LEFT"); label:SetText(({"S","D","T"})[index])
+                        label:SetJustifyH("LEFT"); label:SetText(({"S","T","D"})[index])
                         label:SetTextColor(0.28,0.85,0.46,1)
                         if index==1 then
                             local count=S.Text(button,5); count:SetPoint("TOPLEFT",0,0); count:SetSize(7,7)
@@ -187,7 +187,7 @@ function V.PrepareDebuffs()
 end
 function V.ClearRow(row)
     for _,container in ipairs(row.debuffContainers or {}) do container:SetEnabled(false) end
-    for _,label in ipairs(row.debuffs) do label:SetText(""); label:Show() end
+    for _,label in ipairs(row.debuffs) do label:SetText(""); label:Hide() end
     for _,icon in ipairs(row.demoIcons) do icon:Hide() end
     row.demoCount:Hide()
     clearNative(row)
@@ -307,11 +307,11 @@ function V.PaintDemo(time)
         row.selection:SetAlpha(i == 8 and 1 or 0)
         row.demoCount:SetText(i<=5 and tostring(i) or ""); row.demoCount:Show()
         for j,label in ipairs(row.debuffs) do
-            local prefix=({"S","D","T"})[j]
+            local prefix=({"S","T","D"})[j]
             local active=(j==1 and i<=5) or (i+j)%3~=0
             label:Hide()
-            row.demoIcons[j]:SetAlpha(i~=6 and active and 1 or 0.25)
-            row.demoIcons[j]:Show()
+            row.demoIcons[j]:SetAlpha(1)
+            row.demoIcons[j]:SetShown(i~=6 and active)
             label:SetText(prefix..(i==6 and "?" or (active and j==1 and tostring(i%5+1) or "")))
             if i==6 then label:SetTextColor(0.65,0.70,0.78,1)
             elseif active then label:SetTextColor(0.28,0.85,0.46,1)

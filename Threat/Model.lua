@@ -75,10 +75,6 @@ function M.PaintDebuffs(row, unit)
         for _,container in ipairs(row.debuffContainers) do
             container:SetUnit(unit); container:SetEnabled(true)
         end
-        for i,label in ipairs(row.debuffs) do
-            label:SetText(({"S","D","T"})[i]); label:SetTextColor(0.42,0.45,0.50,1)
-        end
-    else
-        for i,label in ipairs(row.debuffs) do label:SetText(({"S?","D?","T?"})[i]) end
     end
+    for _,label in ipairs(row.debuffs) do label:SetText(""); label:Hide() end
 end

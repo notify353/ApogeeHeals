@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Order enemy indicators as Sunder, Thunder Clap, Demo Shout and hide unconfirmed slots.
+
 - Narrow threat bars for side clearance and center demo stack counts inside icons.
 
 - Pack demo debuff icons edge-to-edge, overlay outlined stack counts, and enlarge the centered demo.
