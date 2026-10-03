@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Double the gray/blue mana-type strip width while preserving the overall
+  threat row width and centered placement.
+
 - Anchor the first threat bar center at screen center; additional stable rows
   extend downward without moving that first row.
 
