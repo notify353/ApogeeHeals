@@ -28,7 +28,7 @@ end
 function V.Place()
     if InCombatLockdown() then return end
     local demo=A.Threat and A.Threat.demo
-    local extent=width+(demo and 27 or 42)
+    local extent=width+(demo and 28 or 42)
     V.root:SetScale(S.scale*(demo and 1.3 or 1.1))
     V.root:SetSize(extent,8*rowHeight-0.5)
     V.root:ClearAllPoints()
@@ -116,10 +116,10 @@ local function createRow(parent, index)
     row.demoIcons, row.demoFrames = {}, {}
     for i,id in ipairs({7386,6343,1160}) do
         local frame=overlay:CreateTexture(nil,"ARTWORK"); frame:SetSize(7,7)
-        frame:SetPoint("TOPLEFT",row,"TOPLEFT",width+6+(i-1)*7,0)
+        frame:SetPoint("TOPLEFT",row,"TOPLEFT",width+6+(i-1)*7.5,0)
         frame:SetColorTexture(0.06,0.075,0.1,0.94); frame:Hide(); row.demoFrames[i]=frame
         local icon=overlay:CreateTexture(nil,"OVERLAY"); icon:SetSize(6.2,6.2)
-        icon:SetPoint("TOPLEFT",row,"TOPLEFT",width+6.4+(i-1)*7,-0.4)
+        icon:SetPoint("TOPLEFT",row,"TOPLEFT",width+6.4+(i-1)*7.5,-0.4)
         icon:SetTexCoord(0.07,0.93,0.07,0.93)
         local info=A.Access.Read(C_Spell and C_Spell.GetSpellInfo,id)
         local texture=type(info)=="table" and A.Access.Readable(info.iconID) and info.iconID or nil

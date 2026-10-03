@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Add a subtle half-unit gap between demo debuff icon frames and retain group centering.
+
 - Match demo debuff icons to Keybinds with cropped artwork, dark inset frames, and outlined/shadowed white counts.
 
 - Restore white demo Sunder counts while retaining the thick black outline.
