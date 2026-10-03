@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Add native last-value displays to frozen Threat checks so solo/group percentage
+  semantics can be verified, without Lua calculations or storage of secret values.
+
 - Remove the separate live target slot: all eight rows track stable nameplate
   lifetimes, and targeting only changes the outline. Refresh client API review.
 

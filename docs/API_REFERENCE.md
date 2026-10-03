@@ -1,5 +1,16 @@
 # Forever API authority
 
+## Native diagnostic readings (70205, 2026-10-02)
+
+The solo left-filled green report is not sufficient evidence of the numeric
+meaning. Preserve the current prototype pending actual values. Threat checks
+now sends numeric values directly to visible SetFormattedText sinks and tanking
+booleans to paired YES/NO native alpha sinks. Last sampled native UI text remains
+for screenshots after combat; it is never read back or saved to Lua/storage.
+Public PASS/FAIL outcomes still latch independently of the latest native display.
+The panel samples target; nameplate restrictions may differ. Capture during
+combat if the engine clears secret text when combat ends.
+
 ## Stable threat rows and refreshed export (70205, 2026-10-02)
 
 Fresh owner export postdates the updated client. Reviewed native threat, unit

@@ -16,6 +16,7 @@ function D.Reset()
     D.firstSample, D.lastSample = nil, nil
     for _, row in ipairs(D.rows) do
         row.readable, row.native = nil, nil
+        row.value:SetText("--"); row.value:SetAlpha(1); row.falseValue:SetText(""); row.falseValue:SetAlpha(0)
         row.access:SetText("--"); row.sink:SetText("--"); row.reason:SetText("")
     end
     D.PaintCoverage()
@@ -35,6 +36,7 @@ end
 function D.Probe(row, ok, value, boolean)
     -- Only public capability outcomes are retained; never retain the value.
     local readable, sent, reason = false, false, "API error"
+    row.value:SetText("--"); row.value:SetAlpha(1); row.falseValue:SetText(""); row.falseValue:SetAlpha(0)
     if ok then
         -- Access checks precede every type test, comparison and Lua operation.
         readable = A.Access.Readable(value)
@@ -48,8 +50,16 @@ function D.Probe(row, ok, value, boolean)
         if readable or reason == "Restricted" then
             if boolean then
                 sent = A.ThreatView.BooleanAlpha(D.booleanSink, value, 1, 0)
+                row.value:SetText("YES"); row.falseValue:SetText("NO")
+                local yesOK = A.ThreatView.BooleanAlpha(row.value,value,1,0)
+                local noOK = A.ThreatView.BooleanAlpha(row.falseValue,value,0,1)
+                if not yesOK or not noOK then
+                    row.value:SetText("--"); row.value:SetAlpha(1); row.falseValue:SetAlpha(0)
+                end
             else
                 sent = pcall(D.numberSink.SetFormattedText, D.numberSink, "%.2f", value)
+                local displayed = pcall(row.value.SetFormattedText,row.value,"%.2f",value)
+                if not displayed then row.value:SetText("--") end
             end
         end
     end
@@ -77,7 +87,7 @@ function D.Refresh(polled)
     D.firstSample = D.firstSample or D.duration
     D.lastSample = D.duration
     D.sampled = true
-    D.context:SetText("IN COMBAT - checking your threat against selected enemies")
+    D.context:SetText("IN COMBAT - selected target readings; last display is native")
     local ok, tanking, status, scaled, raw, amount = pcall(UnitDetailedThreatSituation, "player", "target")
     D.Probe(D.rows[1], ok, tanking, true)
     D.Probe(D.rows[2], ok, status)
@@ -122,7 +132,7 @@ end
 function D.Start()
     local root = CreateFrame("Frame", nil, UIParent)
     D.root = root
-    root:SetSize(530, 360); root:SetPoint("CENTER", UIParent, "CENTER", 290, 80)
+    root:SetSize(650, 360); root:SetPoint("CENTER", UIParent, "CENTER", 290, 80)
     root:SetMovable(true); root:SetClampedToScreen(true); root:EnableMouse(false)
     A.Style.Background(root)
     local function text(size, x, y, width)
@@ -132,7 +142,7 @@ function D.Start()
     end
     text(13, 12, -8, 506):SetText("Threat checks - drag header outside combat")
     local handle = CreateFrame("Button", nil, root); D.handle = handle
-    handle:SetSize(530, 30); handle:SetPoint("TOPLEFT"); handle:RegisterForDrag("LeftButton")
+    handle:SetSize(650, 30); handle:SetPoint("TOPLEFT"); handle:RegisterForDrag("LeftButton")
     handle:SetScript("OnDragStart", function()
         if not InCombatLockdown() then root:StartMoving(); D.moving = true end
     end)
@@ -142,14 +152,16 @@ function D.Start()
     text(11, 184, -65, 90):SetText("Lua read")
     text(11, 280, -65, 106):SetText("Display call")
     text(11, 396, -65, 122):SetText("Read failure")
+    text(11, 526, -65, 112):SetText("Last display")
     D.rows = {}
     for i, field in ipairs(fields) do
         local y = -89-(i-1)*23
         text(11, 12, y, 165):SetText(field)
-        D.rows[i] = {access=text(11, 184, y, 90), sink=text(11, 280, y, 106), reason=text(11, 396, y, 122)}
+        D.rows[i] = {access=text(11, 184, y, 90), sink=text(11, 280, y, 106), reason=text(11, 396, y, 122),
+            value=text(11,526,y,112), falseValue=text(11,526,y,112)}
     end
     text(10, 12, -255, 506):SetText("FAIL = at least one failed check this fight. -- = not checked.")
-    text(10, 12, -274, 506):SetText("Display PASS confirms call acceptance only, not visible rendering.")
+    text(10, 12, -274, 506):SetText("Last display freezes native text; FAIL records any failure this fight.")
     D.coverage = text(11, 12, -299, 506)
     D.timing = text(11, 12, -318, 506)
     text(10, 12, -337, 506):SetText("Samples count API attempts. Gaps include skipped checks and frame stalls.")

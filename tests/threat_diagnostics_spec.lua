@@ -24,6 +24,8 @@ assert(not d.frame.scripts.OnUpdate and d.rows[1].access.text == "--")
 m.units.target = {hostile=true, dead=false}
 m.combat = true; m.Event("PLAYER_REGEN_DISABLED")
 assert(reads == 1 and d.rows[1].access.text == "PASS" and d.rows[1].sink.text == "PASS")
+assert(d.rows[1].value.alpha==0 and d.rows[1].falseValue.alpha==1)
+assert(d.rows[3].value.text=="0.00" and d.rows[4].value.text=="12.50" and d.rows[7].value.text=="25.00")
 assert(d.rows[3].access.text == "PASS") -- zero is a valid reading
 local accepted = 0
 d.numberSink.SetFormattedText = function(_, pattern, value)
@@ -33,19 +35,31 @@ end
 C_CurveUtil = {EvaluateColorValueFromBoolean=function(value, yes, no)
     assert(issecretvalue(value)); return secret
 end}
+local received={}
+for i,row in ipairs(d.rows) do
+    row.value.SetFormattedText=function(self,pattern,value)
+        received[i]=value -- Simulated native sink accepts opaque arguments.
+        if not issecretvalue(value) then self.text=string.format(pattern,value) end
+    end
+end
 mode = "secret"; d.Refresh()
+assert(rawequal(received[4],secret) and rawequal(received[7],secret))
+assert(issecretvalue(d.rows[1].value.alpha) and issecretvalue(d.rows[1].falseValue.alpha))
 assert(accepted == 6 and d.rows[1].access.text == "FAIL" and d.rows[1].sink.text == "PASS")
 assert(d.rows[1].reason.text == "Restricted" and d.rows[3].reason.text == "Restricted")
 mode = "public"; d.Refresh(); assert(d.rows[1].access.text == "FAIL")
 d.numberSink.SetFormattedText = function() error("sink rejected") end
 d.Refresh(); assert(d.rows[5].sink.text == "FAIL")
 local before = reads
+local frozenValue=d.rows[7].value.text
 m.combat = false; m.Event("PLAYER_REGEN_ENABLED")
 assert(not d.collecting and not d.frame.scripts.OnUpdate and d.context.text:find("FROZEN",1,true))
 mode = "missing"; m.Event("PLAYER_TARGET_CHANGED"); m.Event("UNIT_THREAT_LIST_UPDATE")
+assert(d.rows[7].value.text==frozenValue)
 assert(reads == before and d.rows[5].sink.text == "FAIL" and d.rows[1].reason.text == "Restricted")
 assert(d.numberSink.text == "" and d.booleanSink.alpha == 0)
 m.combat = true; m.Event("PLAYER_REGEN_DISABLED")
+assert(d.rows[7].value.text=="25.00" and d.rows[4].value.text=="--")
 assert(d.rows[1].reason.text == "Missing" and d.rows[1].access.text == "FAIL")
 d.SetEnabled(false); assert(d.enabled) -- no combat edits
 m.combat = false; m.Event("PLAYER_REGEN_ENABLED")
