@@ -1,7 +1,7 @@
 local _, A = ...
 local V, S = {}, A.Style
 A.ThreatView = V
-local width, rowHeight, header = 96, 7.5, 0
+local width, rowHeight, header = 64, 7.5, 0
 local warnings = {
     lead={"LEAD", 0.28,0.74,0.46}, weak={"WEAK LEAD", 0.90,0.74,0.22},
     noLead={"NO LEAD", 0.92,0.48,0.24}, noAggro={"NO AGGRO", 0.86,0.30,0.30},
@@ -49,11 +49,11 @@ end
 -- The right half uses native range 100..200. Neither requires Lua arithmetic.
 local function nativeLane(row)
     local lane = CreateFrame("Frame",nil,row); lane:SetAllPoints(row); lane:EnableMouse(false)
-    lane.fill = lane:CreateTexture(nil,"BACKGROUND"); lane.fill:SetSize(46.5,7)
+    lane.fill = lane:CreateTexture(nil,"BACKGROUND"); lane.fill:SetSize((width-3)/2,7)
     lane.fill:SetPoint("TOPLEFT",3,0)
-    lane.mask = bar(lane,46.5,7,"TOPLEFT",3,0,false)
+    lane.mask = bar(lane,(width-3)/2,7,"TOPLEFT",3,0,false)
     lane.mask:SetStatusBarColor(S.background[1],S.background[2],S.background[3],1)
-    lane.right = bar(lane,46.5,7,"TOPRIGHT",0,0,false)
+    lane.right = bar(lane,(width-3)/2,7,"TOPRIGHT",0,0,false)
     lane.right:SetMinMaxValues(100,200)
     lane.notice = S.Text(lane.right,5); lane.notice:SetPoint("TOPRIGHT",-2,0)
     lane.notice:SetSize(21,7); lane.notice:SetJustifyH("RIGHT"); lane.notice:Hide()
@@ -88,8 +88,8 @@ local function createRow(parent, index)
     row:SetSize(width,7); row:SetPoint("TOPLEFT",V.root,"TOPLEFT",0,-header-(index-1)*rowHeight)
     row:EnableMouse(false); S.Background(row)
     -- Immutable half-bars meet at the center. Left fills toward the left edge.
-    row.left = bar(row,46.5,7,"TOPLEFT",3,0,true)
-    row.right = bar(row,46.5,7,"TOPRIGHT",0,0,false)
+    row.left = bar(row,(width-3)/2,7,"TOPLEFT",3,0,true)
+    row.right = bar(row,(width-3)/2,7,"TOPRIGHT",0,0,false)
     row.nativeTank, row.nativeRaw = nativeLane(row), nativeLane(row)
     row.rail = row:CreateTexture(nil,"OVERLAY"); row.rail:SetSize(2,7)
     row.rail:SetPoint("TOPLEFT",0,0); row.rail:SetColorTexture(0.57,0.58,0.61,1)
@@ -97,7 +97,7 @@ local function createRow(parent, index)
     local level = A.Access.Read(row.GetFrameLevel,row)
     if finite(level) then overlay:SetFrameLevel(level+5) end
     row.reference = overlay:CreateTexture(nil,"OVERLAY"); row.reference:SetSize(0.5,7)
-    row.reference:SetPoint("TOPLEFT",row,"TOPLEFT",49.5,0); row.reference:SetColorTexture(0.83,0.87,0.85,0.25)
+    row.reference:SetPoint("TOPLEFT",row,"TOPLEFT",3+(width-3)/2,0); row.reference:SetColorTexture(0.83,0.87,0.85,0.25)
     row.notice = S.Text(overlay,5); row.notice:SetPoint("TOPRIGHT",-2,0); row.notice:SetSize(21,7)
     row.notice:SetJustifyH("RIGHT"); row.notice:Hide()
     row.selection = CreateFrame("Frame",nil,overlay); row.selection:SetAllPoints(row); row.selection:EnableMouse(false)

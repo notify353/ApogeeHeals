@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Narrow threat bars by one third while keeping row height, debuff text size and
+  fixed screen-center anchor, to fit between keybind and healing frames.
+
 - Hide status font regions explicitly so warning color updates cannot restore
   LOST, question marks or dashes inside the bars.
 
