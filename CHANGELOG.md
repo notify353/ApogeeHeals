@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Anchor the first threat bar center at screen center; additional stable rows
+  extend downward without moving that first row.
+
 - Narrow threat bars by one third while keeping row height, debuff text size and
   fixed screen-center anchor, to fit between keybind and healing frames.
 

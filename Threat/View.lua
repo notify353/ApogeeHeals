@@ -28,7 +28,7 @@ end
 function V.Place()
     if InCombatLockdown() then return end
     V.root:ClearAllPoints()
-    V.root:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+    V.root:SetPoint("TOPLEFT", UIParent, "CENTER", -width/2, 3.5)
 end
 function V.StopMoving()
     -- Compatibility with runtime lifecycle calls; the meter is permanently fixed.
