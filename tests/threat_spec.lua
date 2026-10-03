@@ -105,14 +105,15 @@ assert(a.ThreatModel.Classify(opaque,true,3)=="unknown")
 print("PASS centered threat: both directions, empty equality, capped ends, independent aggro loss and guarded restricted arithmetic")
 
 m,a,r,v=setup(); unit=m.Mob(1,true,3,0); row=v.rows[1]
-assert(row.health==nil and row.rail.color[1]==0.57)
+assert(row.health==nil and row.background.color[1]==0.10)
 m.units[unit].maxPower=200; m.units[unit].level=20; r.Refresh()
-assert(row.rail.color[3]==0.80 and row.level==nil and row.name==nil)
-m.units[unit].kind=1; r.Refresh(); assert(row.rail.color[1]==0.57)
-m.units[unit].kind=0; m.units[unit].maxPower=m.Secret(); r.Refresh(); assert(row.rail.color[1]==0.57)
+assert(row.background.color[3]==0.32 and row.level==nil and row.name==nil)
+assert(row.nativeTank.mask.color[3]==0.32 and row.nativeRaw.mask.color[3]==0.32 and row.rail==nil)
+m.units[unit].kind=1; r.Refresh(); assert(row.background.color[1]==0.10)
+m.units[unit].kind=0; m.units[unit].maxPower=m.Secret(); r.Refresh(); assert(row.background.color[1]==0.10)
 m.Event("NAME_PLATE_UNIT_REMOVED",unit)
 assert(row.left.value==0 and row.right.value==0 and row.health==nil and row.name==nil and row.level==nil)
-print("PASS threat-only rows, mana-type rail and stale-data cleanup")
+print("PASS threat-only rows, mana-type background and stale-data cleanup")
 
 m,a,r,v=setup()
 for i=1,10 do m.Mob(i,true,3,0) end

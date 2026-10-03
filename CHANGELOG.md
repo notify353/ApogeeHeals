@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Replace the mana-type edge strip with subdued blue/charcoal row backgrounds
+  in live/demo modes, matching native masks and using the full width for threat.
+
 - Double the gray/blue mana-type strip width while preserving the overall
   threat row width and centered placement.
 

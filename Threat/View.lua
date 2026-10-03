@@ -49,11 +49,11 @@ end
 -- The right half uses native range 100..200. Neither requires Lua arithmetic.
 local function nativeLane(row)
     local lane = CreateFrame("Frame",nil,row); lane:SetAllPoints(row); lane:EnableMouse(false)
-    lane.fill = lane:CreateTexture(nil,"BACKGROUND"); lane.fill:SetSize((width-5)/2,7)
-    lane.fill:SetPoint("TOPLEFT",5,0)
-    lane.mask = bar(lane,(width-5)/2,7,"TOPLEFT",5,0,false)
+    lane.fill = lane:CreateTexture(nil,"BACKGROUND"); lane.fill:SetSize(width/2,7)
+    lane.fill:SetPoint("TOPLEFT",0,0)
+    lane.mask = bar(lane,width/2,7,"TOPLEFT",0,0,false)
     lane.mask:SetStatusBarColor(S.background[1],S.background[2],S.background[3],1)
-    lane.right = bar(lane,(width-5)/2,7,"TOPRIGHT",0,0,false)
+    lane.right = bar(lane,width/2,7,"TOPRIGHT",0,0,false)
     lane.right:SetMinMaxValues(100,200)
     lane.notice = S.Text(lane.right,5); lane.notice:SetPoint("TOPRIGHT",-2,0)
     lane.notice:SetSize(21,7); lane.notice:SetJustifyH("RIGHT"); lane.notice:Hide()
@@ -86,18 +86,17 @@ end
 local function createRow(parent, index)
     local row = CreateFrame("Frame", nil, parent)
     row:SetSize(width,7); row:SetPoint("TOPLEFT",V.root,"TOPLEFT",0,-header-(index-1)*rowHeight)
-    row:EnableMouse(false); S.Background(row)
+    row:EnableMouse(false)
+    row.background=row:CreateTexture(nil,"BACKGROUND"); row.background:SetAllPoints(row)
     -- Immutable half-bars meet at the center. Left fills toward the left edge.
-    row.left = bar(row,(width-5)/2,7,"TOPLEFT",5,0,true)
-    row.right = bar(row,(width-5)/2,7,"TOPRIGHT",0,0,false)
+    row.left = bar(row,width/2,7,"TOPLEFT",0,0,true)
+    row.right = bar(row,width/2,7,"TOPRIGHT",0,0,false)
     row.nativeTank, row.nativeRaw = nativeLane(row), nativeLane(row)
-    row.rail = row:CreateTexture(nil,"OVERLAY"); row.rail:SetSize(4,7)
-    row.rail:SetPoint("TOPLEFT",0,0); row.rail:SetColorTexture(0.57,0.58,0.61,1)
     local overlay = CreateFrame("Frame",nil,row); overlay:SetAllPoints(row); overlay:EnableMouse(false)
     local level = A.Access.Read(row.GetFrameLevel,row)
     if finite(level) then overlay:SetFrameLevel(level+5) end
     row.reference = overlay:CreateTexture(nil,"OVERLAY"); row.reference:SetSize(0.5,7)
-    row.reference:SetPoint("TOPLEFT",row,"TOPLEFT",5+(width-5)/2,0); row.reference:SetColorTexture(0.83,0.87,0.85,0.25)
+    row.reference:SetPoint("TOPLEFT",row,"TOPLEFT",width/2,0); row.reference:SetColorTexture(0.83,0.87,0.85,0.25)
     row.notice = S.Text(overlay,5); row.notice:SetPoint("TOPRIGHT",-2,0); row.notice:SetSize(21,7)
     row.notice:SetJustifyH("RIGHT"); row.notice:Hide()
     row.selection = CreateFrame("Frame",nil,overlay); row.selection:SetAllPoints(row); row.selection:EnableMouse(false)
@@ -159,7 +158,7 @@ function V.PrepareDebuffs()
                         label:SetJustifyH("LEFT"); label:SetText(({"S","D","T"})[index])
                         label:SetTextColor(0.28,0.85,0.46,1)
                         if index==1 then
-                            local count=S.Text(button,5); count:SetPoint("TOPLEFT",5,0); count:SetSize(7,7)
+                            local count=S.Text(button,5); count:SetPoint("TOPLEFT",0,0); count:SetSize(7,7)
                             count:SetJustifyH("LEFT"); count:SetTextColor(0.28,0.85,0.46,1)
                             button:SetApplicationCount(count)
                         end
@@ -177,7 +176,7 @@ function V.ClearRow(row)
     clearNative(row)
     row:SetAlpha(0); row.notice:SetText("")
     row.left:SetValue(0); row.right:SetValue(0)
-    row.selection:SetAlpha(0); row.rail:SetColorTexture(0.57,0.58,0.61,1); row.unit = nil
+    row.selection:SetAlpha(0); V.PaintManaBackground(row,false); row.unit = nil
 end
 function V.Clear()
     for _,row in ipairs(V.rows) do V.ClearRow(row) end
@@ -237,12 +236,20 @@ function V.PaintRelative(row, unit, ok, tanking, rawPercentage)
     end
     if not V.PaintCentered(row,percentage) then return "?" end
 end
+function V.PaintManaBackground(row, mana)
+    local r,g,b=0.10,0.12,0.15
+    if mana then r,g,b=0.08,0.19,0.32 end
+    row.background:SetColorTexture(r,g,b,1)
+    -- Native left masks must blend into the same background as the right half.
+    row.nativeTank.mask:SetStatusBarColor(r,g,b,1)
+    row.nativeRaw.mask:SetStatusBarColor(r,g,b,1)
+end
 function V.PaintIdentity(row, unit)
-    row.rail:SetColorTexture(0.57,0.58,0.61,1)
+    V.PaintManaBackground(row,false)
     local kind = A.Access.Read(UnitPowerType,unit)
     if kind == 0 then
         local maximum = A.Access.Read(UnitPowerMax,unit,0)
-        if type(maximum) == "number" and maximum > 0 then row.rail:SetColorTexture(0.31,0.55,0.80,1) end
+        if type(maximum) == "number" and maximum > 0 then V.PaintManaBackground(row,true) end
     end
 end
 function V.Paint(row, unit, warning)
@@ -279,7 +286,7 @@ function V.PaintDemo(time)
         V.PaintWarning(row,warning)
         if percentage and warning ~= "noAggro" then percentage = math.max(100,percentage) end
         if not V.PaintCentered(row,percentage) then row.notice:SetText(sample[5] or "?") end
-        if sample[4] then row.rail:SetColorTexture(0.31,0.55,0.80,1) end
+        if sample[4] then V.PaintManaBackground(row,true) end
         row.selection:SetAlpha(i == 8 and 1 or 0)
         for j,label in ipairs(row.debuffs) do
             local prefix=({"S","D","T"})[j]
