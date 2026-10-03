@@ -113,17 +113,22 @@ local function createRow(parent, index)
         label:SetPoint("TOPLEFT",row,"TOPLEFT",width+6+(i-1)*12,0)
         label:SetJustifyH("LEFT"); row.debuffs[i]=label
     end
-    row.demoIcons = {}
+    row.demoIcons, row.demoFrames = {}, {}
     for i,id in ipairs({7386,6343,1160}) do
-        local icon=overlay:CreateTexture(nil,"OVERLAY"); icon:SetSize(7,7)
-        icon:SetPoint("TOPLEFT",row,"TOPLEFT",width+6+(i-1)*7,0)
+        local frame=overlay:CreateTexture(nil,"ARTWORK"); frame:SetSize(7,7)
+        frame:SetPoint("TOPLEFT",row,"TOPLEFT",width+6+(i-1)*7,0)
+        frame:SetColorTexture(0.06,0.075,0.1,0.94); frame:Hide(); row.demoFrames[i]=frame
+        local icon=overlay:CreateTexture(nil,"OVERLAY"); icon:SetSize(6.2,6.2)
+        icon:SetPoint("TOPLEFT",row,"TOPLEFT",width+6.4+(i-1)*7,-0.4)
+        icon:SetTexCoord(0.07,0.93,0.07,0.93)
         local info=A.Access.Read(C_Spell and C_Spell.GetSpellInfo,id)
         local texture=type(info)=="table" and A.Access.Readable(info.iconID) and info.iconID or nil
         icon:SetTexture(texture or "Interface\\Icons\\INV_Misc_QuestionMark")
         icon:Hide(); row.demoIcons[i]=icon
     end
     row.demoCount=S.Text(overlay,5); row.demoCount:SetSize(7,7)
-    local countFont=row.demoCount:GetFont(); row.demoCount:SetFont(countFont,5,"THICKOUTLINE")
+    local countFont=row.demoCount:GetFont(); row.demoCount:SetFont(countFont,5,"OUTLINE")
+    row.demoCount:SetShadowColor(0,0,0,0.85); row.demoCount:SetShadowOffset(0.2,-0.2)
     row.demoCount:SetPoint("TOPLEFT",row,"TOPLEFT",width+6,0)
     row.demoCount:SetJustifyH("CENTER"); row.demoCount:SetJustifyV("MIDDLE"); row.demoCount:SetTextColor(1,1,1,1); row.demoCount:Hide()
     row:SetAlpha(0); row.selection:SetAlpha(0)
@@ -189,6 +194,7 @@ function V.ClearRow(row)
     for _,container in ipairs(row.debuffContainers or {}) do container:SetEnabled(false) end
     for _,label in ipairs(row.debuffs) do label:SetText(""); label:Hide() end
     for _,icon in ipairs(row.demoIcons) do icon:Hide() end
+    for _,frame in ipairs(row.demoFrames) do frame:Hide() end
     row.demoCount:Hide()
     clearNative(row)
     row:SetAlpha(0); row.notice:SetText("")
@@ -312,6 +318,7 @@ function V.PaintDemo(time)
             label:Hide()
             row.demoIcons[j]:SetAlpha(1)
             row.demoIcons[j]:SetShown(i~=6 and active)
+            row.demoFrames[j]:SetShown(i~=6 and active)
             label:SetText(prefix..(i==6 and "?" or (active and j==1 and tostring(i%5+1) or "")))
             if i==6 then label:SetTextColor(0.65,0.70,0.78,1)
             elseif active then label:SetTextColor(0.28,0.85,0.46,1)

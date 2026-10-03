@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Match demo debuff icons to Keybinds with cropped artwork, dark inset frames, and outlined/shadowed white counts.
+
 - Restore white demo Sunder counts while retaining the thick black outline.
 
 - Use bright yellow, thick-outlined demo Sunder counts for stronger contrast.
