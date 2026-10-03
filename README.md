@@ -6,14 +6,10 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 
 ## Prototype
 
-- **Threat demo (solo preview; ends in combat)** in Heals settings previews the
-  same threat rows without a group or live threat reads. It shows strong/weak
-  leads, loss of lead/aggro, unknown/no-comparison states, mana-type rails, mob HP and the
-  target outline. One sample bar loses and rebuilds threat over a 24-second loop.
-  The DEMO label and footer identify fictional data; its thresholds are visual
-  examples, not gameplay rules. Drag the header to review placement. Uncheck the
-  demo to restore the live meter's saved enabled state. Combat, zoning, reload
-  and Defaults end the demo. The demo toggle is not saved.
+- **Threat demo (solo preview; ends in combat)** previews scripted threat bars
+  and warrior debuff icons without live reads. The checkbox is session-only;
+  combat, zoning, reload and Defaults end the demo. Uncheck it to restore the
+  live meter's saved enabled state. Its animation is illustrative, not a prediction.
 
 - Optional **Threat checks (freeze after combat; until reload)** in Heals settings
   opens a movable diagnostic panel independently of the tank threat stack.
@@ -28,30 +24,27 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
   elapsed combat time, first/last sample times and the longest gap without a
   sample. These also freeze after combat. Solo tests do not establish group access.
 
-- Independent eight-row tank threat stack, disabled by default. Seven stable mob
-  slots and one reserved selected-target slot follow normal Tab targeting with
-  a yellow outline; duplicate target presentation is suppressed natively.
-  Drag its header outside combat. Toggle **Tank threat stack** in Heals settings.
-  The reserved target row appears only during combat; idle selection adds no row.
-- Compact threat frames use the reference style: level/name over a large threat
-  area, a thin mob-HP strip below, and a left rail that is blue for confirmed
-  mana users and gray otherwise (including unknown mana capability). The gold
-  outline identifies your selected target. Repeated warning/aggro/percentage text
-  and raid markers are removed from these compact rows.
-- Threat fill starts at the center: native relative percentage minus 100 drives
-  the right half when positive and the left half when negative. Equal-to-reference
-  leaves only the center tick. Each half caps at 100 percentage points. The native
-  selector is unchanged: percentage-of-lead when tanking, raw percentage otherwise.
-  This is a prototype reference, not a guaranteed aggro-loss threshold; grouped
-  percentage semantics still need validation.
-- Green/yellow/orange/red fill retains native lead/aggro warning colors. LOST
-  marks confirmed loss of aggro. `?` means unavailable/restricted data; `-` means
-  a tank lead reading of zero provides no usable comparison. Restricted percentages
-  never enter arithmetic: they clear both halves instead. Health still passes
-  directly to native display sinks. Diagnostics remain available for access checks.
-- Coverage depends on exposed hostile nameplates plus the selected target.
-  Overflow shows an exact extra count when identities permit, otherwise a tracked
-  count. No bar predicts time until aggro loss or guarantees a reaction window.
+- Optional **Tank threat stack** tracks up to eight exposed enemy nameplates in
+  stable rows. Selecting an enemy adds a gold marker outside its existing bar;
+  selection never creates or moves a row. Additional enemies wait for a free slot.
+- The compact group is fixed horizontally at screen center, with the first row
+  centered vertically and subsequent rows below it. There are no names, levels,
+  health strips, headings or status words. Blue backgrounds identify confirmed
+  mana users; other rows use charcoal.
+- Threat fill begins at the center. The chosen display reference is 100%, with
+  each half spanning 100 percentage points. Tanking uses percentage-of-lead and
+  only extends right; zero or values below the reference stay centered. Otherwise,
+  raw percentage can extend left or right. Restricted values use native display
+  sinks without Lua arithmetic. Warning colors retain the game's lead/aggro states.
+  This scale is not a verified aggro-loss threshold or time-to-loss prediction.
+- Warrior debuffs appear in fixed order: Sunder Armor, Thunder Clap, Demoralizing
+  Shout. Native player-only aura containers control icon visibility and stacks.
+  Unconfirmed effects leave no placeholder; absence of an icon is not proof of
+  missing data versus a missing effect. Sunder counts are centered white text;
+  native formatting leaves a single application unnumbered. Other class spell
+  sets have not been implemented.
+- The owner confirmed the installed live layout and debuffs work. This does not
+  establish exact grouped threat-percentage semantics or every class/client case.
 
 See [class support](docs/CLASS_SUPPORT.md) for the buff/cleanse matrix, yellow
 guidance, native weapon displays, limitations and live acceptance checks.
