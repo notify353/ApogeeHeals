@@ -122,12 +122,18 @@ local function createRow(parent, index)
         line:SetSize(edge[2],edge[3]); line:SetPoint(edge[1],row,edge[1],0,0)
         line:SetColorTexture(0.87,0.76,0.48,1)
     end
+    row.debuffs = {}
+    for i=1,3 do
+        local label=S.Text(overlay,5); label:SetSize(12,7)
+        label:SetPoint("TOPLEFT",row,"TOPLEFT",width+2+(i-1)*12,0)
+        label:SetJustifyH("LEFT"); row.debuffs[i]=label
+    end
     row:SetAlpha(0); row.selection:SetAlpha(0)
     return row
 end
 function V.Create()
     V.root = CreateFrame("Frame",nil,UIParent)
-    V.root:SetScale(S.scale); V.root:SetSize(width,header+8*rowHeight+7)
+    V.root:SetScale(S.scale); V.root:SetSize(width+38,header+8*rowHeight+7)
     V.root:SetMovable(true); V.root:SetClampedToScreen(true); V.root:EnableMouse(false)
     V.handle = CreateFrame("Button",nil,V.root); V.handle:EnableMouse(true)
     V.handle:SetPoint("TOPLEFT",0,0); V.handle:SetSize(width,header); V.handle:RegisterForDrag("LeftButton")
@@ -143,6 +149,7 @@ function V.Create()
     V.Place(); V.Clear()
 end
 function V.ClearRow(row)
+    for _,label in ipairs(row.debuffs) do label:SetText("") end
     clearNative(row)
     row:SetAlpha(0); row.notice:SetText("")
     row.left:SetValue(0); row.right:SetValue(0)
@@ -216,6 +223,7 @@ function V.PaintIdentity(row, unit)
 end
 function V.Paint(row, unit, warning)
     row.unit = unit; row:SetAlpha(1); V.PaintIdentity(row,unit); V.PaintWarning(row,warning)
+    A.ThreatModel.PaintDebuffs(row,unit)
     local ok,tanking,_,_,rawPercentage = pcall(UnitDetailedThreatSituation,"player",unit)
     local unavailable = V.PaintRelative(row,unit,ok,tanking,rawPercentage)
     if unavailable and warning ~= "noAggro" then row.notice:SetText(unavailable) end
@@ -249,6 +257,14 @@ function V.PaintDemo(time)
         if not V.PaintCentered(row,percentage) then row.notice:SetText(sample[5] or "?") end
         if sample[4] then row.rail:SetColorTexture(0.31,0.55,0.80,1) end
         row.selection:SetAlpha(i == 8 and 1 or 0)
+        for j,label in ipairs(row.debuffs) do
+            local prefix=({"S","D","T"})[j]
+            local active=(i+j)%3~=0
+            label:SetText(prefix..(i==6 and "?" or (active and (j==1 and tostring(i%5+1) or "+") or "-")))
+            if i==6 then label:SetTextColor(0.65,0.70,0.78,1)
+            elseif active then label:SetTextColor(0.28,0.85,0.46,1)
+            else label:SetTextColor(0.42,0.45,0.50,1) end
+        end
     end
     V.footer:SetText("DEMO")
 end

@@ -1,5 +1,20 @@
 # Forever API authority
 
+## Per-enemy warrior debuff observations (70205, 2026-10-02)
+
+Reviewed GetAuraDataByIndex with HARMFUL, GetSpellInfo, UnitIsUnit and native
+formatted text contracts. Read at most 64 auras per fixed nameplate, refreshed
+with active threat polling and UNIT_AURA. Match localized base spell names for
+Sunder Armor (7386), Demoralizing Shout (1160), Thunder Clap (6343), including
+other ranks with the same name. Only public player source identity confirms
+ownership. Restricted/incomplete scans and missing spell metadata are unknown,
+never absence. Public Sunder counts use at least one; restricted counts go
+directly to native text without arithmetic or readback. No persistence/casting.
+Labels: S<count>, D+, T+ for own effects; dash for confirmed own absence, ? for
+unknown. Other warriors do not count as the player. A shared/overwritten aura
+whose caster cannot be confirmed stays unknown. Native combat acceptance and
+rank/caster semantics still require live tests; demo supplies synthetic labels.
+
 ## Solo zero correction (70205, 2026-10-02)
 
 Owner capture: tanking YES, status 3, scaled 100, raw 255, amount 1299, lead

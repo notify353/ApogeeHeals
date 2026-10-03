@@ -68,3 +68,53 @@ function M.Fill(model)
         if not model.slots[i] and waiting[at] then model.slots[i] = waiting[at].unit; at = at + 1 end
     end
 end
+
+-- Read-only warrior debuff observations. Unknown/incomplete scans never mean absent.
+local debuffs = {{7386,"S"},{1160,"D"},{6343,"T"}}
+function M.PaintDebuffs(row, unit)
+    local getter = C_UnitAuras and C_UnitAuras.GetAuraDataByIndex
+    local names, found, uncertain = {}, {}, {}
+    local complete = false
+    for i,entry in ipairs(debuffs) do
+        local info = A.Access.Read(C_Spell and C_Spell.GetSpellInfo,entry[1])
+        if type(info)=="table" and A.Access.Readable(info.name) and type(info.name)=="string" then
+            names[i]=info.name
+        end
+    end
+    if type(getter)=="function" then
+        for index=1,64 do
+            local ok,aura=pcall(getter,unit,index,"HARMFUL")
+            if not ok or not A.Access.Readable(aura) then break end
+            if aura==nil then complete=true; break end
+            if type(aura)~="table" or not A.Access.Readable(aura.name) or type(aura.name)~="string" then break end
+            for i,entry in ipairs(debuffs) do
+                if names[i] and aura.name==names[i] then
+                    local source=aura.sourceUnit
+                    if not A.Access.Readable(source) or type(source)~="string" then uncertain[i]=true
+                    else
+                        local own=source=="player" or A.Access.Read(UnitIsUnit,source,"player")
+                        if own==true then found[i]=aura
+                        elseif own~=false then uncertain[i]=true end
+                    end
+                end
+            end
+        end
+    end
+    for i,entry in ipairs(debuffs) do
+        local label, aura = row.debuffs[i],found[i]
+        label:SetTextColor(0.65,0.70,0.78,1)
+        if aura then
+            label:SetTextColor(0.28,0.85,0.46,1)
+            if i==1 then
+                local count=aura.applications
+                if A.Access.Readable(count) then
+                    if type(count)=="number" and count==count and count>=0 and count<math.huge then
+                        label:SetFormattedText("S%d",math.max(1,count))
+                    else label:SetText("S?") end
+                elseif not pcall(label.SetFormattedText,label,"S%d",count) then label:SetText("S?") end
+            else label:SetText(entry[2].."+") end
+        elseif complete and names[i] and not uncertain[i] then
+            label:SetText(entry[2].."-"); label:SetTextColor(0.42,0.45,0.50,1)
+        else label:SetText(entry[2].."?") end
+    end
+end

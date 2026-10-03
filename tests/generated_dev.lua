@@ -42,7 +42,7 @@ dofile = function(path)
     end
     return Mock
 end
-for _, path in ipairs({ "tests/threat_demo_spec.lua", "tests/threat_diagnostics_spec.lua", "tests/threat_spec.lua", "tests/native_threat_spec.lua", "tests/input_feedback_spec.lua", "tests/target_bindings_spec.lua", "tests/native_contract_spec.lua", "tests/target_spec.lua", "tests/target_target_spec.lua", "tests/reset_spec.lua", "tests/items_spec.lua", "tests/bindings_spec.lua", "tests/buffs_spec.lua", "tests/paladin_buffs_spec.lua", "tests/minimap_spec.lua",
+for _, path in ipairs({ "tests/threat_debuffs_spec.lua", "tests/threat_demo_spec.lua", "tests/threat_diagnostics_spec.lua", "tests/threat_spec.lua", "tests/native_threat_spec.lua", "tests/input_feedback_spec.lua", "tests/target_bindings_spec.lua", "tests/native_contract_spec.lua", "tests/target_spec.lua", "tests/target_target_spec.lua", "tests/reset_spec.lua", "tests/items_spec.lua", "tests/bindings_spec.lua", "tests/buffs_spec.lua", "tests/paladin_buffs_spec.lua", "tests/minimap_spec.lua",
     "tests/names_spec.lua", "tests/full_names_spec.lua", "tests/class_names_spec.lua", "tests/compact_layout_spec.lua", "tests/target_cast_spec.lua",
     "tests/purify_spec.lua", "tests/native_purify_spec.lua", "tests/range_spec.lua", "tests/editor_position_spec.lua", "tests/debuffs_spec.lua", "tests/drinking_timer_spec.lua", "tests/paladin_aura_spec.lua", "tests/blessing_guidance_spec.lua", "tests/target_support_spec.lua", "tests/class_cleansing_spec.lua", "tests/class_upkeep_spec.lua", "tests/hunter_aspects_spec.lua", "tests/weapon_upkeep_spec.lua", "tests/class_integration_spec.lua" }) do
     local fixtureTest = read(path):gsub("ApogeeHeals", name)

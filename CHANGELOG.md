@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Track player-applied Sunder stacks, Demoralizing Shout and Thunder Clap in
+  compact S/D/T labels beside each threat row; unknown scans never imply absence.
+
 - Keep tanking lead readings on the center/right side, including restricted zero:
   no-comparison no longer becomes a full left deficit. Non-tanking deficits remain.
 
