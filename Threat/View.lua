@@ -148,7 +148,50 @@ function V.Create()
     for i=1,8 do V.rows[i] = createRow(V.root,i) end
     V.Place(); V.Clear()
 end
+-- Independent implementation using Blizzard's documented native container API.
+local debuffRanks = {
+    {[7386]=true,[7405]=true,[8380]=true,[11596]=true,[11597]=true},
+    {[1160]=true,[6190]=true,[11554]=true,[11555]=true,[11556]=true},
+    {[6343]=true,[8198]=true,[8204]=true,[8205]=true,[11580]=true,[11581]=true},
+}
+function V.PrepareDebuffs()
+    if InCombatLockdown() then return end
+    local info=A.Access.Read(C_XMLUtil and C_XMLUtil.GetTemplateInfo,"CustomAuraContainerTemplate")
+    if type(info)~="table" or not A.Access.Readable(info.type) or info.type~="AuraContainer" then return end
+    for _,row in ipairs(V.rows) do
+        if not row.debuffContainers then
+            row.debuffContainers={}
+            for i,ids in ipairs(debuffRanks) do
+                local index=i
+                local container=CreateFrame("AuraContainer",nil,row,"CustomAuraContainerTemplate")
+                local level=A.Access.Read(row.GetFrameLevel,row)
+                if finite(level) then container:SetFrameLevel(level+10) end
+                container:SetSize(12,7); container:SetPoint("TOPLEFT",row,"TOPLEFT",width+2+(i-1)*12,0)
+                container:AddAuraGroup("own","HARMFUL|PLAYER",{
+                    maxFrameCount=1, candidateFilters={includeSpellIDs=ids},
+                    layout={elementWidth=12,elementHeight=7,elementSpacing=0},
+                    initializeFrame=function(button)
+                        button:SetSize(12,7); button:SetCancelAuraButtons(nil)
+                        button:SetTooltipAnchorPoint("ANCHOR_RIGHT")
+                        S.Background(button)
+                        local label=S.Text(button,5); label:SetPoint("TOPLEFT",0,0); label:SetSize(12,7)
+                        label:SetJustifyH("LEFT"); label:SetText(({"S","D+","T+"})[index])
+                        label:SetTextColor(0.28,0.85,0.46,1)
+                        if index==1 then
+                            local count=S.Text(button,5); count:SetPoint("TOPLEFT",5,0); count:SetSize(7,7)
+                            count:SetJustifyH("LEFT"); count:SetTextColor(0.28,0.85,0.46,1)
+                            button:SetApplicationCount(count)
+                        end
+                    end,
+                })
+                container:SetEnabled(false)
+                row.debuffContainers[i]=container
+            end
+        end
+    end
+end
 function V.ClearRow(row)
+    for _,container in ipairs(row.debuffContainers or {}) do container:SetEnabled(false) end
     for _,label in ipairs(row.debuffs) do label:SetText("") end
     clearNative(row)
     row:SetAlpha(0); row.notice:SetText("")

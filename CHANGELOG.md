@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Replace enemy aura Lua scanning with native player-filtered aura containers
+  and native Sunder stack text, following the current client display contract.
+
 - Track player-applied Sunder stacks, Demoralizing Shout and Thunder Clap in
   compact S/D/T labels beside each threat row; unknown scans never imply absence.
 

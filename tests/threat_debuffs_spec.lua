@@ -1,33 +1,47 @@
 local Mock=dofile("tests/mock.lua")
-local m=Mock.New(); local a=m.Start(); local row=a.ThreatView.rows[1]
-local names={[7386]="Sunder Armor",[1160]="Demoralizing Shout",[6343]="Thunder Clap"}
-C_Spell.GetSpellInfo=function(id) return names[id] and {name=names[id]} end
-local list={}
-C_UnitAuras.GetAuraDataByIndex=function(unit,index,filter)
-    assert(unit=="nameplate1" and filter=="HARMFUL"); return list[index]
+local m=Mock.New(); local a=m.Start(); local v=a.ThreatView
+local containers,buttons={},{}
+C_XMLUtil={GetTemplateInfo=function() return {type="AuraContainer"} end}
+local create=CreateFrame
+CreateFrame=function(kind,name,parent,template)
+    local frame=create(kind,name,parent,template)
+    if template=="CustomAuraContainerTemplate" then
+        assert(not m.combat); containers[#containers+1]=frame
+        function frame:SetUnit(unit) assert(type(unit)=="string"); self.unit=unit end
+        function frame:SetEnabled(enabled) self.enabled=enabled end
+        function frame:AddAuraGroup(key,filter,options)
+            self.options=options; self.filter=filter
+            local button=create("AuraButton",nil,self)
+            function button:SetCancelAuraButtons(value) assert(value==nil) end
+            function button:SetTooltipAnchorPoint(value) self.tooltipAnchor=value end
+            function button:SetApplicationCount(label) self.count=label end
+            options.initializeFrame(button); buttons[#buttons+1]=button
+        end
+    end
+    return frame
 end
-UnitIsUnit=function(source,player) return source=="playerAlias" end
-local function paint() a.ThreatModel.PaintDebuffs(row,"nameplate1") end
-paint(); assert(row.debuffs[1].text=="S-" and row.debuffs[2].text=="D-" and row.debuffs[3].text=="T-")
-list={{name=names[7386],spellId=999,sourceUnit="player",applications=3},
-    {name=names[1160],sourceUnit="playerAlias"},{name=names[6343],sourceUnit="party1"}}
-paint(); assert(row.debuffs[1].text=="S3" and row.debuffs[2].text=="D+" and row.debuffs[3].text=="T-")
-list[1].applications=5; list[3].sourceUnit="player"; paint()
-assert(row.debuffs[1].text=="S5" and row.debuffs[3].text=="T+")
-list[1].sourceUnit=m.Secret(); paint(); assert(row.debuffs[1].text=="S?")
-list[1].sourceUnit="player"; local count=m.Secret(); list[1].applications=count
-local original=row.debuffs[1].SetFormattedText
-row.debuffs[1].SetFormattedText=function(_,fmt,value) assert(fmt=="S%d" and rawequal(value,count)) end
-paint(); row.debuffs[1].SetFormattedText=original
-list={m.Secret()}; paint()
-for _,label in ipairs(row.debuffs) do assert(label.text:sub(-1)=="?") end
-list={{name=m.Secret()}}; paint(); assert(row.debuffs[1].text=="S?")
-C_UnitAuras.GetAuraDataByIndex=function() error("no aura access") end
-paint(); assert(row.debuffs[2].text=="D?")
-C_UnitAuras.GetAuraDataByIndex=function() return {name="Unrelated"} end
-paint(); assert(row.debuffs[3].text=="T?") -- truncated scan cannot prove absence
-C_UnitAuras.GetAuraDataByIndex=function() return nil end
-C_Spell.GetSpellInfo=function() return nil end
-paint(); assert(row.debuffs[1].text=="S?")
-a.ThreatView.ClearRow(row); for _,label in ipairs(row.debuffs) do assert(label.text=="") end
-print("PASS per-enemy debuffs: rank names, ownership, stack updates, native secret count, unavailable/incomplete scans and cleanup")
+v.PrepareDebuffs(); assert(#containers==24 and #buttons==24)
+v.PrepareDebuffs(); assert(#containers==24)
+for i,c in ipairs(containers) do
+    assert(c.filter=="HARMFUL|PLAYER" and c.options.maxFrameCount==1)
+    assert(c.options.candidateFilters.includeSpellIDs and c.options.layout.elementHeight==7)
+    assert(not c.enabled and c.unit==nil)
+end
+assert(containers[1].options.candidateFilters.includeSpellIDs[7386])
+assert(containers[1].options.candidateFilters.includeSpellIDs[11597])
+assert(containers[2].options.candidateFilters.includeSpellIDs[1160])
+assert(containers[3].options.candidateFilters.includeSpellIDs[6343])
+assert(buttons[1].count and not buttons[2].count)
+C_UnitAuras.GetAuraDataByIndex=function() error("Lua must not enumerate auras") end
+m.combat=true; local row=v.rows[1]
+a.ThreatModel.PaintDebuffs(row,"nameplate7")
+for _,c in ipairs(row.debuffContainers) do assert(c.unit=="nameplate7" and c.enabled) end
+assert(row.debuffs[1].text=="S" and row.debuffs[2].text=="D")
+v.ClearRow(row)
+for _,c in ipairs(row.debuffContainers) do assert(not c.enabled) end
+a.ThreatModel.PaintDebuffs(row,"nameplate8")
+for _,c in ipairs(row.debuffContainers) do assert(c.unit=="nameplate8" and c.enabled) end
+v.PaintDemo(0)
+for _,c in ipairs(containers) do assert(not c.enabled) end
+assert(v.rows[1].debuffs[1].text:sub(1,1)=="S")
+print("PASS native enemy aura containers: player filter, spell ranks, native stacks, zero Lua scans, fixed layout, reuse and demo cleanup")

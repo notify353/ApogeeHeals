@@ -69,7 +69,7 @@ function R.ApplyEnabled()
         R.elapsed = R.elapsed + elapsed
         if R.elapsed >= 0.2 then R.elapsed = 0; R.Refresh() end
     end or nil)
-    if enabled then R.Discover(); R.Refresh() end
+    if enabled then V.PrepareDebuffs(); R.Discover(); R.Refresh() end
 end
 function R.SetDemo(enabled)
     if InCombatLockdown() or R.suspended then return end
@@ -95,7 +95,9 @@ function R.Start()
         elseif event == "PLAYER_REGEN_DISABLED" then
             V.StopMoving(false)
             if R.demo then R.demo = false; R.ApplyEnabled(); A.Settings.Refresh() end
-        elseif event == "PLAYER_REGEN_ENABLED" then V.Place(); A.Settings.Refresh()
+        elseif event == "PLAYER_REGEN_ENABLED" then
+            if A.db.threatEnabled == true then V.PrepareDebuffs() end
+            V.Place(); A.Settings.Refresh()
         elseif event == "UI_SCALE_CHANGED" or event == "DISPLAY_SIZE_CHANGED" then V.Place() end
         if R.demo or R.suspended or A.db.threatEnabled ~= true then return end
         if event == "NAME_PLATE_UNIT_ADDED" and nameplate(unit) then

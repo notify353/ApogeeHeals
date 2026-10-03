@@ -1,5 +1,22 @@
 # Forever API authority
 
+## Native enemy debuff containers (70205, 2026-10-02)
+
+Read installed Threat Plates AurasWidgetMidnight as an architectural reference
+only; no third-party implementation copied. It selects native aura containers
+on the secret-value API client and disables its older Lua scanner. Verified
+Blizzard CustomAuraContainer includeSpellIDs is supported for harmful auras on
+non-assistable units, HARMFUL|PLAYER filter use, native SetApplicationCount, and
+SetUnit/SetEnabled lifecycle. Replace scanning with three precreated containers
+per row, one native player-only harmful group per spell family (Classic ranks).
+Native code owns selection, stack text and aura visibility; never inspect its
+aura buttons after creation. No Lua aura enumeration or source comparisons.
+Dim S/D/T is an unconfirmed slot, not a missing-debuff claim; native green label
+confirms a displayed matching player aura. S with no number is native single-
+application formatting; native counts show stacked applications. Containers
+are disabled for empty rows and demo, rebound only to public nameplate tokens.
+Create/configure geometry out of combat; no secure actions. Live acceptance pending.
+
 ## Per-enemy warrior debuff observations (70205, 2026-10-02)
 
 Reviewed GetAuraDataByIndex with HARMFUL, GetSpellInfo, UnitIsUnit and native
