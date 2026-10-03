@@ -109,6 +109,18 @@ local function createRow(parent, index)
         label:SetPoint("TOPLEFT",row,"TOPLEFT",width+6+(i-1)*12,0)
         label:SetJustifyH("LEFT"); row.debuffs[i]=label
     end
+    row.demoIcons = {}
+    for i,id in ipairs({7386,1160,6343}) do
+        local icon=overlay:CreateTexture(nil,"OVERLAY"); icon:SetSize(7,7)
+        icon:SetPoint("TOPLEFT",row,"TOPLEFT",width+6+(i-1)*12,0)
+        local info=A.Access.Read(C_Spell and C_Spell.GetSpellInfo,id)
+        local texture=type(info)=="table" and A.Access.Readable(info.iconID) and info.iconID or nil
+        icon:SetTexture(texture or "Interface\\Icons\\INV_Misc_QuestionMark")
+        icon:Hide(); row.demoIcons[i]=icon
+    end
+    row.demoCount=S.Text(overlay,5); row.demoCount:SetSize(5,7)
+    row.demoCount:SetPoint("TOPLEFT",row,"TOPLEFT",width+14,0)
+    row.demoCount:SetJustifyH("LEFT"); row.demoCount:SetTextColor(1,1,1,1); row.demoCount:Hide()
     row:SetAlpha(0); row.selection:SetAlpha(0)
     return row
 end
@@ -170,7 +182,9 @@ function V.PrepareDebuffs()
 end
 function V.ClearRow(row)
     for _,container in ipairs(row.debuffContainers or {}) do container:SetEnabled(false) end
-    for _,label in ipairs(row.debuffs) do label:SetText("") end
+    for _,label in ipairs(row.debuffs) do label:SetText(""); label:Show() end
+    for _,icon in ipairs(row.demoIcons) do icon:Hide() end
+    row.demoCount:Hide()
     clearNative(row)
     row:SetAlpha(0); row.notice:SetText("")
     row.left:SetValue(0); row.right:SetValue(0)
@@ -286,9 +300,13 @@ function V.PaintDemo(time)
         if not V.PaintCentered(row,percentage) then row.notice:SetText(sample[5] or "?") end
         if sample[4] then V.PaintManaBackground(row,true) end
         row.selection:SetAlpha(i == 8 and 1 or 0)
+        row.demoCount:SetText(i<=5 and tostring(i) or ""); row.demoCount:Show()
         for j,label in ipairs(row.debuffs) do
             local prefix=({"S","D","T"})[j]
-            local active=(i+j)%3~=0
+            local active=(j==1 and i<=5) or (i+j)%3~=0
+            label:Hide()
+            row.demoIcons[j]:SetAlpha(i~=6 and active and 1 or 0.25)
+            row.demoIcons[j]:Show()
             label:SetText(prefix..(i==6 and "?" or (active and j==1 and tostring(i%5+1) or "")))
             if i==6 then label:SetTextColor(0.65,0.70,0.78,1)
             elseif active then label:SetTextColor(0.28,0.85,0.46,1)

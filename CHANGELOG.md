@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Preview warrior spell icons and separate one-to-five Sunder counts in Threat demo.
+
 - Move the selection marker outside the threat fill and space debuff labels after it.
 
 - Widen the selected enemy gold marker for easier visibility.
