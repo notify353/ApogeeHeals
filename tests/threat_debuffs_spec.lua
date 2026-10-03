@@ -45,3 +45,5 @@ v.PaintDemo(0)
 for _,c in ipairs(containers) do assert(not c.enabled) end
 assert(v.rows[1].debuffs[1].text:sub(1,1)=="S")
 print("PASS native enemy aura containers: player filter, spell ranks, native stacks, zero Lua scans, fixed layout, reuse and demo cleanup")
+
+C_XMLUtil=nil; CreateFrame=create -- Do not leak native template mocks into the next generated fixture.
