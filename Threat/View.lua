@@ -100,11 +100,9 @@ local function createRow(parent, index)
     row.notice = S.Text(overlay,5); row.notice:SetPoint("TOPRIGHT",-2,0); row.notice:SetSize(21,7)
     row.notice:SetJustifyH("RIGHT"); row.notice:Hide()
     row.selection = CreateFrame("Frame",nil,overlay); row.selection:SetAllPoints(row); row.selection:EnableMouse(false)
-    for _,edge in ipairs({{"TOPLEFT",width,0.5},{"BOTTOMLEFT",width,0.5},{"TOPLEFT",0.5,7},{"TOPRIGHT",0.5,7}}) do
-        local line = row.selection:CreateTexture(nil,"OVERLAY")
-        line:SetSize(edge[2],edge[3]); line:SetPoint(edge[1],row,edge[1],0,0)
-        line:SetColorTexture(0.87,0.76,0.48,1)
-    end
+    local marker = row.selection:CreateTexture(nil,"OVERLAY")
+    marker:SetSize(1,7); marker:SetPoint("TOPRIGHT",row,"TOPRIGHT",0,0)
+    marker:SetColorTexture(0.87,0.76,0.48,1)
     row.debuffs = {}
     for i=1,3 do
         local label=S.Text(overlay,5); label:SetSize(12,7)

@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Replace the selected enemy outline with a slim gold right-edge marker.
+
 - Replace the mana-type edge strip with subdued blue/charcoal row backgrounds
   in live/demo modes, matching native masks and using the full width for threat.
 
