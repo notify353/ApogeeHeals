@@ -182,10 +182,10 @@ r.SetEnabled(false); assert(not v.root.shown and r.frame.scripts.OnUpdate==nil a
 reads=m.threatReads; m.Event("NAME_PLATE_UNIT_ADDED",unit); assert(m.threatReads==reads)
 r.SetEnabled(true); assert(v.root.shown and r.model.slots[1]==unit)
 a.db.threatPosition={x=-380,y=330}
-v.Place(); assert(v.root.point[1]=="TOPLEFT" and v.root.point[4]==-53 and v.root.point[5]==3.5)
+v.Place(); assert(v.root.point[1]=="TOPLEFT" and v.root.point[4]==-49 and v.root.point[5]==3.5)
 local saved=a.db
-m,a,r,v=setup(saved); assert(v.root.point[4]==-53 and v.root.point[5]==3.5)
-a.Settings.ResetPositions(); assert(a.db.threatPosition==nil and v.root.point[4]==-53)
+m,a,r,v=setup(saved); assert(v.root.point[4]==-49 and v.root.point[5]==3.5)
+a.Settings.ResetPositions(); assert(a.db.threatPosition==nil and v.root.point[4]==-49)
 r.SetEnabled(false); a.ResetCharacter(); assert(a.db.threatEnabled==nil and not v.root.shown)
 assert(a.Settings.threat.checked==false and r.frame.scripts.OnUpdate==nil)
 local clean=a.Storage.Open({version=3,threatPosition={x=0/0,y=1},threatEnabled="true",bindings={["2"]=2050}})

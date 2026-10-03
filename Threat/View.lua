@@ -1,7 +1,7 @@
 local _, A = ...
 local V, S = {}, A.Style
 A.ThreatView = V
-local width, rowHeight, header = 64, 7.5, 0
+local width, rowHeight, header = 56, 7.5, 0
 local warnings = {
     lead={"LEAD", 0.28,0.74,0.46}, weak={"WEAK LEAD", 0.90,0.74,0.22},
     noLead={"NO LEAD", 0.92,0.48,0.24}, noAggro={"NO AGGRO", 0.86,0.30,0.30},
@@ -125,7 +125,7 @@ local function createRow(parent, index)
     row.demoCount=S.Text(overlay,5); row.demoCount:SetSize(7,7)
     local countFont=row.demoCount:GetFont(); row.demoCount:SetFont(countFont,5,"OUTLINE")
     row.demoCount:SetPoint("TOPLEFT",row,"TOPLEFT",width+6,0)
-    row.demoCount:SetJustifyH("RIGHT"); row.demoCount:SetTextColor(1,1,1,1); row.demoCount:Hide()
+    row.demoCount:SetJustifyH("CENTER"); row.demoCount:SetJustifyV("MIDDLE"); row.demoCount:SetTextColor(1,1,1,1); row.demoCount:Hide()
     row:SetAlpha(0); row.selection:SetAlpha(0)
     return row
 end

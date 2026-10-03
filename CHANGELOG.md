@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Narrow threat bars for side clearance and center demo stack counts inside icons.
+
 - Pack demo debuff icons edge-to-edge, overlay outlined stack counts, and enlarge the centered demo.
 
 - Center the entire threat group horizontally and enlarge it by ten percent.
