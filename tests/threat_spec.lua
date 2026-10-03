@@ -57,15 +57,19 @@ for _,percent in ipairs({75,100,160}) do
     assert(row.left.point==leftPoint and row.right.point==rightPoint)
 end
 m.units[unit].lead=3; m.units[unit].leadPercent=95; r.Refresh()
-assert(r.model.entries[unit].warning=="noLead" and row.left.value==5 and row.notice.text=="")
+assert(r.model.entries[unit].warning=="noLead" and row.left.value==0 and row.notice.text=="")
 m.units[unit].tanking=false; m.units[unit].percent=70; r.Refresh()
 assert(r.model.entries[unit].warning=="noAggro" and row.notice.text=="LOST" and row.left.value==30)
 m.units[unit].lead=0; r.Refresh(); assert(row.notice.text=="LOST")
 m.units[unit].tanking=true; m.units[unit].leadPercent=0; r.Refresh()
 assert(row.notice.text=="-" and row.left.value==0 and row.right.value==0)
+-- Owner solo capture: tanking=true, status=3, scaled=100, raw=255,
+-- threat=1299, lead warning=0, lead percentage=0 must never become a deficit.
+m.units[unit].percent=255; m.units[unit].amount=1299; r.Refresh()
+assert(row.left.value==0 and row.right.value==0 and row.notice.text=="-")
 local opaque=m.Secret(); m.units[unit].leadPercent=opaque; r.Refresh()
 assert(row.notice.text=="" and row.left.value==0 and row.right.value==0)
-assert(row.nativeTank.alpha==1 and rawequal(row.nativeTank.mask.value,opaque)
+assert(row.nativeTank.alpha==1 and row.nativeTank.mask.value==100
     and rawequal(row.nativeTank.right.value,opaque) and row.nativeRaw.alpha==0)
 m.units[unit].leadPercent=150; m.units[unit].tanking=opaque; r.Refresh()
 assert(row.notice.text=="?" and row.left.value==0 and row.right.value==0)
@@ -77,7 +81,7 @@ end
 m.units[unit].percent=70; r.Refresh()
 assert(row.notice.text=="" and rawequal(row.nativeTank.alpha,nativeAlphas[1])
     and rawequal(row.nativeRaw.alpha,nativeAlphas[2]))
-assert(row.nativeTank.mask.value==150 and row.nativeTank.right.value==150)
+assert(row.nativeTank.mask.value==100 and row.nativeTank.right.value==150)
 assert(row.nativeRaw.mask.value==70 and row.nativeRaw.right.value==70)
 assert(row.nativeTank.mask.min==0 and row.nativeTank.mask.max==100)
 assert(row.nativeTank.right.min==100 and row.nativeTank.right.max==200)

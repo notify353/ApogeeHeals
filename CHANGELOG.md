@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Keep tanking lead readings on the center/right side, including restricted zero:
+  no-comparison no longer becomes a full left deficit. Non-tanking deficits remain.
+
 - Add native last-value displays to frozen Threat checks so solo/group percentage
   semantics can be verified, without Lua calculations or storage of secret values.
 

@@ -1,5 +1,18 @@
 # Forever API authority
 
+## Solo zero correction (70205, 2026-10-02)
+
+Owner capture: tanking YES, status 3, scaled 100, raw 255, amount 1299, lead
+warning 0 and lead percentage 0; all fields publicly readable for target. Zero
+cannot imply a deficit. Tanking lead now fills only center/right; below-reference
+lead readings stop at center. Public zero shows a dash (no comparison). The
+native tank lane always keeps its left mask fully covered, so an opaque zero
+cannot produce a false left deficit. Its fixed 100..200 right range accepts the
+original value directly. Non-tanking raw percentages retain center/left behavior.
+Secret tanking still selects lanes only through native alpha. Warning colors
+remain independent; demo follows the same tank/non-tank direction rule. Group
+percentage magnitude remains a prototype, not a validated aggro-loss threshold.
+
 ## Native diagnostic readings (70205, 2026-10-02)
 
 The solo left-filled green report is not sufficient evidence of the numeric

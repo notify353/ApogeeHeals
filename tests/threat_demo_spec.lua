@@ -11,7 +11,7 @@ a.Settings.threatDemo:SetChecked(true); a.Settings.threatDemo.scripts.OnClick(a.
 assert(r.demo and v.root.shown and a.db.threatEnabled==nil and reads==0)
 assert(v.title.text:find("DEMO",1,true) and v.footer.text:find("DEMO",1,true))
 assert(v.rows[1].right.value==82 and v.rows[3].right.value==12)
-assert(v.rows[4].left.value==5 and v.rows[5].notice.text=="LOST")
+assert(v.rows[4].left.value==0 and v.rows[5].notice.text=="LOST")
 assert(v.rows[6].notice.text=="?" and v.rows[7].notice.text=="-")
 assert(v.rows[8].selection.alpha==1)
 assert(v.rows[1].rail.color[1]==0.57 and v.rows[2].rail.color[3]==0.80)

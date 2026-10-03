@@ -89,7 +89,12 @@ local function paintNative(lane, value, tanking)
         end
         if tanking and value == 0 then lane.notice:SetText("-"); return end
     end
-    local ok = pcall(function() lane.mask:SetValue(value); lane.right:SetValue(value) end)
+    -- A tank lead value is not a deficit measurement. In particular, an
+    -- opaque zero must stay neutral. Only the non-tanking lane exposes left.
+    local ok = pcall(function()
+        if not tanking then lane.mask:SetValue(value) end
+        lane.right:SetValue(value)
+    end)
     if not ok then
         lane.mask:SetValue(100); lane.right:SetValue(100); lane.notice:SetText("?")
     end
@@ -195,6 +200,10 @@ function V.PaintRelative(row, unit, ok, tanking, rawPercentage)
         return
     end
     if tanking and percentage == 0 then return "-" end
+    if tanking and type(percentage) == "number" and percentage >= 0 and percentage < 100 then
+        -- Valid low lead readings can shrink to center, never assert a deficit.
+        percentage = 100
+    end
     if not V.PaintCentered(row,percentage) then return "?" end
 end
 function V.PaintIdentity(row, unit)
@@ -236,6 +245,7 @@ function V.PaintDemo(time)
             elseif percentage < 125 then warning = "weak" end
         end
         V.PaintWarning(row,warning)
+        if percentage and warning ~= "noAggro" then percentage = math.max(100,percentage) end
         if not V.PaintCentered(row,percentage) then row.notice:SetText(sample[5] or "?") end
         if sample[4] then row.rail:SetColorTexture(0.31,0.55,0.80,1) end
         row.selection:SetAlpha(i == 8 and 1 or 0)
