@@ -27,8 +27,12 @@ function V.BooleanAlpha(region, value, yes, no)
 end
 function V.Place()
     if InCombatLockdown() then return end
+    local demo=A.Threat and A.Threat.demo
+    local extent=width+(demo and 27 or 42)
+    V.root:SetScale(S.scale*(demo and 1.3 or 1.1))
+    V.root:SetSize(extent,8*rowHeight-0.5)
     V.root:ClearAllPoints()
-    V.root:SetPoint("TOPLEFT", UIParent, "CENTER", -(width+42)/2, 3.5)
+    V.root:SetPoint("TOPLEFT", UIParent, "CENTER", -extent/2, 3.5)
 end
 function V.StopMoving()
     -- Compatibility with runtime lifecycle calls; the meter is permanently fixed.
@@ -112,15 +116,16 @@ local function createRow(parent, index)
     row.demoIcons = {}
     for i,id in ipairs({7386,1160,6343}) do
         local icon=overlay:CreateTexture(nil,"OVERLAY"); icon:SetSize(7,7)
-        icon:SetPoint("TOPLEFT",row,"TOPLEFT",width+6+(i-1)*14,0)
+        icon:SetPoint("TOPLEFT",row,"TOPLEFT",width+6+(i-1)*7,0)
         local info=A.Access.Read(C_Spell and C_Spell.GetSpellInfo,id)
         local texture=type(info)=="table" and A.Access.Readable(info.iconID) and info.iconID or nil
         icon:SetTexture(texture or "Interface\\Icons\\INV_Misc_QuestionMark")
         icon:Hide(); row.demoIcons[i]=icon
     end
-    row.demoCount=S.Text(overlay,5); row.demoCount:SetSize(5,7)
-    row.demoCount:SetPoint("TOPLEFT",row,"TOPLEFT",width+14,0)
-    row.demoCount:SetJustifyH("LEFT"); row.demoCount:SetTextColor(1,1,1,1); row.demoCount:Hide()
+    row.demoCount=S.Text(overlay,5); row.demoCount:SetSize(7,7)
+    local countFont=row.demoCount:GetFont(); row.demoCount:SetFont(countFont,5,"OUTLINE")
+    row.demoCount:SetPoint("TOPLEFT",row,"TOPLEFT",width+6,0)
+    row.demoCount:SetJustifyH("RIGHT"); row.demoCount:SetTextColor(1,1,1,1); row.demoCount:Hide()
     row:SetAlpha(0); row.selection:SetAlpha(0)
     return row
 end
