@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Widen the selected enemy gold marker for easier visibility.
+
 - Replace the selected enemy outline with a slim gold right-edge marker.
 
 - Replace the mana-type edge strip with subdued blue/charcoal row backgrounds

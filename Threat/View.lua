@@ -101,7 +101,7 @@ local function createRow(parent, index)
     row.notice:SetJustifyH("RIGHT"); row.notice:Hide()
     row.selection = CreateFrame("Frame",nil,overlay); row.selection:SetAllPoints(row); row.selection:EnableMouse(false)
     local marker = row.selection:CreateTexture(nil,"OVERLAY")
-    marker:SetSize(1,7); marker:SetPoint("TOPRIGHT",row,"TOPRIGHT",0,0)
+    marker:SetSize(3,7); marker:SetPoint("TOPRIGHT",row,"TOPRIGHT",0,0)
     marker:SetColorTexture(0.87,0.76,0.48,1)
     row.debuffs = {}
     for i=1,3 do
