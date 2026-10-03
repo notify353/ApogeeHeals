@@ -8,6 +8,8 @@ local function declaration(source, name)
     return assert(source:match('Name = "'..name..'",(.-)\n%s*Arguments ='))
 end
 local unit=read("Blizzard_APIDocumentationGenerated/UnitDocumentation.lua")
+assert(declaration(unit,"UnitPowerMax"):find("SecretWhenUnitPowerMaxRestricted = true",1,true))
+assert(not declaration(unit,"UnitPowerType"):find("SecretReturns",1,true))
 for _,name in ipairs({"UnitDetailedThreatSituation","UnitThreatLeadSituation","UnitThreatPercentageOfLead","UnitIsUnit"}) do
     local contract=declaration(unit,name)
     assert(contract:find('SecretArguments = "AllowedWhenUntainted"',1,true))

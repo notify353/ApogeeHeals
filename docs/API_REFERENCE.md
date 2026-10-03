@@ -1,5 +1,18 @@
 # Forever API authority
 
+## Restricted maximum mana background (70205, 2026-10-03)
+
+UnitPowerType identifies the public resource type; UnitPowerMax explicitly has
+SecretWhenUnitPowerMaxRestricted. The old readable-positive-maximum gate lost
+the blue background when maximum mana was restricted. Keep public validation,
+but pass restricted maximum mana directly to native 0..1 StatusBars. Native
+clipping leaves zero capacity empty and fills positive integer capacity blue.
+The two native threat masks have blue fills anchored to their native statusbar
+textures; no fill size, value or visibility is read back. Geometry and ranges
+are created outside combat. Reset all three fills for unavailable data, non-mana,
+cleared rows and demo transitions. Matching export and mock regressions verify
+contracts and passthrough, not native rendering; in-combat acceptance is pending.
+
 ## Live icon presentation (70205, 2026-10-02)
 
 Reviewed CustomAuraButton SetIcon: native code assigns the matched aura texture.

@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Keep mana-capable threat rows blue when maximum mana is restricted, using native fills for the background and threat masks.
+
 - Promote approved demo icon layout, scale, and centered counts to native live enemy debuffs.
 
 - Add a subtle half-unit gap between demo debuff icon frames and retain group centering.

@@ -110,8 +110,34 @@ m.units[unit].maxPower=200; m.units[unit].level=20; r.Refresh()
 assert(row.background.color[3]==0.32 and row.level==nil and row.name==nil)
 assert(row.nativeTank.mask.color[3]==0.32 and row.nativeRaw.mask.color[3]==0.32 and row.rail==nil)
 m.units[unit].kind=1; r.Refresh(); assert(row.background.color[1]==0.10)
-m.units[unit].kind=0; m.units[unit].maxPower=m.Secret(); r.Refresh(); assert(row.background.color[1]==0.10)
+m.units[unit].kind=0; m.units[unit].maxPower=m.Secret(); m.combat=true; r.Refresh()
+assert(row.background.color[1]==0.10)
+for _,tint in ipairs({row.mana,row.nativeTank.mana,row.nativeRaw.mana}) do
+    assert(rawequal(tint.value,m.units[unit].maxPower) and tint.min==0 and tint.max==1)
+    assert(tint.color[3]==0.32)
+end
+assert(row.mana.level==row:GetFrameLevel())
+assert(row.nativeTank.mana.allPoints==row.nativeTank.mask:GetStatusBarTexture())
+assert(row.nativeRaw.mana.allPoints==row.nativeRaw.mask:GetStatusBarTexture())
+m.units[unit].maxPower=0; r.Refresh()
+assert(row.background.color[1]==0.10 and row.mana.value==0 and row.nativeRaw.mana.value==0)
+m.units[unit].maxPower=m.Secret(); r.Refresh()
+m.units[unit].kind=1; r.Refresh()
+assert(row.mana.value==0 and row.nativeTank.mana.value==0 and row.nativeRaw.mana.value==0)
+m.units[unit].kind=0; r.Refresh()
+local originalMax=UnitPowerMax
+UnitPowerMax=function() error("unavailable") end; r.Refresh()
+assert(row.mana.value==0 and row.background.color[1]==0.10)
+UnitPowerMax=originalMax; r.Refresh()
+local originalSet=row.nativeRaw.mana.SetValue
+row.nativeRaw.mana.SetValue=function(self,value)
+    if not a.Access.Readable(value) then error("sink unavailable") end
+    originalSet(self,value)
+end
+r.Refresh(); assert(row.mana.value==0 and row.nativeTank.mana.value==0)
+row.nativeRaw.mana.SetValue=originalSet; r.Refresh()
 m.Event("NAME_PLATE_UNIT_REMOVED",unit)
+assert(row.mana.value==0 and row.nativeTank.mana.value==0 and row.nativeRaw.mana.value==0)
 assert(row.left.value==0 and row.right.value==0 and row.health==nil and row.name==nil and row.level==nil)
 print("PASS threat-only rows, mana-type background and stale-data cleanup")
 

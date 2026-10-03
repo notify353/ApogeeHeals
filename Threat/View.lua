@@ -47,6 +47,16 @@ local function bar(parent, w, h, point, x, y, reverse)
     b:SetMinMaxValues(0,100); b:SetValue(0); b:SetReverseFill(reverse == true)
     return b
 end
+-- Native 0..1 clipping distinguishes zero capacity from positive capacity even
+-- when maximum mana is restricted. Never read back the resulting fill/geometry.
+local function manaTint(parent, region)
+    local tint = CreateFrame("StatusBar",nil,parent)
+    tint:SetAllPoints(region); tint:EnableMouse(false)
+    tint:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
+    tint:SetStatusBarColor(0.08,0.19,0.32,1)
+    tint:SetMinMaxValues(0,1); tint:SetValue(0)
+    return tint
+end
 -- Native-only complement: a left-to-right opaque mask covers a colored left
 -- half. Its uncovered portion extends from center to left as percentage falls.
 -- The right half uses native range 100..200. Neither requires Lua arithmetic.
@@ -56,6 +66,7 @@ local function nativeLane(row)
     lane.fill:SetPoint("TOPLEFT",0,0)
     lane.mask = bar(lane,width/2,7,"TOPLEFT",0,0,false)
     lane.mask:SetStatusBarColor(S.background[1],S.background[2],S.background[3],1)
+    lane.mana = manaTint(lane.mask,lane.mask:GetStatusBarTexture())
     lane.right = bar(lane,width/2,7,"TOPRIGHT",0,0,false)
     lane.right:SetMinMaxValues(100,200)
     lane.notice = S.Text(lane.right,5); lane.notice:SetPoint("TOPRIGHT",-2,0)
@@ -91,6 +102,8 @@ local function createRow(parent, index)
     row:SetSize(width,7); row:SetPoint("TOPLEFT",V.root,"TOPLEFT",0,-header-(index-1)*rowHeight)
     row:EnableMouse(false)
     row.background=row:CreateTexture(nil,"BACKGROUND"); row.background:SetAllPoints(row)
+    row.mana = manaTint(row,row)
+    row.mana:SetFrameLevel(row:GetFrameLevel())
     -- Immutable half-bars meet at the center. Left fills toward the left edge.
     row.left = bar(row,width/2,7,"TOPLEFT",0,0,true)
     row.right = bar(row,width/2,7,"TOPRIGHT",0,0,false)
@@ -267,13 +280,28 @@ function V.PaintManaBackground(row, mana)
     -- Native left masks must blend into the same background as the right half.
     row.nativeTank.mask:SetStatusBarColor(r,g,b,1)
     row.nativeRaw.mask:SetStatusBarColor(r,g,b,1)
+    row.mana:SetValue(0); row.nativeTank.mana:SetValue(0); row.nativeRaw.mana:SetValue(0)
 end
 function V.PaintIdentity(row, unit)
     V.PaintManaBackground(row,false)
     local kind = A.Access.Read(UnitPowerType,unit)
     if kind == 0 then
-        local maximum = A.Access.Read(UnitPowerMax,unit,0)
-        if type(maximum) == "number" and maximum > 0 then V.PaintManaBackground(row,true) end
+        local ok, maximum = pcall(UnitPowerMax,unit,0)
+        if not ok then return end
+        if A.Access.Readable(maximum) then
+            if type(maximum) == "number" and maximum > 0 and maximum < math.huge then
+                V.PaintManaBackground(row,true)
+            end
+            return
+        end
+        -- Restricted maximum goes straight to native bars, including masks
+        -- anchored to the native threat fill. No Lua numeric inspection.
+        local painted = pcall(function()
+            row.mana:SetValue(maximum)
+            row.nativeTank.mana:SetValue(maximum)
+            row.nativeRaw.mana:SetValue(maximum)
+        end)
+        if not painted then V.PaintManaBackground(row,false) end
     end
 end
 function V.Paint(row, unit, warning)
