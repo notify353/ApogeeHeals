@@ -1,7 +1,7 @@
 local _, A = ...
 local V, S = {}, A.Style
 A.ThreatView = V
-local width, rowHeight, header = 96, 7.5, 7
+local width, rowHeight, header = 96, 7.5, 0
 local warnings = {
     lead={"LEAD", 0.28,0.74,0.46}, weak={"WEAK LEAD", 0.90,0.74,0.22},
     noLead={"NO LEAD", 0.92,0.48,0.24}, noAggro={"NO AGGRO", 0.86,0.30,0.30},
@@ -26,28 +26,12 @@ function V.BooleanAlpha(region, value, yes, no)
     return ok
 end
 function V.Place()
-    if InCombatLockdown() or V.moving then return end
-    local position = A.db.threatPosition or {x=-100, y=-45}
+    if InCombatLockdown() then return end
     V.root:ClearAllPoints()
-    V.root:SetPoint("TOPLEFT", UIParent, "CENTER", position.x, position.y)
+    V.root:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
 end
-function V.StopMoving(save)
-    if not V.moving then return end
-    V.root:StopMovingOrSizing(); V.moving = nil
-    if not save or InCombatLockdown() then return end
-    local x = A.Access.Read(V.root.GetLeft, V.root)
-    local y = A.Access.Read(V.root.GetTop, V.root)
-    local scale = A.Access.Read(V.root.GetEffectiveScale, V.root)
-    local parentScale = A.Access.Read(UIParent.GetEffectiveScale, UIParent)
-    local w = A.Access.Read(UIParent.GetWidth, UIParent)
-    local h = A.Access.Read(UIParent.GetHeight, UIParent)
-    if finite(x) and finite(y) and finite(scale) and scale > 0 and finite(parentScale) and parentScale > 0
-        and finite(w) and finite(h) then
-        x, y = x * scale / parentScale - w / 2, y * scale / parentScale - h / 2
-        -- Position offsets are in the panel's scale, matching Place's anchors.
-        x, y = x * parentScale / scale, y * parentScale / scale
-        if finite(x) and finite(y) then A.db.threatPosition = {x=x, y=y} end
-    end
+function V.StopMoving()
+    -- Compatibility with runtime lifecycle calls; the meter is permanently fixed.
 end
 function V.ResetPosition()
     if InCombatLockdown() then return end
@@ -133,17 +117,14 @@ local function createRow(parent, index)
 end
 function V.Create()
     V.root = CreateFrame("Frame",nil,UIParent)
-    V.root:SetScale(S.scale); V.root:SetSize(width+38,header+8*rowHeight+7)
-    V.root:SetMovable(true); V.root:SetClampedToScreen(true); V.root:EnableMouse(false)
-    V.handle = CreateFrame("Button",nil,V.root); V.handle:EnableMouse(true)
-    V.handle:SetPoint("TOPLEFT",0,0); V.handle:SetSize(width,header); V.handle:RegisterForDrag("LeftButton")
+    V.root:SetScale(S.scale); V.root:SetSize(width+38,8*rowHeight-0.5)
+    V.root:SetMovable(false); V.root:SetClampedToScreen(true); V.root:EnableMouse(false)
+    V.handle = CreateFrame("Button",nil,V.root); V.handle:EnableMouse(false)
+    V.handle:SetPoint("TOPLEFT",0,0); V.handle:SetSize(width,header)
     V.title = S.CleanText(V.handle,5); V.title:SetAllPoints(); V.title:SetJustifyH("LEFT")
     V.title:SetText("Threat"); V.title:SetTextColor(unpack(S.muted))
-    V.handle:SetScript("OnDragStart",function()
-        if not InCombatLockdown() then V.root:StartMoving(); V.moving = true end
-    end)
-    V.handle:SetScript("OnDragStop",function() V.StopMoving(true) end)
-    V.footer = S.CleanText(V.root,5); V.footer:SetPoint("BOTTOMLEFT",0,0); V.footer:SetTextColor(unpack(S.muted))
+    V.title:SetAlpha(0); V.handle:Hide()
+    V.footer = S.CleanText(V.root,5); V.footer:SetPoint("BOTTOMLEFT",0,0); V.footer:SetTextColor(unpack(S.muted)); V.footer:SetAlpha(0)
     V.rows = {}
     for i=1,8 do V.rows[i] = createRow(V.root,i) end
     V.Place(); V.Clear()

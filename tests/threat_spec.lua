@@ -161,10 +161,10 @@ m,a,r,v=setup()
 unit=m.Mob(1,true,3,0)
 local anchors={}
 for i,row in ipairs(v.rows) do anchors[i]=row.point end
-v.handle.scripts.OnDragStart(); assert(v.moving)
+assert(not v.root.movable and not v.handle.mouse and not v.handle.scripts.OnDragStart)
 m.combat=true; m.Event("PLAYER_REGEN_DISABLED")
 assert(not v.moving and not v.root.moving)
-v.handle.scripts.OnDragStart(); assert(not v.moving)
+assert(not v.moving and v.title.alpha==0 and v.footer.alpha==0)
 r.SetEnabled(false); assert(a.db.threatEnabled==true)
 local reads=m.threatReads; r.frame.scripts.OnUpdate(r.frame,0.19); assert(m.threatReads==reads)
 r.frame.scripts.OnUpdate(r.frame,0.01); assert(m.threatReads==reads+2)
@@ -180,18 +180,17 @@ assert(v.root.shown and v.rows[1].unit=="nameplate1" and r.frame.scripts.OnUpdat
 r.SetEnabled(false); assert(not v.root.shown and r.frame.scripts.OnUpdate==nil and next(r.model.entries)==nil)
 reads=m.threatReads; m.Event("NAME_PLATE_UNIT_ADDED",unit); assert(m.threatReads==reads)
 r.SetEnabled(true); assert(v.root.shown and r.model.slots[1]==unit)
-v.handle.scripts.OnDragStart(); v.root.left=100; v.root.top=600
-v.handle.scripts.OnDragStop(); assert(a.db.threatPosition.x==-380 and a.db.threatPosition.y==330)
-v.Place(); assert(v.root.point[4]==-380 and v.root.point[5]==330)
+a.db.threatPosition={x=-380,y=330}
+v.Place(); assert(v.root.point[1]=="CENTER" and v.root.point[4]==0 and v.root.point[5]==0)
 local saved=a.db
-m,a,r,v=setup(saved); assert(v.root.point[4]==-380 and v.root.point[5]==330)
-a.Settings.ResetPositions(); assert(a.db.threatPosition==nil and v.root.point[4]==-100)
+m,a,r,v=setup(saved); assert(v.root.point[4]==0 and v.root.point[5]==0)
+a.Settings.ResetPositions(); assert(a.db.threatPosition==nil and v.root.point[4]==0)
 r.SetEnabled(false); a.ResetCharacter(); assert(a.db.threatEnabled==nil and not v.root.shown)
 assert(a.Settings.threat.checked==false and r.frame.scripts.OnUpdate==nil)
 local clean=a.Storage.Open({version=3,threatPosition={x=0/0,y=1},threatEnabled="true",bindings={["2"]=2050}})
 assert(clean.threatPosition==nil and clean.threatEnabled==nil and clean.bindings["2"]==2050)
 m,a,r,v=setup({version=3,threatEnabled=false}); assert(not v.root.shown and r.frame.scripts.OnUpdate==nil)
-print("PASS combat-safe fixed geometry, bounded polling, zoning/bootstrap, toggle, position persistence and reset isolation")
+print("PASS combat-safe fixed geometry, bounded polling, zoning/bootstrap, toggle, fixed center and reset isolation")
 
 -- Reproduce target-before-damage: no bottom placeholder; acquisition uses one
 -- stable row and later threat changes/target switches cannot move it.
@@ -226,9 +225,9 @@ local savedDisabled=a.db
 m,a,r,v=setup(savedDisabled); assert(not v.root.shown and a.Settings.threat.checked==false)
 print("PASS default-off threat has no polling/reads; settings checkbox opt-in and explicit choices persist")
 
--- An enabled meter must explain an empty encounter instead of showing only its title.
+-- Empty-state text stays internal; the owner requested no visible heading/footer.
 m,a,r,v=setup()
-assert(v.root.shown and v.footer.text=="Idle - no tracked enemies")
+assert(v.root.shown and v.footer.alpha==0 and v.title.alpha==0 and v.footer.text=="Idle - no tracked enemies")
 m.combat=true; m.Event("PLAYER_REGEN_DISABLED")
 assert(v.footer.text=="No tracked enemies - show nameplates")
 unit=m.Mob(1,true,3,0); m.Target(unit)

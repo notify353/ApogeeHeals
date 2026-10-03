@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Lock the threat stack to screen center, disable dragging, and hide header/footer
+  with no reserved padding. Empty rows leave the meter transparent.
+
 - Hide threat status words/symbols inside live and demo bars; preserve fill,
   warning colors and adjacent debuff indicators.
 

@@ -9,7 +9,7 @@ local r,v = a.Threat,a.ThreatView
 assert(not r.demo and not v.root.shown)
 a.Settings.threatDemo:SetChecked(true); a.Settings.threatDemo.scripts.OnClick(a.Settings.threatDemo)
 assert(r.demo and v.root.shown and a.db.threatEnabled==nil and reads==0)
-assert(v.title.text:find("DEMO",1,true) and v.footer.text:find("DEMO",1,true))
+assert(v.title.alpha==0 and v.footer.alpha==0 and not v.handle.mouse)
 assert(v.rows[1].right.value==82 and v.rows[3].right.value==12)
 assert(v.rows[4].left.value==0 and v.rows[5].notice.text=="LOST")
 assert(v.rows[6].notice.text=="?" and v.rows[7].notice.text=="-")
