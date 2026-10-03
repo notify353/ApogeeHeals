@@ -1,14 +1,15 @@
 local Mock=dofile("tests/mock.lua")
 local m=Mock.New(); local a=m.Start(); local v=a.ThreatView
 local containers,buttons={},{}
+local binds,enables=0,0
 C_XMLUtil={GetTemplateInfo=function() return {type="AuraContainer"} end}
 local create=CreateFrame
 CreateFrame=function(kind,name,parent,template)
     local frame=create(kind,name,parent,template)
     if template=="CustomAuraContainerTemplate" then
         assert(not m.combat); containers[#containers+1]=frame
-        function frame:SetUnit(unit) assert(type(unit)=="string"); self.unit=unit end
-        function frame:SetEnabled(enabled) self.enabled=enabled end
+        function frame:SetUnit(unit) assert(type(unit)=="string"); self.unit=unit; binds=binds+1 end
+        function frame:SetEnabled(enabled) self.enabled=enabled; enables=enables+1 end
         function frame:AddAuraGroup(key,filter,options)
             self.options=options; self.filter=filter
             local button=create("AuraButton",nil,self)
@@ -40,9 +41,15 @@ C_UnitAuras.GetAuraDataByIndex=function() error("Lua must not enumerate auras") 
 m.combat=true; local row=v.rows[1]
 a.ThreatModel.PaintDebuffs(row,"nameplate7")
 for _,c in ipairs(row.debuffContainers) do assert(c.unit=="nameplate7" and c.enabled) end
+local bound,enabled=binds,enables
+for i=1,100 do a.ThreatModel.PaintDebuffs(row,"nameplate7") end
+assert(binds==bound and enables==enabled)
 assert(not row.debuffs[1].shown and not row.debuffs[2].shown)
 v.ClearRow(row)
 for _,c in ipairs(row.debuffContainers) do assert(not c.enabled) end
+enabled=enables; v.ClearRow(row); assert(enables==enabled)
+a.ThreatModel.PaintDebuffs(row,"nameplate7")
+assert(binds==bound+3 and enables==enabled+3) -- Same token, new lifetime.
 a.ThreatModel.PaintDebuffs(row,"nameplate8")
 for _,c in ipairs(row.debuffContainers) do assert(c.unit=="nameplate8" and c.enabled) end
 v.PaintDemo(0)

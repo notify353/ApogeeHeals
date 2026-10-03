@@ -5,7 +5,7 @@ local function nameplate(unit)
     return A.Access.Readable(unit) and type(unit) == "string" and unit:match("^nameplate%d+$") ~= nil
 end
 function R.Reset()
-    R.model, R.exposed = M.New(), {}; R.elapsed = 0
+    R.model, R.exposed = M.New(), {}; R.elapsed = 0; R.pending = nil
     V.Clear()
 end
 function R.Discover()
@@ -22,11 +22,14 @@ function R.Discover()
 end
 function R.Refresh()
     if R.demo or R.suspended or A.db.threatEnabled ~= true then return end
+    R.pending = nil; R.elapsed = 0
     for unit in pairs(R.exposed) do
-        local presence, warning = M.Sample(unit)
+        local presence, warning, ok, tanking, raw = M.Sample(unit)
         -- An API failure does not establish safety or absence. Keep an unknown
         -- row for exposed hostile mobs when their participation is restricted.
         M.Observe(R.model, unit, presence, warning)
+        local entry = R.model.entries[unit]
+        if entry and entry.slot then V.Paint(V.rows[entry.slot],unit,warning,ok,tanking,raw) end
     end
     M.Fill(R.model)
     -- All rows belong to stable nameplate lifetimes. Selection only paints
@@ -37,7 +40,11 @@ function R.Refresh()
     for i = 1, 8 do
         local unit, row = R.model.slots[i], V.rows[i]
         if unit then
-            visible = visible + 1; V.Paint(row,unit,R.model.entries[unit].warning)
+            visible = visible + 1
+            if row.unit ~= unit then
+                local _, warning, ok, tanking, raw = M.Sample(unit)
+                V.Paint(row,unit,warning,ok,tanking,raw)
+            end
             row.selection:SetAlpha(0)
             local ok, same = pcall(UnitIsUnit,unit,"target")
             if ok then
@@ -67,7 +74,7 @@ function R.ApplyEnabled()
     V.root:SetShown(enabled)
     R.frame:SetScript("OnUpdate", enabled and function(_, elapsed)
         R.elapsed = R.elapsed + elapsed
-        if R.elapsed >= 0.2 then R.elapsed = 0; R.Refresh() end
+        if R.pending or R.elapsed >= 0.1 then R.Refresh() end
     end or nil)
     if enabled then V.PrepareDebuffs(); R.Discover(); R.Refresh() end
 end
@@ -82,8 +89,8 @@ end
 function R.Start()
     V.Create(); R.frame = CreateFrame("Frame")
     for _, event in ipairs({"NAME_PLATE_UNIT_ADDED", "NAME_PLATE_UNIT_REMOVED", "UNIT_THREAT_LIST_UPDATE",
-        "UNIT_THREAT_SITUATION_UPDATE", "PLAYER_TARGET_CHANGED", "RAID_TARGET_UPDATE", "UNIT_FACTION",
-        "UNIT_FLAGS", "UNIT_NAME_UPDATE", "UNIT_AURA", "PLAYER_LEAVING_WORLD", "PLAYER_ENTERING_WORLD",
+        "UNIT_THREAT_SITUATION_UPDATE", "PLAYER_TARGET_CHANGED", "UNIT_FACTION",
+        "UNIT_FLAGS", "UNIT_MAXPOWER", "UNIT_DISPLAYPOWER", "PLAYER_LEAVING_WORLD", "PLAYER_ENTERING_WORLD",
         "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "UI_SCALE_CHANGED", "DISPLAY_SIZE_CHANGED"}) do
         R.frame:RegisterEvent(event)
     end
@@ -102,9 +109,17 @@ function R.Start()
         if R.demo or R.suspended or A.db.threatEnabled ~= true then return end
         if event == "NAME_PLATE_UNIT_ADDED" and nameplate(unit) then
             -- Each added lifetime is new, even if the engine reuses the token.
+            local entry = R.model.entries[unit]
+            if entry and entry.slot then V.ClearRow(V.rows[entry.slot]) end
             M.Remove(R.model, unit); R.exposed[unit] = true
         elseif event == "NAME_PLATE_UNIT_REMOVED" and nameplate(unit) then
             R.exposed[unit] = nil; M.Remove(R.model, unit)
+        elseif event:match("^UNIT_") then
+            -- Coalesce combat bursts to the next frame. Native aura containers
+            -- own their own events; unrelated units must not repaint this stack.
+            if A.Access.Readable(unit) and (unit == "player" or unit == "target"
+                or (nameplate(unit) and R.exposed[unit])) then R.pending = true end
+            return
         end
         R.Refresh()
     end)

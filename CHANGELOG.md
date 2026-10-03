@@ -1,5 +1,10 @@
 ## Unreleased
 
+- Coalesce threat-event bursts, ignore unrelated unit/aura events, and refresh at
+  0.1-second fallback intervals with one detailed threat read per stable row.
+- Avoid repeated aura binding, unchanged colors, empty-row cleanup and fill resets;
+  clear native debuff bindings when a nameplate token starts a new lifetime.
+
 - Keep mana-capable threat rows blue when maximum mana is restricted, using native fills for the background and threat masks.
 
 - Promote approved demo icon layout, scale, and centered counts to native live enemy debuffs.

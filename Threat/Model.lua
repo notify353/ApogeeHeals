@@ -24,7 +24,7 @@ function M.Sample(unit)
         return "absent", "unknown"
     end
     if hostile ~= true then return "unknown", "unknown" end
-    local ok, tanking, status = pcall(UnitDetailedThreatSituation, "player", unit)
+    local ok, tanking, status, _, raw = pcall(UnitDetailedThreatSituation, "player", unit)
     local presence = "unknown"
     if ok and A.Access.Readable(status) then
         if status == nil then presence = "unengaged"
@@ -34,15 +34,18 @@ function M.Sample(unit)
     if not leadOK then lead = nil end
     if not A.Access.Readable(lead) then presence, lead = "unknown", nil end
     if state(lead) then presence = "present" end
-    -- Only public values leave this function. Secret results are never cached.
+    -- Only presence/warning enter the model. Remaining results flow directly
+    -- to the view in this refresh; never cache restricted samples.
     if not ok then tanking, status = nil, nil end
-    return presence, M.Classify(lead, tanking, status)
+    return presence, M.Classify(lead, tanking, status), ok, tanking, raw
 end
 function M.New()
     return {entries={}, slots={}, sequence=0}
 end
 function M.Remove(model, unit)
+    if not model.entries[unit] then return end
     model.entries[unit] = nil
+    model.dirty = true
     for i = 1, 8 do if model.slots[i] == unit then model.slots[i] = nil end end
 end
 function M.Observe(model, unit, presence, warning)
@@ -52,10 +55,12 @@ function M.Observe(model, unit, presence, warning)
     if not entry then
         model.sequence = model.sequence + 1
         entry = {order=model.sequence}; model.entries[unit] = entry
+        model.dirty = true
     end
     entry.warning = warning
 end
 function M.Fill(model)
+    if not model.dirty then return end
     local waiting, occupied = {}, {}
     for i = 1, 8 do if model.slots[i] then occupied[model.slots[i]] = true end end
     for unit, entry in pairs(model.entries) do
@@ -65,16 +70,22 @@ function M.Fill(model)
     table.sort(waiting, function(a, b) return a.order < b.order end)
     local at = 1
     for i = 1, 8 do
-        if not model.slots[i] and waiting[at] then model.slots[i] = waiting[at].unit; at = at + 1 end
+        if not model.slots[i] and waiting[at] then
+            local unit = waiting[at].unit
+            model.slots[i] = unit; model.entries[unit].slot = i; at = at + 1
+        end
     end
+    model.dirty = nil
 end
 
 -- Native containers own aura enumeration, filtering and stack text. No Lua scans.
 function M.PaintDebuffs(row, unit)
+    if row.debuffUnit == unit then return end
     if row.debuffContainers then
         for _,container in ipairs(row.debuffContainers) do
             container:SetUnit(unit); container:SetEnabled(true)
         end
+        row.debuffUnit = unit
     end
     for _,label in ipairs(row.debuffs) do label:SetText(""); label:Hide() end
 end

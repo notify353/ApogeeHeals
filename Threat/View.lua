@@ -75,22 +75,24 @@ local function nativeLane(row)
     return lane
 end
 local function clearNative(row)
-    for _,lane in ipairs({row.nativeTank,row.nativeRaw}) do
+    for _,lane in ipairs(row.nativeLanes) do
         lane:SetAlpha(0); lane.mask:SetValue(100); lane.right:SetValue(100); lane.notice:SetText("")
     end
 end
 local function paintNative(lane, value, tanking)
-    lane.mask:SetValue(100); lane.right:SetValue(100); lane.notice:SetText("")
+    lane.notice:SetText("")
     if A.Access.Readable(value) then
         if type(value) ~= "number" or value ~= value or value < 0 or value == math.huge then
-            lane.notice:SetText("?"); return
+            lane.mask:SetValue(100); lane.right:SetValue(100); lane.notice:SetText("?"); return
         end
-        if tanking and value == 0 then lane.notice:SetText("-"); return end
+        if tanking and value == 0 then
+            lane.mask:SetValue(100); lane.right:SetValue(100); lane.notice:SetText("-"); return
+        end
     end
     -- A tank lead value is not a deficit measurement. In particular, an
     -- opaque zero must stay neutral. Only the non-tanking lane exposes left.
     local ok = pcall(function()
-        if not tanking then lane.mask:SetValue(value) end
+        if tanking then lane.mask:SetValue(100) else lane.mask:SetValue(value) end
         lane.right:SetValue(value)
     end)
     if not ok then
@@ -108,6 +110,7 @@ local function createRow(parent, index)
     row.left = bar(row,width/2,7,"TOPLEFT",0,0,true)
     row.right = bar(row,width/2,7,"TOPRIGHT",0,0,false)
     row.nativeTank, row.nativeRaw = nativeLane(row), nativeLane(row)
+    row.nativeLanes = {row.nativeTank,row.nativeRaw}
     local overlay = CreateFrame("Frame",nil,row); overlay:SetAllPoints(row); overlay:EnableMouse(false)
     local level = A.Access.Read(row.GetFrameLevel,row)
     if finite(level) then overlay:SetFrameLevel(level+5) end
@@ -205,12 +208,15 @@ function V.PrepareDebuffs()
     end
 end
 function V.ClearRow(row)
+    if row.cleared and not row.debuffUnit then return end
     for _,container in ipairs(row.debuffContainers or {}) do container:SetEnabled(false) end
+    row.debuffUnit = nil; row.cleared = true
     for _,label in ipairs(row.debuffs) do label:SetText(""); label:Hide() end
     for _,icon in ipairs(row.demoIcons) do icon:Hide() end
     for _,frame in ipairs(row.demoFrames) do frame:Hide() end
     row.demoCount:Hide()
     clearNative(row)
+    row.relativeMode = nil
     row:SetAlpha(0); row.notice:SetText("")
     row.left:SetValue(0); row.right:SetValue(0)
     row.selection:SetAlpha(0); V.PaintManaBackground(row,false); row.unit = nil
@@ -220,31 +226,40 @@ function V.Clear()
     V.footer:SetText("")
 end
 function V.PaintWarning(row, warning)
-    local info = warnings[warning] or warnings.unknown
-    row.left:SetStatusBarColor(info[2],info[3],info[4],1)
-    row.right:SetStatusBarColor(info[2],info[3],info[4],1)
-    for _,lane in ipairs({row.nativeTank,row.nativeRaw}) do
-        lane.fill:SetColorTexture(info[2],info[3],info[4],1)
-        lane.right:SetStatusBarColor(info[2],info[3],info[4],1)
+    warning = warnings[warning] and warning or "unknown"
+    local info = warnings[warning]
+    if row.warning ~= warning then
+        row.warning = warning
+        row.left:SetStatusBarColor(info[2],info[3],info[4],1)
+        row.right:SetStatusBarColor(info[2],info[3],info[4],1)
+        for _,lane in ipairs(row.nativeLanes) do
+            lane.fill:SetColorTexture(info[2],info[3],info[4],1)
+            lane.right:SetStatusBarColor(info[2],info[3],info[4],1)
+        end
+        row.notice:SetTextColor(info[2],info[3],info[4],1)
     end
-    row.notice:SetTextColor(info[2],info[3],info[4],1)
     row.notice:SetText(warning == "noAggro" and "LOST" or (warning == "unknown" and "?" or ""))
 end
 function V.PaintCentered(row, percentage)
-    row.left:SetValue(0); row.right:SetValue(0)
     -- Public-only transform. Never subtract/compare a restricted percentage.
     if not A.Access.Readable(percentage) or type(percentage) ~= "number"
-        or percentage ~= percentage or percentage < 0 or percentage == math.huge then return false end
+        or percentage ~= percentage or percentage < 0 or percentage == math.huge then
+        row.left:SetValue(0); row.right:SetValue(0); return false
+    end
     local delta = percentage-100
     row.left:SetValue(math.min(100,math.max(0,-delta)))
     row.right:SetValue(math.min(100,math.max(0,delta)))
     return true
 end
+local function relativeMode(row, mode)
+    if row.relativeMode == mode then return end
+    clearNative(row); row.left:SetValue(0); row.right:SetValue(0)
+    row.relativeMode = mode
+end
 function V.PaintRelative(row, unit, ok, tanking, rawPercentage)
-    row.left:SetValue(0); row.right:SetValue(0)
-    clearNative(row)
-    if not ok then return "?" end
+    if not ok then relativeMode(row,"none"); return "?" end
     if not A.Access.Readable(tanking) then
+        relativeMode(row,"dual")
         local leadOK, lead = pcall(UnitThreatPercentageOfLead,"player",unit)
         if not leadOK then lead = nil end
         paintNative(row.nativeTank,lead,true)
@@ -254,60 +269,66 @@ function V.PaintRelative(row, unit, ok, tanking, rawPercentage)
         if not tankOK or not rawOK then clearNative(row); return "?" end
         return
     end
-    if type(tanking) ~= "boolean" then return "?" end
+    if type(tanking) ~= "boolean" then relativeMode(row,"none"); return "?" end
     local percentage = rawPercentage
     if tanking then
         local leadOK, value = pcall(UnitThreatPercentageOfLead,"player",unit)
-        if not leadOK then return "?" end
+        if not leadOK then relativeMode(row,"none"); return "?" end
         percentage = value
     end
     if not A.Access.Readable(percentage) then
+        relativeMode(row,tanking and "tank" or "raw")
         local lane = tanking and row.nativeTank or row.nativeRaw
         paintNative(lane,percentage,tanking); lane:SetAlpha(1)
         return
     end
-    if tanking and percentage == 0 then return "-" end
+    relativeMode(row,"public")
+    if tanking and percentage == 0 then V.PaintCentered(row,100); return "-" end
     if tanking and type(percentage) == "number" and percentage >= 0 and percentage < 100 then
         -- Valid low lead readings can shrink to center, never assert a deficit.
         percentage = 100
     end
     if not V.PaintCentered(row,percentage) then return "?" end
 end
-function V.PaintManaBackground(row, mana)
+function V.PaintManaBackground(row, mana, native)
     local r,g,b=0.10,0.12,0.15
     if mana then r,g,b=0.08,0.19,0.32 end
-    row.background:SetColorTexture(r,g,b,1)
-    -- Native left masks must blend into the same background as the right half.
-    row.nativeTank.mask:SetStatusBarColor(r,g,b,1)
-    row.nativeRaw.mask:SetStatusBarColor(r,g,b,1)
-    row.mana:SetValue(0); row.nativeTank.mana:SetValue(0); row.nativeRaw.mana:SetValue(0)
+    if row.manaColor ~= mana then
+        row.manaColor = mana
+        row.background:SetColorTexture(r,g,b,1)
+        -- Native left masks must blend into the same background as the right half.
+        row.nativeTank.mask:SetStatusBarColor(r,g,b,1)
+        row.nativeRaw.mask:SetStatusBarColor(r,g,b,1)
+    end
+    if row.manaNative and not native then
+        row.mana:SetValue(0); row.nativeTank.mana:SetValue(0); row.nativeRaw.mana:SetValue(0)
+    end
+    row.manaNative = native == true
 end
 function V.PaintIdentity(row, unit)
-    V.PaintManaBackground(row,false)
     local kind = A.Access.Read(UnitPowerType,unit)
     if kind == 0 then
         local ok, maximum = pcall(UnitPowerMax,unit,0)
-        if not ok then return end
+        if not ok then V.PaintManaBackground(row,false); return end
         if A.Access.Readable(maximum) then
-            if type(maximum) == "number" and maximum > 0 and maximum < math.huge then
-                V.PaintManaBackground(row,true)
-            end
+            V.PaintManaBackground(row,type(maximum) == "number" and maximum > 0 and maximum < math.huge)
             return
         end
         -- Restricted maximum goes straight to native bars, including masks
         -- anchored to the native threat fill. No Lua numeric inspection.
+        V.PaintManaBackground(row,false,true)
         local painted = pcall(function()
             row.mana:SetValue(maximum)
             row.nativeTank.mana:SetValue(maximum)
             row.nativeRaw.mana:SetValue(maximum)
         end)
         if not painted then V.PaintManaBackground(row,false) end
-    end
+    else V.PaintManaBackground(row,false) end
 end
-function V.Paint(row, unit, warning)
+function V.Paint(row, unit, warning, ok, tanking, rawPercentage)
+    row.cleared = false
     row.unit = unit; row:SetAlpha(1); V.PaintIdentity(row,unit); V.PaintWarning(row,warning)
     A.ThreatModel.PaintDebuffs(row,unit)
-    local ok,tanking,_,_,rawPercentage = pcall(UnitDetailedThreatSituation,"player",unit)
     local unavailable = V.PaintRelative(row,unit,ok,tanking,rawPercentage)
     if unavailable and warning ~= "noAggro" then row.notice:SetText(unavailable) end
 end
@@ -327,7 +348,7 @@ function V.PaintDemo(time)
     depth = depth*depth*(3-2*depth)
     for i,sample in ipairs(demoRows) do
         local row = V.rows[i]
-        V.ClearRow(row); row:SetAlpha(1)
+        V.ClearRow(row); row.cleared = false; row:SetAlpha(1)
         local warning, percentage = sample[2],sample[3]
         if i == 2 then
             percentage = 180-110*depth

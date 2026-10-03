@@ -18,6 +18,8 @@ end
 assert(declaration(unit,"UnitThreatLeadSituation"):find("If the unit is not first on threat, will always return red",1,true))
 assert(unit:find('LiteralName = "UNIT_THREAT_LIST_UPDATE"',1,true))
 assert(unit:find('LiteralName = "UNIT_THREAT_SITUATION_UPDATE"',1,true))
+assert(unit:find('LiteralName = "UNIT_MAXPOWER"',1,true))
+assert(unit:find('LiteralName = "UNIT_DISPLAYPOWER"',1,true))
 local events=read("Blizzard_APIDocumentationGenerated/NamePlateManagerDocumentation.lua")
 assert(events:find('LiteralName = "NAME_PLATE_UNIT_ADDED"',1,true))
 assert(events:find('LiteralName = "NAME_PLATE_UNIT_REMOVED"',1,true))

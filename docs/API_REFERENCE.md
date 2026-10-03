@@ -1,5 +1,26 @@
 # Forever API authority
 
+## Threat refresh sweep (70205, 2026-10-03)
+
+Reviewed threat events, UNIT_MAXPOWER/UNIT_DISPLAYPOWER, native SetValue's
+Immediate default, and AuraContainerSharedMixin SetUnit/SetEnabled. Containers
+register their own aura events and already guard unchanged bindings internally;
+the addon now skips those redundant calls too. New nameplate lifetimes explicitly
+disable old bindings before reuse, including when the public token is unchanged.
+
+Relevant unit-event bursts queue one next-frame refresh; unrelated units and
+aura/name/raid-marker events no longer repaint the stack. Periodic fallback is
+0.1 seconds with no catch-up loop. Stable rows consume one detailed-threat sample
+for classification and painting; restricted values flow only through local
+arguments to native sinks, never into model state. New slots may be resampled
+after admission. Slot ordering work runs only when membership changes.
+
+Native/public lane transitions still clear stale data, while steady paints write
+final fills directly. Only public mode/color/binding state is cached. Empty rows
+and unchanged aura bindings are not rebuilt on every pass. Regression tests
+check event/read budgets, final-only fills, stale-data recovery and lifecycle;
+they do not establish live FPS, latency or grouped threat percentage semantics.
+
 ## Restricted maximum mana background (70205, 2026-10-03)
 
 UnitPowerType identifies the public resource type; UnitPowerMax explicitly has

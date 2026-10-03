@@ -193,8 +193,8 @@ m.combat=true; m.Event("PLAYER_REGEN_DISABLED")
 assert(not v.moving and not v.root.moving)
 assert(not v.moving and v.title.alpha==0 and v.footer.alpha==0)
 r.SetEnabled(false); assert(a.db.threatEnabled==true)
-local reads=m.threatReads; r.frame.scripts.OnUpdate(r.frame,0.19); assert(m.threatReads==reads)
-r.frame.scripts.OnUpdate(r.frame,0.01); assert(m.threatReads==reads+2)
+local reads=m.threatReads; r.frame.scripts.OnUpdate(r.frame,0.09); assert(m.threatReads==reads)
+r.frame.scripts.OnUpdate(r.frame,0.011); assert(m.threatReads==reads+1)
 for i,row in ipairs(v.rows) do assert(row.point==anchors[i] and next(row.attributes)==nil) end
 m.Event("PLAYER_LEAVING_WORLD")
 assert(next(r.model.entries)==nil and r.frame.scripts.OnUpdate==nil and not v.root.shown)
@@ -228,6 +228,7 @@ for _,row in ipairs(v.rows) do assert(row.alpha==0) end
 m.units.nameplate1.threatStatus=3; m.units.nameplate1.tanking=true
 m.units.nameplate1.lead=0; m.units.nameplate1.leadPercent=150
 m.Event("UNIT_THREAT_LIST_UPDATE","nameplate1")
+r.frame.scripts.OnUpdate(r.frame,0.001)
 assert(v.rows[1].unit=="nameplate1" and v.rows[1].selection.alpha==1 and v.rows[8].alpha==0)
 local anchor=v.rows[1].point
 m.units.nameplate1.threatStatus=nil; m.units.nameplate1.lead=nil; r.Refresh()
@@ -264,3 +265,39 @@ assert(v.footer.text=="No tracked enemies - show nameplates")
 m.combat=false; m.Event("PLAYER_REGEN_ENABLED")
 assert(v.footer.text=="Idle - no tracked enemies")
 print("PASS empty threat state explains idle/combat and clears when an enemy is tracked")
+
+-- Bursts must not turn one game update into hundreds of full-stack repaints.
+m,a,r,v=setup()
+for i=1,8 do m.Mob(i,true,3,0) end
+reads=m.threatReads
+for i=1,100 do
+    m.Event("UNIT_AURA","nameplate1")
+    m.Event("UNIT_NAME_UPDATE","nameplate1")
+    m.Event("UNIT_FLAGS","party1")
+    m.Event("UNIT_MAXPOWER",m.Secret())
+end
+assert(m.threatReads==reads and not r.pending)
+for i=1,100 do m.Event("UNIT_THREAT_LIST_UPDATE","nameplate1") end
+assert(m.threatReads==reads and r.pending)
+r.frame.scripts.OnUpdate(r.frame,0.001)
+assert(m.threatReads==reads+8 and not r.pending)
+reads=m.threatReads; r.frame.scripts.OnUpdate(r.frame,0.05); assert(m.threatReads==reads)
+r.frame.scripts.OnUpdate(r.frame,0.051); assert(m.threatReads==reads+8)
+reads=m.threatReads; r.frame.scripts.OnUpdate(r.frame,5); assert(m.threatReads==reads+8)
+reads=m.threatReads; r.frame.scripts.OnUpdate(r.frame,0.001); assert(m.threatReads==reads)
+assert(not r.model.dirty)
+
+-- Stable paints write final values without clearing/rebuilding every lane.
+row=v.rows[1]
+local writes=0; local setValue=row.right.SetValue
+row.right.SetValue=function(self,value) writes=writes+1; setValue(self,value) end
+r.Refresh(); assert(writes==1 and row.right.value==50)
+row.right.SetValue=setValue
+m.units.nameplate1.leadPercent=m.Secret(); r.Refresh()
+writes=0; setValue=row.nativeTank.right.SetValue
+row.nativeTank.right.SetValue=function(self,value) writes=writes+1; setValue(self,value) end
+r.Refresh(); assert(writes==1 and rawequal(row.nativeTank.right.value,m.units.nameplate1.leadPercent))
+row.nativeTank.right.SetValue=setValue
+m.Event("UNIT_THREAT_LIST_UPDATE","nameplate1"); assert(r.pending)
+r.SetEnabled(false); assert(not r.pending and not r.frame.scripts.OnUpdate)
+print("PASS threat refresh budget: 100 relevant events coalesce to 8 reads; unrelated events cost zero; no catch-up burst or steady-fill reset")
