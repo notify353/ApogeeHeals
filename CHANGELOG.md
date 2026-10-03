@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Center the entire threat group horizontally and enlarge it by ten percent.
+
 - Preview warrior spell icons and separate one-to-five Sunder counts in Threat demo.
 
 - Move the selection marker outside the threat fill and space debuff labels after it.

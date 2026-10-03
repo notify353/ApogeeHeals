@@ -28,7 +28,7 @@ end
 function V.Place()
     if InCombatLockdown() then return end
     V.root:ClearAllPoints()
-    V.root:SetPoint("TOPLEFT", UIParent, "CENTER", -width/2, 3.5)
+    V.root:SetPoint("TOPLEFT", UIParent, "CENTER", -(width+42)/2, 3.5)
 end
 function V.StopMoving()
     -- Compatibility with runtime lifecycle calls; the meter is permanently fixed.
@@ -126,7 +126,7 @@ local function createRow(parent, index)
 end
 function V.Create()
     V.root = CreateFrame("Frame",nil,UIParent)
-    V.root:SetScale(S.scale); V.root:SetSize(width+42,8*rowHeight-0.5)
+    V.root:SetScale(S.scale*1.1); V.root:SetSize(width+42,8*rowHeight-0.5)
     V.root:SetMovable(false); V.root:SetClampedToScreen(true); V.root:EnableMouse(false)
     V.handle = CreateFrame("Button",nil,V.root); V.handle:EnableMouse(false)
     V.handle:SetPoint("TOPLEFT",0,0); V.handle:SetSize(width,header)
