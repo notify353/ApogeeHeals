@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Hide threat status words/symbols inside live and demo bars; preserve fill,
+  warning colors and adjacent debuff indicators.
+
 - Simplify Demo Shout and Thunder Clap indicators to D/T with active green color,
   including the demo; keep Sunder stack counts. Owner verified native indicators.
 
