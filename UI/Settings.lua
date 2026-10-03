@@ -18,6 +18,14 @@ function S.Refresh()
         S.threat:SetChecked(A.db.threatEnabled == true)
     end
     S.cleanseStatus:SetText(A.Cleansing.status or "Purify configuration is pending.")
+    if S.threatDiagnostics then
+        S.threatDiagnostics:SetEnabled(not InCombatLockdown())
+        S.threatDiagnostics:SetChecked(A.ThreatDiagnostics.enabled)
+    end
+    if S.threatDemo then
+        S.threatDemo:SetEnabled(not InCombatLockdown())
+        S.threatDemo:SetChecked(A.Threat.demo == true)
+    end
 end
 function S.Create()
     if not Settings or not Settings.RegisterCanvasLayoutCategory then return end
@@ -38,6 +46,20 @@ function S.Create()
     local threatLabel = A.Style.Text(panel, 11)
     threatLabel:SetPoint("LEFT", S.threat, "RIGHT", 4, 0); threatLabel:SetText("Tank threat stack")
     S.threat:SetScript("OnClick", function(button) A.Threat.SetEnabled(button:GetChecked()); S.Refresh() end)
+    S.threatDiagnostics = CreateFrame("CheckButton", nil, panel, "UICheckButtonTemplate")
+    S.threatDiagnostics:SetPoint("TOPLEFT", 12, -146); S.threatDiagnostics:SetSize(24, 24)
+    local diagnosticLabel = A.Style.Text(panel, 11)
+    diagnosticLabel:SetPoint("LEFT", S.threatDiagnostics, "RIGHT", 4, 0)
+    diagnosticLabel:SetText("Threat checks (freeze after combat; until reload)")
+    S.threatDiagnostics:SetScript("OnClick", function(button)
+        A.ThreatDiagnostics.SetEnabled(button:GetChecked()); S.Refresh()
+    end)
+    S.threatDemo = CreateFrame("CheckButton", nil, panel, "UICheckButtonTemplate")
+    S.threatDemo:SetPoint("TOPLEFT", 12, -178); S.threatDemo:SetSize(24, 24)
+    local demoLabel = A.Style.Text(panel, 11)
+    demoLabel:SetPoint("LEFT", S.threatDemo, "RIGHT", 4, 0)
+    demoLabel:SetText("Threat demo (solo preview; ends in combat)")
+    S.threatDemo:SetScript("OnClick", function(button) A.Threat.SetDemo(button:GetChecked()) end)
     StaticPopupDialogs.APOGEE_HEALS_RESET_CHARACTER = {
         text = "Restore Apogee Heals defaults for this character?\n\nClears healing assignments, buff reminders and positions and restores defaults. This cannot be undone.\n\nOther characters, other addons and WoW keybindings are unchanged.",
         button1 = "Defaults", button2 = CANCEL or "Cancel",

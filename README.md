@@ -6,23 +6,45 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 
 ## Prototype
 
-- Independent eight-row tank threat stack, disabled by default. Seven stable mob
-  slots and one reserved selected-target slot follow normal Tab targeting with
-  a yellow outline; duplicate target presentation is suppressed natively.
-  Drag its header outside combat. Toggle **Tank threat stack** in Heals settings.
-  The reserved target row appears only during combat; idle selection adds no row.
-- Native warnings read LEAD, WEAK LEAD, NO LEAD, NO AGGRO or UNKNOWN.
-  Independent aggro and native threat amounts appear below each mob. Restricted
-  lead uses a native RISK 0-3 warning display, with discrete movement toward the
-  left as risk increases. This is not a numeric threat margin. Names use native text; raid markers
-  appear only when their indices are readable. Overflow shows an exact extra
-  count when identities permit, otherwise a total tracked count.
-- Coverage depends on exposed hostile nameplates plus the selected target.
-  Unavailable readings are unknown; restricted readings use native display sinks.
-  Continuous equal-threat-centered bars
-  could not be verified and are disabled; warnings do not imply a guaranteed
-  reaction window. This DEV prototype's dungeon warning timing, taint and rendering
-  require [live acceptance](docs/API_REFERENCE.md#minimal-tank-threat-stack-70124-2026-09-29).
+- **Threat demo (solo preview; ends in combat)** previews scripted threat bars
+  and warrior debuff icons without live reads. The checkbox is session-only;
+  combat, zoning, reload and Defaults end the demo. Uncheck it to restore the
+  live meter's saved enabled state. Its animation is illustrative, not a prediction.
+
+- Optional **Threat checks (freeze after combat; until reload)** in Heals settings
+  opens a movable diagnostic panel independently of the tank threat stack.
+  Enable it before combat and select a living enemy. Seven fields show separate
+  Lua-read and native-display-call PASS/FAIL checks. Any failure stays latched for
+  that fight, with the first Lua failure reason. Periods with no target or a
+  friendly/dead target are skipped. Results freeze after combat for screenshots; the next fight
+  starts fresh. `--` means no sample. Display PASS means the native call accepted
+  the value, not proof of rendering or correct percentage semantics. Only public
+  check outcomes are retained for this session; no threat samples are saved.
+  Coverage lines count API attempts (including periodic polls), skipped checks,
+  elapsed combat time, first/last sample times and the longest gap without a
+  sample. These also freeze after combat. Solo tests do not establish group access.
+
+- Optional **Tank threat stack** tracks up to eight exposed enemy nameplates in
+  stable rows. Selecting an enemy adds a gold marker outside its existing bar;
+  selection never creates or moves a row. Additional enemies wait for a free slot.
+- The compact group is fixed horizontally at screen center, with the first row
+  centered vertically and subsequent rows below it. There are no names, levels,
+  health strips, headings or status words. Blue backgrounds identify confirmed
+  mana users; other rows use charcoal.
+- Threat fill begins at the center. The chosen display reference is 100%, with
+  each half spanning 100 percentage points. Tanking uses percentage-of-lead and
+  only extends right; zero or values below the reference stay centered. Otherwise,
+  raw percentage can extend left or right. Restricted values use native display
+  sinks without Lua arithmetic. Warning colors retain the game's lead/aggro states.
+  This scale is not a verified aggro-loss threshold or time-to-loss prediction.
+- Warrior debuffs appear in fixed order: Sunder Armor, Thunder Clap, Demoralizing
+  Shout. Native player-only aura containers control icon visibility and stacks.
+  Unconfirmed effects leave no placeholder; absence of an icon is not proof of
+  missing data versus a missing effect. Sunder counts are centered white text;
+  native formatting leaves a single application unnumbered. Other class spell
+  sets have not been implemented.
+- The owner confirmed the installed live layout and debuffs work. This does not
+  establish exact grouped threat-percentage semantics or every class/client case.
 
 See [class support](docs/CLASS_SUPPORT.md) for the buff/cleanse matrix, yellow
 guidance, native weapon displays, limitations and live acceptance checks.

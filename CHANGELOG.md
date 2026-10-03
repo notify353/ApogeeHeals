@@ -1,5 +1,106 @@
 ## Unreleased
 
+- Promote approved demo icon layout, scale, and centered counts to native live enemy debuffs.
+
+- Add a subtle half-unit gap between demo debuff icon frames and retain group centering.
+
+- Match demo debuff icons to Keybinds with cropped artwork, dark inset frames, and outlined/shadowed white counts.
+
+- Restore white demo Sunder counts while retaining the thick black outline.
+
+- Use bright yellow, thick-outlined demo Sunder counts for stronger contrast.
+
+- Order enemy indicators as Sunder, Thunder Clap, Demo Shout and hide unconfirmed slots.
+
+- Narrow threat bars for side clearance and center demo stack counts inside icons.
+
+- Pack demo debuff icons edge-to-edge, overlay outlined stack counts, and enlarge the centered demo.
+
+- Center the entire threat group horizontally and enlarge it by ten percent.
+
+- Preview warrior spell icons and separate one-to-five Sunder counts in Threat demo.
+
+- Move the selection marker outside the threat fill and space debuff labels after it.
+
+- Widen the selected enemy gold marker for easier visibility.
+
+- Replace the selected enemy outline with a slim gold right-edge marker.
+
+- Replace the mana-type edge strip with subdued blue/charcoal row backgrounds
+  in live/demo modes, matching native masks and using the full width for threat.
+
+- Double the gray/blue mana-type strip width while preserving the overall
+  threat row width and centered placement.
+
+- Anchor the first threat bar center at screen center; additional stable rows
+  extend downward without moving that first row.
+
+- Narrow threat bars by one third while keeping row height, debuff text size and
+  fixed screen-center anchor, to fit between keybind and healing frames.
+
+- Hide status font regions explicitly so warning color updates cannot restore
+  LOST, question marks or dashes inside the bars.
+
+- Lock the threat stack to screen center, disable dragging, and hide header/footer
+  with no reserved padding. Empty rows leave the meter transparent.
+
+- Hide threat status words/symbols inside live and demo bars; preserve fill,
+  warning colors and adjacent debuff indicators.
+
+- Simplify Demo Shout and Thunder Clap indicators to D/T with active green color,
+  including the demo; keep Sunder stack counts. Owner verified native indicators.
+
+- Replace enemy aura Lua scanning with native player-filtered aura containers
+  and native Sunder stack text, following the current client display contract.
+
+- Track player-applied Sunder stacks, Demoralizing Shout and Thunder Clap in
+  compact S/D/T labels beside each threat row; unknown scans never imply absence.
+
+- Keep tanking lead readings on the center/right side, including restricted zero:
+  no-comparison no longer becomes a full left deficit. Non-tanking deficits remain.
+
+- Add native last-value displays to frozen Threat checks so solo/group percentage
+  semantics can be verified, without Lua calculations or storage of secret values.
+
+- Remove the separate live target slot: all eight rows track stable nameplate
+  lifetimes, and targeting only changes the outline. Refresh client API review.
+
+- Render restricted threat percentages through native centered masks/ranges and
+  select secret tanking lanes with native alpha sinks instead of clearing bars.
+
+- Explain empty live threat stacks with idle/no-tracked-enemies status so an
+  enabled meter no longer presents only a blank Threat heading.
+
+- Tighten live/demo threat row gaps to a thin separator without changing bar thickness.
+
+- Remove HP strips and health reads from live/demo threat rows, shortening rows
+  to keep attention on centered threat, warning colors and target selection.
+
+- Remove mob names and levels from live/demo threat rows and shrink to narrow
+  bar-only rows, retaining HP, mana rail, warnings and target outline.
+
+- Reduce threat stack width and row spacing for roughly 36% less screen area,
+  retaining readable names, centered threat, thin HP and selected-target outline.
+
+- Adopt compact name/level threat frames with center-origin fill, mana-type left
+  rail, thin mob HP and selected-target outline in live and solo demo modes.
+  Guard centered arithmetic behind public-value checks; restricted data shows ?.
+
+- Add a settings-enabled solo threat demo using the live row layout, scripted
+  animation and warning examples. No live threat reads or saved demo state;
+  combat closes the demo and restores the configured live meter.
+
+- Replace raw threat totals with prototype relative-threat bars using native
+  tank/non-tank percentage selection, a fixed 0-200 scale and 100 reference tick.
+  Preserve stable rows, targeting and independent warnings; clear unusable data.
+  Grouped percentage semantics and live rendering remain pending acceptance.
+
+- Show frozen combat sampling coverage: total/polled samples, skipped checks,
+  combat duration, first/last sample times and the longest unsampled gap.
+
+- Add optional session-only threat checks with Lua-read and native-call PASS/FAIL
+  results. Failures latch during combat and freeze afterward for screenshots.
+
 - Recognize Forever's native Camelot project identity and retain legacy client
   identification. Stop rejecting compatible Forever clients because their
   interface number differs; required API and family-isolation checks remain.

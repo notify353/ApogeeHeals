@@ -1,5 +1,188 @@
 # Forever API authority
 
+## Live icon presentation (70205, 2026-10-02)
+
+Reviewed CustomAuraButton SetIcon: native code assigns the matched aura texture.
+Use SetApplicationCount for centered white stack text; its default hides one
+application and shows counts above one. No aura texture/count is read back.
+Native button visibility owns both the inset background and icon, so inactive
+slots are fully invisible. Live layout now matches the approved demo.
+
+## Native enemy debuff containers (70205, 2026-10-02)
+
+Read installed Threat Plates AurasWidgetMidnight as an architectural reference
+only; no third-party implementation copied. It selects native aura containers
+on the secret-value API client and disables its older Lua scanner. Verified
+Blizzard CustomAuraContainer includeSpellIDs is supported for harmful auras on
+non-assistable units, HARMFUL|PLAYER filter use, native SetApplicationCount, and
+SetUnit/SetEnabled lifecycle. Replace scanning with three precreated containers
+per row, one native player-only harmful group per spell family (Classic ranks).
+Native code owns selection, stack text and aura visibility; never inspect its
+aura buttons after creation. No Lua aura enumeration or source comparisons.
+Dim S/D/T is an unconfirmed slot, not a missing-debuff claim; native green label
+confirms a displayed matching player aura. S with no number is native single-
+application formatting; native counts show stacked applications. Containers
+are disabled for empty rows and demo, rebound only to public nameplate tokens.
+Create/configure geometry out of combat; no secure actions. Live acceptance pending.
+
+## Per-enemy warrior debuff observations (70205, 2026-10-02)
+
+Reviewed GetAuraDataByIndex with HARMFUL, GetSpellInfo, UnitIsUnit and native
+formatted text contracts. Read at most 64 auras per fixed nameplate, refreshed
+with active threat polling and UNIT_AURA. Match localized base spell names for
+Sunder Armor (7386), Demoralizing Shout (1160), Thunder Clap (6343), including
+other ranks with the same name. Only public player source identity confirms
+ownership. Restricted/incomplete scans and missing spell metadata are unknown,
+never absence. Public Sunder counts use at least one; restricted counts go
+directly to native text without arithmetic or readback. No persistence/casting.
+Labels: S<count>, D+, T+ for own effects; dash for confirmed own absence, ? for
+unknown. Other warriors do not count as the player. A shared/overwritten aura
+whose caster cannot be confirmed stays unknown. Native combat acceptance and
+rank/caster semantics still require live tests; demo supplies synthetic labels.
+
+## Solo zero correction (70205, 2026-10-02)
+
+Owner capture: tanking YES, status 3, scaled 100, raw 255, amount 1299, lead
+warning 0 and lead percentage 0; all fields publicly readable for target. Zero
+cannot imply a deficit. Tanking lead now fills only center/right; below-reference
+lead readings stop at center. Public zero shows a dash (no comparison). The
+native tank lane always keeps its left mask fully covered, so an opaque zero
+cannot produce a false left deficit. Its fixed 100..200 right range accepts the
+original value directly. Non-tanking raw percentages retain center/left behavior.
+Secret tanking still selects lanes only through native alpha. Warning colors
+remain independent; demo follows the same tank/non-tank direction rule. Group
+percentage magnitude remains a prototype, not a validated aggro-loss threshold.
+
+## Native diagnostic readings (70205, 2026-10-02)
+
+The solo left-filled green report is not sufficient evidence of the numeric
+meaning. Preserve the current prototype pending actual values. Threat checks
+now sends numeric values directly to visible SetFormattedText sinks and tanking
+booleans to paired YES/NO native alpha sinks. Last sampled native UI text remains
+for screenshots after combat; it is never read back or saved to Lua/storage.
+Public PASS/FAIL outcomes still latch independently of the latest native display.
+The panel samples target; nameplate restrictions may differ. Capture during
+combat if the engine clears secret text when combat ends.
+
+## Stable threat rows and refreshed export (70205, 2026-10-02)
+
+Fresh owner export postdates the updated client. Reviewed native threat, unit
+comparison and nameplate contracts; matching-source checks pass. All central
+loading-safety reference hashes are unchanged. Interface remains 16001.
+All eight live rows now belong to stable nameplate lifetimes; no reserved target
+row or native duplicate gates remain. Target comparison only paints outlines.
+An unengaged selection no longer creates a bottom placeholder. Enabled enemy
+nameplates are needed to discover mobs; overflow waits for a free stable slot.
+No new protected layout changes or restricted-value Lua calculations.
+
+## Restricted center-origin display correction (70170, 2026-10-02)
+
+Grouped screenshot shows a tracked selected row with a green ? and empty fill.
+The public-only renderer rejects restricted tanking/percentage values, despite
+native SetValue and SetAlpha accepting them. Preserve public arithmetic for
+readable percentages; restricted values now pass directly to native controls.
+A colored left half is covered by an opaque native 0..100 left-to-right mask,
+leaving a center-origin complement visible. The right half has range 100..200.
+All geometry/ranges are public constants created out of combat. Never read back
+native values or calculate/compare restricted values in Lua.
+Two fixed native lanes receive lead and raw percentages when tanking is secret;
+EvaluateColorValueFromBoolean drives their complementary alpha sinks. Missing
+values/errors clear that lane and show ?. Public tank lead zero remains a dash.
+Opaque zero cannot be distinguished in Lua and displays through native range
+clipping; this is still a prototype percentage scale, not an aggro guarantee.
+The existing numeric meaning/center reference still needs grouped validation.
+Checked SetValue, SetMinMaxValues, SetAlpha and boolean conversion contracts in
+the fresh export. Numeric curve Evaluate is AllowedWhenUntainted and is not used.
+HP and name/level display were removed by owner request in later layout changes.
+
+
+
+## Compact center-origin threat and mob HP (70170, 2026-10-02)
+
+Owner approved the reference-styled mock and requested implementation and DEV
+installation. Two immutable 76.5-by-16 half-bars meet at the same center point.
+For a publicly readable, finite, nonnegative selected percentage p, left receives
+clamp(100-p,0,100) with reverse fill and right receives clamp(p-100,0,100).
+At p=100 both fills are empty. Native selection remains percentage-of-lead while
+publicly tanking and rawPercentage otherwise. This is a prototype numeric
+reference; earlier unresolved group/ratio semantics still require live testing.
+No threshold or time-to-loss prediction is claimed. Restricted selector/value
+results clear both halves and show ?, never arithmetic. Tank lead zero shows -.
+This supersedes the previous raw native single-bar restricted-value sink.
+
+Read and checked current UnitPowerType, UnitPowerMax, UnitHealth and UnitHealthMax
+contracts. A publicly confirmed mana type with positive readable maximum gives
+the blue rail; all other/unknown states reset gray. Mob HP uses existing native
+health min/max/value sinks without arithmetic and clears on failures. Names and
+levels reuse existing native name and guarded level helpers. Same fixed live unit
+tokens, 0.2-second active refresh and target-deduplication gates are retained.
+No protected layout/actions change. Name/level sit above bars on a separate text
+layer; rail and thin HP replace redundant text and raid markers. Confirmed lost
+aggro has a small LOST notice; warning colors remain independent of fill length.
+
+Demo uses the same centered renderer with synthetic public percentages, alternating
+mana rails and sample HP. Its animated row crosses the center and changes HP;
+no samples enter live tracking or persistence. Tests check both directions, center
+emptiness, caps, secret-safe fallback, native secret HP passthrough, mana rail
+reset and demo/live lifecycle. Appearance and group data need owner acceptance.
+
+## Relative threat bar prototype (70170, 2026-10-02)
+
+Owner solo screenshot: 133 attempts, 119 periodic polls, 24.7 seconds combat,
+first/last attempts at 0.0/23.8 seconds, longest gap 0.9 seconds; all seven read
+and native-call checks passed. This establishes the observed solo access only.
+
+Rechecked the fresh export and native UnitFrame_UpdateThreatIndicator. Its
+numeric display selects rawPercentage, replacing it with
+UnitThreatPercentageOfLead while isTanking is true, and hides zero. Added that
+source to export freshness checks and matching-source assertions. The new
+prototype mirrors the selector only when the boolean is publicly readable.
+Restricted percentages pass directly to SetValue and SetFormattedText; restricted
+selectors leave NO DATA rather than branching. Numeric invalid/missing inputs
+clear stale fill. Tank lead zero shows NO COMPARISON, not zero threat or safety.
+
+Fixed native range 0-200, left-to-right fill and a center tick at 100 provide a
+reviewable scale without numeric transforms. The label shows the original native
+percentage above the visual cap. No equal-threat, pull threshold, competitor
+identity or seconds-to-loss claim is made from this undocumented percentage.
+Native aggro/lead warnings remain separate and determine row colors. Seven
+stable slots, target deduplication and diagnostics are unchanged. All layout is
+created outside combat; no protected actions or layout writes were added.
+
+This supersedes the earlier disabled-continuous-bar presentation, under explicit
+owner approval to build a prototype using native percentage selection. It does
+not resolve the export's missing numeric definition. Validate with a competitor
+building and losing threat, and solo/no-comparison cases; compare against native
+numeric threat. Mocks check selection, direction, cap contract, missing/secret
+fallbacks and clearing; actual rendering and group semantics remain pending.
+
+## Combat threat diagnostics (70170, 2026-10-02)
+
+Rechecked the fresh export before implementation. UnitDetailedThreatSituation
+returns isTanking, status, scaledPercentage, rawPercentage and rawThreat;
+UnitThreatLeadSituation and UnitThreatPercentageOfLead add independent values.
+Probes use fixed player/target tokens. Access.Readable guards Lua inspection;
+restricted values reach only native SetFormattedText or boolean-to-alpha sinks.
+Only public success flags and failure categories are retained, never raw values
+or native readbacks. Sinks clear immediately. Display-call PASS confirms no
+thrown exception, not rendering, taint safety or percentage semantics.
+
+The session-only setting is independent of the threat stack. Events and a
+0.2-second combat-only poll sample confirmed living attackable targets. Failures
+latch until next combat. Combat exit stops polling and freezes screenshot results.
+World exit suspends/freezes; disabling, reload and Defaults clear the session.
+Target gaps are skipped; no samples means dashes, never PASS. Mocks cover secret
+passthrough, failure latching, freeze and lifecycle. Native combat behavior and
+screenshot usability still require owner acceptance.
+
+Coverage counters use only public frame elapsed time and observation counts.
+They distinguish API attempts from skipped target gates and periodic polls from
+event samples. First/last timestamps are elapsed seconds since collection began;
+longest gaps include initial/trailing gaps and frame stalls. All freeze with the
+results. Tests simulate sustained combat, target gaps and a late API failure.
+An API attempt counts even if it returns missing/error; per-field FAIL retains
+that distinction. Solo results do not establish behavior with threat competitors.
+
 ## October 1 client identification correction
 
 The fresh 70170 export defines WOW_PROJECT_CAMELOT = 18 and assigns

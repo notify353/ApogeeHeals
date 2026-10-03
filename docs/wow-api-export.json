@@ -1,5 +1,5 @@
 {
-  "clientVersion": "1.60.1.70170",
+  "clientVersion": "1.60.1.70205",
   "interface": 16001,
   "reviewedOn": "2026-10-01",
   "requiredFiles": [
@@ -10,6 +10,7 @@
     "Blizzard_APIDocumentationGenerated/UnitDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/PartyInfoDocumentation.lua",
     "Blizzard_UnitFrame/Shared/CompactUnitFrame.lua",
+    "Blizzard_UnitFrame/Mainline/UnitFrame.lua",
     "Blizzard_FrameXMLUtil/Blizzard_FrameXMLUtil.toc",
     "Blizzard_FrameXMLUtil/Camelot/NameUtil.lua",
     "Blizzard_APIDocumentationGenerated/ClassColorDocumentation.lua",
