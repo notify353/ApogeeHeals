@@ -112,7 +112,7 @@ local function createRow(parent, index)
     row.demoIcons = {}
     for i,id in ipairs({7386,1160,6343}) do
         local icon=overlay:CreateTexture(nil,"OVERLAY"); icon:SetSize(7,7)
-        icon:SetPoint("TOPLEFT",row,"TOPLEFT",width+6+(i-1)*12,0)
+        icon:SetPoint("TOPLEFT",row,"TOPLEFT",width+6+(i-1)*14,0)
         local info=A.Access.Read(C_Spell and C_Spell.GetSpellInfo,id)
         local texture=type(info)=="table" and A.Access.Readable(info.iconID) and info.iconID or nil
         icon:SetTexture(texture or "Interface\\Icons\\INV_Misc_QuestionMark")
