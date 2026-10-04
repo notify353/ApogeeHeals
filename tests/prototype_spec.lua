@@ -91,7 +91,9 @@ test("events coalesce, filter unrelated units and remain idle afterward", functi
     m.Event("UNIT_HEALTH", "target"); equal(#m.timers, 0)
     m.Event("UNIT_HEALTH", "player"); m.Event("UNIT_AURA", "player"); m.Event("GROUP_ROSTER_UPDATE")
     equal(#m.timers, 1); m.Flush(); equal(#m.timers, 0)
-    equal(a.Runtime.driver.scripts.OnUpdate, nil)
+    local reads = m.auraReads
+    a.Runtime.driver.scripts.OnUpdate(nil,0.2)
+    equal(m.auraReads, reads)
 end)
 test("finishing a drag saves position and synchronizes the lock control", function()
     local m = Mock.New(); local a = m.Start()

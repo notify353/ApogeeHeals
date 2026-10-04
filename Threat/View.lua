@@ -57,15 +57,16 @@ local function manaTint(parent, region)
     tint:SetMinMaxValues(0,1); tint:SetValue(0)
     return tint
 end
--- Native-only complement: a left-to-right opaque mask covers a colored left
--- half. Its uncovered portion extends from center to left as percentage falls.
+-- Native-only complement: the colored remainder is anchored from the native
+-- fill edge to center. The driver is transparent, so no opaque cover is needed.
 -- The right half uses native range 100..200. Neither requires Lua arithmetic.
 local function nativeLane(row)
     local lane = CreateFrame("Frame",nil,row); lane:SetAllPoints(row); lane:EnableMouse(false)
-    lane.fill = lane:CreateTexture(nil,"BACKGROUND"); lane.fill:SetSize(width/2,7)
-    lane.fill:SetPoint("TOPLEFT",0,0)
     lane.mask = bar(lane,width/2,7,"TOPLEFT",0,0,false)
-    lane.mask:SetStatusBarColor(S.background[1],S.background[2],S.background[3],1)
+    lane.mask:SetStatusBarColor(0,0,0,0)
+    lane.fill = lane:CreateTexture(nil,"BACKGROUND")
+    lane.fill:SetPoint("TOPLEFT",lane.mask:GetStatusBarTexture(),"TOPRIGHT",0,0)
+    lane.fill:SetPoint("BOTTOMRIGHT",lane.mask,"BOTTOMRIGHT",0,0)
     lane.mana = manaTint(lane.mask,lane.mask:GetStatusBarTexture())
     lane.right = bar(lane,width/2,7,"TOPRIGHT",0,0,false)
     lane.right:SetMinMaxValues(100,200)
@@ -118,6 +119,10 @@ local function createRow(parent, index)
     row.reference:SetPoint("TOPLEFT",row,"TOPLEFT",width/2,0); row.reference:SetColorTexture(0.83,0.87,0.85,0.25)
     row.notice = S.Text(overlay,5); row.notice:SetPoint("TOPRIGHT",-2,0); row.notice:SetSize(21,7)
     row.notice:SetJustifyH("RIGHT"); row.notice:Hide()
+    -- A chrome-gray base remains visible when the native target highlight is off.
+    row.unselected = overlay:CreateTexture(nil,"OVERLAY")
+    row.unselected:SetSize(3,7); row.unselected:SetPoint("TOPLEFT",row,"TOPRIGHT",1,0)
+    row.unselected:SetColorTexture(0.48,0.51,0.55,1)
     row.selection = CreateFrame("Frame",nil,overlay); row.selection:SetAllPoints(row); row.selection:EnableMouse(false)
     local marker = row.selection:CreateTexture(nil,"OVERLAY")
     marker:SetSize(3,7); marker:SetPoint("TOPLEFT",row,"TOPRIGHT",1,0)
@@ -295,10 +300,7 @@ function V.PaintManaBackground(row, mana, native)
     if mana then r,g,b=0.08,0.19,0.32 end
     if row.manaColor ~= mana then
         row.manaColor = mana
-        row.background:SetColorTexture(r,g,b,1)
-        -- Native left masks must blend into the same background as the right half.
-        row.nativeTank.mask:SetStatusBarColor(r,g,b,1)
-        row.nativeRaw.mask:SetStatusBarColor(r,g,b,1)
+        row.background:SetColorTexture(r,g,b,mana and 1 or 0)
     end
     if row.manaNative and not native then
         row.mana:SetValue(0); row.nativeTank.mana:SetValue(0); row.nativeRaw.mana:SetValue(0)

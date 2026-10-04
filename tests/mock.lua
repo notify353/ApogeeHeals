@@ -131,6 +131,11 @@ function M.New()
     end
     canaccesstable = function(value) return not secrets[value] and not inaccessibleTables[value] end
     UnitExists = function(u) return m.units[u] ~= nil end
+    UnitDistanceSquared = function(u)
+        local unit=m.units[u]
+        if not unit then return 0,false end
+        return unit.distanceSquared or 0,unit.distanceChecked ~= false
+    end
     Constants = {CharacterNameSeparatorConsts={CHARACTERNAME_SURNAME_SEPARATOR=" "}}
     UnitCastingInfo, UnitChannelInfo, UnitCastingDuration, UnitChannelDuration = nil, nil, nil, nil
     UnitLevel = function(u) return m.units[u] and (m.units[u].level or 60) end

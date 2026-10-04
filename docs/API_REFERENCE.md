@@ -1,5 +1,40 @@
 # Forever API authority
 
+## Raid marking removed (2026-10-03)
+
+Owner requested complete removal of the marking feature after rejecting the
+extra-click workflow. The marking module, loader entry, startup/runtime hooks
+and dedicated tests are removed. Existing raid-icon display remains independent.
+No addon action assigns or clears raid markers.
+
+## Forty-yard party fallback (70205, 2026-10-03)
+
+Owner approved a 40-yard fallback when slot one lacks a usable range result.
+Reviewed UnitDistanceSquared and native CompactUnitFrame_UpdateDistance in the
+current export. Both distance and checkedDistance must be publicly readable;
+checkedDistance must be true and distance finite/nonnegative. The squared
+threshold is 1600, inclusive. A valid slot-one spell boolean takes precedence
+unless SpellHasRange explicitly reports that the spell has no range.
+Owner follow-up requests fading only: missing/error/restricted/unchecked fallback
+data uses 0.65 alpha, and confirmed out-of-range uses 0.45. Range never hides
+names/levels or shows status text. Player self is known nearby when no
+spell result exists. Dead/offline/missing, preview and world-exit handling stay
+separate. Range-only polling continues without a slot-one spell while the native
+distance API exists; no secure attributes, actions or geometry change in combat.
+Mock boundary/restriction checks do not establish native distance availability.
+
+## Transparent non-mana rows (70205, 2026-10-03)
+
+Non-mana and zero-capacity rows now use zero background alpha. Native left
+complements use a colored texture anchored between the native status-bar fill
+edge and the fixed center, replacing the opaque cover. Reviewed GetStatusBarTexture,
+SetPoint and native CompactUnitFrame fill-edge anchoring in the current export.
+All anchors are set at creation outside combat; restricted percentages still
+go directly to SetValue without geometry/value readback. Mana blue remains
+independent, including restricted maximum capacity through native 0..1 fills.
+Mocks check transparency, native passthrough and transitions. Native endpoint
+geometry and combat rendering require owner acceptance after reload.
+
 ## Owner acceptance of threat fixes (2026-10-03)
 
 The owner tested the installed DEV threat mana and refresh fixes and reports

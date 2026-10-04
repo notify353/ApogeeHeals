@@ -1,5 +1,23 @@
 ## Unreleased
 
+- Remove the raid-marking feature completely, including its button, module, loader/startup hooks and dedicated tests.
+
+- Add an out-of-combat priority-mark button: secure circle for confirmed bosses or skull for mana enemies, preserving existing target icons and refusing occupied or unreadable destination icons. Requires a physical click; no automatic reassignment.
+
+- Disable automatic raid marking after live Forever testing produced a Blizzard-only blocked-action popup. Keep the marker module inert so existing DEV installations update safely.
+
+- Keep party names and levels visible at any range; show out-of-range and unknown distance through fading only, with no range labels.
+
+- Use a 40-yard party distance fallback when slot one has no usable spell range; dim and label unknown distance instead of implying nearby.
+
+- Restrict automatic raid marks to bosses and mana enemies; remove health selection. Allow native marking despite restricted existing-icon reads, retain occupied destination icons, and report unavailable marker/mana checks.
+
+- Add automatic circle for detected bosses and sticky skull for mana enemies while the threat meter is enabled. Use lowest readable health only when no mana candidate exists; unavailable data leaves marks unchanged.
+
+- Keep a chrome-gray target indicator on unselected threat rows, with the existing gold highlight for the selected enemy.
+
+- Make non-mana threat row backgrounds fully transparent, including native restricted-value lanes.
+
 - Coalesce threat-event bursts, ignore unrelated unit/aura events, and refresh at
   0.1-second fallback intervals with one detailed threat read per stable row.
 - Avoid repeated aura binding, unchanged colors, empty-row cleanup and fill resets;
