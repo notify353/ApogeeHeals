@@ -1,5 +1,22 @@
 # Forever API authority
 
+## Boss/mana-only marker correction (70205, 2026-10-03)
+
+Owner reports the first marking build did not mark mana enemies. Remove all
+health selection. GetRaidTargetIndex has SecretReturns; requiring a readable
+unmarked result could silently suppress every candidate. It now only preserves
+readable existing icons (nil/zero mean unmarked). Restricted results are ignored;
+native global destination availability still must be publicly confirmed before
+SetRaidTarget. This can replace another icon on a candidate when its existing
+icon is restricted; it never moves a publicly occupied skull/circle.
+
+Mana accepts public UnitHasPowerType or public mana resource type plus positive
+readable maximum. Unknown capacity does not guess; unavailable occupancy/capacity
+reports once per session when an attackable target exists. Native occupancy can
+acknowledge an assignment before its two-second timeout. No marking health reads
+remain. These changes address source gates; the exact owner-session failure and
+native automatic-mark permission still need live verification.
+
 ## Automatic raid markers (70205, 2026-10-03)
 
 Reviewed RaidMarkers, Unit and SecureTemplates contracts. Native

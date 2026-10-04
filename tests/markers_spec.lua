@@ -55,18 +55,26 @@ print("PASS circle boss precedence, targeted mana first, sticky offscreen owners
 tick(); nextMana.dead=true; m.units.target=nil
 local low=mob("nameplate3",false,false,20)
 local high=mob("nameplate4",false,false,80)
+local healthAPI=UnitHealth
+UnitHealth=function() error("Marking must not read health") end
 high.health=m.Secret(); r.Refresh(); assert(#calls==4)
-high.health=80; r.Refresh(); assert(owners[8]==low)
-tick(); low.dead=true; high.mana=m.Secret(); r.Refresh(); assert(#calls==5)
-high.mana=false; high.mark=m.Secret(); r.Refresh(); assert(#calls==5)
-high.mark=7; r.Refresh(); assert(#calls==5) -- preserve a manual mark
-high.mark=nil; high.engaged=false; r.Refresh(); assert(#calls==5)
-high.engaged=true; restricted=true; r.Refresh(); assert(#calls==5)
-restricted=false; raid=true; r.Refresh(); assert(#calls==5)
-leader=true; r.Refresh(); assert(owners[8]==high)
-print("PASS lowest absolute readable health, incomplete-data refusal, manual marks, participation and raid permissions")
+high.health=80; r.Refresh(); assert(#calls==4)
+high.mana=m.Secret(); r.Refresh(); assert(#calls==4)
+high.mana=true; high.mark=7; r.Refresh(); assert(#calls==4) -- preserve a readable manual mark
+high.mark=m.Secret(); high.engaged=false; r.Refresh(); assert(#calls==4)
+high.engaged=true; restricted=true; r.Refresh(); assert(#calls==4)
+restricted=false; raid=true; r.Refresh(); assert(#calls==4)
+leader=true; r.Refresh(); assert(owners[8]==high and #calls==5)
+-- Secret existing-icon data must not block assignment to a publicly free icon.
+-- Acknowledge immediately, so a fast death is not mistaken for a failed call.
+r.Refresh(); assert(r.pending[8]==nil)
+high.dead=true; low.mana=false; low.kind=0; low.maxPower=m.Secret()
+r.Refresh(); assert(#calls==5)
+low.maxPower=100; low.mark=0; r.Refresh(); assert(owners[8]==low and #calls==6)
+UnitHealth=healthAPI
+print("PASS no health reads/fallback, restricted existing icon, public mana capacity fallback, manual marks and raid permissions")
 
-tick(); high.dead=true; mob("target",true,false)
+tick(); low.dead=true; mob("target",true,false)
 a.db.threatEnabled=false; r.Refresh(); assert(#calls==6)
 a.db.threatEnabled=true; a.Threat.demo=true; r.Refresh(); assert(#calls==6)
 a.Threat.demo=false; m.Event("PLAYER_LEAVING_WORLD"); r.Refresh(); assert(#calls==6)

@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Restrict automatic raid marks to bosses and mana enemies; remove health selection. Allow native marking despite restricted existing-icon reads, retain occupied destination icons, and report unavailable marker/mana checks.
+
 - Add automatic circle for detected bosses and sticky skull for mana enemies while the threat meter is enabled. Use lowest readable health only when no mana candidate exists; unavailable data leaves marks unchanged.
 
 - Keep a chrome-gray target indicator on unselected threat rows, with the existing gold highlight for the selected enemy.

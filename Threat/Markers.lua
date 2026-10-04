@@ -1,5 +1,5 @@
 local _, A = ...
-local R = {pending={}, blocked={}}
+local R = {pending={}, blocked={}, reported={}}
 A.ThreatMarkers = R
 local units = {"target"}
 for i=1,40 do units[#units+1] = "nameplate"..i end
@@ -9,16 +9,24 @@ local function read(fn, ...)
     if not ok or not A.Access.Readable(value) then return false end
     return true, value
 end
+local function report(reason)
+    if R.reported[reason] or A.Access.Read(UnitCanAttack,"player","target") ~= true then return end
+    R.reported[reason] = true
+    print("Apogee Heals: "..reason)
+end
 local function available(index)
     -- Native marker occupancy survives target changes and missing nameplates.
     -- No wrapping: another returned index does not mean this one is available.
     local ok, value = read(GetNextAvailableRaidTargetMarkerIndex,index,false,false,true)
-    if not ok then return nil end
+    if not ok then
+        report("Raid-marker availability is unavailable or restricted; automatic marking is waiting.")
+        return nil
+    end
     return value == index
 end
 local function permission()
     local ok, raid = read(IsInRaid)
-    if not ok then return false end
+    if not ok or type(raid) ~= "boolean" then return false end
     if raid then
         return A.Access.Read(UnitIsGroupLeader,"player") == true
             or A.Access.Read(UnitIsGroupAssistant,"player") == true
@@ -38,14 +46,24 @@ local function candidate(unit)
         if presence ~= "present" then return end
     end
     local ok, mark = read(GetRaidTargetIndex,unit)
-    if not ok or mark ~= nil then return end -- Preserve existing/manual marks.
+    -- A restricted existing-icon read is not a restriction on native marking.
+    -- Preserve readable marks; global destination occupancy still owns stickiness.
+    if ok and mark ~= nil and mark ~= 0 then return end
     local bossOK, boss = read(UnitIsBossMob,unit)
     local classOK, classification = read(UnitClassification,unit)
     if boss == true or classification == "worldboss" then return "boss" end
     if not bossOK or boss ~= false or not classOK or type(classification) ~= "string" then return "unknown" end
-    local manaOK, mana = read(UnitHasPowerType,unit,0)
-    if not manaOK or type(mana) ~= "boolean" then return "unknown" end
-    return mana and "mana" or "other"
+    -- Accept either public native mana capability or confirmed positive mana
+    -- capacity. No health reads, restricted arithmetic or display readback.
+    if A.Access.Read(UnitHasPowerType,unit,0) == true then return "mana" end
+    if A.Access.Read(UnitPowerType,unit) == 0 then
+        local maxOK, maximum = read(UnitPowerMax,unit,0)
+        if maxOK and type(maximum) == "number" and maximum > 0 and maximum < math.huge then return "mana" end
+        if not maxOK then
+            report("Mana capacity could not be confirmed from public data; automatic skull is waiting.")
+        end
+    end
+    return "other"
 end
 local function stop(index)
     if R.blocked[index] then return end
@@ -56,9 +74,8 @@ local function ready(index)
     if R.blocked[index] then return false end
     local free = available(index)
     if R.pending[index] then
-        if R.clock < R.pending[index] then return false end
-        if free == true then stop(index)
-        elseif free == false then R.pending[index] = nil end
+        if free == false then R.pending[index] = nil
+        elseif R.clock >= R.pending[index] and free == true then stop(index) end
         return false
     end
     return free == true
@@ -74,27 +91,17 @@ function R.Refresh()
     if R.suspended or not A.db or A.db.threatEnabled ~= true or A.Threat.demo or not permission() then return end
     local circle, skull = ready(2), ready(8)
     if not circle and not skull then return end
-    local bossUnit, manaUnit, lowestUnit, lowestHealth
-    local complete = true
+    local bossUnit, manaUnit
     for _,unit in ipairs(units) do
         local kind = candidate(unit)
         if kind == "boss" then
             bossUnit = bossUnit or unit
         elseif kind == "mana" then
             manaUnit = manaUnit or unit
-        elseif kind == "unknown" then
-            complete = false
-        elseif kind == "other" then
-            local ok, health = read(UnitHealth,unit)
-            if not ok or type(health) ~= "number" or health ~= health or health <= 0 or health == math.huge then
-                complete = false
-            elseif not lowestHealth or health < lowestHealth then
-                lowestUnit, lowestHealth = unit, health
-            end
         end
     end
     if circle then assign(bossUnit,2) end
-    if skull then assign(manaUnit or (complete and lowestUnit or nil),8) end
+    if skull then assign(manaUnit,8) end
 end
 function R.Start()
     R.frame = CreateFrame("Frame")
