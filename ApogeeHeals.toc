@@ -31,5 +31,4 @@ Threat/Model.lua
 Threat/View.lua
 Threat/Runtime.lua
 Threat/Diagnostics.lua
-Threat/Markers.lua
 ApogeeHeals.lua

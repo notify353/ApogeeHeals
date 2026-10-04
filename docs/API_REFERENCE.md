@@ -1,33 +1,11 @@
 # Forever API authority
 
-## Physical-input priority marking (70205, 2026-10-03)
+## Raid marking removed (2026-10-03)
 
-Owner approved a secure click alternative after the automatic path was blocked.
-Reviewed the matching export's SECURE_ACTIONS.raidtarget set-unmarked branch,
-SecureActionButtonTemplate release handling, and native marker availability.
-The independent priority-mark button is hidden in combat by a native visibility
-driver. Its action is armed only in out-of-combat PreClick and cleared in
-PostClick. Public boss detection selects circle; a confirmed non-boss with mana
-selects skull. Availability is rechecked at input time, including offscreen
-owners; unreadable/occupied destinations refuse. No death, health or GUID
-tracking, automatic SetRaidTarget calls, or ordinary existing-icon comparisons.
-Blizzard's secure action preserves any icon already on the target. Existing
-threat enable/demo/world lifecycle controls the button outside combat.
-Tests exercise the exported action body and guards, but do not establish native
-physical-input acceptance, server timing, or a guarantee against another group
-member assigning the same icon concurrently. Owner live testing remains required.
-
-## Automatic marking blocked in live testing (70205, 2026-10-03)
-
-Owner screenshot confirms a Blizzard-only blocked-action dialog when automatic
-mana skull marking is attempted. The event/poll-driven SetRaidTarget call is
-not accepted in this client context. pcall does not prevent native blocked-action
-UI. Supersede the marker prototypes below: disable automatic marking completely.
-The packaged marker chunk is inert, retaining its existing file and startup
-interface for safe updates; it registers no events/timers and calls no marker
-APIs. Do not bypass this restriction. Any future addon marking action needs a
-separately designed native secure physical-input path and live acceptance.
-Mock regression asserts no marker calls at startup or during target/combat events.
+Owner requested complete removal of the marking feature after rejecting the
+extra-click workflow. The marking module, loader entry, startup/runtime hooks
+and dedicated tests are removed. Existing raid-icon display remains independent.
+No addon action assigns or clears raid markers.
 
 ## Forty-yard party fallback (70205, 2026-10-03)
 
@@ -44,43 +22,6 @@ spell result exists. Dead/offline/missing, preview and world-exit handling stay
 separate. Range-only polling continues without a slot-one spell while the native
 distance API exists; no secure attributes, actions or geometry change in combat.
 Mock boundary/restriction checks do not establish native distance availability.
-
-## Boss/mana-only marker correction (70205, 2026-10-03)
-
-Owner reports the first marking build did not mark mana enemies. Remove all
-health selection. GetRaidTargetIndex has SecretReturns; requiring a readable
-unmarked result could silently suppress every candidate. It now only preserves
-readable existing icons (nil/zero mean unmarked). Restricted results are ignored;
-native global destination availability still must be publicly confirmed before
-SetRaidTarget. This can replace another icon on a candidate when its existing
-icon is restricted; it never moves a publicly occupied skull/circle.
-
-Mana accepts public UnitHasPowerType or public mana resource type plus positive
-readable maximum. Unknown capacity does not guess; unavailable occupancy/capacity
-reports once per session when an attackable target exists. Native occupancy can
-acknowledge an assignment before its two-second timeout. No marking health reads
-remain. These changes address source gates; the exact owner-session failure and
-native automatic-mark permission still need live verification.
-
-## Automatic raid markers (70205, 2026-10-03)
-
-Reviewed RaidMarkers, Unit and SecureTemplates contracts. Native
-GetNextAvailableRaidTargetMarkerIndex(index,false,false,true) checks occupancy,
-including offscreen enemies, and permits dead hostile owners to be replaced.
-Unreadable occupancy blocks assignment. UnitIsBossMob/worldboss classification
-select circle (2); UnitHasPowerType(unit,0) selects skull (8). Bosses never enter
-the skull fallback. Target is first; fixed nameplate1..40 candidates require
-public combat participation. Existing or unreadable marks are preserved.
-
-Lowest absolute health is used only if every eligible non-mana candidate has
-public finite positive health and all candidate roles are known. Restricted
-health/identity is never compared, formatted, persisted or inferred from UI.
-The existing threat toggle controls marking; demo and world exit suspend it.
-Native SetRaidTarget enforces permission/restrictions. A thrown or unconfirmed
-assignment pauses that marker until reload; no secure-input emulation or
-protected-attribute changes. Mock checks do not establish actual marker access,
-boss/mana classification, secret-value availability or server acknowledgement.
-These require owner testing after reload.
 
 ## Transparent non-mana rows (70205, 2026-10-03)
 

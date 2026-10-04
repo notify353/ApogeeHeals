@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Remove the raid-marking feature completely, including its button, module, loader/startup hooks and dedicated tests.
+
 - Add an out-of-combat priority-mark button: secure circle for confirmed bosses or skull for mana enemies, preserving existing target icons and refusing occupied or unreadable destination icons. Requires a physical click; no automatic reassignment.
 
 - Disable automatic raid marking after live Forever testing produced a Blizzard-only blocked-action popup. Keep the marker module inert so existing DEV installations update safely.
