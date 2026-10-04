@@ -1,5 +1,22 @@
 # Forever API authority
 
+## Physical-input priority marking (70205, 2026-10-03)
+
+Owner approved a secure click alternative after the automatic path was blocked.
+Reviewed the matching export's SECURE_ACTIONS.raidtarget set-unmarked branch,
+SecureActionButtonTemplate release handling, and native marker availability.
+The independent priority-mark button is hidden in combat by a native visibility
+driver. Its action is armed only in out-of-combat PreClick and cleared in
+PostClick. Public boss detection selects circle; a confirmed non-boss with mana
+selects skull. Availability is rechecked at input time, including offscreen
+owners; unreadable/occupied destinations refuse. No death, health or GUID
+tracking, automatic SetRaidTarget calls, or ordinary existing-icon comparisons.
+Blizzard's secure action preserves any icon already on the target. Existing
+threat enable/demo/world lifecycle controls the button outside combat.
+Tests exercise the exported action body and guards, but do not establish native
+physical-input acceptance, server timing, or a guarantee against another group
+member assigning the same icon concurrently. Owner live testing remains required.
+
 ## Automatic marking blocked in live testing (70205, 2026-10-03)
 
 Owner screenshot confirms a Blizzard-only blocked-action dialog when automatic

@@ -61,6 +61,7 @@ function R.Refresh()
 end
 function R.ApplyEnabled()
     R.Reset(); V.Place()
+    if A.ThreatMarkers then A.ThreatMarkers.Refresh() end
     V.title:SetText(R.demo and "DEMO - drag to move" or "Threat")
     if R.demo and not R.suspended then
         R.demoTime = 0; V.root:Show(); V.PaintDemo(0)
