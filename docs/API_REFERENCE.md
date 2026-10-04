@@ -1,5 +1,17 @@
 # Forever API authority
 
+## Automatic marking blocked in live testing (70205, 2026-10-03)
+
+Owner screenshot confirms a Blizzard-only blocked-action dialog when automatic
+mana skull marking is attempted. The event/poll-driven SetRaidTarget call is
+not accepted in this client context. pcall does not prevent native blocked-action
+UI. Supersede the marker prototypes below: disable automatic marking completely.
+The packaged marker chunk is inert, retaining its existing file and startup
+interface for safe updates; it registers no events/timers and calls no marker
+APIs. Do not bypass this restriction. Any future addon marking action needs a
+separately designed native secure physical-input path and live acceptance.
+Mock regression asserts no marker calls at startup or during target/combat events.
+
 ## Forty-yard party fallback (70205, 2026-10-03)
 
 Owner approved a 40-yard fallback when slot one lacks a usable range result.

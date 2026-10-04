@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Disable automatic raid marking after live Forever testing produced a Blizzard-only blocked-action popup. Keep the marker module inert so existing DEV installations update safely.
+
 - Keep party names and levels visible at any range; show out-of-range and unknown distance through fading only, with no range labels.
 
 - Use a 40-yard party distance fallback when slot one has no usable spell range; dim and label unknown distance instead of implying nearby.
