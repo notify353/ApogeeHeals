@@ -8,6 +8,13 @@ local function declaration(source, name)
     return assert(source:match('Name = "'..name..'",(.-)\n%s*Arguments ='))
 end
 local unit=read("Blizzard_APIDocumentationGenerated/UnitDocumentation.lua")
+for _,name in ipairs({"UnitIsBossMob","UnitClassification","UnitHasPowerType","UnitIsDeadOrGhost","UnitAffectingCombat"}) do
+    assert(not declaration(unit,name):find("SecretWhen",1,true))
+end
+local markers=read("Blizzard_APIDocumentationGenerated/RaidMarkersDocumentation.lua")
+assert(declaration(markers,"SetRaidTarget"):find("HasRestrictions = true",1,true))
+assert(declaration(markers,"GetNextAvailableRaidTargetMarkerIndex"):find("SecretInChatMessagingLockdown = true",1,true))
+assert(markers:find('Name = "treatDeadNonFriendlyAsAvailable", Type = "bool"',1,true))
 assert(declaration(unit,"UnitPowerMax"):find("SecretWhenUnitPowerMaxRestricted = true",1,true))
 assert(not declaration(unit,"UnitPowerType"):find("SecretReturns",1,true))
 for _,name in ipairs({"UnitDetailedThreatSituation","UnitThreatLeadSituation","UnitThreatPercentageOfLead","UnitIsUnit"}) do

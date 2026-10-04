@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Add automatic circle for detected bosses and sticky skull for mana enemies while the threat meter is enabled. Use lowest readable health only when no mana candidate exists; unavailable data leaves marks unchanged.
+
 - Keep a chrome-gray target indicator on unselected threat rows, with the existing gold highlight for the selected enemy.
 
 - Make non-mana threat row backgrounds fully transparent, including native restricted-value lanes.

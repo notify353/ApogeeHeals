@@ -20,6 +20,7 @@ local function start()
     A.Minimap.Create()
     A.Threat.Start()
     A.ThreatDiagnostics.Start()
+    A.ThreatMarkers.Start()
     loader:UnregisterAllEvents()
 end
 loader:SetScript("OnEvent", function(_, event, loaded)

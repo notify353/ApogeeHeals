@@ -1,5 +1,25 @@
 # Forever API authority
 
+## Automatic raid markers (70205, 2026-10-03)
+
+Reviewed RaidMarkers, Unit and SecureTemplates contracts. Native
+GetNextAvailableRaidTargetMarkerIndex(index,false,false,true) checks occupancy,
+including offscreen enemies, and permits dead hostile owners to be replaced.
+Unreadable occupancy blocks assignment. UnitIsBossMob/worldboss classification
+select circle (2); UnitHasPowerType(unit,0) selects skull (8). Bosses never enter
+the skull fallback. Target is first; fixed nameplate1..40 candidates require
+public combat participation. Existing or unreadable marks are preserved.
+
+Lowest absolute health is used only if every eligible non-mana candidate has
+public finite positive health and all candidate roles are known. Restricted
+health/identity is never compared, formatted, persisted or inferred from UI.
+The existing threat toggle controls marking; demo and world exit suspend it.
+Native SetRaidTarget enforces permission/restrictions. A thrown or unconfirmed
+assignment pauses that marker until reload; no secure-input emulation or
+protected-attribute changes. Mock checks do not establish actual marker access,
+boss/mana classification, secret-value availability or server acknowledgement.
+These require owner testing after reload.
+
 ## Transparent non-mana rows (70205, 2026-10-03)
 
 Non-mana and zero-capacity rows now use zero background alpha. Native left
