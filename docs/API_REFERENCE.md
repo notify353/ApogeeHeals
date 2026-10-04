@@ -1,5 +1,20 @@
 # Forever API authority
 
+## Forty-yard party fallback (70205, 2026-10-03)
+
+Owner approved a 40-yard fallback when slot one lacks a usable range result.
+Reviewed UnitDistanceSquared and native CompactUnitFrame_UpdateDistance in the
+current export. Both distance and checkedDistance must be publicly readable;
+checkedDistance must be true and distance finite/nonnegative. The squared
+threshold is 1600, inclusive. A valid slot-one spell boolean takes precedence
+unless SpellHasRange explicitly reports that the spell has no range.
+Missing/error/restricted/unchecked fallback data shows RANGE UNKNOWN at 0.65
+alpha, distinct from OUT OF RANGE at 0.45. Player self is known nearby when no
+spell result exists. Dead/offline/missing, preview and world-exit handling stay
+separate. Range-only polling continues without a slot-one spell while the native
+distance API exists; no secure attributes, actions or geometry change in combat.
+Mock boundary/restriction checks do not establish native distance availability.
+
 ## Boss/mana-only marker correction (70205, 2026-10-03)
 
 Owner reports the first marking build did not mark mana enemies. Remove all

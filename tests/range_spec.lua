@@ -54,11 +54,40 @@ m.Event("PLAYER_LEAVING_WORLD");assert(not a.Runtime.driver.scripts.OnUpdate)
 for _,r in ipairs(a.View.rows) do assert(not r.rangeStatus.shown) end
 m.Event("PLAYER_ENTERING_WORLD");m.Flush();assert(a.Runtime.driver.scripts.OnUpdate)
 known[700002]=false;m.Event("SPELLS_CHANGED");m.Flush()
-assert(not a.Bindings.rangeSpell and not a.Runtime.driver.scripts.OnUpdate)
+assert(not a.Bindings.rangeSpell and a.Runtime.driver.scripts.OnUpdate)
 assert(row.attributes.type1=="")
 a.Bindings.Put("1",nil);assert(a.Bindings.rangeSpell==2050)
 m.units.player.class="WARRIOR";a.Bindings.Apply()
 assert(not a.Bindings.rangeSpell and a.View.rows[1].attributes.type1=="target")
 C_Spell.IsSpellInRange=nil;a.Bindings.Put("1",700001)
-assert(not a.Runtime.driver.scripts.OnUpdate and row.alpha==1)
+assert(a.Runtime.driver.scripts.OnUpdate and row.alpha==1)
+-- The fallback remains active without a usable slot-one spell.
+m.units.party1={name="Party",health=80,maxHealth=100,connected=true,dead=false,distanceSquared=1600}
+a.View.RefreshRange(); assert(row.alpha==1 and not row.rangeStatus.shown)
+m.units.party1.distanceSquared=1601
+a.Runtime.driver.scripts.OnUpdate(nil,0.2)
+assert(row.alpha==0.45 and row.rangeStatus.text=="OUT OF RANGE")
+m.units.party1.distanceChecked=false; a.View.RefreshRange()
+assert(row.alpha==0.65 and row.rangeStatus.shown and row.rangeStatus.text=="RANGE UNKNOWN")
+local distanceAPI=UnitDistanceSquared
+for _,value in ipairs({m.Secret(),m.InaccessibleTable(),-1,math.huge,0/0,"1600"}) do
+    UnitDistanceSquared=function() return value,true end
+    a.View.RefreshRange(); assert(row.alpha==0.65 and row.rangeStatus.text=="RANGE UNKNOWN")
+end
+UnitDistanceSquared=function() return 0,m.Secret() end
+a.View.RefreshRange(); assert(row.alpha==0.65)
+UnitDistanceSquared=function() error("unavailable") end
+a.View.RefreshRange(); assert(row.alpha==0.65)
+UnitDistanceSquared=nil;a.Runtime.RangePolling()
+assert(not a.Runtime.driver.scripts.OnUpdate and row.alpha==0.65)
+UnitDistanceSquared=distanceAPI;m.units.party1.distanceChecked=true
+-- A valid spell result still takes precedence over fallback distance.
+C_Spell.IsSpellInRange=function() return true end
+a.Runtime.RangePolling();assert(row.alpha==1)
+C_Spell.SpellHasRange=function() return false end
+a.View.RefreshRange();assert(row.alpha==0.45)
+C_Spell.SpellHasRange=function() return true end
+C_Spell.IsSpellInRange=function() return nil end
+a.View.RefreshRange();assert(row.alpha==0.45)
+print("PASS 40-yard inclusive fallback, unavailable/restricted uncertainty, persistent polling and spell precedence")
 print("PASS exact applied left-spell/fixed-unit range, guarded unknowns, combat deferral, polling isolation and lifecycle cleanup")

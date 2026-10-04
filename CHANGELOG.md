@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Use a 40-yard party distance fallback when slot one has no usable spell range; dim and label unknown distance instead of implying nearby.
+
 - Restrict automatic raid marks to bosses and mana enemies; remove health selection. Allow native marking despite restricted existing-icon reads, retain occupied destination icons, and report unavailable marker/mana checks.
 
 - Add automatic circle for detected bosses and sticky skull for mana enemies while the threat meter is enabled. Use lowest readable health only when no mana candidate exists; unavailable data leaves marks unchanged.

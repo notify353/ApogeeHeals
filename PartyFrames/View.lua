@@ -228,14 +228,31 @@ function V.Lock()
 end
 function V.PaintRange(row, state)
     local result
-    if not V.unlocked and not A.Runtime.suspended and state == "alive" and A.Bindings.rangeSpell then
-        result = A.Access.Read(C_Spell and C_Spell.IsSpellInRange, A.Bindings.rangeSpell, row.unit)
+    local active = not V.unlocked and not A.Runtime.suspended and state == "alive"
+    if active then
+        if A.Bindings.rangeSpell
+            and A.Access.Read(C_Spell and C_Spell.SpellHasRange,A.Bindings.rangeSpell) ~= false then
+            result = A.Access.Read(C_Spell and C_Spell.IsSpellInRange, A.Bindings.rangeSpell, row.unit)
+        end
+        if type(result) ~= "boolean" then
+            result = nil
+            if row.unit == "player" then result = true
+            else
+                local ok, distance, checked = pcall(UnitDistanceSquared,row.unit)
+                if ok and A.Access.Readable(distance,checked) and checked == true
+                    and type(distance) == "number" and distance >= 0 and distance < math.huge then
+                    result = distance <= 40*40
+                end
+            end
+        end
     end
-    -- Only a public boolean false establishes out-of-range. Unknown clears stale feedback.
+    -- Unknown distance is distinct from both confirmed nearby and out of range.
     local outside = result == false
-    row.rangeStatus:SetShown(outside)
-    row:SetAlpha(V.unlocked and 0 or (outside and 0.45 or 1))
-    local showName = not outside and state ~= "missing" and state ~= "dead" and state ~= "offline"
+    local unknown = active and result == nil
+    row.rangeStatus:SetText(unknown and "RANGE UNKNOWN" or "OUT OF RANGE")
+    row.rangeStatus:SetShown(outside or unknown)
+    row:SetAlpha(V.unlocked and 0 or (outside and 0.45 or (unknown and 0.65 or 1)))
+    local showName = not outside and not unknown and state ~= "missing" and state ~= "dead" and state ~= "offline"
     row.name:SetShown(showName); row.level:SetShown(showName)
 end
 function V.RefreshRange()
