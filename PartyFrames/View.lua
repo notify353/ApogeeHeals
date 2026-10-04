@@ -70,7 +70,7 @@ local function buildRow(row, preview, first, width)
     row.rangeStatus = S.Text(row.nameLayer, 8)
     row.rangeStatus:SetAllPoints(row.status)
     row.rangeStatus:SetJustifyH("CENTER"); row.rangeStatus:SetJustifyV("MIDDLE")
-    row.rangeStatus:SetTextColor(unpack(S.muted)); row.rangeStatus:SetText("OUT OF RANGE")
+    row.rangeStatus:SetTextColor(unpack(S.muted)); row.rangeStatus:SetText("")
     row.rangeStatus:Hide()
     -- Smaller artwork in an inset dark frame, attached closely to the row.
     row.drinkIcon = CreateFrame("Frame", nil, row)
@@ -249,10 +249,9 @@ function V.PaintRange(row, state)
     -- Unknown distance is distinct from both confirmed nearby and out of range.
     local outside = result == false
     local unknown = active and result == nil
-    row.rangeStatus:SetText(unknown and "RANGE UNKNOWN" or "OUT OF RANGE")
-    row.rangeStatus:SetShown(outside or unknown)
+    row.rangeStatus:Hide()
     row:SetAlpha(V.unlocked and 0 or (outside and 0.45 or (unknown and 0.65 or 1)))
-    local showName = not outside and not unknown and state ~= "missing" and state ~= "dead" and state ~= "offline"
+    local showName = state ~= "missing" and state ~= "dead" and state ~= "offline"
     row.name:SetShown(showName); row.level:SetShown(showName)
 end
 function V.RefreshRange()

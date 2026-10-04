@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Keep party names and levels visible at any range; show out-of-range and unknown distance through fading only, with no range labels.
+
 - Use a 40-yard party distance fallback when slot one has no usable spell range; dim and label unknown distance instead of implying nearby.
 
 - Restrict automatic raid marks to bosses and mana enemies; remove health selection. Allow native marking despite restricted existing-icon reads, retain occupied destination icons, and report unavailable marker/mana checks.
