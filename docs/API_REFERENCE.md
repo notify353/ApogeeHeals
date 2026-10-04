@@ -1,5 +1,17 @@
 # Forever API authority
 
+## Transparent non-mana rows (70205, 2026-10-03)
+
+Non-mana and zero-capacity rows now use zero background alpha. Native left
+complements use a colored texture anchored between the native status-bar fill
+edge and the fixed center, replacing the opaque cover. Reviewed GetStatusBarTexture,
+SetPoint and native CompactUnitFrame fill-edge anchoring in the current export.
+All anchors are set at creation outside combat; restricted percentages still
+go directly to SetValue without geometry/value readback. Mana blue remains
+independent, including restricted maximum capacity through native 0..1 fills.
+Mocks check transparency, native passthrough and transitions. Native endpoint
+geometry and combat rendering require owner acceptance after reload.
+
 ## Owner acceptance of threat fixes (2026-10-03)
 
 The owner tested the installed DEV threat mana and refresh fixes and reports

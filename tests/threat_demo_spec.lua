@@ -15,7 +15,8 @@ assert(v.rows[4].left.value==0 and v.rows[5].notice.text=="LOST")
 assert(v.rows[6].notice.text=="?" and v.rows[7].notice.text=="-")
 assert(v.rows[8].selection.alpha==1)
 for _,row in ipairs(v.rows) do assert(not row.notice.shown and not row.nativeTank.notice.shown and not row.nativeRaw.notice.shown) end
-assert(v.rows[1].background.color[1]==0.10 and v.rows[2].background.color[3]==0.32)
+assert(v.rows[1].background.color[4]==0 and v.rows[2].background.color[3]==0.32
+    and v.rows[2].background.color[4]==1)
 for _,row in ipairs(v.rows) do assert(row.unit==nil and not row.protected and next(row.attributes)==nil) end
 assert(next(r.model.entries)==nil and next(r.exposed)==nil)
 m.Event("PLAYER_TARGET_CHANGED"); m.Event("NAME_PLATE_UNIT_ADDED","nameplate1")

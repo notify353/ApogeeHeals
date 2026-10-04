@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Make non-mana threat row backgrounds fully transparent, including native restricted-value lanes.
+
 - Coalesce threat-event bursts, ignore unrelated unit/aura events, and refresh at
   0.1-second fallback intervals with one detailed threat read per stable row.
 - Avoid repeated aura binding, unchanged colors, empty-row cleanup and fill resets;

@@ -85,7 +85,8 @@ assert(row.nativeTank.mask.value==100 and row.nativeTank.right.value==150)
 assert(row.nativeRaw.mask.value==70 and row.nativeRaw.right.value==70)
 assert(row.nativeTank.mask.min==0 and row.nativeTank.mask.max==100)
 assert(row.nativeTank.right.min==100 and row.nativeTank.right.max==200)
-assert(not row.nativeTank.mask.reverseFill and row.nativeTank.fill.width==row.left.width)
+assert(not row.nativeTank.mask.reverseFill and row.nativeTank.mask.color[4]==0)
+assert(row.nativeTank.fill.point[1]=="BOTTOMRIGHT" and row.nativeTank.fill.point[2]==row.nativeTank.mask)
 -- Missing data blanks only its own native lane; never reuse stale fill.
 m.units[unit].leadPercent=nil; r.Refresh()
 assert(row.nativeTank.notice.text=="?" and row.nativeTank.mask.value==100
@@ -105,11 +106,11 @@ assert(a.ThreatModel.Classify(opaque,true,3)=="unknown")
 print("PASS centered threat: both directions, empty equality, capped ends, independent aggro loss and guarded restricted arithmetic")
 
 m,a,r,v=setup(); unit=m.Mob(1,true,3,0); row=v.rows[1]
-assert(row.health==nil and row.background.color[1]==0.10)
+assert(row.health==nil and row.background.color[4]==0)
 m.units[unit].maxPower=200; m.units[unit].level=20; r.Refresh()
-assert(row.background.color[3]==0.32 and row.level==nil and row.name==nil)
-assert(row.nativeTank.mask.color[3]==0.32 and row.nativeRaw.mask.color[3]==0.32 and row.rail==nil)
-m.units[unit].kind=1; r.Refresh(); assert(row.background.color[1]==0.10)
+assert(row.background.color[3]==0.32 and row.background.color[4]==1 and row.level==nil and row.name==nil)
+assert(row.nativeTank.mask.color[4]==0 and row.nativeRaw.mask.color[4]==0 and row.rail==nil)
+m.units[unit].kind=1; r.Refresh(); assert(row.background.color[4]==0)
 m.units[unit].kind=0; m.units[unit].maxPower=m.Secret(); m.combat=true; r.Refresh()
 assert(row.background.color[1]==0.10)
 for _,tint in ipairs({row.mana,row.nativeTank.mana,row.nativeRaw.mana}) do
