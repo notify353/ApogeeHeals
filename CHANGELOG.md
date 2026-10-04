@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Keep a chrome-gray target indicator on unselected threat rows, with the existing gold highlight for the selected enemy.
+
 - Make non-mana threat row backgrounds fully transparent, including native restricted-value lanes.
 
 - Coalesce threat-event bursts, ignore unrelated unit/aura events, and refresh at
