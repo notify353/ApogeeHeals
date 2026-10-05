@@ -15,8 +15,6 @@ local function createDebuffs(row)
     container:SetUnit(row.unit)
     container:AddAuraGroup("debuffs", "HARMFUL", {
         maxFrameCount = 8,
-        -- Boosted Rest (Camp Tent cooldown); native code enforces aura secrecy.
-        candidateFilters = { excludeSpellIDs = { [1229451] = true } },
         layout = { elementSpacing = gap, elementWidth = size, elementHeight = size },
         initializeFrame = function(button)
             button:SetSize(size, size)

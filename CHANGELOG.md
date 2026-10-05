@@ -1,7 +1,5 @@
 ## Unreleased
 
-- Exclude Boosted Rest (Camp Tent cooldown) from unit-frame debuffs through the native spell-ID filter, where permitted by the game's aura secrecy rules.
-
 - Match startup build-review warnings to the verified Forever 70205 export and test against review metadata to catch drift.
 
 - Remove the raid-marking feature completely, including its button, module, loader/startup hooks and dedicated tests.
