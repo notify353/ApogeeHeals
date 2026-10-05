@@ -1,5 +1,13 @@
 # Forever API authority
 
+## Reviewed-build startup warning (2026-10-04)
+
+The runtime warning baseline now matches the verified 1.60.1.70205 export.
+The regression derives its reviewed build from docs/wow-api-export.json and
+requires quiet startup for that build, a warning for an unreviewed build, and
+unchanged required API checks. Future review metadata updates now expose a stale
+runtime baseline in tests. No API or gameplay change; native reload is pending.
+
 ## Raid marking removed (2026-10-03)
 
 Owner requested complete removal of the marking feature after rejecting the
