@@ -1,5 +1,18 @@
 # Forever API authority
 
+## Boosted Rest display exclusion (70205, 2026-10-05)
+
+Owner-provided in-game aura ID: 1229451. The existing player, party and target
+HARMFUL groups pass this single ID in candidateFilters.excludeSpellIDs.
+Reviewed CustomAuraContainer AddAuraGroup and AuraContainerUtil identity/filter
+logic in the matching export. Native code owns filtering, ordering and visibility;
+the addon does not scan, compare or read back restricted aura identities.
+Native identity matching on harmful friendly auras requires NeverSecret spell
+classification. Otherwise the exclusion is ignored and the aura stays visible.
+Mock and matching-source checks cover the configured exclusion, unrelated auras
+and this secrecy fallback. The provided ID does not establish NeverSecret
+classification; disappearance on friends and combat rendering need live acceptance.
+
 ## Reviewed-build startup warning (2026-10-04)
 
 The runtime warning baseline now matches the verified 1.60.1.70205 export.

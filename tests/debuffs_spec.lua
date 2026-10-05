@@ -19,7 +19,7 @@ local function setup(mode)
             function frame:SetEnabled(enabled) self.enabled = enabled end
             function frame:AddAuraGroup(key, filter, options)
                 self.key, self.filter, self.options = key, filter, options
-                assert(not options.templateNames and not options.candidateFilters)
+                assert(not options.templateNames)
                 -- Native initialization allocates a batch of ten irrespective of aura count.
                 for index = 1, 10 do
                     local button = create("AuraButton", nil, self, "CustomAuraButtonTemplate")
@@ -43,6 +43,10 @@ for index, container in ipairs(containers) do
     local row = a.View.supportRows[index]
     assert(container.parent == (row.supportFrame or row) and container.unit == row.unit and container.enabled)
     assert(container.filter == "HARMFUL" and container.options.maxFrameCount == 8)
+    local filters = container.options.candidateFilters
+    assert(filters and filters.excludeSpellIDs[1229451] == true)
+    assert(next(filters, "excludeSpellIDs") == nil)
+    assert(next(filters.excludeSpellIDs, 1229451) == nil)
     assert(container.point[2] == row.health and container.point[3] == "TOPRIGHT")
     assert(container.point[4] == (row.unit == "target" and a.Style.sideIconGap or a.Style.sideIconOffset) and container.point[5] == a.Style.sideIconY)
     assert(container.options.layout.elementHeight == a.Style.sideIconSize and container.options.layout.elementSpacing == a.Style.sideIconGap)
@@ -111,6 +115,7 @@ local container = {layoutOptionsByAuraGroup={}}
 function container:HasAuraGroup() return false end
 function container:RegisterAuraGroup(key, description)
     assert(allocated and key == "debuffs" and description.filterString == "HARMFUL")
+    assert(description.candidateFilters == containers[1].options.candidateFilters)
     assert(description.maxFrameCount == 8); registered = true; return {}
 end
 function container:AddForbiddenAspects(value) assert(value == 1) end
@@ -118,6 +123,29 @@ function container:UpdateEventRegistrations() assert(registered) end
 function container:UpdateAllAuras() refreshed = true end
 env.CustomAuraContainerSharedMixin.AddAuraGroup(container, "debuffs", "HARMFUL", containers[1].options)
 assert(refreshed)
+-- Execute native identity permission and exclusion logic. Never-secret noisy
+-- debuffs may be hidden on friends; restricted friendly debuffs stay visible.
+local secrecy = 0
+env.Enum.SecrecyLevel = {NeverSecret=0}
+env.C_Secrets = {GetSpellAuraSecrecy=function() return secrecy end}
+env.UnitCanAssist = function(_, unit) return unit ~= "enemy" end
+env.UnitIsPlayerControlledOrGroupMember = function() return true end
+local source = read("Blizzard_AuraContainerUtil.lua")
+for _, name in ipairs({"CanApplyIdentityCandidateFilters", "DoesAuraPassCandidateFilters"}) do
+    local chunk = assert(loadstring(definition(source, "AuraContainerUtil." .. name)))
+    setfenv(chunk, env); chunk()
+end
+local passes = env.AuraContainerUtil.DoesAuraPassCandidateFilters
+local filters = containers[1].options.candidateFilters
+for _, unit in ipairs({"player", "party1", "party2", "party3", "party4", "target", "enemy"}) do
+    secrecy = 0
+    assert(not passes(unit, {spellId=1229451, isHarmful=true}, filters))
+    assert(passes(unit, {spellId=17, isHarmful=true}, filters))
+    secrecy = 1
+    assert(passes(unit, {spellId=1229451, isHarmful=true}, filters) == (unit ~= "enemy"))
+    assert(passes(unit, {spellId=17, isHarmful=true}, filters))
+end
+print("PASS native Boosted Rest exclusion, unrelated debuffs and friendly aura secrecy fallback")
 assert(read("Blizzard_CustomAuraContainer.xml"):find('allowUntaintedCreation="true"', 1, true))
 assert(read("Blizzard_AuraContainerFrameProviders.lua"):find('"CustomAuraButtonTemplate"', 1, true))
 print("PASS matching-export harmful group setup, native frame provider and restricted layout contract; live acceptance remains separate")
