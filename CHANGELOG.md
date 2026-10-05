@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Match startup build-review warnings to the verified Forever 70205 export and test against review metadata to catch drift.
+
 - Remove the raid-marking feature completely, including its button, module, loader/startup hooks and dedicated tests.
 
 - Add an out-of-combat priority-mark button: secure circle for confirmed bosses or skull for mana enemies, preserving existing target icons and refusing occupied or unreadable destination icons. Requires a physical click; no automatic reassignment.
