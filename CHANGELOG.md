@@ -1,3 +1,9 @@
+## [Unreleased]
+
+- Click a player's class-color strip to inspect current buffs and cast learned
+  buff choices, including recasting or replacing existing blessings. The picker
+  works outside combat only and closes on combat entry and target/group changes.
+
 ## October 11 - Consistent minimap controls
 
 - Match minimap tooltip styling and instructions across Keybinds and Heals.

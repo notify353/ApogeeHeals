@@ -1,3 +1,16 @@
+## Recipient buff picker (October 11)
+
+Rechecked the matching 70338 SecureStateDriver resolveDriver implementation and
+SecureTemplates fixed-unit spell action path. A secure panel visibility driver
+uses `[combat] hide` without an out-of-combat show clause; only an out-of-combat
+strip click opens it. Secure spell buttons retain fixed recipient tokens and
+existing modifier isolation. No protected attributes/layout/visibility writes
+occur in combat. Combat entry clears the session selection, and subsequent
+refresh closes it permanently. Current buffs use the existing guarded complete
+HELPFUL scan; unknown/restricted data closes the picker. Current buff names are
+display only, never converted into casting actions. Learned spell resolution
+owns the recast choices. Native taint, timing and appearance need live acceptance.
+
 ## Friendly player target buffs (October 11)
 
 The reviewed 70338 UnitDocumentation defines UnitIsPlayer(unit) and

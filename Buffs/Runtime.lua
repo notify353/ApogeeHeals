@@ -63,7 +63,7 @@ function B.Learn(aura, unit)
 end
 -- Native own stance state distinguishes a Paladin aura or Hunter aspect from
 -- another player's effect. Unknown/incomplete state never means "missing".
-function B.AuraChoices()
+function B.AuraChoices(includeActive)
     B.modeIDs = {}
     if InCombatLockdown() or B.suspended or A.View.unlocked then return {} end
     local ok, _, class = pcall(UnitClass, "player")
@@ -82,7 +82,7 @@ function B.AuraChoices()
         if not info then return {} end
         choices[#choices + 1] = {id=id, icon=info.iconID}
     end
-    return selected and {} or choices
+    return selected and not includeActive and {} or choices
 end
 function B.Refresh()
     if InCombatLockdown() or B.suspended then return end
@@ -138,9 +138,11 @@ function B.Refresh()
             end
         end
     end
+    B.RefreshRecipient()
     if B.picker and B.picker:IsShown() then B.RefreshPicker() end
 end
 function B.Stop()
+    B.CloseRecipient()
     B.candidates = {}
     for _, row in ipairs(A.View.supportRows or A.View.rows) do
         B.Paint(row, {})

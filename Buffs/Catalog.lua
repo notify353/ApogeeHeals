@@ -100,7 +100,7 @@ local function resolve(id, cache)
     if cache then cache[id] = info or false end
     return info
 end
-function C.Choices(unit, auras, cache)
+function C.Choices(unit, auras, cache, includeDisabled)
     local choices = {}
     if InCombatLockdown() or not A.Access.Readable(unit, auras)
         or type(unit) ~= "string" or not recipients[unit] or type(auras) ~= "table" then return choices end
@@ -117,7 +117,7 @@ function C.Choices(unit, auras, cache)
     end
     local disabled, offered = disabledVariants(), {}
     for _, definition in ipairs(definitions) do
-        if (not definition.self or unit == "player") and not disabled[definition.key]
+        if (not definition.self or unit == "player") and (includeDisabled or not disabled[definition.key])
             and not covered[definition.family or definition.key] then
             for _, id in ipairs(definition.ranks) do
                 local info = resolve(id, cache)
