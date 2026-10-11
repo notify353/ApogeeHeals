@@ -16,7 +16,10 @@ m.time=1120;a.Buffs.Refresh();assert(button.buffTimer.text=="" and button.attrib
 m.units.player.auras={};a.Buffs.Refresh();assert(button.buffTimer.text=="")
 aura.expirationTime=1420;m.units.player.auras={aura};a.Buffs.Refresh()
 assert(not button.attributes.spell1 and button.buffTimer.text=="")
-row.buffStrip.scripts.OnClick();assert(button.buffTimer.text=="5:00")
+row.buffStrip.scripts.OnClick();assert(button.buffTimer.text=="5m")
+assert(button.buffTimer.width==a.Style.sideIconSize-4 and button.buffTimer.font[3]=="OUTLINE")
+aura.expirationTime=m.time+3378;a.Buffs.Refresh();assert(button.buffTimer.text=="56m")
+aura.expirationTime=m.time+7200;a.Buffs.Refresh();assert(button.buffTimer.text=="2h")
 row.buffStrip.scripts.OnClick();assert(not button.attributes.spell1)
 for _,value in ipairs({m.Secret(),0,math.huge,0/0,-1,"soon"}) do
     aura.expirationTime=value;a.Buffs.Refresh()

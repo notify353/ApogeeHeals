@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+- Keep buff timer text inside the icon with smaller outlined type and compact
+  minute/hour labels; retain m:ss for the final two minutes.
+
 - Fix the lower class-strip click area over the power bar opening buff options
   instead of falling through to the row's healing action.
 

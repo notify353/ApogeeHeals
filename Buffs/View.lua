@@ -1,15 +1,25 @@
 local _, A = ...
 local B = A.Buffs
 local function createTimer(button)
-    button.buffTimer = A.Style.Text(button, 7)
-    button.buffTimer:SetPoint("BOTTOM", button, "BOTTOM", 0, 1)
+    button.buffTimer = A.Style.CleanText(button, 5.5)
+    local font = button.buffTimer:GetFont()
+    button.buffTimer:SetFont(font, 5.5, "OUTLINE")
+    button.buffTimer:SetPoint("BOTTOM", button, "BOTTOM", 0, 2)
+    button.buffTimer:SetSize(A.Style.sideIconSize - 4, 7)
+    button.buffTimer:SetJustifyH("CENTER")
     button.buffTimer:SetTextColor(1, 1, 1, 1)
     button.buffTimer:SetShadowColor(0, 0, 0, 1); button.buffTimer:SetShadowOffset(1, -1)
 end
 local function paintTimer(button, entry)
     local remaining = entry and entry.remaining
     local seconds = remaining and remaining > 0 and math.ceil(remaining) or nil
-    button.buffTimer:SetText(seconds and string.format("%d:%02d", math.floor(seconds / 60), seconds % 60) or "")
+    local text = ""
+    if seconds then
+        if seconds >= 3600 then text = math.floor(seconds / 3600) .. "h"
+        elseif seconds >= 120 then text = math.floor(seconds / 60) .. "m"
+        else text = string.format("%d:%02d", math.floor(seconds / 60), seconds % 60) end
+    end
+    button.buffTimer:SetText(text)
 end
 function B.HideTooltip(button)
     if not button or B.tooltipButton ~= button then return end
