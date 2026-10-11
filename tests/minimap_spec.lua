@@ -56,6 +56,22 @@ print("PASS circular constant-radius orbit and default nonoverlap across sizes/r
 local opened=0;a.Settings.category={GetID=function() return 123 end}
 Settings.OpenToCategory=function(id) assert(id==123);opened=opened+1 end
 button.scripts.OnMouseDown(button,"RightButton");button.scripts.OnClick(button,"RightButton");assert(opened==1)
+local tooltipLines={}
+local originalText,originalLine=GameTooltip.SetText,GameTooltip.AddLine
+GameTooltip.SetText=function(self,title,r,g,b)
+    assert(title=="Apogee Heals" and r==1 and g==0.82 and b==0)
+    originalText(self,title,r,g,b)
+end
+GameTooltip.AddLine=function(self,text,r,g,b)
+    assert(r==0.8 and g==0.85 and b==0.9)
+    tooltipLines[#tooltipLines+1]=text
+    originalLine(self,text,r,g,b)
+end
+button.scripts.OnEnter()
+assert(tooltipLines[1]=="Left-click: toggle healing bindings.")
+assert(tooltipLines[2]=="Right-click: open settings.")
+assert(tooltipLines[3]=="Hold right-click and drag: move.")
+GameTooltip.SetText,GameTooltip.AddLine=originalText,originalLine
 button.scripts.OnEnter();assert(GameTooltip.owner==button and GameTooltip.shown)
 Minimap.scale=0.5;m.cursorX=(500+100)*0.5;m.cursorY=500*0.5
 button.scripts.OnDragStart(button,"LeftButton");assert(not M.dragging)

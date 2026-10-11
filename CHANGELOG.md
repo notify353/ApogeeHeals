@@ -1,3 +1,9 @@
+## October 11 - Consistent minimap controls
+
+- Match minimap tooltip styling and instructions across Keybinds and Heals.
+- Right-click opens settings; hold right-click and drag to move, without opening
+  settings on drag release. Left-click retains its existing editing action.
+
 ## October 11 - Friendly player target buffs
 
 - Show target buff suggestions only for confirmed friendly player characters.
