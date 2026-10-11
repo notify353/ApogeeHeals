@@ -1,5 +1,12 @@
 ## Early buff reminders and icon timers (October 11)
 
+The class-strip input button is parented to the complete row, with explicit
+2-by-clusterHeight bounds above its artwork. Its previous health-only name-layer
+parent excluded the lower power section from the intended hit area. This uses
+existing frame geometry and mouse APIs, configured only at creation. The strip
+has no secure spell action; the click callback retains its combat guard. Source
+geometry regressions cover every supported row; native mouse routing needs testing.
+
 Rechecked matching 70338 BuffFrame.lua: expirationTime minus GetTime is remaining
 time; duration/expiration zero denotes untimed coverage. The existing guarded
 HELPFUL scan is unchanged. Duration and expiration must both be public finite

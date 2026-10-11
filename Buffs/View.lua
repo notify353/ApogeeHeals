@@ -27,10 +27,14 @@ function B.Create(row)
             elapsed = 0; B.Refresh()
         end)
     end
-    local strip = CreateFrame("Button", nil, row.nameLayer)
+    -- Parent to the whole row: the health-only name layer excludes the power
+    -- section from child hit testing even when the strip artwork extends there.
+    local strip = CreateFrame("Button", nil, row)
     row.buffStrip = strip
-    strip:SetAllPoints(row.classStrip)
-    strip:SetFrameLevel(row.nameLayer:GetFrameLevel() + 1)
+    strip:SetPoint("TOPLEFT", row, "TOPLEFT", 0, 0)
+    strip:SetSize(2, A.Style.clusterHeight)
+    strip:SetFrameLevel(row.nameLayer:GetFrameLevel() + 2)
+    strip:EnableMouse(true)
     strip:RegisterForClicks("LeftButtonUp")
     strip:SetHighlightTexture("Interface/Buttons/ButtonHilight-Square")
     strip:SetScript("OnClick", function() B.ToggleRecipient(row) end)

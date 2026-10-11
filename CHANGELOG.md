@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+- Fix the lower class-strip click area over the power bar opening buff options
+  instead of falling through to the row's healing action.
+
 - Show buff reminders below two minutes remaining, with a live m:ss countdown
   on the existing icon. Missing buffs remain actionable without a timer. Permanent
   or unreadable timing stays unlabelled. Reminders remain outside combat only.

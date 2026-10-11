@@ -1,5 +1,14 @@
 local m,a=dofile("tests/purify_fixture.lua").New({might=true})
 local row=a.View.rows[1]
+for _,recipient in ipairs(a.View.supportRows) do
+    local strip=recipient.buffStrip
+    assert(strip.parent==recipient and strip.mouse==true)
+    assert(strip.width==2 and strip.height==a.Style.clusterHeight)
+    assert(strip.height>a.Style.healthHeight+a.Style.barGap)
+    assert(strip.point[2]==recipient and strip.point[3]=="TOPLEFT")
+    assert(strip:GetFrameLevel()>recipient.nameLayer:GetFrameLevel())
+    assert(not strip.template and not strip.attributes.type1)
+end
 local getInfo=C_Spell.GetSpellInfo
 C_Spell.GetSpellInfo=function(id)
     if id==19742 then return {spellID=id,name="Wisdom",iconID=135970} end
