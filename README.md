@@ -1,5 +1,7 @@
 # Apogee Heals
 
+Settings appear under **Apogee** (or **Apogee DEV**) with a one-word child label. Only enabled, loaded addons with settings appear; changes to enabled addons take effect after reload.
+
 Minimal five-player healing frames for **WoW Forever 1.60.x, interface 16001**.
 Prototype 0.1.0-dev; reviewed against local export 1.60.1.70170. The owner confirmed incoming heals and reviewed
 the appearance in game; full live acceptance remains pending. Not released. Classic Era is deliberately unsupported.
@@ -334,3 +336,6 @@ its spell or item can be used. Changes to assignments remain locked in combat.
 ### Unified Defaults
 
 Defaults clears this character's healing assignments, buff preferences and positions. Use the top-right Defaults button and confirm; changes are blocked in combat.
+
+Target buff suggestions appear only for living friendly player characters out of
+combat. NPCs, pets, hostile players and unknown target identity are excluded.

@@ -1,3 +1,22 @@
+## October 11 - Consistent minimap controls
+
+- Match minimap tooltip styling and instructions across Keybinds and Heals.
+- Right-click opens settings; hold right-click and drag to move, without opening
+  settings on drag release. Left-click retains its existing editing action.
+
+## October 11 - Friendly player target buffs
+
+- Show target buff suggestions only for confirmed friendly player characters.
+- Hide suggestions for NPCs, pets, hostile players and unknown target identity.
+
+## Unreleased - consistent settings typography
+
+- Use native gold titles/headings, small white labels, light-gray help and a matching parent backdrop. Preserve existing controls, saved settings and gameplay.
+
+## Unreleased - grouped settings
+
+- Nest this addon under the shared Apogee settings parent (Apogee DEV in development). Only loaded addons with settings register a child page; existing controls and saved preferences remain independent.
+
 ## Unreleased
 
 - Match startup build-review warnings to the verified Forever 70205 export and test against review metadata to catch drift.

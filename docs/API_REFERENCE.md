@@ -1,4 +1,39 @@
+## Friendly player target buffs (October 11)
+
+The reviewed 70338 UnitDocumentation defines UnitIsPlayer(unit) and
+UnitCanAssist(source, target) as boolean predicates. Both are read through the
+existing protected public-value adapter; unknown/restricted/error results do not
+establish eligibility. Target buff scanning requires a confirmed player that the
+player can assist, then the existing alive/out-of-combat checks. All target buff
+suggestion paths consume this shared snapshot, including blessings and catalog
+upkeep. Friendly NPCs/pets are excluded. Self/party reminders and target identity,
+health, debuffs and cleansing are unchanged. No protected combat mutations added.
+
 # Forever API authority
+
+## Settings typography (October 10)
+
+Reviewed the matching shared FontStyles.xml: GameFontNormalLarge uses gold,
+GameFontNormal/NormalSmall use native gold, HighlightSmall is white, and
+DisableSmall uses disabled gray. Settings titles/labels now use native font
+templates instead of HUD size overrides; help uses a readable 0.8 gray. Native
+button normal/highlight font APIs keep selected settings tabs gold on hover.
+The parent canvas shares the child background. Gameplay/HUD typography and
+saved preferences are unchanged; final appearance requires user reload review.
+
+## Shared settings parent (October 10)
+
+Reviewed the fresh Forever 1.60.1.70338 Settings wrapper, SettingsInbound,
+SettingsPanel, CategoryList and Category mixin. Canvas subcategories use the
+native parent category object; GetCategory only searches numeric IDs, not names.
+Each independent child keeps a schema-1 session-only ApogeeSettingsRegistry with
+the parent and child categories. The central DEV transform maps that exact owned
+global to ApogeeDevSettingsRegistry. No marker runtime or saved registry is added.
+Only a loaded child's existing settings registration creates its page. Disabled
+addons contribute no page after reload. Native category IDs and existing direct
+settings entry points remain intact. A missing subcategory API retains the
+standalone page; malformed shared registry data is not overwritten. Actual tree
+expansion, navigation and reload behavior require in-game acceptance.
 
 ## Reviewed-build startup warning (2026-10-04)
 

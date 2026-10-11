@@ -1,4 +1,41 @@
-local _, A = ...
+local addonName, A = ...
+-- Each independent addon joins one family-local native settings parent.
+local function RegisterApogeeCategory(panel, label, standaloneTitle)
+    if type(Settings.RegisterCanvasLayoutSubcategory) ~= "function" then
+        return Settings.RegisterCanvasLayoutCategory(panel, standaloneTitle)
+    end
+    local registry = _G.ApogeeSettingsRegistry
+    if registry ~= nil and (type(registry) ~= "table" or registry.schema ~= 1
+        or type(registry.category) ~= "table" or type(registry.category.GetID) ~= "function"
+        or type(registry.children) ~= "table") then return nil end
+    if not registry then
+        local parentName = addonName:sub(-3) == "Dev" and "Apogee DEV" or "Apogee"
+        local overview = CreateFrame("Frame")
+        local background = overview:CreateTexture(nil, "BACKGROUND")
+        background:SetAllPoints(overview)
+        background:SetColorTexture(0.035, 0.035, 0.045, 0.96)
+        local title = overview:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+        title:SetPoint("TOPLEFT", 16, -16); title:SetText(parentName)
+        local description = overview:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        description:SetPoint("TOPLEFT", 16, -52)
+        description:SetPoint("TOPRIGHT", -16, -52)
+        description:SetJustifyH("LEFT"); description:SetTextColor(0.8, 0.8, 0.8)
+        description:SetText("Select an enabled addon's settings from the list on the left.")
+        local parent = Settings.RegisterCanvasLayoutCategory(overview, parentName)
+        Settings.RegisterAddOnCategory(parent)
+        registry = {schema = 1, category = parent, children = {}}
+        _G.ApogeeSettingsRegistry = registry
+    end
+    local existing = registry.children[label]
+    if existing ~= nil then
+        if type(existing) == "table" and type(existing.GetID) == "function" then return existing end
+        return nil
+    end
+    local category = Settings.RegisterCanvasLayoutSubcategory(registry.category, panel, label)
+    registry.children[label] = category
+    return category
+end
+
 local S = {}
 A.Settings = S
 function S.ResetPositions()
@@ -15,15 +52,21 @@ function S.Refresh()
     S.buffs:SetEnabled(not InCombatLockdown())
     if S.threat then
         S.threat:SetEnabled(not InCombatLockdown())
+        local color = InCombatLockdown() and 0.5 or 1
+        S.threat.label:SetTextColor(color, color, color)
         S.threat:SetChecked(A.db.threatEnabled == true)
     end
     S.cleanseStatus:SetText(A.Cleansing.status or "Purify configuration is pending.")
     if S.threatDiagnostics then
         S.threatDiagnostics:SetEnabled(not InCombatLockdown())
+        local color = InCombatLockdown() and 0.5 or 1
+        S.threatDiagnostics.label:SetTextColor(color, color, color)
         S.threatDiagnostics:SetChecked(A.ThreatDiagnostics.enabled)
     end
     if S.threatDemo then
         S.threatDemo:SetEnabled(not InCombatLockdown())
+        local color = InCombatLockdown() and 0.5 or 1
+        S.threatDemo.label:SetTextColor(color, color, color)
         S.threatDemo:SetChecked(A.Threat.demo == true)
     end
 end
@@ -33,22 +76,25 @@ function S.Create()
     local background = panel:CreateTexture(nil, "BACKGROUND")
     background:SetAllPoints(panel)
     background:SetColorTexture(0.035, 0.035, 0.045, 0.96)
-    local title = A.Style.Text(panel, 16)
+    local title = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     title:SetPoint("TOPLEFT", 16, -16); title:SetText("Apogee Heals")
     S.buffs = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
     S.buffs:SetPoint("TOPLEFT", 16, -48); S.buffs:SetSize(180, 24)
     S.buffs:SetText("Buff reminders")
     S.buffs:SetScript("OnClick", function() A.Buffs.OpenPicker() end)
-    S.cleanseStatus = A.Style.Text(panel, 11)
+    S.cleanseStatus = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    S.cleanseStatus:SetTextColor(0.8, 0.8, 0.8)
     S.cleanseStatus:SetPoint("TOPLEFT", 16, -88)
     S.threat = CreateFrame("CheckButton", nil, panel, "UICheckButtonTemplate")
     S.threat:SetPoint("TOPLEFT", 12, -114); S.threat:SetSize(24, 24)
-    local threatLabel = A.Style.Text(panel, 11)
+    local threatLabel = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    S.threat.label = threatLabel
     threatLabel:SetPoint("LEFT", S.threat, "RIGHT", 4, 0); threatLabel:SetText("Tank threat stack")
     S.threat:SetScript("OnClick", function(button) A.Threat.SetEnabled(button:GetChecked()); S.Refresh() end)
     S.threatDiagnostics = CreateFrame("CheckButton", nil, panel, "UICheckButtonTemplate")
     S.threatDiagnostics:SetPoint("TOPLEFT", 12, -146); S.threatDiagnostics:SetSize(24, 24)
-    local diagnosticLabel = A.Style.Text(panel, 11)
+    local diagnosticLabel = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    S.threatDiagnostics.label = diagnosticLabel
     diagnosticLabel:SetPoint("LEFT", S.threatDiagnostics, "RIGHT", 4, 0)
     diagnosticLabel:SetText("Threat checks (freeze after combat; until reload)")
     S.threatDiagnostics:SetScript("OnClick", function(button)
@@ -56,7 +102,8 @@ function S.Create()
     end)
     S.threatDemo = CreateFrame("CheckButton", nil, panel, "UICheckButtonTemplate")
     S.threatDemo:SetPoint("TOPLEFT", 12, -178); S.threatDemo:SetSize(24, 24)
-    local demoLabel = A.Style.Text(panel, 11)
+    local demoLabel = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    S.threatDemo.label = demoLabel
     demoLabel:SetPoint("LEFT", S.threatDemo, "RIGHT", 4, 0)
     demoLabel:SetText("Threat demo (solo preview; ends in combat)")
     S.threatDemo:SetScript("OnClick", function(button) A.Threat.SetDemo(button:GetChecked()) end)
@@ -74,6 +121,7 @@ function S.Create()
     end)
     panel.OnDefault = function() A.ResetCharacter() end
     panel:SetScript("OnShow", S.Refresh)
-    S.category = Settings.RegisterCanvasLayoutCategory(panel, "Apogee Heals")
+    S.category = RegisterApogeeCategory(panel, "Heals", "Apogee Heals")
+    if not S.category then return end
     Settings.RegisterAddOnCategory(S.category); S.Refresh()
 end
