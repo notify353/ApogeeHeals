@@ -1,8 +1,8 @@
 ## [Unreleased]
 
-- Click a player's class-color strip to inspect current buffs and cast learned
-  buff choices, including recasting or replacing existing blessings. The picker
-  works outside combat only and closes on combat entry and target/group changes.
+- Click a player's class-color strip to show buff options in the existing icon
+  row on the left, including buffs already active for recasting or replacement.
+  Click again to restore missing-buff reminders. Out of combat only; no panel.
 
 ## October 11 - Consistent minimap controls
 

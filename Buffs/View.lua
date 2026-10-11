@@ -73,7 +73,7 @@ local function paintChoices(row, key, choices, offset, recommendedID, recommenda
     for index = 1, math.max(#choices, #buttons) do
         local entry, button = choices[index], buttons[index]
         if not button and not InCombatLockdown() then
-            button = CreateFrame("Button", nil, key == "recipientButtons" and row.recipientPanel or row.supportFrame or row, "SecureActionButtonTemplate")
+            button = CreateFrame("Button", nil, row.supportFrame or row, "SecureActionButtonTemplate")
             buttons[index] = button
             button:SetSize(size, size)
             button:SetAttribute("unit", row.unit); button:SetAttribute("useOnKeyDown", false)
@@ -112,11 +112,7 @@ local function paintChoices(row, key, choices, offset, recommendedID, recommenda
                 local position = offset + index - 1
                 if button.configuredPosition ~= position then
                     button:ClearAllPoints()
-                    if key == "recipientButtons" then
-                        button:SetPoint("TOPLEFT", row.recipientPanel, "TOPLEFT", 12 + (position % 10) * (size + gap), -174 - math.floor(position / 10) * (size + gap))
-                    else
-                        button:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - position * (size + gap), A.Style.sideIconY)
-                    end
+                    button:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - position * (size + gap), A.Style.sideIconY)
                     button.configuredPosition = position
                 end
                 if not button.configured or button.configuredSpell ~= id then
@@ -129,81 +125,17 @@ local function paintChoices(row, key, choices, offset, recommendedID, recommenda
         end
     end
 end
--- Recipient picker is session-only. Secure visibility owns combat hiding;
--- insecure code never changes protected attributes/layout while in combat.
+-- The strip expands the existing left-hand buff choices for one recipient.
 function B.CloseRecipient()
     B.HideTooltip(B.tooltipButton)
     B.recipientRow = nil
-    for _, row in ipairs(A.View.supportRows or A.View.rows) do
-        if row.recipientPanel and not InCombatLockdown() then
-            RegisterStateDriver(row.recipientPanel, "visibility", "hide")
-        end
-    end
-end
-function B.RefreshRecipient()
-    if InCombatLockdown() then return end
-    local row = B.recipientRow
-    if not row then B.CloseRecipient(); return end
-    local auras = not B.suspended and not A.View.unlocked and B.Scan(row.unit)
-    if not auras then B.CloseRecipient(); return end
-    local names, choices, seen = {}, {}, {}
-    for _, aura in ipairs(auras) do names[#names + 1] = aura.name end
-    local function add(entry)
-        if not seen[entry.id] then seen[entry.id] = true; choices[#choices + 1] = entry end
-    end
-    for _, entry in ipairs(A.BuffDefaults.Choices()) do add(entry) end
-    -- Empty coverage deliberately includes learned buffs already on this unit.
-    for _, entry in ipairs(A.BuffCatalog.Choices(row.unit, {}, nil, true)) do add(entry) end
-    if row.unit == "player" then
-        for _, entry in ipairs(B.AuraChoices(true)) do add(entry) end
-    end
-    for _, entry in ipairs(A.db.buffs) do
-        if row.unit == "player" or B.ForParty(entry) then
-            local info = A.Bindings.Resolve(entry.id)
-            if info then add({id=entry.id, icon=info.iconID}) end
-        end
-    end
-    row.recipientCurrent:SetText(#names > 0 and table.concat(names, "\n") or "No current buffs")
-    row.recipientContent:SetHeight(math.max(100, #names * 30))
-    row.recipientCurrent:SetHeight(math.max(100, #names * 30))
-    row.recipientHelp:SetText(#choices > 0 and "Click a spell to recast or change a buff" or "No learned buffs available for this player")
-    paintChoices(row, "recipientButtons", choices, 0)
-    row.recipientPanel:SetHeight(190 + math.max(1, math.ceil(#choices / 10)) * (A.Style.sideIconSize + A.Style.sideIconGap))
 end
 function B.ToggleRecipient(row)
     if InCombatLockdown() or B.suspended or A.View.unlocked then return end
     local previous = B.recipientRow
     B.CloseRecipient()
-    if previous == row or not B.Scan(row.unit) then return end
-    if not row.recipientPanel then
-        local panel = CreateFrame("Frame", nil, row.supportFrame or row, "SecureHandlerStateTemplate")
-        row.recipientPanel = panel
-        panel:SetScale(1 / A.Style.scale)
-        panel:SetSize(340, 240); panel:SetFrameStrata("DIALOG")
-        panel:SetPoint("TOPLEFT", row, "BOTTOMLEFT", 0, -4)
-        panel:SetClampedToScreen(true); panel:EnableMouse(true); A.Style.Background(panel)
-        local title = A.Style.Text(panel, 12)
-        title:SetPoint("TOPLEFT", 12, -10); title:SetText("Current buffs")
-        local close = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
-        close:SetSize(24, 20); close:SetPoint("TOPRIGHT", -6, -6); close:SetText("X")
-        close:SetScript("OnClick", function() if not InCombatLockdown() then B.CloseRecipient() end end)
-        local scroll = CreateFrame("ScrollFrame", nil, panel, "UIPanelScrollFrameTemplate")
-        scroll:SetPoint("TOPLEFT", 12, -34); scroll:SetSize(294, 110)
-        row.recipientContent = CreateFrame("Frame", nil, scroll)
-        row.recipientContent:SetSize(294, 110); scroll:SetScrollChild(row.recipientContent)
-        row.recipientCurrent = A.Style.Text(row.recipientContent, 11)
-        row.recipientCurrent:SetPoint("TOPLEFT", 0, 0); row.recipientCurrent:SetSize(294, 110)
-        row.recipientCurrent:SetJustifyH("LEFT"); row.recipientCurrent:SetJustifyV("TOP")
-        row.recipientCurrent:SetWordWrap(true)
-        row.recipientHelp = A.Style.Text(panel, 10)
-        row.recipientHelp:SetPoint("TOPLEFT", 12, -154)
-    end
-    B.recipientRow = row; B.RefreshRecipient()
-    if B.recipientRow then
-        -- No out-of-combat 'show' clause: leaving combat cannot reopen it.
-        RegisterStateDriver(row.recipientPanel, "visibility", "[combat] hide")
-        row.recipientPanel:Show()
-    end
+    if previous ~= row and B.Scan(row.unit) then B.recipientRow = row end
+    B.Refresh()
 end
 function B.PaintBlessings(row, choices, missingCount)
     local offset = math.min(missingCount, 4) + (missingCount > 4 and 1 or 0)

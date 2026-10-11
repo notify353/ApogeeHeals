@@ -341,9 +341,7 @@ Target buff suggestions appear only for living friendly player characters out of
 combat. NPCs, pets, hostile players and unknown target identity are excluded.
 
 Click the class-color strip on a player, party or friendly-player target bar to
-open that recipient's buff picker. Current buffs appear in a scrollable list;
-hover your learned spell icons for details and click one to recast or change a
-buff. Existing blessings do not hide alternatives in this picker. Click the strip
-again or X to close. It works only outside combat, closes on combat entry or
-target/group changes, and stays closed afterward. Native spell targeting, range,
-mana and reagent rules still apply. No buff is automatically removed or cast.
+show learned buff options in the existing icon row on the left, even if buffs
+are already active. Click an icon to recast or change the buff. Click the strip
+again to return to normal missing-buff reminders. Expansion works outside combat
+only and resets on combat entry or target/group changes. No extra panel opens.

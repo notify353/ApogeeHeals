@@ -13,20 +13,21 @@ a.Buffs.Refresh()
 assert(not row.blessingButtons or not row.blessingButtons[1].attributes.spell1)
 row.buffStrip.scripts.OnClick()
 assert(a.Buffs.recipientRow==row)
-assert(row.recipientCurrent.text:find("Might") and row.recipientCurrent.text:find("Other player's buff"))
-local button=row.recipientButtons[1]
+assert(not row.recipientPanel and not row.recipientButtons)
+local button=row.blessingButtons[1]
 assert(button.attributes.unit=="player" and button.attributes.spell1==19740)
 assert(button.attributes.type1=="spell" and not button.scripts.OnClick)
-assert(row.recipientButtons[2].attributes.spell1==19742)
-assert(row.recipientButtons[2].attributes.unit=="player")
-assert(row.recipientPanel.driver=="[combat] hide")
-row.buffStrip.scripts.OnClick();assert(not a.Buffs.recipientRow and row.recipientPanel.driver=="hide")
+assert(row.blessingButtons[2].attributes.spell1==19742)
+assert(row.blessingButtons[2].attributes.unit=="player")
+assert(button.point[1]=="TOPRIGHT" and button.point[2]==row.health and button.point[3]=="TOPLEFT")
+assert(button.driver=="[combat] hide; show")
+row.buffStrip.scripts.OnClick();assert(not a.Buffs.recipientRow and not button.attributes.spell1)
 row.buffStrip.scripts.OnClick()
 m.combat=true;m.Event("PLAYER_REGEN_DISABLED")
 assert(not a.Buffs.recipientRow)
 row.buffStrip.scripts.OnClick();assert(not a.Buffs.recipientRow)
 m.combat=false;m.Event("PLAYER_REGEN_ENABLED");m.Flush()
-assert(row.recipientPanel.driver=="hide")
+assert(not button.attributes.spell1 and not button.icon.shown)
 row.buffStrip.scripts.OnClick();m.Event("GROUP_ROSTER_UPDATE");assert(not a.Buffs.recipientRow)
 UnitCanAssist=function() return true end
 UnitIsPlayer=function() return true end
@@ -34,7 +35,7 @@ m.units.target={name="Friend",class="WARRIOR",connected=true,dead=false,health=1
 m.Event("PLAYER_TARGET_CHANGED");m.Flush()
 a.View.target.buffStrip.scripts.OnClick()
 assert(a.Buffs.recipientRow==a.View.target)
-assert(a.View.target.recipientButtons[1].attributes.unit=="target")
+assert(a.View.target.blessingButtons[1].attributes.unit=="target")
 m.Event("PLAYER_TARGET_CHANGED");assert(not a.Buffs.recipientRow)
 UnitIsPlayer=function() return false end
 a.View.target.buffStrip.scripts.OnClick();assert(not a.Buffs.recipientRow)
@@ -44,4 +45,4 @@ row.buffStrip.scripts.OnClick()
 m.units.player.auras={{spellId=m.Secret(),name="Unknown"}}
 a.Buffs.Refresh();assert(not a.Buffs.recipientRow)
 UnitIsPlayer=nil;UnitCanAssist=nil
-print("PASS buff strip recast, current buffs, fixed recipients, toggle, combat closure, roster/target changes and restricted observations")
+print("PASS buff strip expands existing left icons, recast/change, fixed recipients, toggle, combat closure and restricted observations without a panel")

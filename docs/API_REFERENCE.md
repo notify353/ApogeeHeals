@@ -1,15 +1,12 @@
-## Recipient buff picker (October 11)
+## Class-strip inline buff choices (October 11)
 
-Rechecked the matching 70338 SecureStateDriver resolveDriver implementation and
-SecureTemplates fixed-unit spell action path. A secure panel visibility driver
-uses `[combat] hide` without an out-of-combat show clause; only an out-of-combat
-strip click opens it. Secure spell buttons retain fixed recipient tokens and
-existing modifier isolation. No protected attributes/layout/visibility writes
-occur in combat. Combat entry clears the session selection, and subsequent
-refresh closes it permanently. Current buffs use the existing guarded complete
-HELPFUL scan; unknown/restricted data closes the picker. Current buff names are
-display only, never converted into casting actions. Learned spell resolution
-owns the recast choices. Native taint, timing and appearance need live acceptance.
+The strip toggles session-only expansion of the existing left-side buff buttons.
+Expanded recipients bypass aura coverage suppression; complete guarded scans
+still determine recipient eligibility. Existing secure fixed-unit buttons,
+visibility drivers, layout, tooltips and modifier isolation are reused. No new
+panel, casting path or saved state is introduced. Combat/world/recipient changes
+clear expansion; unknown/restricted snapshots close it. Matching Forever export
+checks pass. Native timing, taint and appearance still require owner acceptance.
 
 ## Friendly player target buffs (October 11)
 

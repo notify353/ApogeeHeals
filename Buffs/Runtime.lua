@@ -104,19 +104,21 @@ function B.Refresh()
     end
     for index, row in ipairs(A.View.supportRows or A.View.rows) do
         local missing, blessings = {}, {}
+        if B.recipientRow == row and (not snapshots[index] or A.View.unlocked) then B.CloseRecipient() end
+        local expanded = B.recipientRow == row
         if snapshots[index] and not A.View.unlocked then
             local names, ids, blessed = {}, {}, false
             for _, aura in ipairs(snapshots[index]) do
                 names[aura.name] = true; ids[aura.spellId] = true
                 if A.BuffDefaults.Group(aura.spellId) then blessed = true end
             end
-            if not blessed then blessings = blessingChoices end
+            if expanded or not blessed then blessings = blessingChoices end
             for _, watch in ipairs(watched) do
                 local grouped = A.BuffDefaults.active and A.BuffDefaults.Group(watch.entry.id)
                 if (row.unit == "player" or watch.party
                     or (row.unit == "target" and A.Access.Read(UnitIsUnit, "target", "player") == true))
                     and not grouped
-                    and not ids[watch.entry.id] and not names[watch.info.name] then
+                    and (expanded or (not ids[watch.entry.id] and not names[watch.info.name])) then
                     missing[#missing + 1] = { id = watch.entry.id, icon = watch.info.iconID }
                 end
             end
@@ -125,11 +127,11 @@ function B.Refresh()
         B.PaintBlessings(row, blessings, #missing)
         local upkeep, suggested, reason = {}, nil, nil
         if A.BuffCatalog and not A.View.unlocked then
-            upkeep, suggested, reason = A.BuffCatalog.Choices(row.unit, snapshots[index], catalogCache)
+            upkeep, suggested, reason = A.BuffCatalog.Choices(row.unit, expanded and {} or snapshots[index], catalogCache, expanded)
         end
         B.PaintCatalog(row, upkeep, #missing, #blessings, suggested, reason)
         if row.unit == "player" then
-            local modes = snapshots[index] and auraChoices or {}
+            local modes = snapshots[index] and (expanded and B.AuraChoices(true) or auraChoices) or {}
             B.PaintAuras(row, modes, #missing, #blessings + #upkeep)
             if A.WeaponUpkeep then
                 local offset = math.min(#missing, 4) + (#missing > 4 and 1 or 0)
@@ -138,7 +140,6 @@ function B.Refresh()
             end
         end
     end
-    B.RefreshRecipient()
     if B.picker and B.picker:IsShown() then B.RefreshPicker() end
 end
 function B.Stop()
