@@ -38,6 +38,22 @@ local reads=m.auraReads
 a.Buffs.timerDriver.scripts.OnUpdate(nil,10)
 assert(m.auraReads==reads and button.buffTimer.text=="")
 m.combat=false;m.Event("PLAYER_REGEN_ENABLED");m.Flush();assert(button.buffTimer.text=="0:59")
+-- A longer buff on another recipient must not change this row's countdown.
+m.units.party1={name="Party",class="WARRIOR",connected=true,dead=false,
+    health=100,maxHealth=100,auras={{spellId=19740,name="Might",duration=300,expirationTime=m.time+300}}}
+a.Buffs.Refresh()
+local party=a.View.rows[2]
+assert(not party.blessingButtons[1].attributes.spell1 and button.buffTimer.text=="0:59")
+party.buffStrip.scripts.OnClick()
+assert(party.blessingButtons[1].buffTimer.text=="5m" and button.buffTimer.text=="0:59")
+party.buffStrip.scripts.OnClick()
+-- A stalled frame performs one fresh scan, never a burst of catch-up scans.
+reads=m.auraReads;a.Buffs.Refresh();local refreshReads=m.auraReads-reads
+reads=m.auraReads;a.Buffs.timerDriver.scripts.OnUpdate(nil,30)
+assert(m.auraReads-reads==refreshReads)
+a.View.unlocked=true;reads=m.auraReads
+a.Buffs.timerDriver.scripts.OnUpdate(nil,10);assert(m.auraReads==reads)
+a.View.unlocked=false
 m.Event("PLAYER_LEAVING_WORLD");reads=m.auraReads
 a.Buffs.timerDriver.scripts.OnUpdate(nil,10);assert(m.auraReads==reads)
 -- Catalog and generic watched buffs share the same threshold and timer.
