@@ -54,6 +54,7 @@ end
 function C.Recognized(id)
     return A.Access.Readable(id) and type(id) == "number" and recognized[id] == true
 end
+function C.TimerGroup(id) return variants[id] end
 local function disabledVariants()
     local disabled = {}
     -- A saved opt-out applies across ranks of that variant. Never rewrite storage

@@ -345,3 +345,8 @@ show learned buff options in the existing icon row on the left, even if buffs
 are already active. Click an icon to recast or change the buff. Click the strip
 again to return to normal missing-buff reminders. Expansion works outside combat
 only and resets on combat entry or target/group changes. No extra panel opens.
+
+Buff icons also appear when a buff has less than two minutes remaining. A small
+m:ss timer on the icon counts down once per second. Refreshing the buff hides
+the reminder again. Missing buffs have no timer; permanent or unreadable durations
+are never guessed. Expanded options show known remaining times as well.

@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+- Show buff reminders below two minutes remaining, with a live m:ss countdown
+  on the existing icon. Missing buffs remain actionable without a timer. Permanent
+  or unreadable timing stays unlabelled. Reminders remain outside combat only.
+
 - Click a player's class-color strip to show buff options in the existing icon
   row on the left, including buffs already active for recasting or replacement.
   Click again to restore missing-buff reminders. Out of combat only; no panel.

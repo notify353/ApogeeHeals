@@ -28,6 +28,42 @@ function B.Info(id)
     if type(info) == "table" and A.Access.Readable(info.name, info.iconID)
         and type(info.name) == "string" and info.name ~= "" then return info end
 end
+-- Only public, finite timing can establish an expiring buff. Unknown timing
+-- remains coverage and never produces a guessed countdown.
+function B.Remaining(aura)
+    if not A.Access.Readable(aura.duration, aura.expirationTime) then return end
+    local duration, expires = aura.duration, aura.expirationTime
+    if type(duration) ~= "number" or duration <= 0 or duration ~= duration or duration >= math.huge
+        or type(expires) ~= "number" or expires <= 0 or expires ~= expires or expires >= math.huge then return end
+    return math.max(0, expires - GetTime())
+end
+function B.Coverage(auras)
+    if not auras then return end
+    local result = {}
+    for _, aura in ipairs(auras) do
+        local remaining = B.Remaining(aura)
+        if not remaining or remaining >= 120 then result[#result + 1] = aura end
+    end
+    return result
+end
+function B.WithTimers(choices, auras)
+    local result = {}
+    for _, entry in ipairs(choices) do
+        local remaining, unknown
+        local blessing = A.BuffDefaults.Group(entry.id)
+        local catalog = A.BuffCatalog.TimerGroup(entry.id)
+        for _, aura in ipairs(auras or {}) do
+            if aura.spellId == entry.id or (entry.name and aura.name == entry.name)
+                or (blessing and A.BuffDefaults.Group(aura.spellId) == blessing)
+                or (catalog and A.BuffCatalog.TimerGroup(aura.spellId) == catalog) then
+                local value = B.Remaining(aura)
+                if value then remaining = math.max(remaining or 0, value) else unknown = true end
+            end
+        end
+        result[#result + 1] = {id=entry.id, icon=entry.icon, remaining=not unknown and remaining or nil}
+    end
+    return result
+end
 function B.ForParty(entry)
     local selfOnly = A.Access.Read(C_Spell and C_Spell.IsSelfBuff, entry.id)
     if selfOnly == true then return false end
@@ -106,9 +142,10 @@ function B.Refresh()
         local missing, blessings = {}, {}
         if B.recipientRow == row and (not snapshots[index] or A.View.unlocked) then B.CloseRecipient() end
         local expanded = B.recipientRow == row
+        local coverage = B.Coverage(snapshots[index])
         if snapshots[index] and not A.View.unlocked then
             local names, ids, blessed = {}, {}, false
-            for _, aura in ipairs(snapshots[index]) do
+            for _, aura in ipairs(coverage) do
                 names[aura.name] = true; ids[aura.spellId] = true
                 if A.BuffDefaults.Group(aura.spellId) then blessed = true end
             end
@@ -119,20 +156,20 @@ function B.Refresh()
                     or (row.unit == "target" and A.Access.Read(UnitIsUnit, "target", "player") == true))
                     and not grouped
                     and (expanded or (not ids[watch.entry.id] and not names[watch.info.name])) then
-                    missing[#missing + 1] = { id = watch.entry.id, icon = watch.info.iconID }
+                    missing[#missing + 1] = { id = watch.entry.id, icon = watch.info.iconID, name = watch.info.name }
                 end
             end
         end
-        B.Paint(row, missing)
-        B.PaintBlessings(row, blessings, #missing)
+        B.Paint(row, B.WithTimers(missing, snapshots[index]))
+        B.PaintBlessings(row, B.WithTimers(blessings, snapshots[index]), #missing)
         local upkeep, suggested, reason = {}, nil, nil
         if A.BuffCatalog and not A.View.unlocked then
-            upkeep, suggested, reason = A.BuffCatalog.Choices(row.unit, expanded and {} or snapshots[index], catalogCache, expanded)
+            upkeep, suggested, reason = A.BuffCatalog.Choices(row.unit, expanded and {} or coverage, catalogCache, expanded)
         end
-        B.PaintCatalog(row, upkeep, #missing, #blessings, suggested, reason)
+        B.PaintCatalog(row, B.WithTimers(upkeep, snapshots[index]), #missing, #blessings, suggested, reason)
         if row.unit == "player" then
             local modes = snapshots[index] and (expanded and B.AuraChoices(true) or auraChoices) or {}
-            B.PaintAuras(row, modes, #missing, #blessings + #upkeep)
+            B.PaintAuras(row, B.WithTimers(modes, snapshots[index]), #missing, #blessings + #upkeep)
             if A.WeaponUpkeep then
                 local offset = math.min(#missing, 4) + (#missing > 4 and 1 or 0)
                     + #blessings + #upkeep + #modes

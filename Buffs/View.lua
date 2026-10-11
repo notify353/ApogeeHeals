@@ -1,11 +1,32 @@
 local _, A = ...
 local B = A.Buffs
+local function createTimer(button)
+    button.buffTimer = A.Style.Text(button, 7)
+    button.buffTimer:SetPoint("BOTTOM", button, "BOTTOM", 0, 1)
+    button.buffTimer:SetTextColor(1, 1, 1, 1)
+    button.buffTimer:SetShadowColor(0, 0, 0, 1); button.buffTimer:SetShadowOffset(1, -1)
+end
+local function paintTimer(button, entry)
+    local remaining = entry and entry.remaining
+    local seconds = remaining and remaining > 0 and math.ceil(remaining) or nil
+    button.buffTimer:SetText(seconds and string.format("%d:%02d", math.floor(seconds / 60), seconds % 60) or "")
+end
 function B.HideTooltip(button)
     if not button or B.tooltipButton ~= button then return end
     if GameTooltip:IsOwned(button) then GameTooltip:Hide() end
     B.tooltipButton = nil
 end
 function B.Create(row)
+    if not B.timerDriver then
+        B.timerDriver = CreateFrame("Frame")
+        local elapsed = 0
+        B.timerDriver:SetScript("OnUpdate", function(_, delta)
+            if InCombatLockdown() or B.suspended or A.View.unlocked then elapsed = 0; return end
+            elapsed = elapsed + delta
+            if elapsed < 1 then return end
+            elapsed = 0; B.Refresh()
+        end)
+    end
     local strip = CreateFrame("Button", nil, row.nameLayer)
     row.buffStrip = strip
     strip:SetAllPoints(row.classStrip)
@@ -40,6 +61,7 @@ function B.Create(row)
         icon:SetPoint("TOPLEFT", button, "TOPLEFT", 1, -1); icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -1, 1)
         icon:SetTexCoord(0.07, 0.93, 0.07, 0.93); icon:Hide()
         row.buffReminders[index] = icon
+        createTimer(button)
     end
     row.buffOverflow = A.Style.Text(row.supportFrame or row, 8)
     row.buffOverflow:SetPoint("RIGHT", row, "LEFT", -gap - 4 * (size + gap), 0); row.buffOverflow:Hide()
@@ -52,6 +74,7 @@ function B.Paint(row, missing)
         if button.reminderSpell ~= id then B.HideTooltip(button) end
         button.reminderSpell = id -- Public display identity only; never a protected combat attribute.
         icon:SetTexture(entry and entry.icon); icon:SetShown(entry ~= nil)
+        paintTimer(button, entry)
         if not InCombatLockdown() then
             -- Cache only our public configured spell identity, never aura data.
             -- Combat painting leaves this untouched so deferred changes still apply.
@@ -100,6 +123,7 @@ local function paintChoices(row, key, choices, offset, recommendedID, recommenda
             end
             button.icon = button:CreateTexture(nil, "ARTWORK")
             button.icon:SetPoint("TOPLEFT", button, "TOPLEFT", 1, -1); button.icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -1, 1); button.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+            createTimer(button)
         end
         if button then
             local id = entry and entry.id
@@ -108,6 +132,7 @@ local function paintChoices(row, key, choices, offset, recommendedID, recommenda
             button.reminderSpell, button.recommendation = id, reason
             if button.suggestion then button.suggestion:SetShown(reason ~= nil) end
             button.icon:SetTexture(entry and entry.icon); button.icon:SetShown(entry ~= nil)
+            paintTimer(button, entry)
             if not InCombatLockdown() then
                 local position = offset + index - 1
                 if button.configuredPosition ~= position then

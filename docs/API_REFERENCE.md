@@ -1,3 +1,19 @@
+## Early buff reminders and icon timers (October 11)
+
+Rechecked matching 70338 BuffFrame.lua: expirationTime minus GetTime is remaining
+time; duration/expiration zero denotes untimed coverage. The existing guarded
+HELPFUL scan is unchanged. Duration and expiration must both be public finite
+positive numbers before arithmetic. Unknown/secret/invalid timing retains coverage
+and has no timer. Known remaining time below 120 seconds stops suppressing upkeep
+choices. Equivalent higher ranks/group variants and any-caster coverage remain;
+other long-lived copies still suppress early reminders. Timer identity is scoped
+to matching spell/name or blessing/catalog variant, never an unrelated choice.
+One shared one-second refresh handles threshold crossings without aura events;
+it performs no aura work in combat, preview or world suspension. Timers use the
+existing native FontString display with public m:ss strings and clear on Stop.
+This supersedes the original absence-only policy below. No saved state or secure
+action changes. Native readability, appearance and taint acceptance remain pending.
+
 ## Class-strip inline buff choices (October 11)
 
 The strip toggles session-only expansion of the existing left-side buff buttons.
