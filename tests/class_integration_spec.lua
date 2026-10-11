@@ -25,6 +25,7 @@ for _, case in ipairs(cases) do
     C_SpellBook={IsSpellInSpellBook=function(id) return known[id]==true end,
         IsSpellKnown=function(id) return known[id]==true end}
     UnitCanAssist=function() return not m.hostile end
+    UnitIsPlayer=function() return not m.targetNPC end
     UnitGroupRolesAssigned=function() return "NONE" end
     GetNumShapeshiftForms=function() return 0 end
     local a=m.Start()
@@ -42,6 +43,10 @@ for _, case in ipairs(cases) do
         return count
     end
     for index,row in ipairs(a.View.supportRows) do assert(active(row)==(index==1 and case.self or case.party)) end
+    m.targetNPC=true; a.Buffs.Refresh()
+    assert(active(a.View.target)==0,"Friendly NPCs and pets receive no catalog buff suggestions")
+    assert(active(a.View.rows[2])==case.party,"Party buff suggestions remain unchanged")
+    m.targetNPC=false; a.Buffs.Refresh(); assert(active(a.View.target)==case.party)
     assert(not a.View.targetTarget.upkeepButtons)
     -- Catalog recognition prevents a saved generic entry from duplicating or
     -- spreading a self/area action onto party rows. Storage stays untouched.

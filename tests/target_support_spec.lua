@@ -15,12 +15,21 @@ local refreshes=0
 row.debuffContainer.UpdateAllAuras=function() refreshes=refreshes+1 end
 row.cleanseIndicator.UpdateAllAuras=function() refreshes=refreshes+1 end
 UnitCanAssist=function(source,unit) assert(source=="player" and unit=="target");return m.friendly end
+UnitIsPlayer=function(unit) assert(unit=="target");return m.targetPlayer end
+m.targetPlayer=true
 m.units.target={name="Friendly",class="WARRIOR",connected=true,dead=false,health=100,maxHealth=100,power=0,maxPower=0,auras={}}
 m.friendly=true;m.Event("PLAYER_TARGET_CHANGED");m.Flush()
 assert(refreshes==2)
 local choice=row.blessingButtons[1]
 assert(choice.attributes.unit=="target" and choice.attributes.spell1==19740 and choice.parent==row.supportFrame)
 assert(choice.suggestion.shown)
+-- Friendly NPCs/pets and unreadable player identity must never offer buffs.
+for _,identity in ipairs({false,m.Secret()}) do
+    m.targetPlayer=identity;m.Event("PLAYER_TARGET_CHANGED");m.Flush()
+    assert(not choice.attributes.spell1 and not choice.icon.shown and not choice.suggestion.shown)
+end
+m.targetPlayer=nil;m.Event("PLAYER_TARGET_CHANGED");m.Flush();assert(not choice.attributes.spell1)
+m.targetPlayer=true;m.Event("PLAYER_TARGET_CHANGED");m.Flush();assert(choice.attributes.spell1==19740)
 choice.scripts.OnEnter(choice);assert(GameTooltip.shown)
 m.units.target.auras={{spellId=19740,name="Might"}}
 m.Event("UNIT_AURA","target");m.Flush()
@@ -39,4 +48,5 @@ assert(refreshes==before+2 and row.cleanseButtons[1].attributes.unit=="target")
 m.friendly=true;m.combat=false;m.Event("PLAYER_REGEN_ENABLED");m.Flush();assert(choice.attributes.spell1==19740)
 m.units.target=nil;m.Event("PLAYER_TARGET_CHANGED");m.Flush();assert(not choice.attributes.spell1)
 UnitCanAssist=nil
+UnitIsPlayer=nil
 print("PASS friendly target upkeep/cleansing/native debuffs, fixed target actions, explicit aura refresh, hostile/unknown/dead switching and combat deferral")

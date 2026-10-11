@@ -8,7 +8,8 @@ function B.OnCast(unit, id)
 end
 -- nil is unknown, not an empty list. Never learn from partial observations.
 function B.Scan(unit)
-    if unit == "target" and A.Access.Read(UnitCanAssist, "player", "target") ~= true then return nil end
+    if unit == "target" and (A.Access.Read(UnitIsPlayer, "target") ~= true
+        or A.Access.Read(UnitCanAssist, "player", "target") ~= true) then return nil end
     if InCombatLockdown() or A.UnitAPI.State(unit) ~= "alive" then return nil end
     local getter = C_UnitAuras and C_UnitAuras.GetAuraDataByIndex
     if type(getter) ~= "function" then return nil end

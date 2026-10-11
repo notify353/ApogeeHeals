@@ -1,3 +1,14 @@
+## Friendly player target buffs (October 11)
+
+The reviewed 70338 UnitDocumentation defines UnitIsPlayer(unit) and
+UnitCanAssist(source, target) as boolean predicates. Both are read through the
+existing protected public-value adapter; unknown/restricted/error results do not
+establish eligibility. Target buff scanning requires a confirmed player that the
+player can assist, then the existing alive/out-of-combat checks. All target buff
+suggestion paths consume this shared snapshot, including blessings and catalog
+upkeep. Friendly NPCs/pets are excluded. Self/party reminders and target identity,
+health, debuffs and cleansing are unchanged. No protected combat mutations added.
+
 # Forever API authority
 
 ## Settings typography (October 10)

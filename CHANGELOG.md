@@ -1,3 +1,8 @@
+## October 11 - Friendly player target buffs
+
+- Show target buff suggestions only for confirmed friendly player characters.
+- Hide suggestions for NPCs, pets, hostile players and unknown target identity.
+
 ## Unreleased - consistent settings typography
 
 - Use native gold titles/headings, small white labels, light-gray help and a matching parent backdrop. Preserve existing controls, saved settings and gameplay.

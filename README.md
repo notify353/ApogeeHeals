@@ -336,3 +336,6 @@ its spell or item can be used. Changes to assignments remain locked in combat.
 ### Unified Defaults
 
 Defaults clears this character's healing assignments, buff preferences and positions. Use the top-right Defaults button and confirm; changes are blocked in combat.
+
+Target buff suggestions appear only for living friendly player characters out of
+combat. NPCs, pets, hostile players and unknown target identity are excluded.
