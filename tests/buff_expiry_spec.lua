@@ -43,7 +43,7 @@ m.units.party1={name="Party",class="WARRIOR",connected=true,dead=false,
     health=100,maxHealth=100,auras={{spellId=19740,name="Might",duration=300,expirationTime=m.time+300}}}
 a.Buffs.Refresh()
 local party=a.View.rows[2]
-assert(not party.blessingButtons[1].attributes.spell1 and button.buffTimer.text=="0:59")
+assert(#party.blessingButtons==0 and button.buffTimer.text=="0:59")
 party.buffStrip.scripts.OnClick()
 assert(party.blessingButtons[1].buffTimer.text=="5m" and button.buffTimer.text=="0:59")
 party.buffStrip.scripts.OnClick()
