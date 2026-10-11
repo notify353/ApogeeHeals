@@ -1,4 +1,36 @@
-local _, A = ...
+local addonName, A = ...
+-- Each independent addon joins one family-local native settings parent.
+local function RegisterApogeeCategory(panel, label, standaloneTitle)
+    if type(Settings.RegisterCanvasLayoutSubcategory) ~= "function" then
+        return Settings.RegisterCanvasLayoutCategory(panel, standaloneTitle)
+    end
+    local registry = _G.ApogeeSettingsRegistry
+    if registry ~= nil and (type(registry) ~= "table" or registry.schema ~= 1
+        or type(registry.category) ~= "table" or type(registry.category.GetID) ~= "function"
+        or type(registry.children) ~= "table") then return nil end
+    if not registry then
+        local parentName = addonName:sub(-3) == "Dev" and "Apogee DEV" or "Apogee"
+        local overview = CreateFrame("Frame")
+        local title = overview:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+        title:SetPoint("TOPLEFT", 16, -16); title:SetText(parentName)
+        local description = overview:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        description:SetPoint("TOPLEFT", 16, -52)
+        description:SetText("Select an enabled addon's settings from the list on the left.")
+        local parent = Settings.RegisterCanvasLayoutCategory(overview, parentName)
+        Settings.RegisterAddOnCategory(parent)
+        registry = {schema = 1, category = parent, children = {}}
+        _G.ApogeeSettingsRegistry = registry
+    end
+    local existing = registry.children[label]
+    if existing ~= nil then
+        if type(existing) == "table" and type(existing.GetID) == "function" then return existing end
+        return nil
+    end
+    local category = Settings.RegisterCanvasLayoutSubcategory(registry.category, panel, label)
+    registry.children[label] = category
+    return category
+end
+
 local S = {}
 A.Settings = S
 function S.ResetPositions()
@@ -74,6 +106,7 @@ function S.Create()
     end)
     panel.OnDefault = function() A.ResetCharacter() end
     panel:SetScript("OnShow", S.Refresh)
-    S.category = Settings.RegisterCanvasLayoutCategory(panel, "Apogee Heals")
+    S.category = RegisterApogeeCategory(panel, "Heals", "Apogee Heals")
+    if not S.category then return end
     Settings.RegisterAddOnCategory(S.category); S.Refresh()
 end

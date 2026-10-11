@@ -1,3 +1,7 @@
+## Unreleased - grouped settings
+
+- Nest this addon under the shared Apogee settings parent (Apogee DEV in development). Only loaded addons with settings register a child page; existing controls and saved preferences remain independent.
+
 ## Unreleased
 
 - Match startup build-review warnings to the verified Forever 70205 export and test against review metadata to catch drift.
