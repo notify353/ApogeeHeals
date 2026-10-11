@@ -1,3 +1,7 @@
+## Unreleased - consistent settings typography
+
+- Use native gold titles/headings, small white labels, light-gray help and a matching parent backdrop. Preserve existing controls, saved settings and gameplay.
+
 ## Unreleased - grouped settings
 
 - Nest this addon under the shared Apogee settings parent (Apogee DEV in development). Only loaded addons with settings register a child page; existing controls and saved preferences remain independent.

@@ -1,5 +1,15 @@
 # Forever API authority
 
+## Settings typography (October 10)
+
+Reviewed the matching shared FontStyles.xml: GameFontNormalLarge uses gold,
+GameFontNormal/NormalSmall use native gold, HighlightSmall is white, and
+DisableSmall uses disabled gray. Settings titles/labels now use native font
+templates instead of HUD size overrides; help uses a readable 0.8 gray. Native
+button normal/highlight font APIs keep selected settings tabs gold on hover.
+The parent canvas shares the child background. Gameplay/HUD typography and
+saved preferences are unchanged; final appearance requires user reload review.
+
 ## Shared settings parent (October 10)
 
 Reviewed the fresh Forever 1.60.1.70338 Settings wrapper, SettingsInbound,
