@@ -24,11 +24,11 @@ for _,unit in ipairs({"player","party1","target"}) do
         local aura={spellId=id,name="Might",duration=300,expirationTime=159,sourceUnit="party2"}
         m.units[unit].auras={aura};a.Buffs.Refresh()
         assert(not offered(row,"might") and not offered(row,"wisdom"), "Foreign blessing remains coverage below two minutes")
-        row.buffStrip.scripts.OnClick()
+        row.buffStrip.scripts.OnClick(nil,"LeftButton",false)
         assert(not offered(row,"might") and offered(row,"wisdom"), "Manual alternatives must not offer a protected same-family replacement")
         local first=row.blessingButtons[1]
         assert(first.point[4]==-a.Style.sideIconGap, "Filtered options must not leave a gap")
-        row.buffStrip.scripts.OnClick()
+        row.buffStrip.scripts.OnClick(nil,"LeftButton",false)
         aura.sourceUnit=m.Secret();a.Buffs.Refresh();assert(not offered(row,"might"))
         aura.sourceUnit=nil;a.Buffs.Refresh();assert(not offered(row,"might"))
         m.units[unit].auras={};a.Buffs.Refresh();assert(offered(row,"might"))
@@ -37,8 +37,8 @@ for _,unit in ipairs({"player","party1","target"}) do
     a.Buffs.Refresh();assert(offered(row,"might"), "Own applications still receive early refresh reminders")
     m.units[unit].auras={{spellId=999999,name="Greater Might",duration=300,expirationTime=159,sourceUnit="party2"}}
     a.Buffs.Refresh();assert(not offered(row,"might") and not offered(row,"wisdom"))
-    row.buffStrip.scripts.OnClick();assert(not offered(row,"might") and offered(row,"wisdom"))
-    row.buffStrip.scripts.OnClick()
+    row.buffStrip.scripts.OnClick(nil,"LeftButton",false);assert(not offered(row,"might") and offered(row,"wisdom"))
+    row.buffStrip.scripts.OnClick(nil,"LeftButton",false)
 end
 local groupMap={[19740]="might"}
 assert(a.Buffs.NamedGroup(groupMap,999999,m.Secret())==nil,"Restricted names must not be compared or indexed")

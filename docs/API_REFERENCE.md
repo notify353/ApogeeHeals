@@ -1,3 +1,16 @@
+## Exclusive class-strip input (October 12)
+
+Reviewed matching 70338 SimpleFrame SetHitRectInsets and SimpleScriptRegion
+SetPropagateMouseClicks; both are protected configuration APIs used only during
+out-of-combat frame creation. Exclude the full class rail plus its half-unit seam
+from every real unit row's secure hit rectangle. The buff overlay covers exactly
+that width and the full row height, disables propagation, and registers AnyDown
+and AnyUp. Only left release invokes the existing guarded toggle; other buttons
+are absorbed without actions. No class/color condition or secure spell attributes.
+All nine class fixtures verify the input configuration, including empty choices;
+mouse-down/right/middle/extra-button regressions verify no toggle. These checks
+do not emulate native hit testing; owner physical-click acceptance is pending.
+
 ## Buff recipient range (October 11)
 
 Reviewed matching 70338 C_Spell.IsSpellInRange(spellIdentifier,targetUnit):

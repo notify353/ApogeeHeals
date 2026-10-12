@@ -18,7 +18,7 @@ end
 a.Buffs.Refresh()
 assert(shown(a.View.rows[1]),"Self buffs must not depend on target distance")
 assert(not shown(a.View.rows[2]) and not shown(a.View.target),"Hide out-of-range party and target reminders")
-a.View.target.buffStrip.scripts.OnClick()
+a.View.target.buffStrip.scripts.OnClick(nil,"LeftButton",false)
 assert(not shown(a.View.target),"Manual expansion must also respect range")
 outside=false;a.Buffs.timerDriver.scripts.OnUpdate(a.Buffs.timerDriver,1)
 assert(shown(a.View.rows[2]) and shown(a.View.target),"Walking into range restores options without aura events")

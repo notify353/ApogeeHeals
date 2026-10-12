@@ -58,6 +58,8 @@ function M.New()
     function methods:SetAttribute(k, v) protected(self); self.attributes[k] = v end
     function methods:GetAttribute(k) return self.attributes[k] end
     function methods:RegisterForClicks(...) protected(self); self.clicks = {...} end
+    function methods:SetHitRectInsets(...) protected(self); self.hitRectInsets = {...} end
+    function methods:SetPropagateMouseClicks(value) protected(self); self.propagateMouseClicks = value end
     function methods:RegisterForDrag(...) self.drags = {...} end
     function methods:EnableMouse(v) self.mouse = v end
     function methods:SetScript(k, v) self.scripts[k] = v end

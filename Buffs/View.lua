@@ -42,12 +42,15 @@ function B.Create(row)
     local strip = CreateFrame("Button", nil, row)
     row.buffStrip = strip
     strip:SetPoint("TOPLEFT", row, "TOPLEFT", 0, 0)
-    strip:SetSize(2, A.Style.clusterHeight)
+    strip:SetSize(A.Style.classStripHitWidth, A.Style.clusterHeight)
     strip:SetFrameLevel(row.nameLayer:GetFrameLevel() + 2)
     strip:EnableMouse(true)
-    strip:RegisterForClicks("LeftButtonUp")
+    strip:SetPropagateMouseClicks(false)
+    strip:RegisterForClicks("AnyDown", "AnyUp")
     strip:SetHighlightTexture("Interface/Buttons/ButtonHilight-Square")
-    strip:SetScript("OnClick", function() B.ToggleRecipient(row) end)
+    strip:SetScript("OnClick", function(_, button, down)
+        if button == "LeftButton" and not down then B.ToggleRecipient(row) end
+    end)
     local size, gap = A.Style.sideIconSize, A.Style.sideIconGap
     row.buffReminders, row.buffButtons = {}, {}
     for index = 1, 4 do

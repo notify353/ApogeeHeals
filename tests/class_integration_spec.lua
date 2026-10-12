@@ -29,6 +29,16 @@ for _, case in ipairs(cases) do
     UnitGroupRolesAssigned=function() return "NONE" end
     GetNumShapeshiftForms=function() return 0 end
     local a=m.Start()
+    for _,row in ipairs(a.View.supportRows) do
+        local strip=row.buffStrip
+        assert(strip and strip.mouse and strip.propagateMouseClicks==false,case.class.." rail must consume mouse input")
+        assert(row.hitRectInsets[1]==strip.width and strip.width>=row.classStrip.width)
+        assert(strip.height==a.Style.clusterHeight and not strip.attributes.type1)
+        strip.scripts.OnClick(strip,"LeftButton",false)
+        assert(a.Buffs.recipientRow==row,case.class.." rail must toggle regardless of class/color or empty choices")
+        strip.scripts.OnClick(strip,"LeftButton",false)
+        assert(not a.Buffs.recipientRow)
+    end
     local function active(row)
         local count=0
         for _, button in ipairs(row.upkeepButtons) do
@@ -53,10 +63,10 @@ for _, case in ipairs(cases) do
     a.Buffs.Refresh()
     assert(active(a.View.rows[1])==case.self,"Self upkeep stays available regardless of target range")
     assert(active(a.View.rows[2])==0 and active(a.View.target)==0,"Every class hides out-of-range recipient upkeep")
-    a.View.target.buffStrip.scripts.OnClick();assert(active(a.View.target)==0)
+    a.View.target.buffStrip.scripts.OnClick(nil,"LeftButton",false);assert(active(a.View.target)==0)
     C_Spell.IsSpellInRange=function() return true end
     a.Buffs.Refresh();assert(active(a.View.target)==case.party)
-    a.View.target.buffStrip.scripts.OnClick()
+    a.View.target.buffStrip.scripts.OnClick(nil,"LeftButton",false)
     C_Spell.SpellHasRange=nil;C_Spell.IsSpellInRange=nil
     if case.self > 0 then
         local id=case.ids[1]
@@ -74,9 +84,9 @@ for _, case in ipairs(cases) do
                         sourceUnit="party4",duration=300,expirationTime=GetTime()+59}}
                     a.Buffs.Refresh()
                     assert(not offered(row),case.class.." unlisted foreign rank must cover automatic reminders")
-                    row.buffStrip.scripts.OnClick()
+                    row.buffStrip.scripts.OnClick(nil,"LeftButton",false)
                     assert(not offered(row),case.class.." unlisted foreign rank must block matching manual replacement")
-                    row.buffStrip.scripts.OnClick()
+                    row.buffStrip.scripts.OnClick(nil,"LeftButton",false)
                     m.units[row.unit].auras={};a.Buffs.Refresh()
                     assert(offered(row),case.class.." removal must restore reminder")
                 end

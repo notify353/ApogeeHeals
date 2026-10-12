@@ -43,6 +43,8 @@ end
 local function buildRow(row, preview, first, width)
     width = width or S.width
     row:SetSize(width, S.clusterHeight)
+    -- The class rail is never part of the secure healing/targeting hit area.
+    if not preview then row:SetHitRectInsets(S.classStripHitWidth, 0, 0, 0) end
     row.health = bar(row, S.healthHeight, 0, width)
     row.incoming = A.IncomingHeals.Create(row.health, preview, width)
     -- A separate text layer stays above both the health fill and incoming heals.

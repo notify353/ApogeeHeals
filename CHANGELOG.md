@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+- Reserve the full class-color strip and its seam for buff input, excluding it
+  from the row's healing hitbox. Absorb all mouse buttons; left release toggles
+  buffs outside combat for every class.
+
 - Hide automatic and expanded buff options when that spell is out of range of
   its recipient; restore them as the recipient returns to range.
 

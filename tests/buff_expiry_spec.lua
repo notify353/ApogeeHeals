@@ -16,16 +16,16 @@ m.time=1120;a.Buffs.Refresh();assert(button.buffTimer.text=="" and button.attrib
 m.units.player.auras={};a.Buffs.Refresh();assert(button.buffTimer.text=="")
 aura.expirationTime=1420;m.units.player.auras={aura};a.Buffs.Refresh()
 assert(not button.attributes.spell1 and button.buffTimer.text=="")
-row.buffStrip.scripts.OnClick();assert(button.buffTimer.text=="5m")
+row.buffStrip.scripts.OnClick(nil,"LeftButton",false);assert(button.buffTimer.text=="5m")
 assert(button.buffTimer.width==a.Style.sideIconSize-4 and button.buffTimer.font[3]=="OUTLINE")
 aura.expirationTime=m.time+3378;a.Buffs.Refresh();assert(button.buffTimer.text=="56m")
 aura.expirationTime=m.time+7200;a.Buffs.Refresh();assert(button.buffTimer.text=="2h")
-row.buffStrip.scripts.OnClick();assert(not button.attributes.spell1)
+row.buffStrip.scripts.OnClick(nil,"LeftButton",false);assert(not button.attributes.spell1)
 for _,value in ipairs({m.Secret(),0,math.huge,0/0,-1,"soon"}) do
     aura.expirationTime=value;a.Buffs.Refresh()
     assert(not button.attributes.spell1, "Unknown/permanent timing must retain coverage")
-    row.buffStrip.scripts.OnClick();assert(button.buffTimer.text=="")
-    row.buffStrip.scripts.OnClick()
+    row.buffStrip.scripts.OnClick(nil,"LeftButton",false);assert(button.buffTimer.text=="")
+    row.buffStrip.scripts.OnClick(nil,"LeftButton",false)
 end
 aura.expirationTime=1179;aura.duration=m.Secret();a.Buffs.Refresh();assert(not button.attributes.spell1)
 aura.duration=300
@@ -44,9 +44,9 @@ m.units.party1={name="Party",class="WARRIOR",connected=true,dead=false,
 a.Buffs.Refresh()
 local party=a.View.rows[2]
 assert(#party.blessingButtons==0 and button.buffTimer.text=="0:59")
-party.buffStrip.scripts.OnClick()
+party.buffStrip.scripts.OnClick(nil,"LeftButton",false)
 assert(party.blessingButtons[1].buffTimer.text=="5m" and button.buffTimer.text=="0:59")
-party.buffStrip.scripts.OnClick()
+party.buffStrip.scripts.OnClick(nil,"LeftButton",false)
 -- A stalled frame performs one fresh scan, never a burst of catch-up scans.
 reads=m.auraReads;a.Buffs.Refresh();local refreshReads=m.auraReads-reads
 reads=m.auraReads;a.Buffs.timerDriver.scripts.OnUpdate(nil,30)
