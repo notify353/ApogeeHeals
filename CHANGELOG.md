@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+- Update central development workflow paths to ApogeeForever; no gameplay or installation changes.
+
 - Reserve the full class-color strip and its seam for buff input, excluding it
   from the row's healing hitbox. Absorb all mouse buttons; left release toggles
   buffs outside combat for every class.
