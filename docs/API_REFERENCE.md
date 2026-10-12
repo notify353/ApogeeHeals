@@ -1,3 +1,16 @@
+## Buff recipient range (October 11)
+
+Reviewed matching 70338 C_Spell.IsSpellInRange(spellIdentifier,targetUnit):
+true means in range, false means outside, nil means invalid/unavailable. Use
+the existing guarded Access.Read adapter and each offered spell's fixed unit.
+SpellHasRange=false and player/self aliases bypass the range query. Only a
+public false suppresses a choice; secret/nil/error results remain unknown.
+Filter automatic and expanded blessings, catalog and watched buffs before
+layout counts. The existing out-of-combat one-second refresh restores choices
+after movement. No healing-spell distance proxy, new polling or combat writes.
+Source and generated regressions cover classes, recipients and range recovery;
+native movement acceptance remains pending.
+
 ## Buff name coverage correction (October 11)
 
 The owner reports that the previous correction still suggests a protected buff.

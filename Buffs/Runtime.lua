@@ -78,7 +78,14 @@ function B.Coverage(auras)
     end
     return result
 end
-function B.WithTimers(choices, auras, nativeMode)
+function B.OutOfRange(id, unit)
+    if not unit or unit == "player" or A.Access.Read(UnitIsUnit, unit, "player") == true then return false end
+    if A.Access.Read(C_Spell and C_Spell.SpellHasRange, id) == false then return false end
+    -- Test the buff itself against its fixed recipient, not the healing binding.
+    -- Unknown/restricted range is not evidence that the recipient is too far away.
+    return A.Access.Read(C_Spell and C_Spell.IsSpellInRange, id, unit) == false
+end
+function B.WithTimers(choices, auras, nativeMode, unit)
     local result = {}
     for _, entry in ipairs(choices) do
         local remaining, unknown, protected
@@ -96,7 +103,7 @@ function B.WithTimers(choices, auras, nativeMode)
                 if value then remaining = math.max(remaining or 0, value) else unknown = true end
             end
         end
-        if not protected then
+        if not protected and not B.OutOfRange(entry.id, unit) then
             result[#result + 1] = {id=entry.id, icon=entry.icon, remaining=not unknown and remaining or nil}
         end
     end
@@ -199,19 +206,19 @@ function B.Refresh()
                 end
             end
         end
-        missing = B.WithTimers(missing, snapshots[index])
-        blessings = B.WithTimers(blessings, snapshots[index])
+        missing = B.WithTimers(missing, snapshots[index], nil, row.unit)
+        blessings = B.WithTimers(blessings, snapshots[index], nil, row.unit)
         B.Paint(row, missing)
         B.PaintBlessings(row, blessings, #missing)
         local upkeep, suggested, reason = {}, nil, nil
         if A.BuffCatalog and not A.View.unlocked then
             upkeep, suggested, reason = A.BuffCatalog.Choices(row.unit, expanded and {} or coverage, catalogCache, expanded)
         end
-        upkeep = B.WithTimers(upkeep, snapshots[index])
+        upkeep = B.WithTimers(upkeep, snapshots[index], nil, row.unit)
         B.PaintCatalog(row, upkeep, #missing, #blessings, suggested, reason)
         if row.unit == "player" then
             local modes = snapshots[index] and (expanded and B.AuraChoices(true) or auraChoices) or {}
-            modes = B.WithTimers(modes, snapshots[index], true)
+            modes = B.WithTimers(modes, snapshots[index], true, row.unit)
             B.PaintAuras(row, modes, #missing, #blessings + #upkeep)
             if A.WeaponUpkeep then
                 local offset = math.min(#missing, 4) + (#missing > 4 and 1 or 0)

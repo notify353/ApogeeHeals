@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+- Hide automatic and expanded buff options when that spell is out of range of
+  its recipient; restore them as the recipient returns to range.
+
 - Recognize unlisted buff ranks by client-localized names, including Greater,
   Prayer and group variants. Apply coverage and replacement protection across
   class buff reminders instead of relying only on fixed aura spell IDs.

@@ -48,6 +48,16 @@ for _, case in ipairs(cases) do
     assert(active(a.View.rows[2])==case.party,"Party buff suggestions remain unchanged")
     m.targetNPC=false; a.Buffs.Refresh(); assert(active(a.View.target)==case.party)
     assert(not a.View.targetTarget.upkeepButtons)
+    C_Spell.SpellHasRange=function() return true end
+    C_Spell.IsSpellInRange=function() return false end
+    a.Buffs.Refresh()
+    assert(active(a.View.rows[1])==case.self,"Self upkeep stays available regardless of target range")
+    assert(active(a.View.rows[2])==0 and active(a.View.target)==0,"Every class hides out-of-range recipient upkeep")
+    a.View.target.buffStrip.scripts.OnClick();assert(active(a.View.target)==0)
+    C_Spell.IsSpellInRange=function() return true end
+    a.Buffs.Refresh();assert(active(a.View.target)==case.party)
+    a.View.target.buffStrip.scripts.OnClick()
+    C_Spell.SpellHasRange=nil;C_Spell.IsSpellInRange=nil
     if case.self > 0 then
         local id=case.ids[1]
         local groupID=({DRUID=21850,PRIEST=21564,MAGE=23028})[case.class] or id
