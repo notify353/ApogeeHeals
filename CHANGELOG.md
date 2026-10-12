@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+- Preserve buffs from other players until they disappear, avoiding early reminders
+  and same-family replacement choices that may fail with "a more powerful spell".
+  Other blessing types remain selectable; your own buffs retain early reminders.
+
 - Keep buff timer text inside the icon with smaller outlined type and compact
   minute/hour labels; retain m:ss for the final two minutes.
 

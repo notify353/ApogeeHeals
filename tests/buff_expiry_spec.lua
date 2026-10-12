@@ -1,7 +1,7 @@
 local m,a=dofile("tests/purify_fixture.lua").New({might=true})
 local row=a.View.rows[1]
 m.time=1000
-local aura={spellId=19740,name="Might",duration=300,expirationTime=1120}
+local aura={spellId=19740,name="Might",sourceUnit="player",duration=300,expirationTime=1120}
 m.units.player.auras={aura}
 a.Buffs.Refresh()
 local button=row.blessingButtons[1]
@@ -40,7 +40,7 @@ assert(m.auraReads==reads and button.buffTimer.text=="")
 m.combat=false;m.Event("PLAYER_REGEN_ENABLED");m.Flush();assert(button.buffTimer.text=="0:59")
 -- A longer buff on another recipient must not change this row's countdown.
 m.units.party1={name="Party",class="WARRIOR",connected=true,dead=false,
-    health=100,maxHealth=100,auras={{spellId=19740,name="Might",duration=300,expirationTime=m.time+300}}}
+    health=100,maxHealth=100,auras={{spellId=19740,name="Might",sourceUnit="player",duration=300,expirationTime=m.time+300}}}
 a.Buffs.Refresh()
 local party=a.View.rows[2]
 assert(#party.blessingButtons==0 and button.buffTimer.text=="0:59")
@@ -63,8 +63,8 @@ C_Spell.GetSpellInfo=function(id) return {spellID=id,name="Buff"..id,iconID=id} 
 C_SpellBook.IsSpellKnown=function(id) return id==1126 or id==700001 end
 C_SpellBook.IsSpellInSpellBook=C_SpellBook.IsSpellKnown
 b.db.buffs={{id=700001,enabled=true,party=true}}
-n.units.player.auras={{spellId=1126,name="Buff1126",duration=1800,expirationTime=219},
-    {spellId=700001,name="Buff700001",duration=600,expirationTime=219}}
+n.units.player.auras={{spellId=1126,name="Buff1126",sourceUnit="player",duration=1800,expirationTime=219},
+    {spellId=700001,name="Buff700001",sourceUnit="player",duration=600,expirationTime=219}}
 b.Buffs.Refresh()
 local r=b.View.rows[1]
 assert(r.upkeepButtons[1].attributes.spell1==1126 and r.upkeepButtons[1].buffTimer.text=="1:59")

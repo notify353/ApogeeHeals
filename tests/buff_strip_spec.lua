@@ -17,7 +17,7 @@ end
 local known=C_SpellBook.IsSpellKnown
 C_SpellBook.IsSpellKnown=function(id,...) return id==19742 or known(id,...) end
 C_SpellBook.IsSpellInSpellBook=C_SpellBook.IsSpellKnown
-m.units.player.auras={{spellId=19740,name="Might"},{spellId=999,name="Other player's buff"}}
+m.units.player.auras={{spellId=19740,name="Might",sourceUnit="player"},{spellId=999,name="Other player's buff"}}
 a.Buffs.Refresh()
 assert(not row.blessingButtons or not row.blessingButtons[1].attributes.spell1)
 row.buffStrip.scripts.OnClick()

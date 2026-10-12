@@ -37,30 +37,41 @@ function B.Remaining(aura)
         or type(expires) ~= "number" or expires <= 0 or expires ~= expires or expires >= math.huge then return end
     return math.max(0, expires - GetTime())
 end
+-- Rank alone cannot establish strength: another caster may have an improved
+-- version of the same spell ID. Only refresh our own observed applications.
+function B.OwnApplication(aura)
+    local source = aura.sourceUnit
+    if not A.Access.Readable(source) or type(source) ~= "string" then return false end
+    return source == "player" or A.Access.Read(UnitIsUnit, source, "player") == true
+end
 function B.Coverage(auras)
     if not auras then return end
     local result = {}
     for _, aura in ipairs(auras) do
         local remaining = B.Remaining(aura)
-        if not remaining or remaining >= 120 then result[#result + 1] = aura end
+        if not B.OwnApplication(aura) or not remaining or remaining >= 120 then result[#result + 1] = aura end
     end
     return result
 end
-function B.WithTimers(choices, auras)
+function B.WithTimers(choices, auras, nativeMode)
     local result = {}
     for _, entry in ipairs(choices) do
-        local remaining, unknown
+        local remaining, unknown, protected
         local blessing = A.BuffDefaults.Group(entry.id)
         local catalog = A.BuffCatalog.TimerGroup(entry.id)
         for _, aura in ipairs(auras or {}) do
-            if aura.spellId == entry.id or (entry.name and aura.name == entry.name)
+            if (aura.spellId == entry.id or (entry.name and aura.name == entry.name)
                 or (blessing and A.BuffDefaults.Group(aura.spellId) == blessing)
-                or (catalog and A.BuffCatalog.TimerGroup(aura.spellId) == catalog) then
+                or (catalog and A.BuffCatalog.TimerGroup(aura.spellId) == catalog))
+                and (not nativeMode or B.OwnApplication(aura)) then
                 local value = B.Remaining(aura)
+                if not B.OwnApplication(aura) then protected = true end
                 if value then remaining = math.max(remaining or 0, value) else unknown = true end
             end
         end
-        result[#result + 1] = {id=entry.id, icon=entry.icon, remaining=not unknown and remaining or nil}
+        if not protected then
+            result[#result + 1] = {id=entry.id, icon=entry.icon, remaining=not unknown and remaining or nil}
+        end
     end
     return result
 end
@@ -160,16 +171,20 @@ function B.Refresh()
                 end
             end
         end
-        B.Paint(row, B.WithTimers(missing, snapshots[index]))
-        B.PaintBlessings(row, B.WithTimers(blessings, snapshots[index]), #missing)
+        missing = B.WithTimers(missing, snapshots[index])
+        blessings = B.WithTimers(blessings, snapshots[index])
+        B.Paint(row, missing)
+        B.PaintBlessings(row, blessings, #missing)
         local upkeep, suggested, reason = {}, nil, nil
         if A.BuffCatalog and not A.View.unlocked then
             upkeep, suggested, reason = A.BuffCatalog.Choices(row.unit, expanded and {} or coverage, catalogCache, expanded)
         end
-        B.PaintCatalog(row, B.WithTimers(upkeep, snapshots[index]), #missing, #blessings, suggested, reason)
+        upkeep = B.WithTimers(upkeep, snapshots[index])
+        B.PaintCatalog(row, upkeep, #missing, #blessings, suggested, reason)
         if row.unit == "player" then
             local modes = snapshots[index] and (expanded and B.AuraChoices(true) or auraChoices) or {}
-            B.PaintAuras(row, B.WithTimers(modes, snapshots[index]), #missing, #blessings + #upkeep)
+            modes = B.WithTimers(modes, snapshots[index], true)
+            B.PaintAuras(row, modes, #missing, #blessings + #upkeep)
             if A.WeaponUpkeep then
                 local offset = math.min(#missing, 4) + (#missing > 4 and 1 or 0)
                     + #blessings + #upkeep + #modes

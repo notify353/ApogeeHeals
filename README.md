@@ -351,3 +351,8 @@ m:ss timer on the icon counts down once per second below two minutes; longer
 durations use compact minute/hour labels. Refreshing the buff hides
 the reminder again. Missing buffs have no timer; permanent or unreadable durations
 are never guessed. Expanded options show known remaining times as well.
+
+Buffs applied by someone else (or with unknown caster identity) remain covered
+until they disappear. Their matching recast choices are hidden to avoid replacing
+a stronger or talent-improved buff. Other blessing types remain available through
+the strip. Early refresh reminders apply to your own confirmed applications.

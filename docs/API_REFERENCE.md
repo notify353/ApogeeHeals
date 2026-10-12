@@ -1,3 +1,16 @@
+## Protect existing buffs from other casters (October 11)
+
+Rank/spell identity cannot prove overwrite strength, including talent improvements
+on the same ID. Reuse the reviewed guarded sourceUnit plus UnitIsUnit contract:
+only a public player-owned application can trigger early refresh. Foreign or
+unknown-source buffs remain coverage until removed and suppress matching ID/name,
+blessing family or catalog variant choices during manual expansion. Different
+blessing types remain selectable. Native aura/aspect stance choices retain their
+own-state authority and ignore another caster's effect. Filtering precedes icon
+offsets. No strength values are guessed and no combat queries/actions are added.
+This deliberately also preserves another caster's equal/weaker buff rather than
+claiming its overwrite safety. Native acceptance of the correction is pending.
+
 ## Early buff reminders and icon timers (October 11)
 
 The class-strip input button is parented to the complete row, with explicit
