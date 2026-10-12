@@ -58,6 +58,7 @@ function R.Start()
             end
         end
         if event == "PLAYER_TARGET_CHANGED" then
+            A.Buffs.CloseRecipient()
             A.View.RefreshTargetAuras()
             A.Buffs.HideTooltip(A.Buffs.tooltipButton); A.Cleansing.HideTooltip()
             A.Buffs.Paint(A.View.target, {}); A.Buffs.PaintBlessings(A.View.target, {}, 0)
@@ -65,6 +66,7 @@ function R.Start()
         elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
             A.Buffs.OnCast(unit, spellID)
         elseif event == "GROUP_ROSTER_UPDATE" then
+            A.Buffs.CloseRecipient()
             A.Buffs.HideTooltip(A.Buffs.tooltipButton)
         elseif event == "PLAYER_LEAVING_WORLD" then
             R.suspended = true
@@ -101,6 +103,7 @@ function R.Start()
         elseif event == "SPELLS_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
             A.Cleansing.pending = true
             A.BuffDefaults.pending = true
+            A.Buffs.spellNames, A.Buffs.nameGroups = nil, nil
             if event == "PLAYER_ENTERING_WORLD" then
                 R.suspended, A.Buffs.suspended = nil, nil
             end

@@ -1,3 +1,34 @@
+## [Unreleased]
+
+- Reserve the full class-color strip and its seam for buff input, excluding it
+  from the row's healing hitbox. Absorb all mouse buttons; left release toggles
+  buffs outside combat for every class.
+
+- Hide automatic and expanded buff options when that spell is out of range of
+  its recipient; restore them as the recipient returns to range.
+
+- Recognize unlisted buff ranks by client-localized names, including Greater,
+  Prayer and group variants. Apply coverage and replacement protection across
+  class buff reminders instead of relying only on fixed aura spell IDs.
+
+- Preserve buffs from other players until they disappear, avoiding early reminders
+  and same-family replacement choices that may fail with "a more powerful spell".
+  Other blessing types remain selectable; your own buffs retain early reminders.
+
+- Keep buff timer text inside the icon with smaller outlined type and compact
+  minute/hour labels; retain m:ss for the final two minutes.
+
+- Fix the lower class-strip click area over the power bar opening buff options
+  instead of falling through to the row's healing action.
+
+- Show buff reminders below two minutes remaining, with a live m:ss countdown
+  on the existing icon. Missing buffs remain actionable without a timer. Permanent
+  or unreadable timing stays unlabelled. Reminders remain outside combat only.
+
+- Click a player's class-color strip to show buff options in the existing icon
+  row on the left, including buffs already active for recasting or replacement.
+  Click again to restore missing-buff reminders. Out of combat only; no panel.
+
 ## October 11 - Consistent minimap controls
 
 - Match minimap tooltip styling and instructions across Keybinds and Heals.

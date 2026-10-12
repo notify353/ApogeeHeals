@@ -5,6 +5,7 @@ local S = { width = 112, healthHeight = 14, powerHeight = 5, barGap = 0.5,
     background = { 0.06, 0.075, 0.1, 0.94 }, muted = { 0.65, 0.70, 0.78, 1 } }
 A.Style = S
 S.targetWidth = S.width
+S.classStripWidth, S.classStripHitWidth = 2, 2.5
 S.clusterHeight = S.healthHeight + S.barGap + S.powerHeight
 -- Match 36px settings tiles / 4px gaps at the row root's 2x scale.
 -- Borders stay inside each square; vertical centering separates adjacent rows.
@@ -56,11 +57,11 @@ function S.RowEdges(row, first, width)
     texture:SetPoint("TOPLEFT", row, "TOPLEFT", 0, -S.healthHeight)
     texture:SetColorTexture(0.08, 0.10, 0.13, 1)
     local seam = layer:CreateTexture(nil, "OVERLAY")
-    seam:SetSize(2.5, S.clusterHeight)
+    seam:SetSize(S.classStripHitWidth, S.clusterHeight)
     seam:SetPoint("TOPLEFT", row, "TOPLEFT", 0, 0)
     seam:SetColorTexture(0.08, 0.10, 0.13, 1)
     row.classStrip = layer:CreateTexture(nil, "OVERLAY", nil, 1)
-    row.classStrip:SetSize(2, S.clusterHeight)
+    row.classStrip:SetSize(S.classStripWidth, S.clusterHeight)
     row.classStrip:SetPoint("TOPLEFT", row, "TOPLEFT", 0, 0)
     row.classStrip:SetColorTexture(unpack(S.muted))
 end

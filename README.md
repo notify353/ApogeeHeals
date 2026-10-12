@@ -339,3 +339,20 @@ Defaults clears this character's healing assignments, buff preferences and posit
 
 Target buff suggestions appear only for living friendly player characters out of
 combat. NPCs, pets, hostile players and unknown target identity are excluded.
+
+Click the class-color strip on a player, party or friendly-player target bar to
+show learned buff options in the existing icon row on the left, even if buffs
+are already active. Click an icon to recast or change the buff. Click the strip
+again to return to normal missing-buff reminders. Expansion works outside combat
+only and resets on combat entry or target/group changes. No extra panel opens.
+
+Buff icons also appear when a buff has less than two minutes remaining. A small
+m:ss timer on the icon counts down once per second below two minutes; longer
+durations use compact minute/hour labels. Refreshing the buff hides
+the reminder again. Missing buffs have no timer; permanent or unreadable durations
+are never guessed. Expanded options show known remaining times as well.
+
+Buffs applied by someone else (or with unknown caster identity) remain covered
+until they disappear. Their matching recast choices are hidden to avoid replacing
+a stronger or talent-improved buff. Other blessing types remain available through
+the strip. Early refresh reminders apply to your own confirmed applications.

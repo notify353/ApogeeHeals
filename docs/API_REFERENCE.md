@@ -1,3 +1,89 @@
+## Exclusive class-strip input (October 12)
+
+Reviewed matching 70338 SimpleFrame SetHitRectInsets and SimpleScriptRegion
+SetPropagateMouseClicks; both are protected configuration APIs used only during
+out-of-combat frame creation. Exclude the full class rail plus its half-unit seam
+from every real unit row's secure hit rectangle. The buff overlay covers exactly
+that width and the full row height, disables propagation, and registers AnyDown
+and AnyUp. Only left release invokes the existing guarded toggle; other buttons
+are absorbed without actions. No class/color condition or secure spell attributes.
+All nine class fixtures verify the input configuration, including empty choices;
+mouse-down/right/middle/extra-button regressions verify no toggle. These checks
+do not emulate native hit testing; owner physical-click acceptance is pending.
+
+## Buff recipient range (October 11)
+
+Reviewed matching 70338 C_Spell.IsSpellInRange(spellIdentifier,targetUnit):
+true means in range, false means outside, nil means invalid/unavailable. Use
+the existing guarded Access.Read adapter and each offered spell's fixed unit.
+SpellHasRange=false and player/self aliases bypass the range query. Only a
+public false suppresses a choice; secret/nil/error results remain unknown.
+Filter automatic and expanded blessings, catalog and watched buffs before
+layout counts. The existing out-of-combat one-second refresh restores choices
+after movement. No healing-spell distance proxy, new polling or combat writes.
+Source and generated regressions cover classes, recipients and range recovery;
+native movement acceptance remains pending.
+
+## Buff name coverage correction (October 11)
+
+The owner reports that the previous correction still suggests a protected buff.
+Fixed a reproducible gap: blessing/catalog coverage accepted only seeded aura
+IDs, and their choices omitted names from replacement matching. Use the existing
+guarded C_Spell.GetSpellInfo contract to map localized ordinary and group variant
+names to their known families. Unknown IDs may match those exact names; unknown,
+restricted or ambiguous names establish no family. No English-name parsing or
+rank-strength inference. Public names are cached, reset on spell/world changes;
+missing names are retried. Existing source ownership and native stance rules stay.
+Regression cases cover unlisted ordinary/group ranks across supported classes,
+automatic/manual choices, recipient isolation and removal recovery. This fixes
+the identified code gap; the reported native case still needs owner verification.
+
+## Protect existing buffs from other casters (October 11)
+
+Rank/spell identity cannot prove overwrite strength, including talent improvements
+on the same ID. Reuse the reviewed guarded sourceUnit plus UnitIsUnit contract:
+only a public player-owned application can trigger early refresh. Foreign or
+unknown-source buffs remain coverage until removed and suppress matching ID/name,
+blessing family or catalog variant choices during manual expansion. Different
+blessing types remain selectable. Native aura/aspect stance choices retain their
+own-state authority and ignore another caster's effect. Filtering precedes icon
+offsets. No strength values are guessed and no combat queries/actions are added.
+This deliberately also preserves another caster's equal/weaker buff rather than
+claiming its overwrite safety. Native acceptance of the correction is pending.
+
+## Early buff reminders and icon timers (October 11)
+
+The class-strip input button is parented to the complete row, with explicit
+2-by-clusterHeight bounds above its artwork. Its previous health-only name-layer
+parent excluded the lower power section from the intended hit area. This uses
+existing frame geometry and mouse APIs, configured only at creation. The strip
+has no secure spell action; the click callback retains its combat guard. Source
+geometry regressions cover every supported row; native mouse routing needs testing.
+
+Rechecked matching 70338 BuffFrame.lua: expirationTime minus GetTime is remaining
+time; duration/expiration zero denotes untimed coverage. The existing guarded
+HELPFUL scan is unchanged. Duration and expiration must both be public finite
+positive numbers before arithmetic. Unknown/secret/invalid timing retains coverage
+and has no timer. Known remaining time below 120 seconds stops suppressing upkeep
+choices. Equivalent higher ranks/group variants and any-caster coverage remain;
+other long-lived copies still suppress early reminders. Timer identity is scoped
+to matching spell/name or blessing/catalog variant, never an unrelated choice.
+One shared one-second refresh handles threshold crossings without aura events;
+it performs no aura work in combat, preview or world suspension. Timers use the
+existing native FontString display with public m:ss strings and clear on Stop.
+This supersedes the original absence-only policy below. No saved state or secure
+action changes. Native readability, appearance and taint acceptance remain pending.
+
+## Class-strip inline buff choices (October 11)
+
+The strip toggles session-only expansion of the existing left-side buff buttons.
+Expanded recipients bypass aura coverage suppression; complete guarded scans
+still determine recipient eligibility. Existing secure fixed-unit buttons,
+visibility drivers, layout, tooltips and modifier isolation are reused. No new
+panel, casting path or saved state is introduced. Combat/world/recipient changes
+clear expansion; unknown/restricted snapshots close it. Matching Forever export
+checks pass. Native timing, taint and appearance still require owner acceptance.
+
 ## Friendly player target buffs (October 11)
 
 The reviewed 70338 UnitDocumentation defines UnitIsPlayer(unit) and
