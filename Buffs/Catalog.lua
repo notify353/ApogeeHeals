@@ -54,7 +54,7 @@ end
 function C.Recognized(id)
     return A.Access.Readable(id) and type(id) == "number" and recognized[id] == true
 end
-function C.TimerGroup(id) return variants[id] end
+function C.TimerGroup(id, name) return A.Buffs.NamedGroup(variants, id, name) end
 local function disabledVariants()
     local disabled = {}
     -- A saved opt-out applies across ranks of that variant. Never rewrite storage
@@ -113,7 +113,7 @@ function C.Choices(unit, auras, cache, includeDisabled)
     for _, aura in ipairs(auras) do
         if not A.Access.Readable(aura) or type(aura) ~= "table"
             or not A.Access.Readable(aura.spellId) or type(aura.spellId) ~= "number" then return {} end
-        local family = families[aura.spellId]
+        local family = A.Buffs.NamedGroup(families, aura.spellId, aura.name)
         if family then covered[family] = true end
     end
     local disabled, offered = disabledVariants(), {}
@@ -123,7 +123,7 @@ function C.Choices(unit, auras, cache, includeDisabled)
             for _, id in ipairs(definition.ranks) do
                 local info = resolve(id, cache)
                 if info and A.Access.Readable(info) and type(info) == "table" and A.Access.Readable(info.iconID) then
-                    choices[#choices + 1] = {id=id, icon=info.iconID}
+                    choices[#choices + 1] = {id=id, icon=info.iconID, name=info.name}
                     offered[definition.key] = id
                     break
                 end

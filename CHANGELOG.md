@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+- Recognize unlisted buff ranks by client-localized names, including Greater,
+  Prayer and group variants. Apply coverage and replacement protection across
+  class buff reminders instead of relying only on fixed aura spell IDs.
+
 - Preserve buffs from other players until they disappear, avoiding early reminders
   and same-family replacement choices that may fail with "a more powerful spell".
   Other blessing types remain selectable; your own buffs retain early reminders.

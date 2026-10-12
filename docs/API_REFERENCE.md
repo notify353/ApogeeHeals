@@ -1,3 +1,17 @@
+## Buff name coverage correction (October 11)
+
+The owner reports that the previous correction still suggests a protected buff.
+Fixed a reproducible gap: blessing/catalog coverage accepted only seeded aura
+IDs, and their choices omitted names from replacement matching. Use the existing
+guarded C_Spell.GetSpellInfo contract to map localized ordinary and group variant
+names to their known families. Unknown IDs may match those exact names; unknown,
+restricted or ambiguous names establish no family. No English-name parsing or
+rank-strength inference. Public names are cached, reset on spell/world changes;
+missing names are retried. Existing source ownership and native stance rules stay.
+Regression cases cover unlisted ordinary/group ranks across supported classes,
+automatic/manual choices, recipient isolation and removal recovery. This fixes
+the identified code gap; the reported native case still needs owner verification.
+
 ## Protect existing buffs from other casters (October 11)
 
 Rank/spell identity cannot prove overwrite strength, including talent improvements

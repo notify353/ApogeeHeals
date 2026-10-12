@@ -4,6 +4,7 @@ local m = Mock.New()
 local a = {db={buffs={}}}
 assert(loadfile("Core/Access.lua"))("ApogeeHeals", a)
 assert(loadfile("Bindings/Runtime.lua"))("ApogeeHeals", a)
+assert(loadfile("Buffs/Runtime.lua"))("ApogeeHeals", a)
 assert(loadfile("Buffs/Catalog.lua"))("ApogeeHeals", a)
 local known, passive = {}, {}
 Enum.SpellBookSpellBank = {Player=0}
@@ -35,7 +36,7 @@ setup("DRUID", {1126,9885,467,9910,21850})
 local list, id, reason=choices("party1")
 assert(#list==2 and has(list,9885) and has(list,9910) and id==9885 and reason)
 assert(not has(list,1126) and not has(list,21850))
--- Family coverage uses exact identities, any rank/caster, never localized names.
+-- Family coverage accepts exact identities and client-localized rank names.
 list,id=choices("party1", {{spellId=1126,name="anything",sourceUnit="party4"}})
 assert(#list==1 and has(list,9910) and id==nil)
 role="TANK";m.units.party1.class="MAGE"
@@ -43,7 +44,7 @@ list,id,reason=choices("party1", {{spellId=21849}})
 assert(#list==1 and id==9910 and reason:find("assigned tank",1,true))
 list,id=choices("party1", {{spellId=467}});assert(#list==1 and id==9885)
 assert(#choices("party1", {{spellId=21850},{spellId=467}})==0)
-assert(#choices("party1", {{spellId=999999,name="Spell 9885"}})==2)
+assert(#choices("party1", {{spellId=999999,name="Spell 9885"}})==1)
 known[9885]=nil;list,id=choices("party1");assert(has(list,1126) and id==1126)
 a.db.buffs={{id=1126,enabled=false},{id=9885,enabled=true}}
 local original=a.db.buffs

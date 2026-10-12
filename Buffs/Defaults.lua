@@ -17,7 +17,7 @@ for group, ids in pairs(families) do for _, id in ipairs(ids) do groups[id] = gr
 for _, group in ipairs({ "might", "wisdom" }) do
     for index = 1, #families[group] - 2 do seeds[families[group][index]] = group end
 end
-function D.Group(id) return groups[id] end
+function D.Group(id, name) return A.Buffs.NamedGroup(groups, id, name) end
 function D.SeededGroup(id) return seeds[id] end
 function D.Seed()
     if not D.pending or InCombatLockdown() then return end
@@ -65,7 +65,7 @@ function D.Choices()
     for _, ranks in ipairs(choices) do
         for _, id in ipairs(ranks) do
             local info = A.Bindings.Resolve(id)
-            if info then result[#result + 1] = {id=id, icon=info.iconID}; break end
+            if info then result[#result + 1] = {id=id, icon=info.iconID, name=info.name}; break end
         end
     end
     return result

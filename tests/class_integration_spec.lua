@@ -48,6 +48,31 @@ for _, case in ipairs(cases) do
     assert(active(a.View.rows[2])==case.party,"Party buff suggestions remain unchanged")
     m.targetNPC=false; a.Buffs.Refresh(); assert(active(a.View.target)==case.party)
     assert(not a.View.targetTarget.upkeepButtons)
+    if case.self > 0 then
+        local id=case.ids[1]
+        local groupID=({DRUID=21850,PRIEST=21564,MAGE=23028})[case.class] or id
+        local function offered(row)
+            for _,button in ipairs(row.upkeepButtons) do
+                if button.attributes.type1=="spell" and button.attributes.spell1==id then return true end
+            end
+        end
+        for _,row in ipairs(a.View.supportRows) do
+            if row.unit=="player" or case.party>0 then
+                for _,nameID in ipairs({id,groupID}) do
+                    -- Simulate an unlisted rank, including differently named group buffs.
+                    m.units[row.unit].auras={{spellId=999999,name="Spell"..nameID,
+                        sourceUnit="party4",duration=300,expirationTime=GetTime()+59}}
+                    a.Buffs.Refresh()
+                    assert(not offered(row),case.class.." unlisted foreign rank must cover automatic reminders")
+                    row.buffStrip.scripts.OnClick()
+                    assert(not offered(row),case.class.." unlisted foreign rank must block matching manual replacement")
+                    row.buffStrip.scripts.OnClick()
+                    m.units[row.unit].auras={};a.Buffs.Refresh()
+                    assert(offered(row),case.class.." removal must restore reminder")
+                end
+            end
+        end
+    end
     -- Catalog recognition prevents a saved generic entry from duplicating or
     -- spreading a self/area action onto party rows. Storage stays untouched.
     if case.ids[1] then

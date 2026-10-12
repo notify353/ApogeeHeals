@@ -28,6 +28,31 @@ function B.Info(id)
     if type(info) == "table" and A.Access.Readable(info.name, info.iconID)
         and type(info.name) == "string" and info.name ~= "" then return info end
 end
+-- Client-localized names cover ranks whose aura IDs are absent from our seed
+-- lists. Cache public names, but retry unavailable data on subsequent refreshes.
+function B.NamedGroup(groups, id, name)
+    if groups[id] then return groups[id] end
+    if not A.Access.Readable(name) or type(name) ~= "string" or name == "" then return end
+    B.nameGroups = B.nameGroups or {}
+    local names = B.nameGroups[groups]
+    if not names then
+        names = {}; B.nameGroups[groups] = names
+        B.spellNames = B.spellNames or {}
+        for spellID, group in pairs(groups) do
+            local spellName = B.spellNames[spellID]
+            if not spellName then
+                local info = B.Info(spellID)
+                spellName = info and info.name
+                B.spellNames[spellID] = spellName
+            end
+            if spellName then
+                local previous = names[spellName]
+                names[spellName] = (previous == nil or previous == group) and group or false
+            end
+        end
+    end
+    return names[name] or nil
+end
 -- Only public, finite timing can establish an expiring buff. Unknown timing
 -- remains coverage and never produces a guessed countdown.
 function B.Remaining(aura)
@@ -57,12 +82,14 @@ function B.WithTimers(choices, auras, nativeMode)
     local result = {}
     for _, entry in ipairs(choices) do
         local remaining, unknown, protected
+        local info = not entry.name and B.Info(entry.id)
+        local name = entry.name or (info and info.name)
         local blessing = A.BuffDefaults.Group(entry.id)
         local catalog = A.BuffCatalog.TimerGroup(entry.id)
         for _, aura in ipairs(auras or {}) do
-            if (aura.spellId == entry.id or (entry.name and aura.name == entry.name)
-                or (blessing and A.BuffDefaults.Group(aura.spellId) == blessing)
-                or (catalog and A.BuffCatalog.TimerGroup(aura.spellId) == catalog))
+            if (aura.spellId == entry.id or (name and aura.name == name)
+                or (blessing and A.BuffDefaults.Group(aura.spellId, aura.name) == blessing)
+                or (catalog and A.BuffCatalog.TimerGroup(aura.spellId, aura.name) == catalog))
                 and (not nativeMode or B.OwnApplication(aura)) then
                 local value = B.Remaining(aura)
                 if not B.OwnApplication(aura) then protected = true end
@@ -127,12 +154,13 @@ function B.AuraChoices(includeActive)
         B.modeIDs[id] = true
         local info = A.Bindings.Resolve(id)
         if not info then return {} end
-        choices[#choices + 1] = {id=id, icon=info.iconID}
+        choices[#choices + 1] = {id=id, icon=info.iconID, name=info.name}
     end
     return selected and not includeActive and {} or choices
 end
 function B.Refresh()
     if InCombatLockdown() or B.suspended then return end
+    B.nameGroups = {}
     A.BuffDefaults.Seed()
     local now = GetTime()
     for id, expires in pairs(B.candidates) do if expires < now then B.candidates[id] = nil end end
@@ -158,7 +186,7 @@ function B.Refresh()
             local names, ids, blessed = {}, {}, false
             for _, aura in ipairs(coverage) do
                 names[aura.name] = true; ids[aura.spellId] = true
-                if A.BuffDefaults.Group(aura.spellId) then blessed = true end
+                if A.BuffDefaults.Group(aura.spellId, aura.name) then blessed = true end
             end
             if expanded or not blessed then blessings = blessingChoices end
             for _, watch in ipairs(watched) do

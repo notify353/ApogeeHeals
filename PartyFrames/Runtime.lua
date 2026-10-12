@@ -103,6 +103,7 @@ function R.Start()
         elseif event == "SPELLS_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
             A.Cleansing.pending = true
             A.BuffDefaults.pending = true
+            A.Buffs.spellNames, A.Buffs.nameGroups = nil, nil
             if event == "PLAYER_ENTERING_WORLD" then
                 R.suspended, A.Buffs.suspended = nil, nil
             end
