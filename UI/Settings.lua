@@ -1,7 +1,7 @@
 local addonName, A = ...
 -- Shared preference protocol v1; keep identical in Heals and Keybinds.
 -- Only this preference is mirrored. Assignment tables are never read or written.
-local function JoinDefaultSpells(registry, getDB, refresh)
+local function JoinDefaultSpells(registry, getDB, refresh, container)
     local function choice(value)
         if type(value) ~= "table" or type(value.enabled) ~= "boolean"
             or type(value.time) ~= "number" or value.time < 0 or value.time ~= value.time
@@ -45,12 +45,7 @@ local function JoinDefaultSpells(registry, getDB, refresh)
     policy.consumers[addonName] = {getDB=getDB, refresh=refresh}
     local saved = choice(getDB().defaultSpells)
     if newer(saved, policy.value) then policy.value = saved end
-    -- The native layout also finds a parent created first by another addon.
-    local overview = registry.overview
-    if not overview and SettingsPanel and SettingsPanel.GetLayout then
-        local layout = SettingsPanel:GetLayout(registry.category)
-        overview = layout and layout:GetFrame()
-    end
+    local overview = container -- Only Keybinds supplies the feature settings container.
     if overview and not policy.check then
         local check = CreateFrame("CheckButton", nil, overview, "UICheckButtonTemplate")
         policy.check = check
@@ -58,16 +53,13 @@ local function JoinDefaultSpells(registry, getDB, refresh)
         check.label = overview:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         check.label:SetPoint("LEFT", check, "RIGHT", 4, 0)
         check.label:SetText("Enable default spells")
-        local help = overview:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        help:SetPoint("TOPLEFT", 16, -116); help:SetPoint("TOPRIGHT", -16, -116)
-        help:SetJustifyH("LEFT"); help:SetTextColor(0.8, 0.8, 0.8)
-        help:SetText("Automatically assign suggested spells for your class in Keybinds and Heals. Applies only to this character. Your custom assignments take priority.")
         check:SetScript("OnClick", function(self) policy:Set(self:GetChecked()) end)
         check:SetScript("OnShow", function() policy:Apply() end)
         check:RegisterEvent("PLAYER_REGEN_DISABLED"); check:RegisterEvent("PLAYER_REGEN_ENABLED")
         check:SetScript("OnEvent", function() policy:Apply() end)
     end
     policy:Apply()
+    return policy.check
 end
 -- End shared preference protocol.
 

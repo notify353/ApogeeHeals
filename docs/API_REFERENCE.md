@@ -1135,3 +1135,7 @@ explicit choice wins when a disabled consumer rejoins. Equal conflicting revisio
 fail off. Missing preferences start off. Custom assignments and locations are
 never modified. Changes are blocked during combat; ordinary rebuilds remain guarded.
 Addon-specific resets preserve this shared preference. Native acceptance pending.
+
+October 17 placement correction: only Keybinds supplies the checkbox container,
+inside its feature settings page above the rule toggles. Heals still joins the
+shared preference without creating a control. No native layout lookup is needed.

@@ -358,6 +358,6 @@ a stronger or talent-improved buff. Other blessing types remain available throug
 the strip. Early refresh reminders apply to your own confirmed applications.
 
 Automatic spell assignments are off initially, including existing characters.
-Use **Apogee > Enable default spells** to switch built-in Keybinds and Heals
+Use **Apogee > Keybinds > Enable default spells** to switch built-in Keybinds and Heals
 spells on or off for this character. Custom assignments keep their locations
 and always take priority. Changes are unavailable during combat.

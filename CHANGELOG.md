@@ -1,6 +1,6 @@
 ## Unreleased - Optional default spells
 
-- Add one per-character Enable default spells checkbox on the Apogee parent page, off initially.
+- Add one per-character Enable default spells checkbox in the Keybinds settings group, off initially.
 - Toggle automatic Heals and Keybinds assignments without changing custom spell locations.
 
 ## Unreleased - Forever 70450 review
