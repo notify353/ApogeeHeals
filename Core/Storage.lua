@@ -63,5 +63,6 @@ function A.Storage.Open(saved)
     local threatEnabled
     if type(saved) == "table" and type(saved.threatEnabled) == "boolean" then threatEnabled = saved.threatEnabled end
     return { version = 3, position = { x = position.x, y = position.y }, bindings = bindings, buffs = buffs,
+        defaultSpells = type(saved) == "table" and saved.defaultSpells or nil,
         minimapAngle = angle, editorPosition = editorPosition, threatPosition = threatPosition, threatEnabled = threatEnabled }
 end

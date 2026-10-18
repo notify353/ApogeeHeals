@@ -16,6 +16,7 @@ local results, calls = {player=true,party1=false,party2=true}, {}
 C_Spell.IsSpellInRange=function(id,unit)
     calls[#calls+1]={id,unit};return results[unit]
 end
+ApogeeHealsDB={defaultSpells={enabled=true,time=1,serial=0}}
 local a=m.Load();m.Event("ADDON_LOADED","ApogeeHeals");m.Flush()
 assert(a.Bindings.rangeSpell==2050)
 for _,call in ipairs(calls) do assert(call[1]==2050 and call[2]~="target") end

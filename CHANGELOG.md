@@ -1,3 +1,8 @@
+## Unreleased - Optional default spells
+
+- Add one per-character Enable default spells checkbox on the Apogee parent page, off initially.
+- Toggle automatic Heals and Keybinds assignments without changing custom spell locations.
+
 ## Unreleased - Forever 70450 review
 
 - Review the refreshed Forever 1.60.1.70450 export and update the known-build baseline.

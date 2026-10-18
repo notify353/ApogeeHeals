@@ -10,6 +10,7 @@ local classes = { PRIEST = {
     ["1"] = { 25292, 10329, 10328, 3472, 1042, 1026, 647, 639, 635 }, -- Holy Light
 } }
 function D.Spell(slot)
+    if not A.db or type(A.db.defaultSpells) ~= "table" or A.db.defaultSpells.enabled ~= true then return nil end
     local ok, _, class = pcall(UnitClass, "player")
     if not ok or not A.Access.Readable(class) or type(class) ~= "string" then return nil end
     local ranks = classes[class] and classes[class][slot]
