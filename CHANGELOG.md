@@ -1,3 +1,7 @@
+## Unreleased - Forever 70450 review
+
+- Review the refreshed Forever 1.60.1.70450 export and update the known-build baseline.
+
 ## [Unreleased]
 
 - Update central development workflow paths to ApogeeForever; no gameplay or installation changes.
