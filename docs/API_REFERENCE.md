@@ -1124,3 +1124,18 @@ export baselines advance; native acceptance on the new client is separate.
 Historical source bodies are not retained, so changed hashes establish a need for
 current-contract review, not a complete old/new source diff. Detailed local hash
 inventory: C:/Temp/apogee-api-20261017/export-review.json.
+
+## Opt-in default spells (2026-10-17)
+
+Reviewed matching 70450 SettingsPanel:GetLayout(category), canvas GetFrame(),
+GetServerTime (non-null number), and existing checkbox/combat-event APIs. One
+parent checkbox joins both loaded consumers through the existing family registry.
+Only the timestamped preference is mirrored in per-character storage; latest
+explicit choice wins when a disabled consumer rejoins. Equal conflicting revisions
+fail off. Missing preferences start off. Custom assignments and locations are
+never modified. Changes are blocked during combat; ordinary rebuilds remain guarded.
+Addon-specific resets preserve this shared preference. Native acceptance pending.
+
+October 17 placement correction: only Keybinds supplies the checkbox container,
+inside its feature settings page above the rule toggles. Heals still joins the
+shared preference without creating a control. No native layout lookup is needed.

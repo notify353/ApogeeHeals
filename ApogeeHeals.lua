@@ -4,7 +4,9 @@ loader:RegisterEvent("ADDON_LOADED")
 function A.ResetCharacter()
     if not A.started or not A.db or InCombatLockdown() then return false end
     A.BindingEditor.Close(); A.View.Lock(); A.Buffs.Stop()
+    local defaultSpells = A.db.defaultSpells
     A.db = A.Storage.Open(nil)
+    A.db.defaultSpells = defaultSpells
     ApogeeHealsDB = A.db
     A.BuffDefaults.pending = true
     A.Settings.ResetPositions()

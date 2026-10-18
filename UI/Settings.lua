@@ -1,4 +1,68 @@
 local addonName, A = ...
+-- Shared preference protocol v1; keep identical in Heals and Keybinds.
+-- Only this preference is mirrored. Assignment tables are never read or written.
+local function JoinDefaultSpells(registry, getDB, refresh, container)
+    local function choice(value)
+        if type(value) ~= "table" or type(value.enabled) ~= "boolean"
+            or type(value.time) ~= "number" or value.time < 0 or value.time ~= value.time
+            or value.time == math.huge or type(value.serial) ~= "number"
+            or value.serial < 0 or value.serial ~= value.serial or value.serial == math.huge then
+            return {enabled=false, time=0, serial=0}
+        end
+        return {enabled=value.enabled, time=value.time, serial=value.serial}
+    end
+    local function newer(a, b)
+        return a.time > b.time or (a.time == b.time and (a.serial > b.serial
+            or (a.serial == b.serial and not a.enabled and b.enabled)))
+    end
+    local policy = registry.defaultSpells
+    if not policy then
+        policy = {value={enabled=false,time=0,serial=0}, consumers={}}
+        registry.defaultSpells = policy
+        function policy:Apply()
+            for _, consumer in pairs(self.consumers) do
+                local db = consumer.getDB()
+                local old = choice(db.defaultSpells)
+                db.defaultSpells = choice(self.value)
+                if old.enabled ~= self.value.enabled then consumer.refresh() end
+            end
+            if self.check then
+                self.check:SetChecked(self.value.enabled)
+                self.check:SetEnabled(not InCombatLockdown())
+                local color = InCombatLockdown() and 0.5 or 1
+                self.check.label:SetTextColor(color, color, color)
+            end
+        end
+        function policy:Set(enabled)
+            if InCombatLockdown() then self:Apply(); return false end
+            local now = GetServerTime()
+            self.value = {enabled=enabled == true, time=math.max(now,self.value.time),
+                serial=now > self.value.time and 0 or self.value.serial + 1}
+            self:Apply()
+            return true
+        end
+    end
+    policy.consumers[addonName] = {getDB=getDB, refresh=refresh}
+    local saved = choice(getDB().defaultSpells)
+    if newer(saved, policy.value) then policy.value = saved end
+    local overview = container -- Only Keybinds supplies the feature settings container.
+    if overview and not policy.check then
+        local check = CreateFrame("CheckButton", nil, overview, "UICheckButtonTemplate")
+        policy.check = check
+        check:SetPoint("TOPLEFT", 12, -84); check:SetSize(24, 24)
+        check.label = overview:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        check.label:SetPoint("LEFT", check, "RIGHT", 4, 0)
+        check.label:SetText("Enable default spells")
+        check:SetScript("OnClick", function(self) policy:Set(self:GetChecked()) end)
+        check:SetScript("OnShow", function() policy:Apply() end)
+        check:RegisterEvent("PLAYER_REGEN_DISABLED"); check:RegisterEvent("PLAYER_REGEN_ENABLED")
+        check:SetScript("OnEvent", function() policy:Apply() end)
+    end
+    policy:Apply()
+    return policy.check
+end
+-- End shared preference protocol.
+
 -- Each independent addon joins one family-local native settings parent.
 local function RegisterApogeeCategory(panel, label, standaloneTitle)
     if type(Settings.RegisterCanvasLayoutSubcategory) ~= "function" then
@@ -23,9 +87,10 @@ local function RegisterApogeeCategory(panel, label, standaloneTitle)
         description:SetText("Select an enabled addon's settings from the list on the left.")
         local parent = Settings.RegisterCanvasLayoutCategory(overview, parentName)
         Settings.RegisterAddOnCategory(parent)
-        registry = {schema = 1, category = parent, children = {}}
+        registry = {schema = 1, category = parent, children = {}, overview = overview}
         _G.ApogeeSettingsRegistry = registry
     end
+    JoinDefaultSpells(registry, function() return A.db end, function() A.Bindings.Apply() end)
     local existing = registry.children[label]
     if existing ~= nil then
         if type(existing) == "table" and type(existing.GetID) == "function" then return existing end

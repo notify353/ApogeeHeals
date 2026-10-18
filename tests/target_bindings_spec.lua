@@ -11,6 +11,7 @@ C_SpellBook={IsSpellKnown=function(id) return known[id]==true end,
 Enum.ItemClass={Consumable=0};Enum.ItemConsumableSubclass={Bandage=7}
 C_Item={GetItemInfoInstant=function(id) return id,"Consumable","Bandage","",1,0,7 end,
     GetItemNameByID=function() return "Bandage" end}
+ApogeeHealsDB={defaultSpells={enabled=true,time=1,serial=0}}
 local a=m.Start();local targets={a.View.target,a.View.targetTarget}
 for _,row in ipairs(targets) do
     assert(row.attributes.spell1==2050 and row.attributes.spell2==17) -- learned Priest defaults
