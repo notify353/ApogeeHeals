@@ -15,9 +15,14 @@ for i, atlas in ipairs({"roleicon-tiny-healer", "roleicon-tiny-tank", "roleicon-
     assert(a.Preview.rows[i].roleIcon.atlas == atlas)
 end
 m.combat = true
+m.Event("PLAYER_REGEN_DISABLED")
+assert(not player.roleIcon.shown and not party.roleIcon.shown and not party.leader.shown)
 roles.party1 = "DAMAGER"; m.Event("ROLE_CHANGED_INFORM", m.Secret()); m.Flush()
-assert(party.roleIcon.shown and party.roleIcon.atlas == "roleicon-tiny-dps")
+assert(not party.roleIcon.shown and not party.leader.shown)
 roles.player = "TANK"; m.Event("PLAYER_ROLES_ASSIGNED"); m.Flush()
+assert(not player.roleIcon.shown)
+m.combat = false; m.Event("PLAYER_REGEN_ENABLED"); m.Flush()
+assert(party.roleIcon.shown and party.roleIcon.atlas == "roleicon-tiny-dps")
 assert(player.roleIcon.atlas == "roleicon-tiny-tank")
 m.units.party1.dead = true; a.View.Refresh()
 assert(party.roleIcon.shown, "assigned role survives death")
@@ -34,4 +39,4 @@ UnitGroupRolesAssigned = function() error("unavailable") end
 a.View.Refresh(); assert(not player.roleIcon.shown)
 UnitGroupRolesAssigned = nil
 a.View.Refresh(); assert(not player.roleIcon.shown)
-print("PASS assigned role icons, combat changes, crown coexistence, restricted data and roster/world clearing")
+print("PASS roles hidden throughout combat, fresh roles on exit, crown coexistence and restricted clearing")

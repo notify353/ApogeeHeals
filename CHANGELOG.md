@@ -1,3 +1,7 @@
+## Unreleased - Indicator combat visibility
+
+- Hide role and party leader icons in combat; restore current assignments afterward.
+
 ## Unreleased - Assigned party roles
 
 - Show the game's assigned tank, healer or damage role beside the party leader crown.

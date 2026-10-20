@@ -319,14 +319,15 @@ function V.RefreshTarget()
 end
 function V.Refresh()
     V.RefreshTarget()
+    local showIndicators = not InCombatLockdown() and not A.Runtime.suspended
     for _, row in ipairs(V.rows) do
         local state = A.UnitAPI.State(row.unit)
-        row.leader:SetShown(not A.Runtime.suspended
+        row.leader:SetShown(showIndicators
             and A.Access.Read(UnitExists, "party1") == true
             and A.Access.Read(UnitExists, row.unit) == true
             and A.Access.Read(UnitIsGroupLeader, row.unit) == true)
         local role
-        if not A.Runtime.suspended and A.Access.Read(UnitExists, row.unit) == true then
+        if showIndicators and A.Access.Read(UnitExists, row.unit) == true then
             role = A.Access.Read(UnitGroupRolesAssigned, row.unit)
         end
         V.PaintRole(row, role)

@@ -1,3 +1,11 @@
+## Indicator combat visibility (October 20, 70450)
+
+Supersedes combat visibility below: the existing InCombatLockdown boolean gates
+both leader and role reads/displays on every refresh. PLAYER_REGEN_DISABLED hides
+both textures immediately; PLAYER_REGEN_ENABLED queues fresh current assignments.
+Layout remains fixed. Preview already closes on combat entry. Matching 70450
+RestrictedActionsDocumentation verifies InCombatLockdown. No protected mutations.
+
 ## Assigned party role icons (October 20, 70450)
 
 Matching Forever export verified. UnitDocumentation defines UnitGroupRolesAssigned

@@ -83,9 +83,10 @@ function R.Start()
             A.Buffs.Stop()
             A.BindingEditor.Close()
             A.View.Lock(); A.Settings.Refresh()
-            -- Clear drinking immediately; combat alone does not hide unit identity.
+            -- Hide ancillary indicators immediately, before the queued refresh.
             for _, row in ipairs(A.View.rows) do
                 A.Drinking.Clear(row)
+                row.leader:Hide(); row.roleIcon:Hide()
             end
         elseif event == "PLAYER_REGEN_ENABLED" then
             A.Cleansing.pending = true
