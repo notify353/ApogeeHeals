@@ -69,17 +69,27 @@ function V.RefreshPartyActions()
         end
     end
 end
+function V.LayoutPartyActions(row)
+    if InCombatLockdown() or not row.partyActions then return end
+    local slots = row.partyActionBuffSlots or 0
+    for _, lastSlot in pairs(row.partyActionChoiceEnds or {}) do slots = math.max(slots, lastSlot) end
+    if row.partyActionSlots == slots then return end
+    row.partyActionSlots = slots
+    local size, gap = S.sideIconSize, S.sideIconGap
+    for index, button in ipairs(row.partyActions) do
+        button:ClearAllPoints()
+        button:SetPoint("TOPRIGHT", row.health, "TOPLEFT",
+            -6 - (slots + #row.partyActions - index) * (size + gap), S.sideIconY)
+    end
+end
 local function createPartyActions(row)
     if row.unit == "player" then return end
     local size, gap = S.sideIconSize, S.sideIconGap
-    local offset = gap + (row.cleanseSlotCount or 0) * (size + gap) + gap
-    row.partyActionWidth = 3 * (size + gap) + gap
     row.partyActions = {}
     for index, label in ipairs({"Follow", "Inspect", "Inspect Talents"}) do
         local inspect, talents = index >= 2, index == 3
         local button = CreateFrame("Button", nil, row)
         button:SetSize(size, size)
-        button:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset + (index - 1) * (size + gap), S.sideIconY)
         button:SetPropagateMouseClicks(false)
         button:RegisterForClicks("LeftButtonUp")
         button.icon = button:CreateTexture(nil, "ARTWORK")
@@ -119,9 +129,7 @@ local function createPartyActions(row)
         end)
         row.partyActions[index] = button
     end
-    row.drinkIcon:ClearAllPoints()
-    row.drinkIcon:SetPoint("TOPLEFT", row.health, "TOPRIGHT",
-        gap + (row.cleanseSlotCount or 0) * (size + gap) + row.partyActionWidth, S.sideIconY)
+    V.LayoutPartyActions(row)
 end
 local roleAtlases = {
     TANK = "roleicon-tiny-tank", HEALER = "roleicon-tiny-healer", DAMAGER = "roleicon-tiny-dps",
@@ -139,7 +147,7 @@ local function createDebuffs(row)
     local container = CreateFrame("AuraContainer", nil, row.supportFrame or row, "CustomAuraContainerTemplate")
     local size, gap = S.sideIconSize, S.sideIconGap
     local offset = (row.unit == "target" and S.sideIconGap or S.sideIconOffset)
-        + (row.cleanseSlotCount or 0) * (size + gap) + (row.partyActionWidth or 0)
+        + (row.cleanseSlotCount or 0) * (size + gap)
     container:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset, A.Style.sideIconY)
     container:SetSize(8 * size + 7 * gap, size)
     container:SetUnit(row.unit)

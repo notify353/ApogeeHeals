@@ -1,5 +1,8 @@
 ## Unreleased - Party Follow and Inspect (2026-10-20)
 
+- Place the action group left of the healing bars with consistent spacing,
+  automatically clearing suggested/expanded buffs and returning when they close.
+
 - Add a muted Inspect Talents button that opens the native inspected talent
   tree after matching data arrives; cancel stale, combat and roster requests.
 

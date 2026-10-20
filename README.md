@@ -8,12 +8,13 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 
 ## Prototype
 
-- Follow (footprints) and Inspect (magnifying glass) sit after the existing
-  cleansing buttons on each other party member's row. Left-click outside combat.
+- Follow (footprints), Inspect (magnifying glass) and Inspect Talents sit to the
+  left of each other party member's row. The group moves farther left to clear
+  buff suggestions and expanded choices. Left-click outside combat.
   Move within native interaction range to use them. They do not change your
   target; combat, loading and frame unlock prevent actions. Player and target
   rows retain their existing controls. Small muted icons brighten on hover.
-  The two buttons disappear completely during combat.
+  These buttons disappear completely during combat.
 
 - Inspect Talents beside Inspect opens the native talent window for that party
   member after inspection data arrives. It shares the muted appearance and

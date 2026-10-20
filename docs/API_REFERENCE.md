@@ -1,3 +1,15 @@
+## Left-side party actions (October 20, 70450)
+
+Follow, Inspect and Inspect Talents retain their order from left to right.
+The group sits six UI units left of the bar or the outermost buff slot.
+Buff painters supply public layout counts for missing reminders, overflow,
+blessings, upkeep and aura choices. The maximum occupied endpoint determines
+the group offset; no aura visibility or restricted values are inspected.
+SetPoint/ClearAllPoints are guarded outside combat and skipped when unchanged.
+Native visibility hides the controls in combat, with position refreshed by
+ordinary buff painting afterward. No new polling or changed spell hit regions.
+Right-side cleanse/drink/debuff geometry returns to its pre-action positions.
+
 ## Party talent inspection (October 20, 70450)
 
 Matching Camelot UnitPopupMenus explicitly includes Inspect Talents.
@@ -26,8 +38,8 @@ fixed party1-4 tokens only from left release, outside combat, with public
 existence/connection/death and range checks (4 follow, 1 inspect). No target
 switch, cached recipient name, automatic action, retry or delayed follow.
 
-Ordinary child buttons reserve permanent squares after cleansing, before
-drinking and debuffs. Reviewed SecureStateDriver handles the fixed
+Ordinary child buttons now sit left of the buff choices, as documented above.
+Reviewed SecureStateDriver handles the fixed
 `[combat] hide; show` visibility expression natively, hiding the buttons and
 their hit regions without addon layout mutations in combat. Artwork is 10x10,
 desaturated, 45% opaque (80% on hover), with no added button background;

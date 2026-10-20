@@ -105,6 +105,10 @@ function B.Paint(row, missing)
     end
     row.buffOverflow:SetText(#missing > 4 and "+" .. (#missing - 4) or "")
     row.buffOverflow:SetShown(#missing > 4)
+    if not InCombatLockdown() then
+        row.partyActionBuffSlots = math.min(#missing, 4) + (#missing > 4 and 1 or 0)
+        if A.View.LayoutPartyActions then A.View.LayoutPartyActions(row) end
+    end
 end
 local function paintChoices(row, key, choices, offset, recommendedID, recommendation)
     row[key] = row[key] or {}
@@ -165,6 +169,11 @@ local function paintChoices(row, key, choices, offset, recommendedID, recommenda
                 end
             end
         end
+    end
+    if not InCombatLockdown() then
+        row.partyActionChoiceEnds = row.partyActionChoiceEnds or {}
+        row.partyActionChoiceEnds[key] = #choices > 0 and offset + #choices or 0
+        if A.View.LayoutPartyActions then A.View.LayoutPartyActions(row) end
     end
 end
 -- The strip expands the existing left-hand buff choices for one recipient.
