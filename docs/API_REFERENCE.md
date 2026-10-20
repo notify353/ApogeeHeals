@@ -10,7 +10,10 @@ existence/connection/death and range checks (4 follow, 1 inspect). No target
 switch, cached recipient name, automatic action, retry or delayed follow.
 
 Ordinary child buttons reserve two permanent squares after cleansing, before
-drinking and debuffs. Combat disables input immediately and dims the artwork;
+drinking and debuffs. Reviewed SecureStateDriver handles the fixed
+`[combat] hide; show` visibility expression natively, hiding the buttons and
+their hit regions without addon layout mutations in combat. Artwork is 10x10,
+desaturated, 45% opaque (80% on hover), with no added button background;
 click-time guards also cover loading, frame unlock and restricted reads.
 Native PetActionBar supplies Ability_Tracking for follow; WhoList uses
 common-icon-search for inspection. Existing roles, crown and spell art remain.

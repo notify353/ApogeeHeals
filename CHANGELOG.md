@@ -1,5 +1,8 @@
 ## Unreleased - Party Follow and Inspect (2026-10-20)
 
+- Make Follow/Inspect smaller, desaturated and translucent without button
+  backgrounds; brighten on hover and hide the controls completely in combat.
+
 - Add Follow and Inspect beside party-member cleansing buttons, with native
   fixed-unit actions outside combat and click-time range checks. Preserve the
   existing role and spell icons; move drinking/debuff displays right to fit.
