@@ -71,6 +71,7 @@ function R.Start()
             A.Buffs.HideTooltip(A.Buffs.tooltipButton)
         elseif event == "PLAYER_LEAVING_WORLD" then
             R.suspended = true
+            A.View.RefreshPartyActions()
             for _, row in ipairs(A.View.rows) do
                 A.Drinking.Clear(row); row.leader:Hide(); row.roleIcon:Hide()
             end
@@ -80,6 +81,7 @@ function R.Start()
             R.RangePolling()
             return
         elseif event == "PLAYER_REGEN_DISABLED" then
+            A.View.RefreshPartyActions()
             A.Buffs.Stop()
             A.BindingEditor.Close()
             A.View.Lock(); A.Settings.Refresh()

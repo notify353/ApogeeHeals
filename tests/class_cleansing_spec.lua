@@ -80,11 +80,11 @@ for _, case in ipairs(cases) do
         local count=#case.ids
         assert((row.cleanseSlotCount or 0) == count)
         assert(row.debuffContainer.point[4] == (row.unit=="target" and a.Style.sideIconGap or a.Style.sideIconOffset)
-            + count*(a.Style.sideIconSize+2))
+            + count*(a.Style.sideIconSize+2) + (row.partyActionWidth or 0))
         if count==0 then assert(not row.cleanseButtons and not row.cleanseIndicator)
         else
             assert(#row.cleanseButtons==count)
-            assert(row.drinkIcon.point[4]==2+count*(a.Style.sideIconSize+2))
+            assert(row.drinkIcon.point[4]==2+count*(a.Style.sideIconSize+2)+(row.partyActionWidth or 0))
             for index,button in ipairs(row.cleanseButtons) do
                 assert(button.attributes.spell1==case.ids[index] and button.attributes.type1=="spell")
                 assert(button.attributes.unit==row.unit and button.attributes.useOnKeyDown==false)

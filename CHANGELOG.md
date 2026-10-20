@@ -1,3 +1,9 @@
+## Unreleased - Party Follow and Inspect (2026-10-20)
+
+- Add Follow and Inspect beside party-member cleansing buttons, with native
+  fixed-unit actions outside combat and click-time range checks. Preserve the
+  existing role and spell icons; move drinking/debuff displays right to fit.
+
 ## Unreleased - Remove Focus diagnostic (2026-10-20)
 
 - Remove temporary Focus health checks and their tests after the owner selected

@@ -8,6 +8,12 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 
 ## Prototype
 
+- Follow (footprints) and Inspect (magnifying glass) sit after the existing
+  cleansing buttons on each other party member's row. Left-click outside combat.
+  Move within native interaction range to use them. They do not change your
+  target; combat, loading and frame unlock prevent actions. Player and target
+  rows retain their existing controls.
+
 - **Threat demo (solo preview; ends in combat)** previews scripted threat bars
   and warrior debuff icons without live reads. The checkbox is session-only;
   combat, zoning, reload and Defaults end the demo. Uncheck it to restore the

@@ -2,6 +2,77 @@ local _, A = ...
 local V, S = {}, A.Style
 A.View = V
 local units = { "player", "party1", "party2", "party3", "party4" }
+local function partyActionReason(row, inspect, checkRange)
+    local read = A.Access.Read
+    if InCombatLockdown() then return "Unavailable during combat." end
+    if A.Runtime.suspended or V.unlocked then return "Unavailable while moving frames or loading." end
+    if read(UnitExists, row.unit) ~= true or read(UnitIsConnected, row.unit) ~= true
+        or read(UnitIsDeadOrGhost, "player") ~= false then return "Player unavailable." end
+    if inspect then
+        if type(InspectUnit) ~= "function" then return "Inspect unavailable." end
+        if checkRange and (read(CanInspect, row.unit) ~= true
+            or read(CheckInteractDistance, row.unit, 1) ~= true) then
+            return "Move closer to inspect this player."
+        end
+    else
+        if type(FollowUnit) ~= "function" then return "Follow unavailable." end
+        if read(UnitIsDeadOrGhost, row.unit) ~= false then return "Cannot follow a dead player." end
+        if checkRange and read(CheckInteractDistance, row.unit, 4) ~= true then
+            return "Move closer to follow this player."
+        end
+    end
+end
+function V.RefreshPartyActions()
+    for _, row in ipairs(V.rows or {}) do
+        for index, button in ipairs(row.partyActions or {}) do
+            local available = partyActionReason(row, index == 2, false) == nil
+            button:SetEnabled(available)
+            button.icon:SetAlpha(available and 1 or 0.3)
+            if not available and GameTooltip:IsOwned(button) then GameTooltip:Hide() end
+        end
+    end
+end
+local function createPartyActions(row)
+    if row.unit == "player" then return end
+    local size, gap = S.sideIconSize, S.sideIconGap
+    local offset = gap + (row.cleanseSlotCount or 0) * (size + gap) + gap
+    row.partyActionWidth = 2 * (size + gap) + gap
+    row.partyActions = {}
+    for index, label in ipairs({"Follow", "Inspect"}) do
+        local inspect = index == 2
+        local button = CreateFrame("Button", nil, row)
+        button:SetSize(size, size)
+        button:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset + (index - 1) * (size + gap), S.sideIconY)
+        button:SetPropagateMouseClicks(false)
+        button:RegisterForClicks("LeftButtonUp")
+        S.Background(button)
+        button.icon = button:CreateTexture(nil, "ARTWORK")
+        button.icon:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
+        button.icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
+        if inspect then button.icon:SetAtlas("common-icon-search", false)
+        else button.icon:SetTexture("Interface\\Icons\\Ability_Tracking") end
+        button:SetScript("OnEnter", function()
+            GameTooltip:SetOwner(button, "ANCHOR_RIGHT"); GameTooltip:SetText(label)
+            GameTooltip:AddLine(partyActionReason(row, inspect, true) or
+                (inspect and "Inspect this party member." or "Follow this party member."), 0.8, 0.8, 0.8)
+            GameTooltip:Show()
+        end)
+        local function hideTooltip()
+            if GameTooltip:IsOwned(button) then GameTooltip:Hide() end
+        end
+        button:SetScript("OnLeave", hideTooltip)
+        button:SetScript("OnHide", hideTooltip)
+        button:SetScript("OnClick", function(_, mouseButton)
+            if mouseButton ~= "LeftButton" or partyActionReason(row, inspect, true) then return end
+            -- Native actions only on this hardware click; never queue or retarget.
+            if inspect then InspectUnit(row.unit) else FollowUnit(row.unit) end
+        end)
+        row.partyActions[index] = button
+    end
+    row.drinkIcon:ClearAllPoints()
+    row.drinkIcon:SetPoint("TOPLEFT", row.health, "TOPRIGHT",
+        gap + (row.cleanseSlotCount or 0) * (size + gap) + row.partyActionWidth, S.sideIconY)
+end
 local roleAtlases = {
     TANK = "roleicon-tiny-tank", HEALER = "roleicon-tiny-healer", DAMAGER = "roleicon-tiny-dps",
 }
@@ -17,7 +88,8 @@ local function createDebuffs(row)
     if not info or not A.Access.Readable(info.type) or info.type ~= "AuraContainer" then return end
     local container = CreateFrame("AuraContainer", nil, row.supportFrame or row, "CustomAuraContainerTemplate")
     local size, gap = S.sideIconSize, S.sideIconGap
-    local offset = (row.unit == "target" and S.sideIconGap or S.sideIconOffset) + (row.cleanseSlotCount or 0) * (size + gap)
+    local offset = (row.unit == "target" and S.sideIconGap or S.sideIconOffset)
+        + (row.cleanseSlotCount or 0) * (size + gap) + (row.partyActionWidth or 0)
     container:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset, A.Style.sideIconY)
     container:SetSize(8 * size + 7 * gap, size)
     container:SetUnit(row.unit)
@@ -175,6 +247,7 @@ function V.Create()
         row:SetAttribute("unit", unit); row:SetAttribute("type1", "target")
         buildRow(row, false, i == 1)
         A.Cleansing.Create(row)
+        createPartyActions(row)
         createDebuffs(row)
         A.Buffs.Create(row)
         row:Hide()
@@ -318,6 +391,7 @@ function V.RefreshTarget()
     V.RefreshTargetTarget()
 end
 function V.Refresh()
+    V.RefreshPartyActions()
     V.RefreshTarget()
     local showIndicators = not InCombatLockdown() and not A.Runtime.suspended
     for _, row in ipairs(V.rows) do

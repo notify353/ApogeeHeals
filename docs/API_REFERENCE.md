@@ -1,3 +1,22 @@
+## Party Follow and Inspect (October 20, 70450)
+
+Matching generated PlayerScriptDocumentation defines FollowUnit, CanInspect and
+CheckInteractDistance. Native UnitPopupSharedButtonMixins uses FollowUnit on a
+user click, interaction distance 4 for Follow and InspectUnit/CanInspect for
+inspection. InspectUnit's Mainline bootstrap loads Blizzard_InspectUI; its TOC
+selects Camelot's inspection implementation. Buttons call native functions with
+fixed party1-4 tokens only from left release, outside combat, with public
+existence/connection/death and range checks (4 follow, 1 inspect). No target
+switch, cached recipient name, automatic action, retry or delayed follow.
+
+Ordinary child buttons reserve two permanent squares after cleansing, before
+drinking and debuffs. Combat disables input immediately and dims the artwork;
+click-time guards also cover loading, frame unlock and restricted reads.
+Native PetActionBar supplies Ability_Tracking for follow; WhoList uses
+common-icon-search for inspection. Existing roles, crown and spell art remain.
+All new authority files join freshness checking. Native range, hardware input,
+appearance and taint acceptance require owner testing.
+
 ## Indicator combat visibility (October 20, 70450)
 
 Supersedes combat visibility below: the existing InCombatLockdown boolean gates
