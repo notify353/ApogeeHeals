@@ -172,6 +172,10 @@ function S.Create()
     demoLabel:SetPoint("LEFT", S.threatDemo, "RIGHT", 4, 0)
     demoLabel:SetText("Threat demo (solo preview; ends in combat)")
     S.threatDemo:SetScript("OnClick", function(button) A.Threat.SetDemo(button:GetChecked()) end)
+    S.healthDiagnostics = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+    S.healthDiagnostics:SetPoint("TOPLEFT", 16, -218); S.healthDiagnostics:SetSize(200, 24)
+    S.healthDiagnostics:SetText("Focus health checks")
+    S.healthDiagnostics:SetScript("OnClick", function() A.HealthDiagnostics.Open() end)
     StaticPopupDialogs.APOGEE_HEALS_RESET_CHARACTER = {
         text = "Restore Apogee Heals defaults for this character?\n\nClears healing assignments, buff reminders and positions and restores defaults. This cannot be undone.\n\nOther characters, other addons and WoW keybindings are unchanged.",
         button1 = "Defaults", button2 = CANCEL or "Cancel",

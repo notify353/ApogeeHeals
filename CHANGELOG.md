@@ -1,3 +1,10 @@
+## Unreleased - Focus health feasibility (2026-10-20)
+
+- Add silent session-only Focus health checks with Start/Stop/Reset and separate
+  combat/outside-combat readability and 50% crossing counts for player/party1-4.
+  Restricted data never triggers comparisons; roster changes reset party results.
+  No sound or saved health samples are included.
+
 ## Unreleased - Optional default spells
 
 - Add one per-character Enable default spells checkbox in the Keybinds settings group, off initially.

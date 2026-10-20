@@ -6,6 +6,22 @@ Minimal five-player healing frames for **WoW Forever 1.60.x, interface 16001**.
 Prototype 0.1.0-dev; reviewed against local export 1.60.1.70450. The owner confirmed incoming heals and reviewed
 the appearance in game; full live acceptance remains pending. Not released. Classic Era is deliberately unsupported.
 
+## Focus health checks
+
+In Heals settings, open **Focus health checks** and click **Start**. Play solo
+and in a normal party, then **Stop** to retain results on screen. Each fixed unit
+has Outside/Combat counters: readable, restricted, missing/invalid/error, skipped.
+UNSUPPORTED latches any restricted read; INCOMPLETE records unavailable reads;
+NOT TESTED means no readable sample. READABLE describes observed samples only,
+not guaranteed future access. Below 50 / Recover counts observed crossings below
+50% and recovery to at least 50%. Starting low or resuming after a data gap
+establishes a baseline without counting a drop. Dead/offline/absent units and
+raids are skipped. Party roster changes reset party results and continuity.
+Start begins a fresh run; Reset clears results without changing run state;
+Stop/Close end sampling. Closing retains results until Start/Reset/reload.
+No health numbers, names or diagnostic state are saved, and no sound plays.
+Actual Focus audio remains pending supported combat health access.
+
 ## Prototype
 
 - **Threat demo (solo preview; ends in combat)** previews scripted threat bars

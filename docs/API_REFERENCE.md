@@ -1,3 +1,29 @@
+## Focus health feasibility (October 20)
+
+Verified the current 1.60.1.70450 / 16001 export with the child freshness checker.
+UnitDocumentation declares UnitHealth(unit, usePredicted) and UnitHealthPercent
+SecretReturns; UnitHealthMax is SecretWhenUnitHealthMaxRestricted. This does not
+establish readable combat health. The diagnostic calls UnitHealth(unit, false)
+and UnitHealthMax for fixed player/party1-4. Access.Readable guards every return
+before type checks, arithmetic, comparison or display. Finite public health in
+[0, maximum] and positive finite maximum establish a threshold boolean. Only
+public outcomes, counters and that boolean survive a sample; no numeric health
+value or identity is retained or displayed.
+
+Matching UnitExists, UnitIsConnected and UnitIsDeadOrGhost boolean predicates
+establish living connected recipients. UnitInRaid(player) has nullable luaIndex
+and SecretWhenUnitIdentityRestricted: public nil establishes non-raid; a public
+positive index skips sampling. Restricted/error/malformed eligibility outcomes
+do not permit health processing. The same permission-first guard applies.
+UNIT_HEALTH/UNIT_MAXHEALTH/UNIT_CONNECTION/UNIT_FLAGS fixed-unit events plus an
+opt-in 0.2-second OnUpdate sample observations. GROUP_ROSTER_UPDATE resets party
+counts and continuity. World transitions suspend reads and clear continuity.
+Combat transitions select separate counters. Anonymous diagnostic controls use
+existing Style/frame APIs and never alter protected unit frames or actions.
+Stop removes polling/event registration. No native visual sink is read back to
+infer restricted health. Owner live tests must establish engine access and UI
+acceptance; mock checks cannot establish sound feasibility.
+
 ## Exclusive class-strip input (October 12)
 
 Reviewed matching 70338 SimpleFrame SetHitRectInsets and SimpleScriptRegion
