@@ -18,13 +18,15 @@ local function recommend(class,role,available)
     m.units.party1.class,m.units.party1.role=class,role
     return a.BuffDefaults.Recommend("party1",available or a.BuffDefaults.Choices())
 end
-assert(recommend("WARRIOR","TANK")==20217)
+assert(recommend("WARRIOR","TANK")==19740)
+assert(recommend("PALADIN","TANK")==20217)
+assert(recommend("DRUID","TANK")==20217)
 assert(recommend("PALADIN","HEALER")==19742)
 assert(recommend("PALADIN","DAMAGER")==19740)
 assert(recommend("WARRIOR","NONE")==19740)
 assert(recommend("ROGUE",nil)==19740)
 for _,class in ipairs({"MAGE","PRIEST","WARLOCK"}) do assert(recommend(class,"DAMAGER")==19742) end
-assert(recommend("HUNTER","DAMAGER")==20217)
+assert(recommend("HUNTER","DAMAGER")==19742)
 for _,class in ipairs({"DRUID","SHAMAN","PALADIN"}) do assert(recommend(class,"NONE")==20217) end
 assert(recommend("DRUID","HEALER")==19742)
 assert(recommend("DRUID","DAMAGER")==20217) -- No invented feral/caster spec.
@@ -34,6 +36,22 @@ assert(recommend("MAGE","NONE",{{id=19740}})==nil)
 assert(recommend("HUNTER","NONE",{{id=19740}})==nil)
 assert(recommend("PRIEST","HEALER",{{id=20217}})==20217)
 assert(recommend("ROGUE","DAMAGER",{{id=25782}})==25782)
+local classes = {"WARRIOR","PALADIN","HUNTER","ROGUE","PRIEST","SHAMAN","MAGE","WARLOCK","DRUID"}
+local damage = {WARRIOR=19740,PALADIN=19740,HUNTER=19742,ROGUE=19740,
+    PRIEST=19742,SHAMAN=20217,MAGE=19742,WARLOCK=19742,DRUID=20217}
+for _, class in ipairs(classes) do
+    assert(recommend(class,"HEALER")==19742, class.." healer must prioritize mana")
+    assert(recommend(class,"DAMAGER")==damage[class], class.." damage fallback")
+    local tank = class=="WARRIOR" and 19740 or 20217
+    assert(recommend(class,"TANK")==tank, class.." tank role wins over damage fallback")
+    assert(recommend(class,"HEALER",{{id=25894},{id=25898}})==25894)
+end
+assert(recommend("WARRIOR","TANK",{{id=20217}})==20217)
+assert(recommend("PALADIN","TANK",{{id=20217}})==20217)
+assert(recommend("PALADIN","TANK",{{id=19742},{id=25898}})==25898)
+assert(recommend("PALADIN","TANK",{{id=25894}})==25894)
+assert(recommend("HUNTER","DAMAGER",{{id=20217}})==20217)
+assert(recommend("DRUID","TANK",{{id=19740}})==19740)
 for _,role in ipairs({"TANK","HEALER","DAMAGER","NONE"}) do
     assert(recommend("PALADIN",role,{{id=1038},{id=19977},{id=20911}})==nil)
 end
@@ -44,7 +62,7 @@ assert(recommend(secret,secret)==20217)
 UnitGroupRolesAssigned=nil
 assert(recommend("PRIEST",nil)==19742)
 UnitGroupRolesAssigned=function(unit) return m.units[unit] and m.units[unit].role or "NONE" end
-m.units.party1.class,m.units.party1.role="WARRIOR","TANK"
+m.units.party1.class,m.units.party1.role="PALADIN","TANK"
 a.Buffs.Refresh()
 local row=a.View.rows[2]
 local function selected()

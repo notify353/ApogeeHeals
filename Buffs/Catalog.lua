@@ -55,18 +55,14 @@ function C.Recognized(id)
     return A.Access.Readable(id) and type(id) == "number" and recognized[id] == true
 end
 function C.TimerGroup(id, name) return A.Buffs.NamedGroup(variants, id, name) end
-local function disabledVariants()
-    local disabled = {}
-    -- A saved opt-out applies across ranks of that variant. Never rewrite storage
-    -- or let an enabled duplicate override a disabled entry.
-    for _, entry in ipairs(A.db and A.db.buffs or {}) do
-        if A.Access.Readable(entry) and type(entry) == "table"
-            and A.Access.Readable(entry.id, entry.enabled) and entry.enabled == false
-            and type(entry.id) == "number" and variants[entry.id] then
-            disabled[variants[entry.id]] = true
-        end
+function C.PreferenceKey(id) return families[id] end
+function C.Definitions() return classes[classOf("player")] or {} end
+local function useful(definition, unit)
+    if definition.key == "thorns" then return A.Access.Read(UnitGroupRolesAssigned, unit) == "TANK" end
+    if definition.key == "spirit" or definition.key == "intellect" then
+        return A.Access.Read(UnitGroupRolesAssigned, unit) == "HEALER" or manaClasses[classOf(unit)] == true
     end
-    return disabled
+    return true
 end
 local function suggest(class, unit, offered)
     local role = A.Access.Read(UnitGroupRolesAssigned, unit)
@@ -101,7 +97,7 @@ local function resolve(id, cache)
     if cache then cache[id] = info or false end
     return info
 end
-function C.Choices(unit, auras, cache, includeDisabled)
+function C.Choices(unit, auras, cache, expanded)
     local choices = {}
     if InCombatLockdown() or not A.Access.Readable(unit, auras)
         or type(unit) ~= "string" or not recipients[unit] or type(auras) ~= "table" then return choices end
@@ -116,9 +112,12 @@ function C.Choices(unit, auras, cache, includeDisabled)
         local family = A.Buffs.NamedGroup(families, aura.spellId, aura.name)
         if family then covered[family] = true end
     end
-    local disabled, offered = disabledVariants(), {}
+    local offered = {}
     for _, definition in ipairs(definitions) do
-        if (not definition.self or unit == "player") and (includeDisabled or not disabled[definition.key])
+        if (not definition.self or unit == "player")
+            and A.SmartBuffs.Allows(definition.family or definition.key, expanded,
+                definition.key == "shadow" and "manual" or nil)
+            and (expanded or useful(definition, unit))
             and not covered[definition.family or definition.key] then
             for _, id in ipairs(definition.ranks) do
                 local info = resolve(id, cache)

@@ -17,6 +17,21 @@ common-icon-search for inspection. Existing roles, crown and spell art remain.
 All new authority files join freshness checking. Native range, hardware input,
 appearance and taint acceptance require owner testing.
 
+## Smart buffs preferences (October 20)
+
+Reverified matching Forever 1.60.1.70450 / 16001 export before this change.
+Uses existing reviewed spell resolution, public class/assigned-role reads, aura
+coverage, fixed-recipient secure actions and native frame/button/font APIs.
+One family preference controls Smart, Manual or Off across automatic and expanded
+choices. Preferences only change out of combat; combat closes the settings panel.
+No new API, aura polling or casting path. Unknown recipient class/role does not
+establish usefulness for Spirit, Intellect or Thorns. Existing unknown aura,
+foreign-caster, timer, range and native aura/aspect safeguards still apply.
+The settings list is built from learned catalog families plus compatible generic
+entries, with version-3 storage preserving validated family modes. Ordinary and
+Greater Paladin blessings share a preference, while prior seed values are kept
+only for data compatibility. Native UI/secure-click acceptance remains separate.
+
 ## Indicator combat visibility (October 20, 70450)
 
 Supersedes combat visibility below: the existing InCombatLockdown boolean gates

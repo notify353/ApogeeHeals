@@ -103,7 +103,7 @@ guidance, native weapon displays, limitations and live acceptance checks.
 - Native left-click targeting when unassigned, with healing click bindings on Left, Right,
   Middle, Mouse 4 and Mouse 5 (plain, Shift and Ctrl). No global binding overrides.
   Standard native target actions also retain the client's spell/item cursor behavior.
-- Escape -> Options -> AddOns -> Apogee Heals: Reset positions, Buff reminders
+- Escape -> Options -> AddOns -> Apogee Heals: Reset positions, Smart buffs
   and Factory reset. Position and healing assignments are saved
   per character.
 
@@ -164,57 +164,53 @@ Tank, Keybinds or Party Health Bars installed. No raid/pet frames, shield/HoT ov
 dispel coverage, health/power numbers, profiles
 or drinking countdowns.
 
-## Learned upkeep buffs
+## Smart buffs
 
-Paladins receive **Blessing of Might reminders as soon as a rank is learned**;
-no discovery cast is needed. Learned **Blessing of Wisdom** is also added to
-Buff reminders, initially unchecked. To prefer Wisdom, uncheck Might and check
-Wisdom there. These defaults use the highest client-confirmed learned ordinary
-rank and preserve saved opt-outs through upgrades and reloads. They do not seed
-greater blessings, seals, short defensive cooldowns or combat utility.
+Open **Options > AddOns > Apogee > Heals > Smart buffs** (Apogee DEV for DEV).
+Supported buffs appear as soon as you learn them; no discovery cast is needed.
+Each buff family has a per-character preference that survives reloads and rank upgrades:
 
-Only one maintained blessing is prompted per recipient: the first enabled,
-learned blessing in the existing watch order. Earlier discovered choices retain
-priority over appended defaults; there is no automatic class/role optimization.
-Any recognized ordinary or greater Might, Wisdom, Kings, Salvation, Sanctuary or
-Light already on a recipient suppresses another blessing prompt, even from a
-different caster. This conservative policy avoids replacement prompts; it does
-not optimize multi-Paladin blessing assignments. Other discovered upkeep buffs
-remain independent. A full 32-entry watch list is preserved without eviction.
+- **Smart:** show useful missing buffs beside their recipient. A yellow border
+  identifies a suggested next choice; hover for its reason and native spell tooltip.
+- **Manual:** show only when you click the recipient's class strip to expand choices.
+- **Off:** hide the family, including in expanded choices.
 
-Hover a visible reminder for **Blizzard's native spell tooltip**, including its
-actual rank. Tooltips close when reminders change/disappear, the roster changes
-or combat begins. Click behavior is unchanged.
+Left-click an icon to cast on that row's player without selecting them. Modified
+clicks do nothing. Native range, mana, reagents and spell restrictions still apply.
+Buff choices and their settings close/hide in combat and resume afterward. Self
+buffs appear only on your own row. No automatic casts occur.
 
-Heals learns active, friendly player spells after a successful cast and a complete,
-readable aura observation within ten seconds. The aura must come from you and
-have a duration of at least five minutes. Discovery has no class filter or spell list.
-Short buffs, passive spells, items, pets, failed casts and unreadable observations
-do not teach a reminder. Cast buffs outside combat to teach them.
+Paladins have one **Blessings** preference. All learned lasting blessing choices
+remain available, with conservative role/class guidance and the highest learned
+rank of each ordinary or Greater variant. Any recognized existing blessing
+suppresses automatic blessing choices. Expansion lets you select another type;
+it does not offer to replace the same type from another caster. **Auras (self)**
+controls the separate own-aura choices. Old Might/Wisdom checklist values do not
+control these choices and are retained only for compatibility.
 
-Missing buffs appear as small icons to the left of each living, connected party
-row, with four visible icons and an overflow count. The client's self-buff check
-keeps self-only effects on your row; party-capable buffs are checked on every
-row even when first learned on yourself. If classification is unavailable, actual
-party application remains the fallback evidence. Existing learned buffs use this
-rule without relearning. **Left-click a reminder icon to reapply its learned spell
-to that row's player**, without selecting them first. Modified clicks do nothing.
-The game still enforces range, mana, reagents and spell restrictions. Reminders
-hide in combat and during preview; no automatic casts occur. Learning scope
-avoids assuming that self-only buffs can be applied to everyone.
-Dead, offline, unknown and preview rows receive no reminders.
-Learning and reminders pause in combat and resume from fresh observations afterward.
+Priests maintain Fortitude and Spirit independently: Fortitude serves every
+recipient, Spirit is suggested for healers/mana classes, Inner Fire is self-only,
+and Shadow Protection defaults to Manual. Druids get Mark for everyone and Thorns
+for assigned tanks; expansion offers Thorns for other recipients too. Mages get
+Intellect for healers/mana classes and a separate Armor choices group. Warlock
+armor alternatives also share a group. Other supported self buffs and Hunter
+aspects use the same Smart/Manual/Off controls. Classes without supported spells
+show an empty state rather than unrelated spell choices.
 
-An existing buff from another caster satisfies coverage. Observed ranks with
-the same localized client spell name share one watch entry. Differently named
-single/group buffs are not guessed to be equivalent. The five-minute rule is a
-duration filter, not a claim that every qualifying spell should always be maintained.
+Recognized ranks and group versions satisfy their family, including another
+caster's buffs. Independent families stay independent. Own buffs can reappear
+with a remaining-time label below two minutes; another caster's or unknown-source
+buff is preserved until it disappears. Unreadable observations never mean missing.
+Group versions such as Prayers/Gift/Brilliance count as coverage but are not new
+casting actions; Greater Paladin blessings retain their existing explicit actions.
 
-Open **Options > AddOns > Apogee Heals > Buff reminders** to uncheck an unwanted
-reminder. Choices persist across reloads and relearning. The list supports up to
-32 learned entries. Self-only versus party coverage is detected automatically;
-there is no manual scope setting. No duration countdown, automatic casting, party chat alerts
-or shared Tank state is involved. Tank can be absent or disabled.
+Existing disabled catalog/discovered buffs remain Off unless you choose a new
+mode. For grouped armor choices, any legacy disabled variant keeps the group Off.
+Additional five-minute upkeep buffs can still be learned from your successful
+casts followed by a complete readable own-aura observation within ten seconds.
+Their entries use the same controls, and opt-outs survive relearning and rank
+changes. Short effects, passive spells, items and pet casts are not learned.
+Battle Shout remains handled by Keybinds. See [class support](docs/CLASS_SUPPORT.md).
 
 ## Paladin cleansing buttons
 

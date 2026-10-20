@@ -1,76 +1,75 @@
-# Beginner blessing guidance
+# Five-player blessing guidance
 
-Reviewed September 27, 2026 for Forever build 1.60.1.70009.
+Reviewed October 20, 2026. Local API authority remains the verified Forever
+1.60.1.70450 / 16001 export. Spell candidates must resolve through the actual
+learned/helpful/active spellbook. The yellow border is a practical dungeon default,
+not a measured popularity ranking, gear optimizer or inferred specialization.
 
-The yellow border is a conservative starting suggestion for pre-combat party
-upkeep, not an optimal raid assignment or a claim of an 80% success rate. It
-selects one currently offered, learned blessing and leaves every alternative
-available. A tooltip explains the benefit and whether role or class informed it.
-The recommendation does not infer talents, gear, threat, mana urgency or intent.
+## Evidence and limits
 
-## Research findings
+[Blizzard's October 15 Paladin deep dive](https://worldofwarcraft.blizzard.com/en-us/news/24302099)
+confirms that Salvation is no longer a blessing and can coexist with one. It must
+not be a competing default in the Might/Wisdom/Kings indicator. This change does
+not add new Salvation/Revoke actions; old candidate spell IDs remain gated by the
+native spellbook. Short/emergency spells never become a fallback suggestion.
 
-The matching-build [60.tools Paladin spellbook](https://www.60.tools/spellbook/paladin)
-shows Might increasing **melee** attack power, Wisdom restoring mana, and Greater
-blessings affecting same-class group members. That rules out treating every
-physical damage dealer as a Might recipient: a hunter's combat style is unknown.
-It also supports preferring the ordinary variant for a recommendation attached
-to one specific recipient. These are data-informed design decisions, not a
-published universal priority list. This database separately marks Sanctuary as
-absent from the current Forever spellbook; existing addon candidates remain
-runtime-gated by learned-spell validation, so a candidate is never a spell grant.
+The [Forever: Pally Blessings Assignment author's documentation](https://www.curseforge.com/wow/addons/forever-blessings)
+uses Might then Kings as its Protection Warrior priority example and Wisdom then
+Kings for Holy Priest. Its separate dungeon Salvation controls reinforce treating
+threat reduction separately. This is one practitioner's design, not usage telemetry.
 
-[Wowhead's Forever ability guide](https://www.wowhead.com/forever/guide/classes/paladin/holy/healer-abilities)
-confirms Kings' broad stat benefit, Wisdom's mana regeneration, Light's benefit
-to Holy Light/Flash of Light, and Salvation's threat reduction. These effects
-support an approachable first choice but do not identify the best choice for
-individual gear or encounters. Salvation remains manual: threat-limited damage
-dealers can prefer it, but the addon does not establish that condition. Light
-and Sanctuary are also manual, rather than universal fallbacks.
+[Forever player discussion](https://www.reddit.com/r/wowforever/comments/1x6ujis/paladin_class_deep_dive_in_wow_forever/)
+describes Protection Paladin mana pressure and using Wisdom with Seal of Fury.
+Wisdom remains a mana-sustain option, but this does not establish it as the usual
+first choice. Forever adds mana recovery through Improved Seal of Fury and Shield
+Specialization. The [EzBlessings author's priorities](https://www.curseforge.com/wow/addons/ezblessings)
+put Kings before Wisdom for Paladin tanks. The owner selected Kings first with
+Wisdom as the learned fallback; this is a default, not a population-wide trend.
 
-The [Classic class overview](https://www.wowhead.com/classic/guide/classes/paladin/overview-basics)
-lists Wisdom/Kings among healer options and Might among melee options; it also
-places Salvation prominently for damage dealers. Classic priorities are context,
-not assumed Forever rules. [Warcraft Tavern's Classic blessings discussion](https://www.warcrafttavern.com/wow-classic/guides/understanding-the-paladins-blessings-part-1-the-most-important-raid-blessings-classic-wow/)
-discusses using Light on a tank with a Paladin healer. This illustrates why
-reasonable players disagree on a universal tank blessing. We use Kings for broad
-benefit and preserve manual choice instead of optimizing healing or threat.
-Expansion-mismatched forum advice and numerical tuning are not used as rules.
+The [60.tools extracted Paladin spellbook](https://www.60.tools/spellbook/paladin)
+currently labels its spell data 70425, rather than the local 70450 API export.
+It is contextual spell-effect evidence only, not replacement API authority:
+Might affects melee attack power, Wisdom restores mana, Kings affects stats, and
+Greater variants affect same-class group members. We therefore use Wisdom for
+the usual ranged Hunter rather than assuming Might improves ranged damage.
+The addon cannot identify melee Hunter intent or Feral/Balance and Enhancement/
+Elemental from assigned DAMAGER alone. It must not claim those specializations.
 
-## Implemented decision order
+## Implemented order
 
-Assigned TANK and HEALER take precedence over class. DAMAGER still needs class
-to distinguish melee from caster; it cannot reveal a hybrid's specialization.
-Missing, NONE, failed or restricted role reads fall back to a public class.
+Assigned TANK and HEALER take precedence. Missing, NONE, failed or restricted
+roles fall back to a public class. Every fallback must itself be learned.
 
-| Recipient information | First choice, then learned fallback |
+| Recipient | First choice, then fallback |
 | --- | --- |
-| Tank: Warrior or Druid | Kings, Might |
-| Tank: Paladin | Kings, Wisdom |
-| Tank: other/unknown class | Kings |
-| Healer | Wisdom, Kings |
-| Warrior or Rogue; Paladin assigned damage | Might, Kings |
-| Mage, Priest, Warlock without a tank/healer override | Wisdom, Kings |
-| Hunter | Kings, Wisdom |
-| Paladin, Druid or Shaman with ambiguous specialization | Kings, Wisdom |
-| Neither usable role nor recognizable class | Kings |
+| Warrior tank | Might, Kings |
+| Paladin tank | Kings, Wisdom |
+| Druid tank | Kings, Might |
+| Other/unknown tank class | Kings |
+| Any assigned healer | Wisdom, Kings |
+| Warrior/Rogue; Paladin assigned damage | Might, Kings |
+| Mage/Priest/Warlock | Wisdom, Kings |
+| Hunter | Wisdom, Kings |
+| Druid/Shaman damage or unknown spec; unassigned Paladin | Kings, Wisdom |
+| Unreadable/unknown class and role | Kings |
 
-This table is our conservative heuristic, inferred from the effects and common
-roles, not copied from a guide or presented as best-in-slot advice. A hybrid's
-fallback may be suboptimal. When none of the suitable options is learned,
-no border is shown; we never fall through to Salvation or an emergency spell.
-Within a family the ordinary version is preferred if offered, otherwise the
-learned Greater version may be suggested. Existing highest-rank validation is
-unchanged. No bag/reagent check or automatic spell execution is added.
+The caster, melee and mana-sustain choices follow common dungeon use; the exact
+fallback table is our design inference. Light can help a Paladin healer and
+other options can suit particular fights, but role/class alone cannot establish
+those conditions. They stay explicit choices instead of universal defaults.
 
-## API and acceptance
+Ordinary ranks are preferred for an individual row; a learned Greater variant
+is the fallback within its family. The indicator selects at most one offered
+choice and explains the reason in the tooltip. No suitable learned choice means
+no yellow border. Existing blessing coverage suppresses automatic prompts;
+expansion still protects the same type from another/unknown caster. Manual and
+Off preferences retain their Smart buffs semantics. No automated casts occur.
 
-The local UnitDocumentation marks UnitGroupRolesAssigned as potentially secret;
-Access.Read validates before comparisons. UnitClass's token has the same guard.
-The matching CompactUnitFrame source refreshes on PLAYER_ROLES_ASSIGNED. The
-addon handles that event through its existing out-of-combat refresh, alongside
-roster/spell/aura changes. The steady one-pixel yellow border is display artwork;
-secure actions and fixed recipients remain unchanged. Native spell tooltips gain
-one plain-language recommendation line. Combat and lifecycle cleanup remove the
-suggestion. Source and packaged mocks must pass; visual appearance, role delivery
-and physical clicks still require in-game acceptance.
+## Validation
+
+Role/class matrix tests cover all nine classes, learned ordinary/Greater
+fallbacks, unknown/restricted roles, indicator/tooltips, role transitions,
+combat hiding and fresh restoration. Existing foreign-caster, range, early
+refresh and lifecycle tests remain. Generated PROD/DEV checks use the same
+owning tests. Native visual appearance, role delivery and physical casting
+still require owner testing after approved DEV installation.

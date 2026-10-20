@@ -133,6 +133,7 @@ function B.Learn(aura, unit)
         local previous = B.Info(entry.id)
         if entry.id == aura.spellId or (previous and previous.name == spell.name)
             or (A.BuffDefaults.active and group and A.BuffDefaults.SeededGroup(entry.id) == group) then
+            A.SmartBuffs.Rekey(entry.id, learnedID)
             entry.id = learnedID -- Keep the highest learned seeded rank, including after a downrank cast.
             if unit ~= "player" then entry.party = true end
             return
@@ -180,7 +181,7 @@ function B.Refresh()
     end
     local watched = {}
     for _, entry in ipairs(A.db.buffs) do
-        local info = entry.enabled and A.Bindings.Resolve(entry.id)
+        local info = A.Bindings.Resolve(entry.id)
         if info and not (A.BuffCatalog and A.BuffCatalog.Recognized(entry.id))
             and not B.modeIDs[entry.id] then watched[#watched + 1] = { entry = entry, info = info, party = B.ForParty(entry) } end
     end
@@ -195,12 +196,12 @@ function B.Refresh()
                 names[aura.name] = true; ids[aura.spellId] = true
                 if A.BuffDefaults.Group(aura.spellId, aura.name) then blessed = true end
             end
-            if expanded or not blessed then blessings = blessingChoices end
+            if (expanded or not blessed) and A.SmartBuffs.Allows("blessings", expanded) then blessings = blessingChoices end
             for _, watch in ipairs(watched) do
                 local grouped = A.BuffDefaults.active and A.BuffDefaults.Group(watch.entry.id)
                 if (row.unit == "player" or watch.party
                     or (row.unit == "target" and A.Access.Read(UnitIsUnit, "target", "player") == true))
-                    and not grouped
+                    and not grouped and A.SmartBuffs.Allows(A.SmartBuffs.Key(watch.entry.id), expanded)
                     and (expanded or (not ids[watch.entry.id] and not names[watch.info.name])) then
                     missing[#missing + 1] = { id = watch.entry.id, icon = watch.info.iconID, name = watch.info.name }
                 end
@@ -218,6 +219,7 @@ function B.Refresh()
         B.PaintCatalog(row, upkeep, #missing, #blessings, suggested, reason)
         if row.unit == "player" then
             local modes = snapshots[index] and (expanded and B.AuraChoices(true) or auraChoices) or {}
+            if not A.SmartBuffs.Allows("modes", expanded) then modes = {} end
             modes = B.WithTimers(modes, snapshots[index], true, row.unit)
             B.PaintAuras(row, modes, #missing, #blessings + #upkeep)
             if A.WeaponUpkeep then

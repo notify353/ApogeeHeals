@@ -7,49 +7,39 @@ candidate on the reviewed 1.60.1.70009 client. It is not an exhaustive execution
 record for every case below, a measured FPS result, or completion of the separate
 Focus audio request. Earlier pending entries remain detailed regression checklists.
 
-## Learned upkeep buffs (pending)
+## Smart buffs (native acceptance pending)
 
-- Paladin defaults/tooltips: on a fresh DEV Paladin with Might learned, verify
-  an unbuffed self and party member show Might without a discovery cast. Learning
-  Wisdom must leave Might selected and add Wisdom unchecked in Buff reminders.
-  Existing enabled/discovered blessings keep their earlier priority. Uncheck
-  Might/check Wisdom to switch. Rank upgrades/reloads preserve explicit opt-outs.
-  An existing ordinary/greater maintained blessing suppresses other blessing
-  prompts, including another caster's blessing; at most one appears per unit.
-  Verify this conservative policy rather than multi-Paladin assignment logic.
-- Hover self/party reminders: native spell description and actual rank should
-  match the click action. Leave, hide, roster replacement, coverage, rank change,
-  preview, zoning and combat must clear stale tooltips. No protected action
-  changes or hidden hit areas may be introduced by tooltip handlers. These
-  new defaults and tooltip behavior have offline tests; live acceptance is pending.
+- Open Smart buffs on each available class. Learned supported families appear
+  without casting first. Confirm readable labels, selected Smart/Manual/Off modes,
+  scrolling and the empty state on a class without supported spells.
+- Paladin: one Blessings entry, separate Auras entry. Confirm role/class yellow
+  suggestions, ordinary/Greater choices, existing-blessing suppression and manual
+  choice of another type. Old Might/Wisdom checkbox choices must not suppress it.
+- Priest: missing Fortitude on all eligible rows; Spirit for mana users/healers;
+  applying Fortitude leaves missing Spirit available. Shadow Protection initially
+  appears only after class-strip expansion. Inner Fire stays on your row.
+- Druid: Mark for everyone, Thorns for assigned tanks; Mage: Intellect for mana
+  users/healers. Check self armor alternatives share one preference and coverage.
+  Check other supported self buffs and Hunter aspects use the same three modes.
+- Manual removes automatic reminders but stays available after expansion. Off
+  removes both. Smart restores useful reminders. Choices survive reload, new ranks
+  and generic relearning. Legacy disabled entries stay Off until explicitly changed.
+- Existing recognized group buffs satisfy their family. Foreign/unknown-source
+  buffs remain protected even in expanded choices. Own buffs can reappear below
+  two minutes with a timer; unknown aura data does not establish missing coverage.
+- Click icons on self, party and friendly-player target: one intended native cast
+  per click, unchanged selected target, no action for modified clicks. Native range,
+  mana, reagent and recipient failures must not redirect a cast. Friendly NPCs,
+  dead/offline/missing/unknown recipients do not receive buff choices.
+- Combat closes the picker and expansion, hides choices and rejects preference
+  changes. Verify recovery after combat, zoning, spellbook/role changes and preview.
+  No blocked protected actions, stale icons or hidden hit areas should remain.
+- Generic five-minute own-cast discovery remains supported, including self-only
+  versus party classification. Short effects, items, pets, passive effects and
+  failed casts do not create entries. Existing bindings and positions survive.
 
-- Reminder learning and click-to-reapply were reported working by the owner.
-  Full acceptance remains pending: left-click each missing icon on self and party1-party4 and verify the
-  correct learned spell, exactly one cast, and unchanged selected target with
-  both key-down preferences. Modified clicks must do nothing. Range, resource,
-  reagent and recipient failures must not redirect to another player. Test
-  combat transitions and preview mode for hidden/inactive reminder hit areas.
-
-- With Tank disabled or absent, cast a known five-minute-or-longer friendly buff
-  outside combat on yourself and a party member. Confirm automatic discovery,
-  icon removal where present and missing icons on other living party members.
-  Confirm learning a party-capable buff on yourself produces a missing reminder
-  on an unbuffed party member immediately, including after loading an older
-  self-scoped watch entry. Truly self-only effects must stay on your own row.
-- Test another class without any spell catalog changes. Short effects such as
-  Renew/shields, passive effects, items, pets and failed casts must not be learned.
-  Cast/aura IDs that differ cannot be inferred; record actual live identities
-  if an otherwise qualifying buff is not discovered.
-- A different caster's same-name/rank buff satisfies coverage. Removal/expiry
-  restores the icon. Learning a rank with the same client name keeps one entry.
-  Differently named group and single buffs are separate; disable unwanted watches.
-- Uncheck a learned entry in Buff reminders, recast and reload: it stays disabled.
-  Recheck it, test scrolling and four-icon overflow, and inspect row spacing.
-- Combat immediately clears icons and closes the picker, with no blocked actions.
-  Combat exit refreshes real state. Unknown aura data, dead/offline/missing units,
-  preview mode, zoning and raid conversion must not leave stale reminders.
-- Existing bindings and position survive schema migration. Tank's files and
-  saved data remain untouched. Source/mock checks do not establish live behavior.
+Source and generated-family tests cover these policies; they do not establish
+native appearance, secure physical-click behavior or gameplay acceptance.
 
 ## Paladin cleansing buttons (live acceptance pending)
 

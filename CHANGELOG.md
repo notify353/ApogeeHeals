@@ -4,6 +4,18 @@
   fixed-unit actions outside combat and click-time range checks. Preserve the
   existing role and spell icons; move drinking/debuff displays right to fit.
 
+## Unreleased â€” Smart buffs
+
+- Tune five-man blessing guidance: Might for Warrior tanks, Wisdom for Hunters,
+  Kings for Paladin/Druid tanks; retain role-first healer/melee choices.
+
+- Replace the legacy reminder checklist with learned-spell Smart, Manual and Off
+  controls, shared by blessings, class upkeep, armor choices and auras/aspects.
+- Preserve Paladin guidance; keep stacking buffs independent, filter Spirit and
+  Intellect to mana users/healers, and suggest Thorns for assigned tanks.
+- Default Shadow Protection to Manual. Preserve existing opt-outs, foreign-caster
+  coverage, combat hiding and fixed-recipient click casting.
+
 ## Unreleased - Remove Focus diagnostic (2026-10-20)
 
 - Remove temporary Focus health checks and their tests after the owner selected
