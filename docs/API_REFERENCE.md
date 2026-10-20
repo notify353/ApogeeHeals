@@ -1,3 +1,20 @@
+## Party talent inspection (October 20, 70450)
+
+Matching Camelot UnitPopupMenus explicitly includes Inspect Talents.
+UnitPopupSharedButtonMixins requests NotifyInspect(unit), waits for matching
+INSPECT_READY GUID, then calls PlayerSpellsUtil.OpenToClassTalentsTab(unit).
+The family FrameXMLUtil TOC loads this utility; Camelot ClassTalentsFrame
+refreshes its inspect configuration on INSPECT_READY. Generated
+PlayerScript/PaperDollInfo document request and event contracts.
+
+The third fixed-party button follows this flow with public GUID/range guards,
+single pending request, five-second expiry, and cancellation on combat, roster
+change, zoning or gear inspection. Rechecks current GUID and range before opening.
+No talent-data parsing or storage. Native UI owns point/tree presentation.
+Uses the native UI-HUD-MicroMenu-SpecTalents-Up atlas from ClickBindingUI,
+with the same muted artwork and native combat hiding as existing actions.
+Server availability, point display and actual window loading need in-game testing.
+
 ## Party Follow and Inspect (October 20, 70450)
 
 Matching generated PlayerScriptDocumentation defines FollowUnit, CanInspect and
@@ -9,7 +26,7 @@ fixed party1-4 tokens only from left release, outside combat, with public
 existence/connection/death and range checks (4 follow, 1 inspect). No target
 switch, cached recipient name, automatic action, retry or delayed follow.
 
-Ordinary child buttons reserve two permanent squares after cleansing, before
+Ordinary child buttons reserve permanent squares after cleansing, before
 drinking and debuffs. Reviewed SecureStateDriver handles the fixed
 `[combat] hide; show` visibility expression natively, hiding the buttons and
 their hit regions without addon layout mutations in combat. Artwork is 10x10,

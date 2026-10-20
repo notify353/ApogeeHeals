@@ -15,6 +15,10 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
   rows retain their existing controls. Small muted icons brighten on hover.
   The two buttons disappear completely during combat.
 
+- Inspect Talents beside Inspect opens the native talent window for that party
+  member after inspection data arrives. It shares the muted appearance and
+  combat hiding. Stay nearby; combat/roster changes cancel a pending request.
+
 - **Threat demo (solo preview; ends in combat)** previews scripted threat bars
   and warrior debuff icons without live reads. The checkbox is session-only;
   combat, zoning, reload and Defaults end the demo. Uncheck it to restore the

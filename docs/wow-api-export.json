@@ -74,6 +74,11 @@
     "Blizzard_InspectUI/Mainline/Blizzard_InspectUI_Bootstrap.lua",
     "Blizzard_InspectUI/Camelot/Blizzard_InspectUI.lua",
     "Blizzard_ActionBar/Shared/PetActionBar.lua",
-    "Blizzard_GroupFinder_VanillaStyle/Mainline/WhoList.xml"
+    "Blizzard_GroupFinder_VanillaStyle/Mainline/WhoList.xml",
+    "Blizzard_UnitPopup/Camelot/UnitPopupMenus.lua",
+    "Blizzard_FrameXMLUtil/Blizzard_FrameXMLUtil.toc",
+    "Blizzard_FrameXMLUtil/Mainline/PlayerSpellsUtil.lua",
+    "Blizzard_PlayerSpells/Camelot/ClassTalents/Blizzard_ClassTalentsFrame.lua",
+    "Blizzard_ClickBindingUI/Blizzard_ClickBindingUI.xml"
   ]
 }

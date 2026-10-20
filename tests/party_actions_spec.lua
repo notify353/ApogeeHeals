@@ -1,6 +1,9 @@
 local Mock = dofile("tests/mock.lua")
 local m = Mock.New()
 local calls, inRange, inspectable = {}, true, true
+local requests, opened, guid = {}, {}, "Party-First"
+NotifyInspect = function(unit) requests[#requests + 1] = unit end
+PlayerSpellsUtil = {OpenToClassTalentsTab = function(unit) opened[#opened + 1] = unit end}
 FollowUnit = function(unit) calls[#calls + 1] = {"follow", unit} end
 InspectUnit = function(unit) calls[#calls + 1] = {"inspect", unit} end
 CanInspect = function() return inspectable end
@@ -11,8 +14,9 @@ CheckInteractDistance = function(unit, distance)
 end
 m.units.party1 = {name="First", connected=true, dead=false, health=90, maxHealth=100, auras={}}
 local a = m.Start()
+UnitGUID = function() return guid end
 local row = a.View.rows[2]
-local follow, inspect = unpack(row.partyActions)
+local follow, inspect, talents = unpack(row.partyActions)
 local function click(button, mouse) button.scripts.OnClick(button, mouse or "LeftButton") end
 assert(not a.View.rows[1].partyActions and not a.View.target.partyActions
     and not a.View.targetTarget.partyActions)
@@ -29,6 +33,8 @@ follow.scripts.OnLeave()
 assert(follow.icon.alpha == 0.45)
 assert(follow.point[4] + follow.width < inspect.point[4])
 assert(inspect.point[4] + inspect.width < row.drinkIcon.point[4])
+assert(inspect.point[4] + inspect.width < talents.point[4])
+assert(talents.point[4] + talents.width < row.drinkIcon.point[4])
 click(follow); click(inspect)
 assert(#calls == 2 and calls[1][1] == "follow" and calls[1][2] == "party1")
 assert(calls[2][1] == "inspect" and calls[2][2] == "party1")
@@ -52,4 +58,24 @@ a.View.unlocked = true; click(follow); click(inspect); assert(#calls == 3)
 a.View.unlocked = false
 m.Event("PLAYER_LEAVING_WORLD"); click(follow); click(inspect); assert(#calls == 3)
 assert(not follow.enabled and not inspect.enabled)
+click(talents); assert(#requests == 0)
+-- Only the matching, still-current recipient can open the talent window.
+a.Runtime.suspended = false
+click(talents); assert(#requests == 1 and requests[1] == "party1" and #opened == 0)
+m.Event("INSPECT_READY", "Unrelated"); assert(#opened == 0)
+m.Event("INSPECT_READY", guid); assert(#opened == 1 and opened[1] == "party1")
+click(talents); guid = "Party-Replacement"
+m.Event("INSPECT_READY", "Party-First"); assert(#opened == 1)
+click(talents); m.combat = true; m.Event("PLAYER_REGEN_DISABLED")
+m.Event("INSPECT_READY", guid); assert(#opened == 1)
+m.combat = false; m.Flush()
+click(talents); m.Event("GROUP_ROSTER_UPDATE")
+m.Event("INSPECT_READY", guid); assert(#opened == 1)
+click(talents); m.Flush()
+m.Event("INSPECT_READY", guid); assert(#opened == 1, "expired request must not open")
+click(talents); click(inspect)
+m.Event("INSPECT_READY", guid); assert(#opened == 1, "gear inspection supersedes talents")
+local count = #requests
+guid = m.Secret(); click(talents); assert(#requests == count)
+guid = "Party-Final"; inRange = false; click(talents); assert(#requests == count)
 print("party_actions_spec: OK")

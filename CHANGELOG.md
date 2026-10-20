@@ -1,5 +1,8 @@
 ## Unreleased - Party Follow and Inspect (2026-10-20)
 
+- Add a muted Inspect Talents button that opens the native inspected talent
+  tree after matching data arrives; cancel stale, combat and roster requests.
+
 - Make Follow/Inspect smaller, desaturated and translucent without button
   backgrounds; brighten on hover and hide the controls completely in combat.
 

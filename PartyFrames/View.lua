@@ -2,14 +2,19 @@ local _, A = ...
 local V, S = {}, A.Style
 A.View = V
 local units = { "player", "party1", "party2", "party3", "party4" }
-local function partyActionReason(row, inspect, checkRange)
+local function partyActionReason(row, inspect, checkRange, talents)
     local read = A.Access.Read
     if InCombatLockdown() then return "Unavailable during combat." end
     if A.Runtime.suspended or V.unlocked then return "Unavailable while moving frames or loading." end
     if read(UnitExists, row.unit) ~= true or read(UnitIsConnected, row.unit) ~= true
         or read(UnitIsDeadOrGhost, "player") ~= false then return "Player unavailable." end
     if inspect then
-        if type(InspectUnit) ~= "function" then return "Inspect unavailable." end
+        if talents then
+            if type(NotifyInspect) ~= "function" or type(PlayerSpellsUtil) ~= "table"
+                or type(PlayerSpellsUtil.OpenToClassTalentsTab) ~= "function" then
+                return "Talent inspection unavailable."
+            end
+        elseif type(InspectUnit) ~= "function" then return "Inspect unavailable." end
         if checkRange and (read(CanInspect, row.unit) ~= true
             or read(CheckInteractDistance, row.unit, 1) ~= true) then
             return "Move closer to inspect this player."
@@ -22,10 +27,42 @@ local function partyActionReason(row, inspect, checkRange)
         end
     end
 end
+local talentRequest, talentEvents
+local function cancelTalentRequest()
+    talentRequest = nil
+    if talentEvents then talentEvents:UnregisterAllEvents() end
+end
+local function inspectTalents(row)
+    cancelTalentRequest()
+    local guid = A.Access.Read(UnitGUID, row.unit)
+    if type(guid) ~= "string" or guid == "" then return end
+    if not talentEvents then
+        talentEvents = CreateFrame("Frame")
+        talentEvents:SetScript("OnEvent", function(_, event, inspectedGUID)
+            local request = talentRequest
+            if not request then return end
+            if event ~= "INSPECT_READY" then cancelTalentRequest(); return end
+            if not A.Access.Readable(inspectedGUID) or inspectedGUID ~= request.guid then return end
+            cancelTalentRequest()
+            if partyActionReason(request.row, true, true, true)
+                or A.Access.Read(UnitGUID, request.row.unit) ~= request.guid then return end
+            PlayerSpellsUtil.OpenToClassTalentsTab(request.row.unit)
+        end)
+    end
+    local request = {row = row, guid = guid}
+    talentRequest = request
+    for _, event in ipairs({"INSPECT_READY", "PLAYER_REGEN_DISABLED", "GROUP_ROSTER_UPDATE",
+        "PLAYER_LEAVING_WORLD"}) do talentEvents:RegisterEvent(event) end
+    -- Never leave a request able to open a window long after its initiating click.
+    C_Timer.After(5, function()
+        if talentRequest == request then cancelTalentRequest() end
+    end)
+    NotifyInspect(row.unit)
+end
 function V.RefreshPartyActions()
     for _, row in ipairs(V.rows or {}) do
         for index, button in ipairs(row.partyActions or {}) do
-            local available = partyActionReason(row, index == 2, false) == nil
+            local available = partyActionReason(row, index >= 2, false, index == 3) == nil
             button:SetEnabled(available)
             button.icon:SetAlpha(available and (button.hovered and 0.8 or 0.45) or 0.2)
             if not available and GameTooltip:IsOwned(button) then GameTooltip:Hide() end
@@ -36,10 +73,10 @@ local function createPartyActions(row)
     if row.unit == "player" then return end
     local size, gap = S.sideIconSize, S.sideIconGap
     local offset = gap + (row.cleanseSlotCount or 0) * (size + gap) + gap
-    row.partyActionWidth = 2 * (size + gap) + gap
+    row.partyActionWidth = 3 * (size + gap) + gap
     row.partyActions = {}
-    for index, label in ipairs({"Follow", "Inspect"}) do
-        local inspect = index == 2
+    for index, label in ipairs({"Follow", "Inspect", "Inspect Talents"}) do
+        local inspect, talents = index >= 2, index == 3
         local button = CreateFrame("Button", nil, row)
         button:SetSize(size, size)
         button:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset + (index - 1) * (size + gap), S.sideIconY)
@@ -48,7 +85,8 @@ local function createPartyActions(row)
         button.icon = button:CreateTexture(nil, "ARTWORK")
         button.icon:SetSize(10, 10)
         button.icon:SetPoint("CENTER", button, "CENTER", 0, 0)
-        if inspect then button.icon:SetAtlas("common-icon-search", false)
+        if talents then button.icon:SetAtlas("UI-HUD-MicroMenu-SpecTalents-Up", false)
+        elseif inspect then button.icon:SetAtlas("common-icon-search", false)
         else button.icon:SetTexture("Interface\\Icons\\Ability_Tracking") end
         button.icon:SetDesaturated(true)
         button.icon:SetAlpha(0.45)
@@ -60,8 +98,9 @@ local function createPartyActions(row)
             button.hovered = true
             V.RefreshPartyActions()
             GameTooltip:SetOwner(button, "ANCHOR_RIGHT"); GameTooltip:SetText(label)
-            GameTooltip:AddLine(partyActionReason(row, inspect, true) or
-                (inspect and "Inspect this party member." or "Follow this party member."), 0.8, 0.8, 0.8)
+            GameTooltip:AddLine(partyActionReason(row, inspect, true, talents) or
+                (talents and "View this party member's talent points."
+                or inspect and "Inspect this party member." or "Follow this party member."), 0.8, 0.8, 0.8)
             GameTooltip:Show()
         end)
         local function hideTooltip()
@@ -72,9 +111,11 @@ local function createPartyActions(row)
         button:SetScript("OnLeave", hideTooltip)
         button:SetScript("OnHide", hideTooltip)
         button:SetScript("OnClick", function(_, mouseButton)
-            if mouseButton ~= "LeftButton" or partyActionReason(row, inspect, true) then return end
-            -- Native actions only on this hardware click; never queue or retarget.
-            if inspect then InspectUnit(row.unit) else FollowUnit(row.unit) end
+            if mouseButton ~= "LeftButton" or partyActionReason(row, inspect, true, talents) then return end
+            -- Only explicit clicks initiate requests; never retarget or queue follow.
+            if talents then inspectTalents(row)
+            elseif inspect then cancelTalentRequest(); InspectUnit(row.unit)
+            else FollowUnit(row.unit) end
         end)
         row.partyActions[index] = button
     end
