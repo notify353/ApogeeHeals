@@ -39,7 +39,7 @@ function R.Start()
         "UNIT_AURA", "PLAYER_DEAD", "PLAYER_ALIVE", "PLAYER_UNGHOST",
         "UNIT_SPELLCAST_SUCCEEDED", "PLAYER_LEAVING_WORLD",
         "UNIT_HEAL_PREDICTION", "UNIT_HEAL_ABSORB_AMOUNT_CHANGED",
-        "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "SPELLS_CHANGED",
+        "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "SPELLS_CHANGED", "SPELL_TEXT_UPDATE",
         "UI_SCALE_CHANGED", "DISPLAY_SIZE_CHANGED", "GET_ITEM_INFO_RECEIVED",
         "UPDATE_SHAPESHIFT_FORM", "UPDATE_SHAPESHIFT_FORMS", "PLAYER_ROLES_ASSIGNED" }) do driver:RegisterEvent(event) end
     driver:SetScript("OnEvent", function(_, event, unit, castGUID, spellID)
@@ -106,6 +106,8 @@ function R.Start()
                 end
             end
             return
+        elseif event == "SPELL_TEXT_UPDATE" then
+            A.Bindings.Apply()
         elseif event == "SPELLS_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
             A.Cleansing.pending = true
             A.BuffDefaults.pending = true

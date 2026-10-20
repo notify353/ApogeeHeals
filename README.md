@@ -149,6 +149,9 @@ identify Shift and Ctrl rows; hover a tile for its full combination, or the head
 for editing instructions. Invalid drops explain the issue in chat.
 
 Click a live party row with the assigned combination to cast on that fixed unit.
+Spell bindings use an explicit recipient with no alternate target and clear any
+remaining targeting cursor. Clicking your own row explicitly targets you.
+Range and line-of-sight failure behavior still needs native acceptance.
 Plain left-click targets when it has neither an assignment nor a learned class
 default. Removing an assignment restores its class default, or targeting when
 none is available. Empty Shift/Ctrl slots do nothing,

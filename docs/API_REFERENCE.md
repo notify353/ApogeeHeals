@@ -94,6 +94,31 @@ readable). Owner chose native Combat Audio Alerts. Removed the temporary panel,
 sampling runtime and diagnostic tests. No native alert preferences are changed.
 Historical research remains in workspace handoff memory and retained receipts.
 
+## Strict healing recipients (2026-10-20)
+
+Reviewed matching Forever 1.60.1.70450 / 16001 SecureTemplates.lua macro
+dispatch, SlashCommands.lua CAST and STOPSPELLTARGET handlers, and
+C_Spell.GetSpellSubtext/SPELL_TEXT_UPDATE. Healing Mouse spell assignments now
+compile one `/cast [@unit,exists,help] Name(Rank)` followed by `/stopspelltarget`.
+The unit is the immutable row token; there is no empty conditional, alternate
+recipient, selected-target fallback or self-cast branch. The self row explicitly
+uses player. Do not add nodead: friendly resurrection assignments must remain
+possible. Native range and line of sight still decide success.
+
+Localized names and rank subtext come from the learned spell ID outside combat.
+Unavailable/restricted text disables the action; SPELL_TEXT_UPDATE retries with
+the existing combat deferral. Macro control characters are rejected. Replacing
+or clearing a spell clears its macro text; bandage actions remain unchanged.
+The numeric spell attribute remains for identity/diagnostic compatibility but is
+not dispatched by the macro action. No CVar, saved macro, target selection or
+protected combat mutation is introduced.
+
+Source tests verify exact programs, ranks, clearing, modifiers and deferral;
+matching exported secure code verifies macro dispatch. These tests do not
+implement the native macro parser or reproduce server range/line-of-sight failure.
+Owner acceptance must verify both clicks with Auto Self Cast enabled, blocked and
+out-of-range party recipients, and normal party/self healing.
+
 ## Exclusive class-strip input (October 12)
 
 Reviewed matching 70338 SimpleFrame SetHitRectInsets and SimpleScriptRegion
