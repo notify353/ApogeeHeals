@@ -1,3 +1,9 @@
+## Unreleased - Party Follow and Inspect (2026-10-20)
+
+- Add Follow and Inspect beside party-member cleansing buttons, with native
+  fixed-unit actions outside combat and click-time range checks. Preserve the
+  existing role and spell icons; move drinking/debuff displays right to fit.
+
 ## Unreleased — Smart buffs
 
 - Fill leveling Paladin recommendation gaps with suitable learned blessings:
