@@ -1,5 +1,6 @@
 ## Unreleased - Indicator combat visibility
 
+- Place the party leader crown to the left of the role icon.
 - Hide role and party leader icons in combat; restore current assignments afterward.
 
 ## Unreleased - Assigned party roles

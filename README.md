@@ -72,7 +72,7 @@ guidance, native weapon displays, limitations and live acceptance checks.
 - A small gold crown at the right of the party leader's health bar updates when
   leadership changes outside combat. Names reserve space for it. Solo and
   unavailable leader data show no crown; the layout preview crowns its first row.
-- Native tank, healer and damage icons appear just left of the crown for the
+- Native tank, healer and damage icons appear just right of the crown for the
   game's assigned role on each player/party row. Unassigned or unavailable roles
   stay blank. Both role and leader icons hide immediately in combat and refresh
   from current assignments afterward; class is never used to guess a role.

@@ -66,11 +66,11 @@ local function buildRow(row, preview, first, width)
         row.leader = row.nameLayer:CreateTexture(nil, "OVERLAY")
         row.leader:SetTexture("Interface\\GroupFrame\\UI-Group-LeaderIcon")
         row.leader:SetSize(8, 8)
-        row.leader:SetPoint("RIGHT", row.health, "RIGHT", -2, 0)
+        row.leader:SetPoint("RIGHT", row.health, "RIGHT", -12, 0)
         row.leader:Hide()
         row.roleIcon = row.nameLayer:CreateTexture(nil, "OVERLAY")
         row.roleIcon:SetSize(8, 8)
-        row.roleIcon:SetPoint("RIGHT", row.health, "RIGHT", -12, 0)
+        row.roleIcon:SetPoint("RIGHT", row.health, "RIGHT", -2, 0)
         row.roleIcon:Hide()
     end
     -- Match the name font so two-digit levels fit the reserved level column.
