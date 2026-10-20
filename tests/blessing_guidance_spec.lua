@@ -19,7 +19,7 @@ local function recommend(class,role,available)
     return a.BuffDefaults.Recommend("party1",available or a.BuffDefaults.Choices())
 end
 assert(recommend("WARRIOR","TANK")==19740)
-assert(recommend("PALADIN","TANK")==19742)
+assert(recommend("PALADIN","TANK")==20217)
 assert(recommend("DRUID","TANK")==20217)
 assert(recommend("PALADIN","HEALER")==19742)
 assert(recommend("PALADIN","DAMAGER")==19740)
@@ -42,12 +42,14 @@ local damage = {WARRIOR=19740,PALADIN=19740,HUNTER=19742,ROGUE=19740,
 for _, class in ipairs(classes) do
     assert(recommend(class,"HEALER")==19742, class.." healer must prioritize mana")
     assert(recommend(class,"DAMAGER")==damage[class], class.." damage fallback")
-    local tank = class=="WARRIOR" and 19740 or class=="PALADIN" and 19742 or 20217
+    local tank = class=="WARRIOR" and 19740 or 20217
     assert(recommend(class,"TANK")==tank, class.." tank role wins over damage fallback")
     assert(recommend(class,"HEALER",{{id=25894},{id=25898}})==25894)
 end
 assert(recommend("WARRIOR","TANK",{{id=20217}})==20217)
 assert(recommend("PALADIN","TANK",{{id=20217}})==20217)
+assert(recommend("PALADIN","TANK",{{id=19742},{id=25898}})==25898)
+assert(recommend("PALADIN","TANK",{{id=25894}})==25894)
 assert(recommend("HUNTER","DAMAGER",{{id=20217}})==20217)
 assert(recommend("DRUID","TANK",{{id=19740}})==19740)
 for _,role in ipairs({"TANK","HEALER","DAMAGER","NONE"}) do
@@ -70,7 +72,7 @@ local function selected()
     end
     assert(count<=1);return result
 end
-local button=assert(selected());assert(button.attributes.spell1==19742)
+local button=assert(selected());assert(button.attributes.spell1==20217)
 button.scripts.OnEnter(button)
 assert(GameTooltip.extra:find("assigned tank",1,true) and GameTooltip.shown)
 m.units.party1.role="DAMAGER";m.Event("PLAYER_ROLES_ASSIGNED");m.Flush()
@@ -80,7 +82,7 @@ for _,b in ipairs(row.blessingButtons) do
 end
 m.combat=true;m.Event("PLAYER_REGEN_DISABLED");assert(not selected())
 m.units.party1.role="TANK";m.Event("PLAYER_ROLES_ASSIGNED");m.Flush();assert(not selected())
-m.combat=false;m.Event("PLAYER_REGEN_ENABLED");m.Flush();assert(selected().attributes.spell1==19742)
+m.combat=false;m.Event("PLAYER_REGEN_ENABLED");m.Flush();assert(selected().attributes.spell1==20217)
 m.units.party1.auras={{spellId=19742,name="Wisdom"}};a.Buffs.Refresh();assert(not selected())
 m.units.party1.auras={};a.Buffs.Refresh();assert(selected())
 m.auraError=true;a.Buffs.Refresh();assert(not selected())

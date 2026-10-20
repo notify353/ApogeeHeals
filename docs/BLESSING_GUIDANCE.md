@@ -20,8 +20,11 @@ threat reduction separately. This is one practitioner's design, not usage teleme
 
 [Forever player discussion](https://www.reddit.com/r/wowforever/comments/1x6ujis/paladin_class_deep_dive_in_wow_forever/)
 describes Protection Paladin mana pressure and using Wisdom with Seal of Fury.
-That supports Wisdom as a dungeon-sustain default; Kings remains a manual choice
-and the learned fallback. Tank preferences vary with gear, healing and threat.
+Wisdom remains a mana-sustain option, but this does not establish it as the usual
+first choice. Forever adds mana recovery through Improved Seal of Fury and Shield
+Specialization. The [EzBlessings author's priorities](https://www.curseforge.com/wow/addons/ezblessings)
+put Kings before Wisdom for Paladin tanks. The owner selected Kings first with
+Wisdom as the learned fallback; this is a default, not a population-wide trend.
 
 The [60.tools extracted Paladin spellbook](https://www.60.tools/spellbook/paladin)
 currently labels its spell data 70425, rather than the local 70450 API export.
@@ -40,7 +43,7 @@ roles fall back to a public class. Every fallback must itself be learned.
 | Recipient | First choice, then fallback |
 | --- | --- |
 | Warrior tank | Might, Kings |
-| Paladin tank | Wisdom, Kings |
+| Paladin tank | Kings, Wisdom |
 | Druid tank | Kings, Might |
 | Other/unknown tank class | Kings |
 | Any assigned healer | Wisdom, Kings |

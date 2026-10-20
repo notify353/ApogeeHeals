@@ -80,7 +80,7 @@ function D.Recommend(unit, available)
     local order, basis
     if role == "TANK" then
         basis = "assigned tank"
-        if class == "PALADIN" then order, basis = {"wisdom", "kings"}, "assigned tank; mana sustain"
+        if class == "PALADIN" then order = {"kings", "wisdom"}
         elseif class == "WARRIOR" then order, basis = {"might", "kings"}, "assigned tank; melee threat"
         elseif class == "DRUID" then order = {"kings", "might"}
         else order = {"kings"} end
