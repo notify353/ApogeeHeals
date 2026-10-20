@@ -116,9 +116,22 @@ function B.Apply()
             -- and empty modified slots must not fall through to another action.
             local fallback = button == 1 and prefix == "" and id == nil and "target" or ""
             local item = info and info.itemID
+            local castName
+            if info and not item then
+                local rank = A.Access.Read(C_Spell and C_Spell.GetSpellSubtext, id)
+                -- Compile only public client text outside combat. Never emit a second
+                -- recipient/empty conditional that could invoke automatic self casting.
+                if type(rank) == "string" and not info.name:find("[\r\n;%[%]]")
+                    and not rank:find("[\r\n;%[%]]") then
+                    castName = info.name .. (rank ~= "" and "(" .. rank .. ")" or "")
+                end
+            end
             if prefix == "" and button == 1 then B.rangeSpell = info and not item and id or nil end
             for _, frame in ipairs(recipients) do
-                frame:SetAttribute(prefix .. "type" .. button, info and (item and "item" or "spell") or fallback)
+                frame:SetAttribute(prefix .. "type" .. button,
+                    info and (item and "item" or (castName and "macro" or "")) or fallback)
+                frame:SetAttribute(prefix .. "macrotext" .. button, castName
+                    and "/cast [@" .. frame.unit .. ",exists,help] " .. castName .. "\n/stopspelltarget" or nil)
                 frame:SetAttribute(prefix .. "spell" .. button, info and not item and id or nil)
                 frame:SetAttribute(prefix .. "item" .. button, item and "item:" .. item or nil)
             end

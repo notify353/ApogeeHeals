@@ -15,12 +15,12 @@ ApogeeHealsDB={defaultSpells={enabled=true,time=1,serial=0}}
 local a=m.Start();local targets={a.View.target,a.View.targetTarget}
 for _,row in ipairs(targets) do
     assert(row.attributes.spell1==2050 and row.attributes.spell2==17) -- learned Priest defaults
-    assert(row.attributes.type1=="spell" and #row.clicks==5)
+    assert(row.attributes.type1=="macro" and #row.clicks==5)
 end
 for _,slot in ipairs(a.Bindings.slots) do assert(a.Bindings.Put(slot.id,2050)) end
 for _,row in ipairs(targets) do
     for _,slot in ipairs(a.Bindings.slots) do
-        assert(row.attributes[slot.prefix.."type"..slot.button]=="spell")
+        assert(row.attributes[slot.prefix.."type"..slot.button]=="macro")
         assert(row.attributes[slot.prefix.."spell"..slot.button]==2050)
     end
     assert(row.attributes["alt-type1"]=="" and row.attributes["ctrl-shift-type2"]=="")

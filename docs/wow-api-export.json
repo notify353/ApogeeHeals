@@ -3,6 +3,7 @@
   "interface": 16001,
   "reviewedOn": "2026-10-17",
   "requiredFiles": [
+    "Blizzard_ChatFrameBase/Shared/SlashCommands.lua",
     "Blizzard_ActionBar/Shared/StanceBar.lua",
     "Blizzard_BuffFrame/BuffFrame.lua",
     "Blizzard_SharedXMLGame/Tooltip/TooltipDataHandler.lua",

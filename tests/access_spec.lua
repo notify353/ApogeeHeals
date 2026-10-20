@@ -60,7 +60,7 @@ C_Spell = spellAPI; C_SpellBook = nil; Enum = nil
 assert(a.Bindings.Resolve(id) == nil and a.Bindings.Cursor() == nil)
 C_SpellBook = bookAPI; Enum = enum
 a.Bindings.Apply()
-assert(row.attributes.type1 == "spell" and row.attributes.spell1 == id)
+assert(row.attributes.type1 == "macro" and row.attributes.spell1 == id)
 print("PASS missing optional spell APIs retain assignments and recover without targeting fallback")
 
 m = Mock.New(); a = m.Load(); canaccesstable = nil

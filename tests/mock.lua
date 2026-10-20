@@ -194,7 +194,7 @@ function M.New()
         return { SetType = function() end, AddPoint = function() end }
     end }
     C_Timer = { After = function(_, callback) m.timers[#m.timers + 1] = callback end }
-    C_Spell = { GetSpellInfo = function(id)
+    C_Spell = { GetSpellSubtext = function() return "" end, GetSpellInfo = function(id)
         if id == 430 then return { name = "Drink", spellID = id } end
     end }
     C_UnitAuras = { GetAuraDataByIndex = function(u, i, filter)
