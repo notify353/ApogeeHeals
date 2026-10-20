@@ -62,7 +62,15 @@ function A.Storage.Open(saved)
     else threatPosition = nil end
     local threatEnabled
     if type(saved) == "table" and type(saved.threatEnabled) == "boolean" then threatEnabled = saved.threatEnabled end
+    local smartBuffs = {}
+    if type(saved) == "table" and type(saved.smartBuffs) == "table" then
+        for key, mode in pairs(saved.smartBuffs) do
+            if type(key) == "string" and #key <= 80
+                and (mode == "smart" or mode == "manual" or mode == "off") then smartBuffs[key] = mode end
+        end
+    end
     return { version = 3, position = { x = position.x, y = position.y }, bindings = bindings, buffs = buffs,
+        smartBuffs = smartBuffs,
         defaultSpells = type(saved) == "table" and saved.defaultSpells or nil,
         minimapAngle = angle, editorPosition = editorPosition, threatPosition = threatPosition, threatEnabled = threatEnabled }
 end

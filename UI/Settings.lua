@@ -145,7 +145,7 @@ function S.Create()
     title:SetPoint("TOPLEFT", 16, -16); title:SetText("Apogee Heals")
     S.buffs = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
     S.buffs:SetPoint("TOPLEFT", 16, -48); S.buffs:SetSize(180, 24)
-    S.buffs:SetText("Buff reminders")
+    S.buffs:SetText("Smart buffs")
     S.buffs:SetScript("OnClick", function() A.Buffs.OpenPicker() end)
     S.cleanseStatus = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     S.cleanseStatus:SetTextColor(0.8, 0.8, 0.8)
@@ -173,7 +173,7 @@ function S.Create()
     demoLabel:SetText("Threat demo (solo preview; ends in combat)")
     S.threatDemo:SetScript("OnClick", function(button) A.Threat.SetDemo(button:GetChecked()) end)
     StaticPopupDialogs.APOGEE_HEALS_RESET_CHARACTER = {
-        text = "Restore Apogee Heals defaults for this character?\n\nClears healing assignments, buff reminders and positions and restores defaults. This cannot be undone.\n\nOther characters, other addons and WoW keybindings are unchanged.",
+        text = "Restore Apogee Heals defaults for this character?\n\nClears healing assignments, Smart buffs preferences and positions and restores defaults. This cannot be undone.\n\nOther characters, other addons and WoW keybindings are unchanged.",
         button1 = "Defaults", button2 = CANCEL or "Cancel",
         timeout = 0, whileDead = true, hideOnEscape = true,
         OnAccept = function() A.ResetCharacter() end,

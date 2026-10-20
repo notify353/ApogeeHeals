@@ -1,3 +1,12 @@
+## Unreleased — Smart buffs
+
+- Replace the legacy reminder checklist with learned-spell Smart, Manual and Off
+  controls, shared by blessings, class upkeep, armor choices and auras/aspects.
+- Preserve Paladin guidance; keep stacking buffs independent, filter Spirit and
+  Intellect to mana users/healers, and suggest Thorns for assigned tanks.
+- Default Shadow Protection to Manual. Preserve existing opt-outs, foreign-caster
+  coverage, combat hiding and fixed-recipient click casting.
+
 ## Unreleased - Remove Focus diagnostic (2026-10-20)
 
 - Remove temporary Focus health checks and their tests after the owner selected

@@ -1,5 +1,15 @@
 # Class support on Forever
 
+Smart buffs now supplies learned-spell Smart / Manual / Off controls. Blessings,
+auras/aspects and armor alternatives are choice groups; stacking buffs have
+independent preferences. Manual appears only on class-strip expansion; Off stays
+hidden there too. Fortitude and Mark serve all recipients, Spirit and Intellect
+serve healers/mana classes, and automatic Thorns requires an assigned tank.
+Shadow Protection defaults to Manual. Existing disabled catalog/discovered buffs
+remain Off; a legacy disabled armor variant disables its group. Old seeded
+Might/Wisdom choices do not control the Blessings group.
+
+
 Reviewed against Forever 1.60.1.70009 on September 27, 2026. Candidates are
 validated against the live learned spellbook; database presence never grants an
 action. This is a pre-combat upkeep guide, not an encounter optimizer.
