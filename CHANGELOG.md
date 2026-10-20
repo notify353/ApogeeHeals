@@ -1,3 +1,8 @@
+## Unreleased - Assigned party roles
+
+- Show the game's assigned tank, healer or damage role beside the party leader crown.
+- Leave unassigned or unavailable roles blank; update on role and roster changes.
+
 ## Unreleased - Party leader
 
 - Show a gold crown on the party leader's row, updating on leadership changes.

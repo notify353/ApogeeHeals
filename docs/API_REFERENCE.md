@@ -1,3 +1,17 @@
+## Assigned party role icons (October 20, 70450)
+
+Matching Forever export verified. UnitDocumentation defines UnitGroupRolesAssigned
+as a string result, secret when identity is restricted. Access.Read guards it;
+only TANK, HEALER and DAMAGER map to icons. NONE, missing, errors and restricted
+values clear the previous icon. UnitRoleDocumentation's ROLE_CHANGED_INFORM
+and PartyInfoDocumentation's PLAYER_ROLES_ASSIGNED trigger the existing refresh;
+event name payloads are ignored. Roster/world events clear stale recipients.
+CommunitiesUtil.GetRoleSpecClassLine uses roleicon-tiny-tank, roleicon-tiny-healer
+and roleicon-tiny-dps. SimpleTextureBase SetAtlas(atlas, false) preserves the
+fixed 8-by-8 geometry. Only public constant atlas names reach that display API.
+No class inference, saved preferences, protected layout changes or new polling.
+Native readability and combat rendering require owner acceptance.
+
 ## Party leader indicator (October 20, 70450)
 
 Verified matching Forever 1.60.1.70450 / 16001 export. UnitDocumentation

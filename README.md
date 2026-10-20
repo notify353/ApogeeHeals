@@ -72,6 +72,9 @@ guidance, native weapon displays, limitations and live acceptance checks.
 - A small gold crown at the right of the party leader's health bar updates when
   leadership changes, including in combat. Names reserve space for it. Solo and
   unavailable leader data show no crown; the layout preview crowns its first row.
+- Native tank, healer and damage icons appear just left of the crown for the
+  game's assigned role on each player/party row. Unassigned or unavailable roles
+  stay blank. Role changes update in combat; class is never used to guess a role.
 - Up to eight native debuff icons extend right of each player/party health bar,
   after the reserved drinking-icon space. Hover for the native aura tooltip.
   All harmful aura types qualify, including effects you cannot dispel. Native

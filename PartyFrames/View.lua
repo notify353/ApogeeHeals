@@ -2,6 +2,14 @@ local _, A = ...
 local V, S = {}, A.Style
 A.View = V
 local units = { "player", "party1", "party2", "party3", "party4" }
+local roleAtlases = {
+    TANK = "roleicon-tiny-tank", HEALER = "roleicon-tiny-healer", DAMAGER = "roleicon-tiny-dps",
+}
+function V.PaintRole(row, role)
+    local atlas = A.Access.Readable(role) and type(role) == "string" and roleAtlases[role]
+    if atlas then row.roleIcon:SetAtlas(atlas, false) end
+    row.roleIcon:SetShown(atlas ~= nil and atlas ~= false)
+end
 local function createDebuffs(row)
     -- All aura selection, ordering, visibility and updates stay in native code.
     -- Never retain or inspect the native aura buttons after initialization.
@@ -52,14 +60,18 @@ local function buildRow(row, preview, first, width)
     row.nameLayer:SetAllPoints(row.health)
     row.nameLayer:SetFrameLevel(row.incoming.bar:GetFrameLevel() + 1)
     row.nameLayer:EnableMouse(false)
-    local leaderSpace = 0
+    local indicatorSpace = 0
     if preview or row.unit == "player" or row.unit:match("^party%d$") then
-        leaderSpace = 10
+        indicatorSpace = 20
         row.leader = row.nameLayer:CreateTexture(nil, "OVERLAY")
         row.leader:SetTexture("Interface\\GroupFrame\\UI-Group-LeaderIcon")
         row.leader:SetSize(8, 8)
         row.leader:SetPoint("RIGHT", row.health, "RIGHT", -2, 0)
         row.leader:Hide()
+        row.roleIcon = row.nameLayer:CreateTexture(nil, "OVERLAY")
+        row.roleIcon:SetSize(8, 8)
+        row.roleIcon:SetPoint("RIGHT", row.health, "RIGHT", -12, 0)
+        row.roleIcon:Hide()
     end
     -- Match the name font so two-digit levels fit the reserved level column.
     row.level = S.Text(row.nameLayer, 6)
@@ -70,12 +82,12 @@ local function buildRow(row, preview, first, width)
     row.level:SetShadowColor(0, 0, 0, 1); row.level:SetShadowOffset(1, -1)
     row.name = S.Text(row.nameLayer, 6)
     row.name:SetPoint("LEFT", row.health, "LEFT", 18.5, 0)
-    row.name:SetSize(width - 22.5 - leaderSpace, S.healthHeight)
+    row.name:SetSize(width - 22.5 - indicatorSpace, S.healthHeight)
     row.name:SetJustifyH("LEFT"); row.name:SetJustifyV("MIDDLE")
     row.name:SetShadowColor(0, 0, 0, 1); row.name:SetShadowOffset(1, -1)
     row.status = S.Text(row.nameLayer, 8)
-    row.status:SetPoint("CENTER", row.health, "CENTER", -leaderSpace / 2, 0)
-    row.status:SetSize(width - 8 - leaderSpace, S.healthHeight)
+    row.status:SetPoint("CENTER", row.health, "CENTER", -indicatorSpace / 2, 0)
+    row.status:SetSize(width - 8 - indicatorSpace, S.healthHeight)
     row.status:SetJustifyH("CENTER"); row.status:SetJustifyV("MIDDLE")
     row.status:SetTextColor(unpack(S.muted))
     row.status:SetShadowColor(0, 0, 0, 1); row.status:SetShadowOffset(1, -1)
@@ -313,6 +325,11 @@ function V.Refresh()
             and A.Access.Read(UnitExists, "party1") == true
             and A.Access.Read(UnitExists, row.unit) == true
             and A.Access.Read(UnitIsGroupLeader, row.unit) == true)
+        local role
+        if not A.Runtime.suspended and A.Access.Read(UnitExists, row.unit) == true then
+            role = A.Access.Read(UnitGroupRolesAssigned, row.unit)
+        end
+        V.PaintRole(row, role)
         local classOK, _, classToken = pcall(UnitClass, row.unit)
         if not classOK then classToken = nil end
         A.UnitAPI.PaintClassStrip(row.classStrip, classToken)
