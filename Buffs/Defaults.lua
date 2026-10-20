@@ -71,7 +71,7 @@ function D.Choices()
     return result
 end
 
--- Conservative novice guidance, not an optimizer. See docs/BLESSING_GUIDANCE.md.
+-- Five-player upkeep guidance, not a spec/gear optimizer. See docs/BLESSING_GUIDANCE.md.
 function D.Recommend(unit, available)
     if InCombatLockdown() or not D.active or #available == 0 then return end
     local role = A.Access.Read(UnitGroupRolesAssigned, unit)
@@ -80,8 +80,9 @@ function D.Recommend(unit, available)
     local order, basis
     if role == "TANK" then
         basis = "assigned tank"
-        if class == "PALADIN" then order = {"kings", "wisdom"}
-        elseif class == "WARRIOR" or class == "DRUID" then order = {"kings", "might"}
+        if class == "PALADIN" then order, basis = {"wisdom", "kings"}, "assigned tank; mana sustain"
+        elseif class == "WARRIOR" then order, basis = {"might", "kings"}, "assigned tank; melee threat"
+        elseif class == "DRUID" then order = {"kings", "might"}
         else order = {"kings"} end
     elseif role == "HEALER" then
         order, basis = {"wisdom", "kings"}, "assigned healer"
@@ -91,7 +92,7 @@ function D.Recommend(unit, available)
     elseif class == "MAGE" or class == "PRIEST" or class == "WARLOCK" then
         order, basis = {"wisdom", "kings"}, "caster class"
     elseif class == "HUNTER" then
-        order, basis = {"kings", "wisdom"}, "hunter class; combat style unknown"
+        order, basis = {"wisdom", "kings"}, "hunter mana sustain; ranged-play fallback"
     elseif class == "PALADIN" or class == "DRUID" or class == "SHAMAN" then
         order, basis = {"kings", "wisdom"}, "hybrid class; specialization unknown"
     else

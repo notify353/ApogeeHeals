@@ -1,5 +1,8 @@
 ## Unreleased — Smart buffs
 
+- Tune five-man blessing guidance: Might for Warrior tanks, Wisdom for Paladin
+  tanks and Hunters, Kings for Druid tanks; retain role-first healer/melee choices.
+
 - Replace the legacy reminder checklist with learned-spell Smart, Manual and Off
   controls, shared by blessings, class upkeep, armor choices and auras/aspects.
 - Preserve Paladin guidance; keep stacking buffs independent, filter Spirit and
