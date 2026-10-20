@@ -4,7 +4,7 @@
   fixed-unit actions outside combat and click-time range checks. Preserve the
   existing role and spell icons; move drinking/debuff displays right to fit.
 
-## Unreleased â€” Smart buffs
+## Unreleased — Smart buffs
 
 - Tune five-man blessing guidance: Might for Warrior tanks, Wisdom for Hunters,
   Kings for Paladin/Druid tanks; retain role-first healer/melee choices.
