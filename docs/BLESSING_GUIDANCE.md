@@ -43,20 +43,28 @@ roles fall back to a public class. Every fallback must itself be learned.
 | Recipient | First choice, then fallback |
 | --- | --- |
 | Warrior tank | Might, Kings |
-| Paladin tank | Kings, Wisdom |
+| Paladin tank | Kings, Wisdom, Might |
 | Druid tank | Kings, Might |
 | Other/unknown tank class | Kings |
 | Any assigned healer | Wisdom, Kings |
-| Warrior/Rogue; Paladin assigned damage | Might, Kings |
+| Warrior/Rogue | Might, Kings |
+| Paladin assigned damage | Might, Kings, Wisdom |
 | Mage/Priest/Warlock | Wisdom, Kings |
 | Hunter | Wisdom, Kings |
-| Druid/Shaman damage or unknown spec; unassigned Paladin | Kings, Wisdom |
+| Druid/Shaman damage or unknown spec | Kings, Wisdom |
+| Unassigned Paladin | Kings, Wisdom, Might |
 | Unreadable/unknown class and role | Kings |
 
 The caster, melee and mana-sustain choices follow common dungeon use; the exact
 fallback table is our design inference. Light can help a Paladin healer and
 other options can suit particular fights, but role/class alone cannot establish
 those conditions. They stay explicit choices instead of universal defaults.
+
+Leveling Paladins can fall back to Might before learning Wisdom or Kings, except
+when assigned healer. Damage Paladins can use Wisdom when neither Might nor Kings
+is available. These last-resort choices do not change the preferred blessing.
+Training or losing a spell refreshes the indicator; changes during combat wait
+until combat ends. Each ordinary/Greater variant uses its highest learned rank.
 
 Ordinary ranks are preferred for an individual row; a learned Greater variant
 is the fallback within its family. The indicator selects at most one offered

@@ -50,6 +50,11 @@ assert(recommend("WARRIOR","TANK",{{id=20217}})==20217)
 assert(recommend("PALADIN","TANK",{{id=20217}})==20217)
 assert(recommend("PALADIN","TANK",{{id=19742},{id=25898}})==25898)
 assert(recommend("PALADIN","TANK",{{id=25894}})==25894)
+assert(recommend("PALADIN","TANK",{{id=19740}})==19740)
+assert(recommend("PALADIN","NONE",{{id=19740}})==19740)
+assert(recommend("PALADIN","DAMAGER",{{id=19742}})==19742)
+assert(recommend("PALADIN","DAMAGER",{{id=19742},{id=20217}})==20217)
+assert(recommend("PALADIN","HEALER",{{id=19740}})==nil)
 assert(recommend("HUNTER","DAMAGER",{{id=20217}})==20217)
 assert(recommend("DRUID","TANK",{{id=19740}})==19740)
 for _,role in ipairs({"TANK","HEALER","DAMAGER","NONE"}) do
@@ -83,6 +88,23 @@ end
 m.combat=true;m.Event("PLAYER_REGEN_DISABLED");assert(not selected())
 m.units.party1.role="TANK";m.Event("PLAYER_ROLES_ASSIGNED");m.Flush();assert(not selected())
 m.combat=false;m.Event("PLAYER_REGEN_ENABLED");m.Flush();assert(selected().attributes.spell1==20217)
+-- A leveling spellbook must drive the real indicator, including training and
+-- rank changes. An unlearned preferred blessing must never strand the highlight.
+known = {[19740]=true}
+m.Event("SPELLS_CHANGED");m.Flush();assert(selected().attributes.spell1==19740)
+known[19834]=true
+m.Event("SPELLS_CHANGED");m.Flush();assert(selected().attributes.spell1==19834)
+known[19742]=true
+m.Event("SPELLS_CHANGED");m.Flush();assert(selected().attributes.spell1==19742)
+known[20217]=true
+m.combat=true;m.Event("PLAYER_REGEN_DISABLED")
+m.Event("SPELLS_CHANGED");m.Flush();assert(not selected())
+m.combat=false;m.Event("PLAYER_REGEN_ENABLED");m.Flush()
+assert(selected().attributes.spell1==20217)
+known[20217]=nil
+m.Event("SPELLS_CHANGED");m.Flush();assert(selected().attributes.spell1==19742)
+known[20217]=true
+m.Event("SPELLS_CHANGED");m.Flush()
 m.units.party1.auras={{spellId=19742,name="Wisdom"}};a.Buffs.Refresh();assert(not selected())
 m.units.party1.auras={};a.Buffs.Refresh();assert(selected())
 m.auraError=true;a.Buffs.Refresh();assert(not selected())

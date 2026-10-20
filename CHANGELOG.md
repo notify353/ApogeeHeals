@@ -6,6 +6,9 @@
 
 ## Unreleased — Smart buffs
 
+- Fill leveling Paladin recommendation gaps with suitable learned blessings:
+  tank/unassigned Kings, Wisdom, Might; damage Might, Kings, Wisdom.
+
 - Tune five-man blessing guidance: Might for Warrior tanks, Wisdom for Hunters,
   Kings for Paladin/Druid tanks; retain role-first healer/melee choices.
 
