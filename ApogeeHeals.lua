@@ -12,7 +12,6 @@ function A.ResetCharacter()
     A.Settings.ResetPositions()
     A.Threat.demo = false; A.Threat.ApplyEnabled()
     A.ThreatDiagnostics.SetEnabled(false)
-    A.HealthDiagnostics.Close()
     A.Bindings.Apply(); A.Buffs.Refresh(); A.Settings.Refresh()
     return true
 end
@@ -23,7 +22,6 @@ local function start()
     A.Minimap.Create()
     A.Threat.Start()
     A.ThreatDiagnostics.Start()
-    A.HealthDiagnostics.Create()
     loader:UnregisterAllEvents()
 end
 loader:SetScript("OnEvent", function(_, event, loaded)

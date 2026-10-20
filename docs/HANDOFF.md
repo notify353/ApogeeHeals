@@ -1,17 +1,10 @@
-# Focus health feasibility - 2026-10-20
+# Focus investigation closed - 2026-10-20
 
-The silent diagnostic is implemented; native access and layout acceptance remain
-pending. This supersedes the old missing-diagnostic status below, not the pending
-Focus sound feature. Use docs/ACCEPTANCE.md and report separate solo/party combat
-outcomes. No automatic sound or threshold slider is implemented.
-
-Archived Focus.ogg SHA256:
-acf3d7fa0b52e218ebe6cdbd156e46fd4834d7a759692f4cf596b574b2767e3b.
-Archive Media/ATTRIBUTION.md traces an unchanged local WeakAuras copy, but
-explicitly lacks verified original-author/license mapping for Focus. No asset
-is bundled here. Preserve the archive; provenance needs resolution before any
-future redistribution claim. Local evidence and task record:
-C:/Temp/apogee-focus-health-20261020/task-record.md.
+Owner chose Blizzard native health alerts after combat testing showed restricted
+reads. Removed this task's diagnostic UI, runtime and automated diagnostic tests.
+No Focus audio is planned. Historical pending notes below are superseded by this
+decision. Native alert preferences are user-managed. Prior receipts, evidence and
+archived sounds are preserved; no private saved data is inspected or changed.
 
 # Local consolidation handoff
 

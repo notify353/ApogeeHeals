@@ -1,25 +1,3 @@
-# Focus health feasibility acceptance - pending (2026-10-20)
-
-1. Reload the checked DEV build. If Focus health checks is missing, restart the
-   client manually because this candidate adds a Lua file and changes the TOC.
-2. Open Settings > Apogee DEV > Heals > Focus health checks. Opening alone must
-   not sample. Start, observe solo outside/combat rows, then Stop to freeze them.
-3. In normal play, observe a transition from at least 50% to below 50%, followed
-   by recovery to at least 50%. If readable, each crossing counts once; staying
-   low does not repeat. Exactly 50% is recovered. Unobserved crossings remain
-   unverified; no special combat risk is necessary for testing.
-4. Repeat in a normal party. All five fixed token rows are independent; dead,
-   offline, absent recipients and raids skip. Targets and pets never appear.
-5. Any UNSUPPORTED result means a restricted read occurred. INCOMPLETE means
-   missing/error/invalid data. Neither proves healthy status. Readable health
-   bars do not establish Lua access. Report separate Outside/Combat results.
-6. Stop retains counters without sampling; Reset clears; Start begins fresh;
-   Close stops; reload defaults off. Zoning suspends reads, roster changes reset
-   party counters, and no gap is inferred as a crossing. No sound should play.
-7. Share the stopped panel results after solo and party combat. No health values
-   or names appear in the panel or saved data. UI layout, taint and feasibility
-   remain unverified until these live results are supplied.
-
 # In-game prototype acceptance
 
 On 2026-09-24 the owner reported testing all five installed Apogee candidates

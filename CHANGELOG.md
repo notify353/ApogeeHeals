@@ -1,3 +1,8 @@
+## Unreleased - Remove Focus diagnostic (2026-10-20)
+
+- Remove temporary Focus health checks and their tests after the owner selected
+  Blizzard native health alerts. Preserve all other Heals features and settings.
+
 ## Unreleased - Indicator combat visibility
 
 - Place the party leader crown to the left of the role icon.
@@ -15,13 +20,6 @@
 ## Unreleased - Level readability
 
 - Match level text to the compact name font so two-digit levels fit without ellipsis.
-
-## Unreleased - Focus health feasibility (2026-10-20)
-
-- Add silent session-only Focus health checks with Start/Stop/Reset and separate
-  combat/outside-combat readability and 50% crossing counts for player/party1-4.
-  Restricted data never triggers comparisons; roster changes reset party results.
-  No sound or saved health samples are included.
 
 ## Unreleased - Optional default spells
 
