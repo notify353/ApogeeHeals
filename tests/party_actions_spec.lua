@@ -18,6 +18,15 @@ assert(not a.View.rows[1].partyActions and not a.View.target.partyActions
     and not a.View.targetTarget.partyActions)
 assert(follow.propagateMouseClicks == false and inspect.propagateMouseClicks == false)
 assert(follow.width == a.Style.sideIconSize and inspect.width == a.Style.sideIconSize)
+for _, button in ipairs(row.partyActions) do
+    assert(button.driver == "[combat] hide; show", "native combat visibility, including hit region")
+    assert(button.icon.width == 10 and button.icon.height == 10 and button.icon.desaturated)
+    assert(button.icon.alpha == 0.45)
+end
+follow.scripts.OnEnter()
+assert(follow.icon.alpha == 0.8)
+follow.scripts.OnLeave()
+assert(follow.icon.alpha == 0.45)
 assert(follow.point[4] + follow.width < inspect.point[4])
 assert(inspect.point[4] + inspect.width < row.drinkIcon.point[4])
 click(follow); click(inspect)

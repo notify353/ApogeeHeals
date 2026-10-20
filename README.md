@@ -12,7 +12,8 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
   cleansing buttons on each other party member's row. Left-click outside combat.
   Move within native interaction range to use them. They do not change your
   target; combat, loading and frame unlock prevent actions. Player and target
-  rows retain their existing controls.
+  rows retain their existing controls. Small muted icons brighten on hover.
+  The two buttons disappear completely during combat.
 
 - **Threat demo (solo preview; ends in combat)** previews scripted threat bars
   and warrior debuff icons without live reads. The checkbox is session-only;

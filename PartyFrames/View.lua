@@ -27,7 +27,7 @@ function V.RefreshPartyActions()
         for index, button in ipairs(row.partyActions or {}) do
             local available = partyActionReason(row, index == 2, false) == nil
             button:SetEnabled(available)
-            button.icon:SetAlpha(available and 1 or 0.3)
+            button.icon:SetAlpha(available and (button.hovered and 0.8 or 0.45) or 0.2)
             if not available and GameTooltip:IsOwned(button) then GameTooltip:Hide() end
         end
     end
@@ -45,19 +45,28 @@ local function createPartyActions(row)
         button:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset + (index - 1) * (size + gap), S.sideIconY)
         button:SetPropagateMouseClicks(false)
         button:RegisterForClicks("LeftButtonUp")
-        S.Background(button)
         button.icon = button:CreateTexture(nil, "ARTWORK")
-        button.icon:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
-        button.icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
+        button.icon:SetSize(10, 10)
+        button.icon:SetPoint("CENTER", button, "CENTER", 0, 0)
         if inspect then button.icon:SetAtlas("common-icon-search", false)
         else button.icon:SetTexture("Interface\\Icons\\Ability_Tracking") end
+        button.icon:SetDesaturated(true)
+        button.icon:SetAlpha(0.45)
+        -- Native visibility removes both artwork and hit regions in combat.
+        -- Reserve the layout permanently so cleanse and debuff slots never move.
+        RegisterStateDriver(button, "visibility", "[combat] hide; show")
         button:SetScript("OnEnter", function()
+            if InCombatLockdown() then return end
+            button.hovered = true
+            V.RefreshPartyActions()
             GameTooltip:SetOwner(button, "ANCHOR_RIGHT"); GameTooltip:SetText(label)
             GameTooltip:AddLine(partyActionReason(row, inspect, true) or
                 (inspect and "Inspect this party member." or "Follow this party member."), 0.8, 0.8, 0.8)
             GameTooltip:Show()
         end)
         local function hideTooltip()
+            button.hovered = false
+            button.icon:SetAlpha(0.45)
             if GameTooltip:IsOwned(button) then GameTooltip:Hide() end
         end
         button:SetScript("OnLeave", hideTooltip)
