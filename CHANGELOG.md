@@ -1,3 +1,7 @@
+## Unreleased - Party leader
+
+- Show a gold crown on the party leader's row, updating on leadership changes.
+
 ## Unreleased - Level readability
 
 - Match level text to the compact name font so two-digit levels fit without ellipsis.

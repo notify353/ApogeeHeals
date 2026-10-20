@@ -28,7 +28,7 @@ end
 function R.Start()
     local driver = CreateFrame("Frame")
     R.driver = driver
-    for _, event in ipairs({ "PLAYER_ENTERING_WORLD", "GROUP_ROSTER_UPDATE",
+    for _, event in ipairs({ "PLAYER_ENTERING_WORLD", "GROUP_ROSTER_UPDATE", "PARTY_LEADER_CHANGED",
         "UNIT_HEALTH", "UNIT_MAXHEALTH", "UNIT_POWER_UPDATE", "UNIT_MAXPOWER",
         "UNIT_DISPLAYPOWER", "UNIT_FLAGS", "UNIT_CONNECTION", "UNIT_NAME_UPDATE",
         "UNIT_LEVEL", "PLAYER_TARGET_CHANGED", "UNIT_FACTION", "UNIT_TARGET",
@@ -70,7 +70,9 @@ function R.Start()
             A.Buffs.HideTooltip(A.Buffs.tooltipButton)
         elseif event == "PLAYER_LEAVING_WORLD" then
             R.suspended = true
-            for _, row in ipairs(A.View.rows) do A.Drinking.Clear(row) end
+            for _, row in ipairs(A.View.rows) do
+                A.Drinking.Clear(row); row.leader:Hide()
+            end
             A.View.ClearTargetCast()
             A.Buffs.suspended = true
             A.Buffs.Stop()

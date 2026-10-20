@@ -1,3 +1,17 @@
+## Party leader indicator (October 20, 70450)
+
+Verified matching Forever 1.60.1.70450 / 16001 export. UnitDocumentation
+defines UnitIsGroupLeader(unit, optional partyCategory) returning a boolean,
+secret when unit identity is restricted. Read through Access.Read; only public
+true shows the crown. Public UnitExists for party1 and the recipient prevents
+solo/missing-unit indicators. PartyInfoDocumentation exposes PARTY_LEADER_CHANGED;
+that event and GROUP_ROSTER_UPDATE use the existing coalesced refresh.
+The native UI-Group-LeaderIcon texture is referenced by exported Channels and
+GroupFinder code. Configure a noninteractive texture and reserved text width at
+creation; refresh only texture visibility, including combat. World suspension
+clears it. No protected layout or attributes change. Native appearance and combat
+acceptance remain separate from the passing mocks.
+
 ## Exclusive class-strip input (October 12)
 
 Reviewed matching 70338 SimpleFrame SetHitRectInsets and SimpleScriptRegion

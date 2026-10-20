@@ -3,7 +3,7 @@ local m = Mock.New(); local a = m.Start()
 for _, rows in ipairs({a.View.rows, a.Preview.rows}) do
     for _, row in ipairs(rows) do
         assert(row.name.point[1] == "LEFT" and row.name.point[2] == row.health)
-        assert(row.name.width == 89.5 and row.name.height == 14)
+        assert(row.name.width == 79.5 and row.name.height == 14)
         assert(row.name.font[2] == 6)
         assert(row.level.point[4] == 4 and row.name.point[4] == 18.5)
         assert(row.name.justify == "LEFT" and row.name.justifyV == "MIDDLE")
