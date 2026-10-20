@@ -1,3 +1,7 @@
+## Unreleased - Level readability
+
+- Match level text to the compact name font so two-digit levels fit without ellipsis.
+
 ## Unreleased - Focus health feasibility (2026-10-20)
 
 - Add silent session-only Focus health checks with Start/Stop/Reset and separate
