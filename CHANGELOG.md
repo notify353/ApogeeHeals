@@ -1,3 +1,7 @@
+## Unreleased - Level readability
+
+- Match level text to the compact name font so two-digit levels fit without ellipsis.
+
 ## Unreleased - Optional default spells
 
 - Add one per-character Enable default spells checkbox in the Keybinds settings group, off initially.
