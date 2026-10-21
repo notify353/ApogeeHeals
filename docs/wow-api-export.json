@@ -3,6 +3,7 @@
   "interface": 16001,
   "reviewedOn": "2026-10-17",
   "requiredFiles": [
+    "Blizzard_ChatFrameBase/Shared/SlashCommands.lua",
     "Blizzard_ActionBar/Shared/StanceBar.lua",
     "Blizzard_BuffFrame/BuffFrame.lua",
     "Blizzard_SharedXMLGame/Tooltip/TooltipDataHandler.lua",
@@ -67,6 +68,18 @@
     "Blizzard_APIDocumentationGenerated/SimpleRegionAPIDocumentation.lua",
     "Blizzard_APIDocumentationGenerated/RaidMarkersDocumentation.lua",
     "Blizzard_NamePlates/Blizzard_NamePlateBase.lua",
-    "Blizzard_NamePlates/Blizzard_NamePlates.lua"
+    "Blizzard_NamePlates/Blizzard_NamePlates.lua",
+    "Blizzard_APIDocumentationGenerated/PlayerScriptDocumentation.lua",
+    "Blizzard_UnitPopupShared/UnitPopupSharedButtonMixins.lua",
+    "Blizzard_InspectUI/Blizzard_InspectUI.toc",
+    "Blizzard_InspectUI/Mainline/Blizzard_InspectUI_Bootstrap.lua",
+    "Blizzard_InspectUI/Camelot/Blizzard_InspectUI.lua",
+    "Blizzard_ActionBar/Shared/PetActionBar.lua",
+    "Blizzard_GroupFinder_VanillaStyle/Mainline/WhoList.xml",
+    "Blizzard_UnitPopup/Camelot/UnitPopupMenus.lua",
+    "Blizzard_FrameXMLUtil/Blizzard_FrameXMLUtil.toc",
+    "Blizzard_FrameXMLUtil/Mainline/PlayerSpellsUtil.lua",
+    "Blizzard_PlayerSpells/Camelot/ClassTalents/Blizzard_ClassTalentsFrame.lua",
+    "Blizzard_ClickBindingUI/Blizzard_ClickBindingUI.xml"
   ]
 }

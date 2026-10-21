@@ -1,3 +1,11 @@
+# Focus investigation closed - 2026-10-20
+
+Owner chose Blizzard native health alerts after combat testing showed restricted
+reads. Removed this task's diagnostic UI, runtime and automated diagnostic tests.
+No Focus audio is planned. Historical pending notes below are superseded by this
+decision. Native alert preferences are user-managed. Prior receipts, evidence and
+archived sounds are preserved; no private saved data is inspected or changed.
+
 # Local consolidation handoff
 
 ## Owner acceptance and GitHub handoff (2026-09-24)

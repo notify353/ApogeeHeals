@@ -30,8 +30,8 @@ function U.PaintHealth(bar, unit, curve)
     if not colored then bar:SetStatusBarColor(0.7, 0.7, 0.7, 1) end
     return true
 end
-function U.PaintPower(bar, unit)
-    local kind = R(UnitPowerType, unit)
+function U.PaintPower(bar, unit, kind)
+    if kind == nil then kind = R(UnitPowerType, unit) end
     if type(kind) ~= "number" then U.Clear(bar); return end
     local maximum = R(UnitPowerMax, unit, kind)
     if type(maximum) == "number" and maximum <= 0 then U.Clear(bar); return end
@@ -40,6 +40,30 @@ function U.PaintPower(bar, unit)
         bar:SetStatusBarColor(A.Style.PowerColor(kind))
     end)
     if not ok then U.Clear(bar) end
+end
+function U.ClearRowPower(row)
+    U.Clear(row.power)
+    U.Clear(row.manaPower); U.Clear(row.formPower)
+    row.power:SetAlpha(1)
+    row.manaPower:SetAlpha(0); row.formPower:SetAlpha(0)
+end
+function U.PaintRowPower(row, hidden)
+    local ok, _, class = pcall(UnitClass, row.unit)
+    local kind = R(UnitPowerType, row.unit)
+    local split = row.unit == "player" and ok and A.Access.Readable(class) and class == "DRUID"
+        and (kind == 1 or kind == 3)
+    -- Geometry is fixed at creation. Only native display values/alpha change
+    -- during combat; restricted resource quantities never control the layout.
+    row.power:SetAlpha((hidden or split) and 0 or 1)
+    row.manaPower:SetAlpha(split and not hidden and 1 or 0)
+    row.formPower:SetAlpha(split and not hidden and 1 or 0)
+    if split then
+        U.PaintPower(row.manaPower, row.unit, 0)
+        U.PaintPower(row.formPower, row.unit, kind)
+    else
+        U.Clear(row.manaPower); U.Clear(row.formPower)
+        U.PaintPower(row.power, row.unit)
+    end
 end
 function U.PaintClassColor(label, classToken)
     -- Always reset first so reused party slots cannot retain the previous class.

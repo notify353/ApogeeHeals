@@ -1,4 +1,21 @@
+## Simple health-bar range (October 20, 2026)
+
+The applied, unmodified left-click spell alone controls health-bar fading.
+Confirmed out of range fades health artwork and its text/incoming-heal children
+to 45%; in-range or unknown stays fully opaque. Buff buttons are sibling frames
+and retain their own exact-spell range checks without inheriting this fade.
+An empty left slot or bandage uses guarded 40-yard proximity (inclusive), keeping
+non-caster group distance useful. A spell's unknown range never falls back to
+proximity. Right-click and modifier bindings do not alter this cue. The Near/Far
+and per-click labels are removed. Power and support icons retain normal opacity.
+No casting or recipient changes. Native appearance/combat acceptance pending.
+
 # Apogee Heals
+
+Buff buttons on party and target rows now explicitly cast only on that row's
+recipient, using the selected rank without an alternate self target. Player-row
+buffs, auras and aspects keep their intentional self-cast behavior. Native
+range/line-of-sight acceptance of this buff extension is pending.
 
 Settings appear under **Apogee** (or **Apogee DEV**) with a one-word child label. Only enabled, loaded addons with settings appear; changes to enabled addons take effect after reload.
 
@@ -7,6 +24,17 @@ Prototype 0.1.0-dev; reviewed against local export 1.60.1.70450. The owner confi
 the appearance in game; full live acceptance remains pending. Not released. Classic Era is deliberately unsupported.
 
 ## Prototype
+
+- Select another friendly player to show a compact Follow, Inspect and Talents
+  group inside the right end of the target health bar. Three role-sized icons brighten on hover; tooltips name each action.
+  The target name reserves space for the icons. It disappears in combat, while moving frames and while loading.
+  Party rows have no action buttons; buffs never reposition the strip.
+  All three appear together only when Follow and inspection range/availability checks pass.
+  Movement refreshes the group; clicks still recheck the current target.
+
+- Talents opens the native inspected talent window after matching data arrives.
+  Target changes, combat, roster changes, zoning and a five-second timeout cancel
+  pending inspection. No automatic follow, retargeting or stored talent data.
 
 - **Threat demo (solo preview; ends in combat)** previews scripted threat bars
   and warrior debuff icons without live reads. The checkbox is session-only;
@@ -53,6 +81,13 @@ guidance, native weapon displays, limitations and live acceptance checks.
 
 - Player-first vertical stack followed by party1 through party4. Player remains
   while solo; native visibility hides missing units and all rows in raids.
+- A small gold crown at the right of the party leader's health bar updates when
+  leadership changes outside combat. Names reserve space for it. Solo and
+  unavailable leader data show no crown; the layout preview crowns its first row.
+- Native tank, healer and damage icons appear just right of the crown for the
+  game's assigned role on each player/party row. Unassigned or unavailable roles
+  stay blank. Both role and leader icons hide immediately in combat and refresh
+  from current assignments afterward; class is never used to guess a role.
 - Up to eight native debuff icons extend right of each player/party health bar,
   after the reserved drinking-icon space. Hover for the native aura tooltip.
   All harmful aura types qualify, including effects you cannot dispel. Native
@@ -66,13 +101,15 @@ guidance, native weapon displays, limitations and live acceptance checks.
 - Default placement aligns beneath Apogee Tank's Forever bars, with a 9px gap
   below its single-target layout. No Tank dependency or frame attachment is used.
   Existing saved positions remain unchanged; use **Reset positions** to adopt it.
+- Only your own druid player row splits the existing power strip equally in cat/bear form:
+  blue mana above energy/rage. Caster form restores the full mana strip.
 - Apogee Tank styling with taller health bars: 112x14 health, 112x5 power, at 2x scale.
   Full character names use Blizzard's native class colors, left-aligned inside health bars with the
   original game font at the same smaller size as NPC names and dark shadow, including
   during combat. Restricted names stay blank. Long names truncate. Health-state and active-resource colors remain.
   A muted level appears immediately to the left of each name; unavailable levels
   show a question mark. Names and levels remain visible in combat; status messages
-  still replace them for dead, offline or out-of-range units.
+  still replace them for dead or offline units. Range never hides identity.
 - A fine opaque rule divides health from power. A slim Blizzard class-color strip sits flush inside each row's left
   edge, spanning health and power with a dark separator. It remains visible in combat.
   Fully transparent spaces separate
@@ -90,7 +127,7 @@ guidance, native weapon displays, limitations and live acceptance checks.
 - Native left-click targeting when unassigned, with healing click bindings on Left, Right,
   Middle, Mouse 4 and Mouse 5 (plain, Shift and Ctrl). No global binding overrides.
   Standard native target actions also retain the client's spell/item cursor behavior.
-- Escape -> Options -> AddOns -> Apogee Heals: Reset positions, Buff reminders
+- Escape -> Options -> AddOns -> Apogee Heals: Reset positions, Smart buffs
   and Factory reset. Position and healing assignments are saved
   per character.
 
@@ -131,6 +168,9 @@ identify Shift and Ctrl rows; hover a tile for its full combination, or the head
 for editing instructions. Invalid drops explain the issue in chat.
 
 Click a live party row with the assigned combination to cast on that fixed unit.
+Spell bindings use an explicit recipient with no alternate target and clear any
+remaining targeting cursor. Clicking your own row explicitly targets you.
+Range and line-of-sight failure behavior still needs native acceptance.
 Plain left-click targets when it has neither an assignment nor a learned class
 default. Removing an assignment restores its class default, or targeting when
 none is available. Empty Shift/Ctrl slots do nothing,
@@ -151,57 +191,53 @@ Tank, Keybinds or Party Health Bars installed. No raid/pet frames, shield/HoT ov
 dispel coverage, health/power numbers, profiles
 or drinking countdowns.
 
-## Learned upkeep buffs
+## Smart buffs
 
-Paladins receive **Blessing of Might reminders as soon as a rank is learned**;
-no discovery cast is needed. Learned **Blessing of Wisdom** is also added to
-Buff reminders, initially unchecked. To prefer Wisdom, uncheck Might and check
-Wisdom there. These defaults use the highest client-confirmed learned ordinary
-rank and preserve saved opt-outs through upgrades and reloads. They do not seed
-greater blessings, seals, short defensive cooldowns or combat utility.
+Open **Options > AddOns > Apogee > Heals > Smart buffs** (Apogee DEV for DEV).
+Supported buffs appear as soon as you learn them; no discovery cast is needed.
+Each buff family has a per-character preference that survives reloads and rank upgrades:
 
-Only one maintained blessing is prompted per recipient: the first enabled,
-learned blessing in the existing watch order. Earlier discovered choices retain
-priority over appended defaults; there is no automatic class/role optimization.
-Any recognized ordinary or greater Might, Wisdom, Kings, Salvation, Sanctuary or
-Light already on a recipient suppresses another blessing prompt, even from a
-different caster. This conservative policy avoids replacement prompts; it does
-not optimize multi-Paladin blessing assignments. Other discovered upkeep buffs
-remain independent. A full 32-entry watch list is preserved without eviction.
+- **Smart:** show useful missing buffs beside their recipient. A yellow border
+  identifies a suggested next choice; hover for its reason and native spell tooltip.
+- **Manual:** show only when you click the recipient's class strip to expand choices.
+- **Off:** hide the family, including in expanded choices.
 
-Hover a visible reminder for **Blizzard's native spell tooltip**, including its
-actual rank. Tooltips close when reminders change/disappear, the roster changes
-or combat begins. Click behavior is unchanged.
+Left-click an icon to cast on that row's player without selecting them. Modified
+clicks do nothing. Native range, mana, reagents and spell restrictions still apply.
+Buff choices and their settings close/hide in combat and resume afterward. Self
+buffs appear only on your own row. No automatic casts occur.
 
-Heals learns active, friendly player spells after a successful cast and a complete,
-readable aura observation within ten seconds. The aura must come from you and
-have a duration of at least five minutes. Discovery has no class filter or spell list.
-Short buffs, passive spells, items, pets, failed casts and unreadable observations
-do not teach a reminder. Cast buffs outside combat to teach them.
+Paladins have one **Blessings** preference. All learned lasting blessing choices
+remain available, with conservative role/class guidance and the highest learned
+rank of each ordinary or Greater variant. Any recognized existing blessing
+suppresses automatic blessing choices. Expansion lets you select another type;
+it does not offer to replace the same type from another caster. **Auras (self)**
+controls the separate own-aura choices. Old Might/Wisdom checklist values do not
+control these choices and are retained only for compatibility.
 
-Missing buffs appear as small icons to the left of each living, connected party
-row, with four visible icons and an overflow count. The client's self-buff check
-keeps self-only effects on your row; party-capable buffs are checked on every
-row even when first learned on yourself. If classification is unavailable, actual
-party application remains the fallback evidence. Existing learned buffs use this
-rule without relearning. **Left-click a reminder icon to reapply its learned spell
-to that row's player**, without selecting them first. Modified clicks do nothing.
-The game still enforces range, mana, reagents and spell restrictions. Reminders
-hide in combat and during preview; no automatic casts occur. Learning scope
-avoids assuming that self-only buffs can be applied to everyone.
-Dead, offline, unknown and preview rows receive no reminders.
-Learning and reminders pause in combat and resume from fresh observations afterward.
+Priests maintain Fortitude and Spirit independently: Fortitude serves every
+recipient, Spirit is suggested for healers/mana classes, Inner Fire is self-only,
+and Shadow Protection defaults to Manual. Druids get Mark for everyone and Thorns
+for assigned tanks; expansion offers Thorns for other recipients too. Mages get
+Intellect for healers/mana classes and a separate Armor choices group. Warlock
+armor alternatives also share a group. Other supported self buffs and Hunter
+aspects use the same Smart/Manual/Off controls. Classes without supported spells
+show an empty state rather than unrelated spell choices.
 
-An existing buff from another caster satisfies coverage. Observed ranks with
-the same localized client spell name share one watch entry. Differently named
-single/group buffs are not guessed to be equivalent. The five-minute rule is a
-duration filter, not a claim that every qualifying spell should always be maintained.
+Recognized ranks and group versions satisfy their family, including another
+caster's buffs. Independent families stay independent. Own buffs can reappear
+with a remaining-time label below two minutes; another caster's or unknown-source
+buff is preserved until it disappears. Unreadable observations never mean missing.
+Group versions such as Prayers/Gift/Brilliance count as coverage but are not new
+casting actions; Greater Paladin blessings retain their existing explicit actions.
 
-Open **Options > AddOns > Apogee Heals > Buff reminders** to uncheck an unwanted
-reminder. Choices persist across reloads and relearning. The list supports up to
-32 learned entries. Self-only versus party coverage is detected automatically;
-there is no manual scope setting. No duration countdown, automatic casting, party chat alerts
-or shared Tank state is involved. Tank can be absent or disabled.
+Existing disabled catalog/discovered buffs remain Off unless you choose a new
+mode. For grouped armor choices, any legacy disabled variant keeps the group Off.
+Additional five-minute upkeep buffs can still be learned from your successful
+casts followed by a complete readable own-aura observation within ten seconds.
+Their entries use the same controls, and opt-outs survive relearning and rank
+changes. Short effects, passive spells, items and pet casts are not learned.
+Battle Shout remains handled by Keybinds. See [class support](docs/CLASS_SUPPORT.md).
 
 ## Paladin cleansing buttons
 
@@ -239,14 +275,15 @@ are locked during combat; confirming an already-open dialog in combat does nothi
 
 ## Spell range
 
-Rows fade and show OUT OF RANGE when the exact unmodified left-click spell
-reports that recipient out of range, including the learned class default.
-Checks use each row's fixed unit, independent of the selected target. They update
-about five times a second without scanning auras. Missing, restricted or invalid
-results restore normal presentation without claiming the spell is in range.
-No mapping means no spell-range feedback. Combat keeps the actually installed
-mapping until deferred binding changes can apply safely. Native combat behavior
-still needs live confirmation.
+The applied, unmodified left-click spell alone controls health-bar fading.
+Confirmed out of range fades health artwork and its text/incoming-heal children
+to 45%; in-range or unknown stays fully opaque. Buff buttons are sibling frames
+and retain their own exact-spell range checks without inheriting this fade.
+An empty left slot or bandage uses guarded 40-yard proximity (inclusive), keeping
+non-caster group distance useful. A spell's unknown range never falls back to
+proximity. Right-click and modifier bindings do not alter this cue. The Near/Far
+and per-click labels are removed. Power and support icons retain normal opacity.
+No casting or recipient changes. Native appearance/combat acceptance pending.
 
 ## Drinking limitations
 

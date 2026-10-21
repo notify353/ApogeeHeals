@@ -54,7 +54,13 @@ a.db.buffs[1].enabled = false
 m.combat = false; m.Event("PLAYER_REGEN_ENABLED"); m.Flush()
 assert(row.buffButtons[1].attributes.spell1 == nil)
 a.Buffs.OpenPicker()
-assert(a.Buffs.checks[1].checked == false, "Reopening a hidden picker must refresh its choices")
+local found
+for _, preference in ipairs(a.Buffs.preferenceRows) do
+    if preference.entry.key == "learned:" .. id then
+        found = preference.buttons.off.text == "|cffffd100Off|r"
+    end
+end
+assert(found, "Reopening a hidden picker must refresh its choices")
 a.Buffs.picker:Hide()
 -- A callback queued before zoning must not paint/query the departed world.
 m.Event("UNIT_HEALTH", "player"); m.Event("PLAYER_LEAVING_WORLD")

@@ -1,3 +1,260 @@
+## Target actions beside name (October 20)
+
+Three eight-unit icons sit in ten-unit-wide hit areas at the right of target
+health, on its existing text layer above incoming-heal fills. The final artwork
+ends two units inside the bar, matching party role indicators. A fixed 32-unit
+name/status reservation avoids overlap and combat relayout. Existing native
+visibility, shared range checks, tooltips and click guards remain unchanged.
+
+## Player-only druid mana (October 20, 2026)
+
+Owner live checks: other bear druid reports public DRUID/rage; mana quantities
+are restricted, and native text displays 0 / 350 despite full mana on the
+druid client. This observation does not establish a universal client contract.
+Owner therefore requests split display only for the literal player row when
+the player is a druid using rage/energy. All party/target/targettarget rows
+use the normal active-resource bar, even when targeting the player. No cached
+mana estimates, remote mana queries or sharing protocol are introduced.
+Existing native display contracts and fixed geometry remain unchanged.
+
+## Simple health-bar range (October 20, 2026)
+
+The applied, unmodified left-click spell alone controls health-bar fading.
+Confirmed out of range fades health artwork and its text/incoming-heal children
+to 45%; in-range or unknown stays fully opaque. Buff buttons are sibling frames
+and retain their own exact-spell range checks without inheriting this fade.
+An empty left slot or bandage uses guarded 40-yard proximity (inclusive), keeping
+non-caster group distance useful. A spell's unknown range never falls back to
+proximity. Right-click and modifier bindings do not alter this cue. The Near/Far
+and per-click labels are removed. Power and support icons retain normal opacity.
+No casting or recipient changes. Native appearance/combat acceptance pending.
+
+## Superseded per-click labels (October 20, 2026)
+
+## Shared target action availability (October 20, 70450)
+
+Matching export rechecked. Existing CheckInteractDistance indices 4 (Follow)
+and 1 (Inspect), CanInspect and capability/recipient guards must all succeed
+before showing ordinary strip content. Restricted/unknown reads hide it.
+Existing 0.2-second range polling updates the group without triggering actions;
+retain polling when only interaction range is available. Native combat hiding
+and click-time rechecks remain. Native range cannot guarantee server success.
+
+## Spell-aware range and separate proximity (October 20, 2026)
+
+Party and target rows remain fully opaque so healing range cannot dim buff icons.
+The power strip shows Near (within 40 yards), Far (beyond 40 yards), or ? yd
+when public distance is unavailable. This general proximity cue works without
+spell assignments, including warriors with bandages; it does not predict a cast.
+L/R/M/4/5 indicators show each applied click assignment's exact native spell range:
+green is in range, red is out, gray is unknown (including bandages). Holding
+Shift or Ctrl selects that binding layer; unsupported modifier combinations show
+no spell indicators. Buff choices share the exact-spell guarded range check.
+Unknown/restricted spell results never inherit the proximity result. No range
+result guarantees line of sight, resources, cooldown or successful casting.
+Native appearance and combat acceptance remain pending after offline checks.
+
+## Icon-only target actions (October 20)
+
+Visual-only revision: a centered 56-by-16 strip, three 16-unit hit areas with
+four-unit gaps and centered 10-unit icons. No labels or persistent background.
+Existing native APIs, tooltip labels, guards and combat visibility retained.
+
+## Strict buff recipients (October 20, 2026)
+
+Reverified matching Forever 70450 / 16001 export. Both buff action builders
+(generic reminders and shared blessing/catalog/expanded choices) now use the
+accepted healing program for non-player rows: one explicit fixed-recipient
+`/cast [@unit,exists,help] Name(Rank)` followed by `/stopspelltarget`. No empty
+conditional, alternate target, CVar edit or selected-target fallback is added.
+Player-row buffs, auras and aspects retain native fixed-player spell actions.
+Tooltip/rank identity, range filtering, coverage and foreign-buff protection stay.
+
+Public spell name/rank text is resolved outside combat. Missing/restricted or
+unsafe text hides/disables the action and retries on the next refresh. Cached
+actions include a revision invalidated by SPELL_TEXT_UPDATE, SPELLS_CHANGED and
+world entry; combat defers protected writes. Removed/replaced choices clear old
+macro text. Unchanged valid reminders do not re-register secure visibility.
+
+Source regressions cover both builders, all party tokens and target, ranks,
+clearing/replacement, text recovery, modifier isolation, self-only actions and
+combat deferral. Matching SecureTemplates macro dispatch is exercised; the native
+macro parser and server range/LOS are not emulated. Healing acceptance remains
+valid for its unchanged code; this buff extension needs separate owner acceptance.
+
+## Target druid power follow-up (October 20, 2026)
+
+Extend the same fixed split bars and existing explicit power-type reads to
+target and targettarget. Target casting temporarily fades all power artwork;
+stop/interruption restores the appropriate full or split strip. Missing targets
+clear both halves, and class/resource changes reset reused target rows.
+Source regressions cover all seven units, restricted mana sinks, target casting
+and combat geometry. Owner confirms the installed player split works; party
+and target native acceptance remain pending. No new API contracts.
+
+## Druid split power (October 20, 2026)
+
+Verified Forever 1.60.1.70450 / 16001 with the strict export checker.
+UnitDocumentation UnitPower and UnitPowerMax accept an explicit powerType;
+mana uses 0, rage 1 and energy 3. Public UnitClass class token and UnitPowerType
+select the split only for druid player/party rows using rage or energy.
+Restricted current/max amounts go directly to native StatusBar sinks.
+Two equal half-height bars are created once alongside the ordinary full bar;
+only alpha and native values change during combat. Existing UNIT_POWER_UPDATE,
+UNIT_MAXPOWER and UNIT_DISPLAYPOWER refresh both resources. Missing/dead/offline
+rows clear both halves; unknown class/power type restores ordinary power.
+API errors clear the affected fill without substituting another resource.
+No protected geometry/action changes, settings, saved state or target cast changes.
+Full source regressions pass; grouped mana availability, appearance and native
+combat/taint acceptance require owner in-game testing.
+
+## Target action strip (October 20, 70450; supersedes party layouts below)
+
+Reverified matching Forever export. Existing checked UnitDocumentation defines
+UnitIsPlayer, UnitCanAssist and UnitIsUnit; guarded public results alone admit
+another friendly player. Fixed target token is resolved at click time. A single
+native state driver hides the strip in combat or without a friendly target;
+ordinary inner content handles player/self/loading/unlock eligibility out of combat.
+The 16-unit strip starts two units below the target row in the existing 19.5-unit
+gap above the player. Three equal-width buttons use 10-unit icons and short labels.
+Buff painters no longer affect action geometry. No extra polling or saved state.
+PLAYER_TARGET_CHANGED cancels pending talents and immediately refreshes visibility.
+Existing matching GUID/range rechecks and expiry remain. Actual spacing, readability,
+combat transitions and native inspection remain subject to in-game acceptance.
+
+## Left-side party actions (October 20, 70450)
+
+Follow, Inspect and Inspect Talents retain their order from left to right.
+The group sits six UI units left of the bar or the outermost buff slot.
+Buff painters supply public layout counts for missing reminders, overflow,
+blessings, upkeep and aura choices. The maximum occupied endpoint determines
+the group offset; no aura visibility or restricted values are inspected.
+SetPoint/ClearAllPoints are guarded outside combat and skipped when unchanged.
+Native visibility hides the controls in combat, with position refreshed by
+ordinary buff painting afterward. No new polling or changed spell hit regions.
+Right-side cleanse/drink/debuff geometry returns to its pre-action positions.
+
+## Party talent inspection (October 20, 70450)
+
+Matching Camelot UnitPopupMenus explicitly includes Inspect Talents.
+UnitPopupSharedButtonMixins requests NotifyInspect(unit), waits for matching
+INSPECT_READY GUID, then calls PlayerSpellsUtil.OpenToClassTalentsTab(unit).
+The family FrameXMLUtil TOC loads this utility; Camelot ClassTalentsFrame
+refreshes its inspect configuration on INSPECT_READY. Generated
+PlayerScript/PaperDollInfo document request and event contracts.
+
+The third fixed-party button follows this flow with public GUID/range guards,
+single pending request, five-second expiry, and cancellation on combat, roster
+change, zoning or gear inspection. Rechecks current GUID and range before opening.
+No talent-data parsing or storage. Native UI owns point/tree presentation.
+Uses the native UI-HUD-MicroMenu-SpecTalents-Up atlas from ClickBindingUI,
+with the same muted artwork and native combat hiding as existing actions.
+Server availability, point display and actual window loading need in-game testing.
+
+## Party Follow and Inspect (October 20, 70450)
+
+Matching generated PlayerScriptDocumentation defines FollowUnit, CanInspect and
+CheckInteractDistance. Native UnitPopupSharedButtonMixins uses FollowUnit on a
+user click, interaction distance 4 for Follow and InspectUnit/CanInspect for
+inspection. InspectUnit's Mainline bootstrap loads Blizzard_InspectUI; its TOC
+selects Camelot's inspection implementation. Buttons call native functions with
+fixed party1-4 tokens only from left release, outside combat, with public
+existence/connection/death and range checks (4 follow, 1 inspect). No target
+switch, cached recipient name, automatic action, retry or delayed follow.
+
+Ordinary child buttons now sit left of the buff choices, as documented above.
+Reviewed SecureStateDriver handles the fixed
+`[combat] hide; show` visibility expression natively, hiding the buttons and
+their hit regions without addon layout mutations in combat. Artwork is 10x10,
+desaturated, 45% opaque (80% on hover), with no added button background;
+click-time guards also cover loading, frame unlock and restricted reads.
+Native PetActionBar supplies Ability_Tracking for follow; WhoList uses
+common-icon-search for inspection. Existing roles, crown and spell art remain.
+All new authority files join freshness checking. Native range, hardware input,
+appearance and taint acceptance require owner testing.
+
+## Smart buffs preferences (October 20)
+
+Reverified matching Forever 1.60.1.70450 / 16001 export before this change.
+Uses existing reviewed spell resolution, public class/assigned-role reads, aura
+coverage, fixed-recipient secure actions and native frame/button/font APIs.
+One family preference controls Smart, Manual or Off across automatic and expanded
+choices. Preferences only change out of combat; combat closes the settings panel.
+No new API, aura polling or casting path. Unknown recipient class/role does not
+establish usefulness for Spirit, Intellect or Thorns. Existing unknown aura,
+foreign-caster, timer, range and native aura/aspect safeguards still apply.
+The settings list is built from learned catalog families plus compatible generic
+entries, with version-3 storage preserving validated family modes. Ordinary and
+Greater Paladin blessings share a preference, while prior seed values are kept
+only for data compatibility. Native UI/secure-click acceptance remains separate.
+
+## Indicator combat visibility (October 20, 70450)
+
+Supersedes combat visibility below: the existing InCombatLockdown boolean gates
+both leader and role reads/displays on every refresh. PLAYER_REGEN_DISABLED hides
+both textures immediately; PLAYER_REGEN_ENABLED queues fresh current assignments.
+Layout remains fixed. Preview already closes on combat entry. Matching 70450
+RestrictedActionsDocumentation verifies InCombatLockdown. No protected mutations.
+
+## Assigned party role icons (October 20, 70450)
+
+Matching Forever export verified. UnitDocumentation defines UnitGroupRolesAssigned
+as a string result, secret when identity is restricted. Access.Read guards it;
+only TANK, HEALER and DAMAGER map to icons. NONE, missing, errors and restricted
+values clear the previous icon. UnitRoleDocumentation's ROLE_CHANGED_INFORM
+and PartyInfoDocumentation's PLAYER_ROLES_ASSIGNED trigger the existing refresh;
+event name payloads are ignored. Roster/world events clear stale recipients.
+CommunitiesUtil.GetRoleSpecClassLine uses roleicon-tiny-tank, roleicon-tiny-healer
+and roleicon-tiny-dps. SimpleTextureBase SetAtlas(atlas, false) preserves the
+fixed 8-by-8 geometry. Only public constant atlas names reach that display API.
+No class inference, saved preferences, protected layout changes or new polling.
+Native readability and combat rendering require owner acceptance.
+
+## Party leader indicator (October 20, 70450)
+
+Verified matching Forever 1.60.1.70450 / 16001 export. UnitDocumentation
+defines UnitIsGroupLeader(unit, optional partyCategory) returning a boolean,
+secret when unit identity is restricted. Read through Access.Read; only public
+true shows the crown. Public UnitExists for party1 and the recipient prevents
+solo/missing-unit indicators. PartyInfoDocumentation exposes PARTY_LEADER_CHANGED;
+that event and GROUP_ROSTER_UPDATE use the existing coalesced refresh.
+The native UI-Group-LeaderIcon texture is referenced by exported Channels and
+GroupFinder code. Configure a noninteractive texture and reserved text width at
+creation; refresh only texture visibility, including combat. World suspension
+clears it. No protected layout or attributes change. Native appearance and combat
+acceptance remain separate from the passing mocks.
+## Focus health diagnostic retired (October 20)
+
+Combat testing observed only restricted reads (55 player, 61 party1; none
+readable). Owner chose native Combat Audio Alerts. Removed the temporary panel,
+sampling runtime and diagnostic tests. No native alert preferences are changed.
+Historical research remains in workspace handoff memory and retained receipts.
+
+## Strict healing recipients (2026-10-20)
+
+Reviewed matching Forever 1.60.1.70450 / 16001 SecureTemplates.lua macro
+dispatch, SlashCommands.lua CAST and STOPSPELLTARGET handlers, and
+C_Spell.GetSpellSubtext/SPELL_TEXT_UPDATE. Healing Mouse spell assignments now
+compile one `/cast [@unit,exists,help] Name(Rank)` followed by `/stopspelltarget`.
+The unit is the immutable row token; there is no empty conditional, alternate
+recipient, selected-target fallback or self-cast branch. The self row explicitly
+uses player. Do not add nodead: friendly resurrection assignments must remain
+possible. Native range and line of sight still decide success.
+
+Localized names and rank subtext come from the learned spell ID outside combat.
+Unavailable/restricted text disables the action; SPELL_TEXT_UPDATE retries with
+the existing combat deferral. Macro control characters are rejected. Replacing
+or clearing a spell clears its macro text; bandage actions remain unchanged.
+The numeric spell attribute remains for identity/diagnostic compatibility but is
+not dispatched by the macro action. No CVar, saved macro, target selection or
+protected combat mutation is introduced.
+
+Source tests verify exact programs, ranks, clearing, modifiers and deferral;
+matching exported secure code verifies macro dispatch. These tests do not
+implement the native macro parser or reproduce server range/line-of-sight failure.
+Owner acceptance must verify both clicks with Auto Self Cast enabled, blocked and
+out-of-range party recipients, and normal party/self healing.
+
 ## Exclusive class-strip input (October 12)
 
 Reviewed matching 70338 SimpleFrame SetHitRectInsets and SimpleScriptRegion
@@ -136,7 +393,7 @@ extra-click workflow. The marking module, loader entry, startup/runtime hooks
 and dedicated tests are removed. Existing raid-icon display remains independent.
 No addon action assigns or clears raid markers.
 
-## Forty-yard party fallback (70205, 2026-10-03)
+## Historical forty-yard party fallback (superseded October 20, 2026)
 
 Owner approved a 40-yard fallback when slot one lacks a usable range result.
 Reviewed UnitDistanceSquared and native CompactUnitFrame_UpdateDistance in the

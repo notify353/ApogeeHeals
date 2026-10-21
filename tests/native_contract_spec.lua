@@ -66,6 +66,18 @@ env.SecureButton_GetModifiedAttribute = function(frame, field, button)
     assert(button == "LeftButton"); return frame.attributes[field .. "1"]
 end
 env.OnActionButtonClick = function(frame, button) cast(frame, frame.attributes.unit, button) end
+C_Spell.GetSpellInfo = function(id) return {name="Fortitude",iconID=1,spellID=id} end
+local macroAction = assert(source:match("SECURE_ACTIONS%.macro%s*=%s*(function.-\n    end);"))
+env.C_Macro = {RunMacroText=function(text)
+    local unit = assert(text:match("^/cast %[@(%w+),exists,help%] Fortitude\n/stopspelltarget$"))
+    castID, castUnit, castCount = 1243, unit, castCount + 1
+end}
+chunk = assert(loadstring("return " .. macroAction)); setfenv(chunk, env)
+local macro = chunk()
+env.OnActionButtonClick = function(frame, button)
+    if frame.attributes.type1 == "macro" then macro(frame, frame.attributes.unit, button)
+    else cast(frame, frame.attributes.unit, button) end
+end
 for _, row in ipairs(a.View.rows) do
     a.Buffs.Paint(row, {{id=1243,icon=1}})
     local reminder = row.buffButtons[1]

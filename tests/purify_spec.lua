@@ -23,7 +23,7 @@ for _, options in ipairs({{might=true}, {cleanse=true}, {class="ROGUE"}, {known=
                         assert(button.attributes[prefix .. "type1"] == "")
                     end
                 end
-                assert(row.drinkIcon.point[4] == 2 + 2 * (a.Style.sideIconSize + 2))
+                assert(row.drinkIcon.point[4] == 2 + 2 * (a.Style.sideIconSize + 2) + (row.partyActionWidth or 0))
                 if not options.noTemplates and not options.secretTemplates then
                     local indicator = assert(row.cleanseIndicator)
                     assert(indicator.parent == row and indicator.unit == row.unit)

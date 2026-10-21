@@ -17,6 +17,8 @@ m.cursor = {"item", 1251, "item:1251"}
 a.BindingEditor.buttons["1"].scripts.OnReceiveDrag()
 assert(m.cursor == nil and a.db.bindings["1"].kind == "item" and a.db.bindings["1"].id == 1251)
 assert(a.BindingEditor.buttons["1"].icon.texture == 456 and a.Bindings.rangeSpell == nil)
+a.View.RefreshRange()
+assert(a.View.rows[1].health.alpha == 1 and not a.View.rows[1].rangeStatus.shown)
 a.BindingEditor.buttons["1"].scripts.OnEnter()
 for _, row in ipairs(a.View.rows) do
     assert(row.attributes.type1 == "item" and row.attributes.item1 == "item:1251")

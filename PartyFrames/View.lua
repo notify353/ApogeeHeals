@@ -2,6 +2,157 @@ local _, A = ...
 local V, S = {}, A.Style
 A.View = V
 local units = { "player", "party1", "party2", "party3", "party4" }
+local function eligibleTarget()
+    local read = A.Access.Read
+    return read(UnitExists, "target") == true
+        and read(UnitIsPlayer, "target") == true
+        and read(UnitCanAssist, "player", "target") == true
+        and read(UnitIsUnit, "player", "target") == false
+end
+local function partyActionReason(row, inspect, checkRange, talents)
+    local read = A.Access.Read
+    if InCombatLockdown() then return "Unavailable during combat." end
+    if not eligibleTarget() then return "Select another friendly player." end
+    if A.Runtime.suspended or V.unlocked then return "Unavailable while moving frames or loading." end
+    if read(UnitExists, row.unit) ~= true or read(UnitIsConnected, row.unit) ~= true
+        or read(UnitIsDeadOrGhost, "player") ~= false then return "Player unavailable." end
+    if inspect then
+        if talents then
+            if type(NotifyInspect) ~= "function" or type(PlayerSpellsUtil) ~= "table"
+                or type(PlayerSpellsUtil.OpenToClassTalentsTab) ~= "function" then
+                return "Talent inspection unavailable."
+            end
+        elseif type(InspectUnit) ~= "function" then return "Inspect unavailable." end
+        if checkRange and (read(CanInspect, row.unit) ~= true
+            or read(CheckInteractDistance, row.unit, 1) ~= true) then
+            return "Move closer to inspect this player."
+        end
+    else
+        if type(FollowUnit) ~= "function" then return "Follow unavailable." end
+        if read(UnitIsDeadOrGhost, row.unit) ~= false then return "Cannot follow a dead player." end
+        if checkRange and read(CheckInteractDistance, row.unit, 4) ~= true then
+            return "Move closer to follow this player."
+        end
+    end
+end
+local talentRequest, talentEvents
+local function cancelTalentRequest()
+    talentRequest = nil
+    if talentEvents then talentEvents:UnregisterAllEvents() end
+end
+local function inspectTalents(row)
+    cancelTalentRequest()
+    local guid = A.Access.Read(UnitGUID, row.unit)
+    if type(guid) ~= "string" or guid == "" then return end
+    if not talentEvents then
+        talentEvents = CreateFrame("Frame")
+        talentEvents:SetScript("OnEvent", function(_, event, inspectedGUID)
+            local request = talentRequest
+            if not request then return end
+            if event ~= "INSPECT_READY" then cancelTalentRequest(); return end
+            if not A.Access.Readable(inspectedGUID) or inspectedGUID ~= request.guid then return end
+            cancelTalentRequest()
+            if partyActionReason(request.row, true, true, true)
+                or A.Access.Read(UnitGUID, request.row.unit) ~= request.guid then return end
+            PlayerSpellsUtil.OpenToClassTalentsTab(request.row.unit)
+        end)
+    end
+    local request = {row = row, guid = guid}
+    talentRequest = request
+    for _, event in ipairs({"INSPECT_READY", "PLAYER_REGEN_DISABLED", "GROUP_ROSTER_UPDATE",
+        "PLAYER_LEAVING_WORLD", "PLAYER_TARGET_CHANGED"}) do talentEvents:RegisterEvent(event) end
+    -- Never leave a request able to open a window long after its initiating click.
+    C_Timer.After(5, function()
+        if talentRequest == request then cancelTalentRequest() end
+    end)
+    NotifyInspect(row.unit)
+end
+function V.RefreshPartyActions()
+    local row, strip = V.target, V.targetActions
+    if not strip then return end
+    -- The native parent owns combat visibility; only ordinary content is toggled.
+    if not InCombatLockdown() then
+        local available = partyActionReason(row, false, true) == nil
+            and partyActionReason(row, true, true) == nil
+            and partyActionReason(row, true, true, true) == nil
+        strip.content:SetShown(available)
+    end
+    for index, button in ipairs(row.partyActions) do
+        local available = partyActionReason(row, index >= 2, false, index == 3) == nil
+        button:SetEnabled(available)
+        button.icon:SetAlpha(available and (button.hovered and 1 or 0.75) or 0.25)
+        button.highlight:SetAlpha(available and button.hovered and 0.12 or 0)
+        if not available and GameTooltip:IsOwned(button) then GameTooltip:Hide() end
+    end
+end
+local function createTargetActions(row)
+    local strip = CreateFrame("Frame", nil, row.nameLayer)
+    strip:SetSize(30, S.healthHeight)
+    strip:SetPoint("RIGHT", row.health, "RIGHT", -1, 0)
+    strip:EnableMouse(false)
+    V.targetActions = strip
+    RegisterStateDriver(strip, "visibility", "[combat] hide; [@target,help,exists] show; hide")
+    strip.content = CreateFrame("Frame", nil, strip)
+    strip.content:SetAllPoints(); strip.content:EnableMouse(false)
+    strip.content:Hide()
+    row.partyActions = {}
+    local width, gap = 10, 0
+    for index, label in ipairs({"Follow", "Inspect", "Talents"}) do
+        local inspect, talents = index >= 2, index == 3
+        local button = CreateFrame("Button", nil, strip.content)
+        button:SetSize(width, S.healthHeight)
+        button:SetPoint("LEFT", strip.content, "LEFT", (index - 1) * (width + gap), 0)
+        button:SetPropagateMouseClicks(false)
+        button:RegisterForClicks("LeftButtonUp")
+        button.highlight = button:CreateTexture(nil, "BACKGROUND")
+        button.highlight:SetAllPoints(); button.highlight:SetColorTexture(0.65, 0.78, 1, 1)
+        button.highlight:SetAlpha(0)
+        button.icon = button:CreateTexture(nil, "ARTWORK")
+        local iconSize = 8
+        button.icon:SetSize(iconSize, iconSize)
+        button.icon:SetPoint("CENTER", button, "CENTER", 0, 0)
+        if talents then button.icon:SetAtlas("UI-HUD-MicroMenu-SpecTalents-Up", false)
+        elseif inspect then button.icon:SetAtlas("common-icon-search", false)
+        else button.icon:SetTexture("Interface\\Icons\\Ability_Tracking") end
+        button.icon:SetDesaturated(not talents)
+        button.icon:SetAlpha(0.75)
+        button:SetScript("OnEnter", function()
+            if InCombatLockdown() then return end
+            button.hovered = true
+            V.RefreshPartyActions()
+            GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
+            GameTooltip:SetText(talents and "Inspect Talents" or label)
+            GameTooltip:AddLine(partyActionReason(row, inspect, true, talents) or
+                (talents and "View this player's talent points."
+                or inspect and "Inspect this player." or "Follow this player."), 0.8, 0.8, 0.8)
+            GameTooltip:Show()
+        end)
+        local function hideTooltip()
+            button.hovered = false
+            button.icon:SetAlpha(0.75)
+            button.highlight:SetAlpha(0)
+            if GameTooltip:IsOwned(button) then GameTooltip:Hide() end
+        end
+        button:SetScript("OnLeave", hideTooltip)
+        button:SetScript("OnHide", hideTooltip)
+        button:SetScript("OnClick", function(_, mouseButton)
+            if mouseButton ~= "LeftButton" or partyActionReason(row, inspect, true, talents) then return end
+            -- Resolve the current target at the click; never retarget or queue follow.
+            if talents then inspectTalents(row)
+            elseif inspect then cancelTalentRequest(); InspectUnit(row.unit)
+            else FollowUnit(row.unit) end
+        end)
+        row.partyActions[index] = button
+    end
+end
+local roleAtlases = {
+    TANK = "roleicon-tiny-tank", HEALER = "roleicon-tiny-healer", DAMAGER = "roleicon-tiny-dps",
+}
+function V.PaintRole(row, role)
+    local atlas = A.Access.Readable(role) and type(role) == "string" and roleAtlases[role]
+    if atlas then row.roleIcon:SetAtlas(atlas, false) end
+    row.roleIcon:SetShown(atlas ~= nil and atlas ~= false)
+end
 local function createDebuffs(row)
     -- All aura selection, ordering, visibility and updates stay in native code.
     -- Never retain or inspect the native aura buttons after initialization.
@@ -9,7 +160,8 @@ local function createDebuffs(row)
     if not info or not A.Access.Readable(info.type) or info.type ~= "AuraContainer" then return end
     local container = CreateFrame("AuraContainer", nil, row.supportFrame or row, "CustomAuraContainerTemplate")
     local size, gap = S.sideIconSize, S.sideIconGap
-    local offset = (row.unit == "target" and S.sideIconGap or S.sideIconOffset) + (row.cleanseSlotCount or 0) * (size + gap)
+    local offset = (row.unit == "target" and S.sideIconGap or S.sideIconOffset)
+        + (row.cleanseSlotCount or 0) * (size + gap)
     container:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset, A.Style.sideIconY)
     container:SetSize(8 * size + 7 * gap, size)
     container:SetUnit(row.unit)
@@ -52,7 +204,21 @@ local function buildRow(row, preview, first, width)
     row.nameLayer:SetAllPoints(row.health)
     row.nameLayer:SetFrameLevel(row.incoming.bar:GetFrameLevel() + 1)
     row.nameLayer:EnableMouse(false)
-    row.level = S.Text(row.nameLayer, 8)
+    local indicatorSpace = row.unit == "target" and 32 or 0
+    if preview or row.unit == "player" or row.unit:match("^party%d$") then
+        indicatorSpace = 20
+        row.leader = row.nameLayer:CreateTexture(nil, "OVERLAY")
+        row.leader:SetTexture("Interface\\GroupFrame\\UI-Group-LeaderIcon")
+        row.leader:SetSize(8, 8)
+        row.leader:SetPoint("RIGHT", row.health, "RIGHT", -12, 0)
+        row.leader:Hide()
+        row.roleIcon = row.nameLayer:CreateTexture(nil, "OVERLAY")
+        row.roleIcon:SetSize(8, 8)
+        row.roleIcon:SetPoint("RIGHT", row.health, "RIGHT", -2, 0)
+        row.roleIcon:Hide()
+    end
+    -- Match the name font so two-digit levels fit the reserved level column.
+    row.level = S.Text(row.nameLayer, 6)
     row.level:SetPoint("LEFT", row.health, "LEFT", 4, 0)
     row.level:SetSize(13, S.healthHeight)
     row.level:SetJustifyH("LEFT"); row.level:SetJustifyV("MIDDLE")
@@ -60,12 +226,12 @@ local function buildRow(row, preview, first, width)
     row.level:SetShadowColor(0, 0, 0, 1); row.level:SetShadowOffset(1, -1)
     row.name = S.Text(row.nameLayer, 6)
     row.name:SetPoint("LEFT", row.health, "LEFT", 18.5, 0)
-    row.name:SetSize(width - 22.5, S.healthHeight)
+    row.name:SetSize(width - 22.5 - indicatorSpace, S.healthHeight)
     row.name:SetJustifyH("LEFT"); row.name:SetJustifyV("MIDDLE")
     row.name:SetShadowColor(0, 0, 0, 1); row.name:SetShadowOffset(1, -1)
     row.status = S.Text(row.nameLayer, 8)
-    row.status:SetPoint("CENTER", row.health, "CENTER", 0, 0)
-    row.status:SetSize(width - 8, S.healthHeight)
+    row.status:SetPoint("CENTER", row.health, "CENTER", -indicatorSpace / 2, 0)
+    row.status:SetSize(width - 8 - indicatorSpace, S.healthHeight)
     row.status:SetJustifyH("CENTER"); row.status:SetJustifyV("MIDDLE")
     row.status:SetTextColor(unpack(S.muted))
     row.status:SetShadowColor(0, 0, 0, 1); row.status:SetShadowOffset(1, -1)
@@ -91,6 +257,12 @@ local function buildRow(row, preview, first, width)
     A.Drinking.CreateTooltip(row, preview)
     A.Drinking.CreateTimer(row, preview)
     row.power = bar(row, S.powerHeight, -(S.healthHeight + S.barGap), width)
+    if not preview then
+        local top = -(S.healthHeight + S.barGap)
+        row.manaPower = bar(row, S.powerHeight / 2, top, width)
+        row.formPower = bar(row, S.powerHeight / 2, top - S.powerHeight / 2, width)
+        row.manaPower:SetAlpha(0); row.formPower:SetAlpha(0)
+    end
     S.RowEdges(row, first, width)
 end
 function V.ApplyPosition()
@@ -119,6 +291,7 @@ function V.SetUnlocked(value)
     -- The handle is independent of protected frames and can hide on combat entry.
     V.handle:SetShown(V.unlocked)
     A.Preview.SetShown(V.unlocked)
+    V.RefreshPartyActions()
     for _, row in ipairs(V.rows) do row:SetAlpha(V.unlocked and 0 or 1) end
     A.Cleansing.pending = true; A.Cleansing.Refresh()
     A.Buffs.Refresh()
@@ -181,6 +354,7 @@ function V.Create()
     V.supportRows = {unpack(V.rows)}
     V.supportRows[#V.supportRows + 1] = V.target
     V.target:SetPoint("BOTTOMLEFT", V.rows[1], "TOPLEFT", 0, S.targetGap)
+    createTargetActions(V.target)
     V.target.cast = bar(V.target, S.powerHeight, -(S.healthHeight + S.barGap), S.targetWidth)
     V.target.cast:SetAlpha(0)
     RegisterStateDriver(V.target, "visibility", "[@target,exists] show; hide")
@@ -228,58 +402,58 @@ function V.Lock()
     V.SetUnlocked(false)
     if A.Settings then A.Settings.Refresh() end
 end
+local function proximity(unit)
+    if unit == "player" or A.Access.Read(UnitIsUnit, unit, "player") == true then return true end
+    if type(UnitDistanceSquared) ~= "function" then return nil end
+    local ok, distance, checked = pcall(UnitDistanceSquared, unit)
+    if ok and A.Access.Readable(distance, checked) and checked == true
+        and type(distance) == "number" and distance >= 0 and distance < math.huge then
+        return distance <= 40 * 40
+    end
+end
 function V.PaintRange(row, state)
     local result
-    local active = not V.unlocked and not A.Runtime.suspended and state == "alive"
-    if active then
-        if A.Bindings.rangeSpell
-            and A.Access.Read(C_Spell and C_Spell.SpellHasRange,A.Bindings.rangeSpell) ~= false then
-            result = A.Access.Read(C_Spell and C_Spell.IsSpellInRange, A.Bindings.rangeSpell, row.unit)
-        end
-        if type(result) ~= "boolean" then
-            result = nil
-            if row.unit == "player" then result = true
-            else
-                local ok, distance, checked = pcall(UnitDistanceSquared,row.unit)
-                if ok and A.Access.Readable(distance,checked) and checked == true
-                    and type(distance) == "number" and distance >= 0 and distance < math.huge then
-                    result = distance <= 40*40
-                end
-            end
+    if not V.unlocked and not A.Runtime.suspended and state == "alive" then
+        if A.Bindings.rangeSpell then
+            -- Unknown spell range stays unknown; distance cannot prove cast range.
+            result = A.Bindings.SpellRange(A.Bindings.rangeSpell, row.unit)
+        else
+            result = proximity(row.unit)
         end
     end
-    -- Unknown distance is distinct from both confirmed nearby and out of range.
-    local outside = result == false
-    local unknown = active and result == nil
     row.rangeStatus:Hide()
-    row:SetAlpha(V.unlocked and 0 or (outside and 0.45 or (unknown and 0.65 or 1)))
+    -- Only health artwork (including its text/incoming heals) inherits the fade.
+    -- Buff buttons are siblings, so their own spell range remains independent.
+    row.health:SetAlpha(result == false and 0.45 or 1)
+    row:SetAlpha(V.unlocked and 0 or 1)
     local showName = state ~= "missing" and state ~= "dead" and state ~= "offline"
     row.name:SetShown(showName); row.level:SetShown(showName)
 end
 function V.RefreshRange()
+    V.RefreshPartyActions()
     for _, row in ipairs(V.rows) do V.PaintRange(row, A.UnitAPI.State(row.unit)) end
+    for _, row in ipairs({V.target, V.targetTarget}) do
+        V.PaintRange(row, A.UnitAPI.State(row.unit))
+    end
 end
 local function refreshTargetRow(row)
     A.UnitAPI.PaintTargetIdentity(row)
     -- Unknown/restricted state must not prevent native health/power display.
     if A.Access.Read(UnitExists, row.unit) == false then
         if row.cast then V.ClearTargetCast() end
-        A.UnitAPI.Clear(row.health); A.UnitAPI.Clear(row.power)
+        A.UnitAPI.Clear(row.health); A.UnitAPI.ClearRowPower(row)
         A.IncomingHeals.Clear(row.incoming)
         return
     end
     if A.UnitAPI.PaintHealth(row.health, row.unit, V.curve) then
         A.IncomingHeals.Paint(row.incoming, row.unit)
     else A.IncomingHeals.Clear(row.incoming) end
-    A.UnitAPI.PaintPower(row.power, row.unit)
-    if row.cast then
-        local casting = not A.Runtime.suspended and A.UnitAPI.PaintCast(row.cast, row.unit)
-        row.cast:SetAlpha(casting and 1 or 0)
-        row.power:SetAlpha(casting and 0 or 1)
-    end
+    local casting = row.cast and not A.Runtime.suspended and A.UnitAPI.PaintCast(row.cast, row.unit)
+    if row.cast then row.cast:SetAlpha(casting and 1 or 0) end
+    A.UnitAPI.PaintRowPower(row, casting)
 end
 function V.ClearTargetCast()
-    V.target.cast:SetAlpha(0); V.target.power:SetAlpha(1)
+    V.target.cast:SetAlpha(0); A.UnitAPI.PaintRowPower(V.target)
 end
 function V.RefreshTargetTarget()
     if not A.Runtime.suspended then refreshTargetRow(V.targetTarget) end
@@ -292,13 +466,24 @@ function V.RefreshTargetAuras()
     end
 end
 function V.RefreshTarget()
+    V.RefreshPartyActions()
     refreshTargetRow(V.target)
     V.RefreshTargetTarget()
 end
 function V.Refresh()
     V.RefreshTarget()
+    local showIndicators = not InCombatLockdown() and not A.Runtime.suspended
     for _, row in ipairs(V.rows) do
         local state = A.UnitAPI.State(row.unit)
+        row.leader:SetShown(showIndicators
+            and A.Access.Read(UnitExists, "party1") == true
+            and A.Access.Read(UnitExists, row.unit) == true
+            and A.Access.Read(UnitIsGroupLeader, row.unit) == true)
+        local role
+        if showIndicators and A.Access.Read(UnitExists, row.unit) == true then
+            role = A.Access.Read(UnitGroupRolesAssigned, row.unit)
+        end
+        V.PaintRole(row, role)
         local classOK, _, classToken = pcall(UnitClass, row.unit)
         if not classOK then classToken = nil end
         A.UnitAPI.PaintClassStrip(row.classStrip, classToken)
@@ -314,11 +499,11 @@ function V.Refresh()
             if A.UnitAPI.PaintHealth(row.health, row.unit, V.curve) then
                 A.IncomingHeals.Paint(row.incoming, row.unit)
             else A.IncomingHeals.Clear(row.incoming) end
-            A.UnitAPI.PaintPower(row.power, row.unit)
+            A.UnitAPI.PaintRowPower(row)
             A.Drinking.Paint(row)
         else
             A.Drinking.Clear(row)
-            A.UnitAPI.Clear(row.health); A.UnitAPI.Clear(row.power)
+            A.UnitAPI.Clear(row.health); A.UnitAPI.ClearRowPower(row)
             A.IncomingHeals.Clear(row.incoming)
             if state == "offline" then row.status:SetText("OFFLINE")
             elseif state == "dead" then row.status:SetText("DEAD") end

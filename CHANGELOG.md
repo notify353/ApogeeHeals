@@ -1,3 +1,93 @@
+## Unreleased - Target actions beside name
+
+- Place three eight-unit action icons inside the right end of target health, matching role-icon size and spacing. Reserve name space to avoid overlap.
+
+## Unreleased - Player-only druid mana (2026-10-20)
+
+- Keep split mana/form power only on your own druid player bar. Party, target
+  and target-of-target bars show one active resource, including self targets.
+
+## Unreleased - Target action spacing
+
+- Raise the action icons four screen pixels to sit directly beneath the target bar.
+
+## Unreleased - Simple left-click range
+
+- Restore health-only range fading from unmodified left click; retain non-caster proximity and independent buff range. Remove extra indicators.
+
+## Unreleased - Shared target action range
+
+- Show all three target actions together only when Follow and both Inspect actions pass native availability and range checks; refresh while moving.
+
+## Unreleased - Talent icon readability (2026-10-20)
+
+- Enlarge the Inspect Talents artwork from 10 to 13 units and restore its color.
+
+## Unreleased range refinement
+
+- Separate teammate proximity from per-spell click range; retain warrior proximity and neutral unknowns.
+
+## Unreleased - Icon-only target actions
+
+- Remove action labels and the wide background; center three evenly spaced icons beneath the target bar. Retain hover tooltips and combat hiding.
+
+## Unreleased - Target druid power (2026-10-20)
+
+- Extend split mana/resource bars to target and target of target while retaining
+  player/party coverage and the temporary target cast indicator.
+
+## Unreleased - Druid mana in forms (2026-10-20)
+
+- Split druid player/party power strips equally in cat/bear form, with mana
+  above energy/rage; restore full mana in caster form.
+
+## Unreleased - Target actions (2026-10-20)
+
+- Replace per-party actions with one fixed, compact Follow / Inspect / Talents
+  strip beneath the target bar, visible for another friendly player outside combat.
+- Add clear short labels, muted icons and a gentle hover highlight in the existing
+  gap above the player's bar. Buff choices no longer move the controls.
+- Cancel pending talent inspection on target changes as well as combat, roster,
+  zoning and expiry; retain click-time native range and recipient checks.
+
+## Unreleased â€” Smart buffs
+
+- Fill leveling Paladin recommendation gaps with suitable learned blessings:
+  tank/unassigned Kings, Wisdom, Might; damage Might, Kings, Wisdom.
+
+- Tune five-man blessing guidance: Might for Warrior tanks, Wisdom for Hunters,
+  Kings for Paladin/Druid tanks; retain role-first healer/melee choices.
+
+- Replace the legacy reminder checklist with learned-spell Smart, Manual and Off
+  controls, shared by blessings, class upkeep, armor choices and auras/aspects.
+- Preserve Paladin guidance; keep stacking buffs independent, filter Spirit and
+  Intellect to mana users/healers, and suggest Thorns for assigned tanks.
+- Default Shadow Protection to Manual. Preserve existing opt-outs, foreign-caster
+  coverage, combat hiding and fixed-recipient click casting.
+
+## Unreleased - Remove Focus diagnostic (2026-10-20)
+
+- Remove temporary Focus health checks and their tests after the owner selected
+  Blizzard native health alerts. Preserve all other Heals features and settings.
+
+## Unreleased - Indicator combat visibility
+
+- Place the party leader crown to the left of the role icon.
+- Hide role and party leader icons in combat; restore current assignments afterward.
+
+## Unreleased - Assigned party roles
+
+- Show the game's assigned tank, healer or damage role beside the party leader crown.
+- Leave unassigned or unavailable roles blank; update on role and roster changes.
+
+## Unreleased - Party leader
+
+- Show a gold crown on the party leader's row, updating on leadership changes.
+
+## Unreleased - Level readability
+
+- Match level text to the compact name font so two-digit levels fit without ellipsis.
+
 ## Unreleased - Optional default spells
 
 - Add one per-character Enable default spells checkbox in the Keybinds settings group, off initially.

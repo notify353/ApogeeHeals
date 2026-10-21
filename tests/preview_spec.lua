@@ -23,7 +23,7 @@ test("live events never contaminate preview or persist sample data", function()
     m.Event("GROUP_ROSTER_UPDATE"); m.Flush()
     assert(a.Preview.rows[1].name.text == "Priest" and a.Preview.rows[1].health.value == 100)
     assert(a.View.rows[1].health.value == 10)
-    for key in pairs(a.db) do assert(key == "version" or key == "position" or key == "bindings" or key == "buffs") end
+    for key in pairs(a.db) do assert(key == "version" or key == "position" or key == "bindings" or key == "buffs" or key == "smartBuffs") end
     assert(next(a.db.bindings) == nil)
     a.View.SetUnlocked(false)
     assert(not a.Preview.root.shown and a.View.rows[1].alpha == 1)
@@ -53,7 +53,7 @@ test("preview holds full, animates and returns to full before repeating", functi
     p.root.scripts.OnUpdate(p.root, 2)
     assert(p.rows[2].health.value == 45 and p.rows[2].incoming.bar.value == 30)
     assert(p.rows[3].drinkIcon.shown)
-    assert(p.rows[4].alpha == 0.45 and p.rows[4].status.text == "OUT OF RANGE")
+    assert(p.rows[4].alpha == 1 and p.rows[4].health.alpha == 0.45 and not p.rows[4].rangeStatus.shown)
     assert(p.rows[5].status.text == "OFFLINE" and p.rows[5].health.value == 0)
     assert(p.rows[5].power.value == 0 and p.rows[5].incoming.bar.value == 0)
     p.root.scripts.OnUpdate(p.root, 2)

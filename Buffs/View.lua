@@ -1,5 +1,29 @@
 local _, A = ...
 local B = A.Buffs
+local function configureAction(button, id, unit)
+    if InCombatLockdown() then return end
+    local revision = B.actionRevision or 0
+    if button.configured and button.configuredSpell == id
+        and button.configuredRevision == revision then return end
+    local text
+    if id and unit ~= "player" then
+        local info = B.Info(id)
+        local rank = A.Access.Read(C_Spell and C_Spell.GetSpellSubtext, id)
+        -- Same explicit recipient/rank program as the accepted healing fix.
+        -- Missing text fails closed and retries on the next out-of-combat refresh.
+        if info and type(rank) == "string" and not info.name:find("[\r\n;%[%]]")
+            and not rank:find("[\r\n;%[%]]") then
+            local name = info.name .. (rank ~= "" and "(" .. rank .. ")" or "")
+            text = "/cast [@" .. unit .. ",exists,help] " .. name .. "\n/stopspelltarget"
+        end
+    end
+    local active = id and (unit == "player" or text ~= nil)
+    button:SetAttribute("type1", active and (unit == "player" and "spell" or "macro") or "")
+    button:SetAttribute("spell1", id)
+    button:SetAttribute("macrotext1", text)
+    RegisterStateDriver(button, "visibility", active and "[combat] hide; show" or "hide")
+    button.configured, button.configuredSpell, button.configuredRevision = not id or active, id, revision
+end
 local function createTimer(button)
     button.buffTimer = A.Style.CleanText(button, 5.5)
     local font = button.buffTimer:GetFont()
@@ -95,16 +119,12 @@ function B.Paint(row, missing)
         if not InCombatLockdown() then
             -- Cache only our public configured spell identity, never aura data.
             -- Combat painting leaves this untouched so deferred changes still apply.
-            if not button.configured or button.configuredSpell ~= id then
-                button:SetAttribute("type1", entry and "spell" or "")
-                button:SetAttribute("spell1", id)
-                RegisterStateDriver(button, "visibility", entry and "[combat] hide; show" or "hide")
-                button.configured, button.configuredSpell = true, id
-            end
+            configureAction(button, id, row.unit)
         end
     end
     row.buffOverflow:SetText(#missing > 4 and "+" .. (#missing - 4) or "")
     row.buffOverflow:SetShown(#missing > 4)
+
 end
 local function paintChoices(row, key, choices, offset, recommendedID, recommendation)
     row[key] = row[key] or {}
@@ -157,15 +177,11 @@ local function paintChoices(row, key, choices, offset, recommendedID, recommenda
                     button:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - position * (size + gap), A.Style.sideIconY)
                     button.configuredPosition = position
                 end
-                if not button.configured or button.configuredSpell ~= id then
-                    button:SetAttribute("type1", entry and "spell" or "")
-                    button:SetAttribute("spell1", id)
-                    RegisterStateDriver(button, "visibility", entry and "[combat] hide; show" or "hide")
-                    button.configured, button.configuredSpell = true, id
-                end
+                configureAction(button, id, row.unit)
             end
         end
     end
+
 end
 -- The strip expands the existing left-hand buff choices for one recipient.
 function B.CloseRecipient()
@@ -210,43 +226,57 @@ function B.PaintAuras(row, choices, missingCount, blessingCount)
 end
 function B.RefreshPicker()
     if not B.picker then return end
-    B.empty:SetShown(#A.db.buffs == 0)
-    for index = 1, B.limit do
-        local check = B.checks[index]
-        local entry = A.db.buffs[index]
-        if entry and not check then
-            check = CreateFrame("CheckButton", nil, B.content, "UICheckButtonTemplate")
-            B.checks[index] = check; check:SetSize(24, 24)
-            check:SetPoint("TOPLEFT", 4, -(index - 1) * 28)
-            check.label = A.Style.Text(check, 11); check.label:SetPoint("LEFT", check, "RIGHT", 4, 0)
-            check:SetScript("OnClick", function(self)
-                if InCombatLockdown() then return end
-                A.db.buffs[index].enabled = self:GetChecked() == true; B.Refresh()
-            end)
+    local entries = A.SmartBuffs.Entries()
+    B.empty:SetShown(#entries == 0)
+    for index = 1, math.max(#entries, #B.preferenceRows) do
+        local row, entry = B.preferenceRows[index], entries[index]
+        if entry and not row then
+            row = CreateFrame("Frame", nil, B.content)
+            B.preferenceRows[index] = row
+            row:SetSize(476, 30); row:SetPoint("TOPLEFT", 4, -(index - 1) * 32)
+            row.label = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+            row.label:SetPoint("LEFT", row, "LEFT", 0, 0)
+            row.label:SetSize(258, 28); row.label:SetJustifyH("LEFT")
+            row.buttons = {}
+            for position, mode in ipairs({"smart", "manual", "off"}) do
+                local button = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
+                row.buttons[mode] = button
+                button:SetSize(68, 24); button:SetPoint("LEFT", row, "LEFT", 264 + (position - 1) * 70, 0)
+                button:SetScript("OnClick", function() A.SmartBuffs.Set(row.entry.key, mode) end)
+            end
         end
-        if check then
-            check:SetShown(entry ~= nil)
+        if row then
+            row:SetShown(entry ~= nil); row.entry = entry
             if entry then
-                local info = B.Info(entry.id)
-                check.label:SetText((info and info.name or "Unavailable spell") .. (B.ForParty(entry) and "" or " (self)"))
-                check:SetChecked(entry.enabled); check:SetEnabled(not InCombatLockdown())
+                row.label:SetText(entry.label)
+                local current = A.SmartBuffs.Mode(entry.key, entry.fallback)
+                for mode, button in pairs(row.buttons) do
+                    local label = mode:sub(1, 1):upper() .. mode:sub(2)
+                    button:SetText(mode == current and ("|cffffd100" .. label .. "|r") or label)
+                    button:SetEnabled(not InCombatLockdown())
+                end
             end
         end
     end
-    B.content:SetHeight(math.max(32, #A.db.buffs * 28))
+    B.content:SetHeight(math.max(32, #entries * 32))
 end
 function B.OpenPicker()
     if InCombatLockdown() then return end
     if not B.picker then
         local frame = CreateFrame("Frame", "ApogeeHealsBuffPicker", UIParent)
-        B.picker = frame; frame:SetSize(310, 240); frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+        B.picker = frame; frame:SetSize(530, 350); frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
         frame:SetFrameStrata("DIALOG"); frame:EnableMouse(true); A.Style.Background(frame)
-        local title = A.Style.Text(frame, 12); title:SetPoint("TOPLEFT", 12, -12); title:SetText("Learned upkeep buffs")
+        local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+        title:SetPoint("TOPLEFT", 12, -12); title:SetText("Smart buffs")
+        local help = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        help:SetPoint("TOPLEFT", 12, -38); help:SetSize(500, 54); help:SetJustifyH("LEFT")
+        help:SetText("Smart: useful missing buffs. Manual: expanded choices only. Off: hidden.\nClick a player's class strip to expand choices; click a buff to cast.\nYellow marks a suggestion. Your choices are saved for this character.")
         local scroll = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
-        scroll:SetPoint("TOPLEFT", 8, -36); scroll:SetPoint("BOTTOMRIGHT", -30, 36)
-        B.content = CreateFrame("Frame", nil, scroll); B.content:SetSize(264, 32)
-        scroll:SetScrollChild(B.content); B.checks = {}
-        B.empty = A.Style.Text(B.content, 11); B.empty:SetPoint("TOPLEFT", 4, -4); B.empty:SetText("Cast a five-minute buff to learn it.")
+        scroll:SetPoint("TOPLEFT", 8, -102); scroll:SetPoint("BOTTOMRIGHT", -30, 36)
+        B.content = CreateFrame("Frame", nil, scroll); B.content:SetSize(488, 32)
+        scroll:SetScrollChild(B.content); B.preferenceRows = {}
+        B.empty = B.content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        B.empty:SetPoint("TOPLEFT", 4, -4); B.empty:SetText("No supported buffs learned yet.")
         local close = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
         close:SetSize(70, 22); close:SetPoint("BOTTOMRIGHT", -12, 8); close:SetText("Close")
         close:SetScript("OnClick", function() frame:Hide() end)

@@ -1,7 +1,7 @@
 local Mock = dofile("tests/mock.lua")
 local cases = {
-    {class="DRUID",ids={1126,467},party=2,self=2},
-    {class="PRIEST",ids={1243,14752,976,588},party=3,self=4},
+    {class="DRUID",ids={1126,467},party=1,self=1},
+    {class="PRIEST",ids={1243,14752,976,588},party=2,self=3},
     {class="MAGE",ids={1459,168,7302,6117},party=1,self=4},
     {class="SHAMAN",ids={324},party=0,self=1},
     {class="WARLOCK",ids={687,706},party=0,self=2},
@@ -42,7 +42,7 @@ for _, case in ipairs(cases) do
     local function active(row)
         local count=0
         for _, button in ipairs(row.upkeepButtons) do
-            if button.attributes.type1=="spell" then
+            if button.attributes.type1==(row.unit=="player" and "spell" or "macro") then
                 count=count+1
                 assert(button.attributes.unit==row.unit and button.attributes.useOnKeyDown==false)
                 assert(button.clicks[1]=="LeftButtonUp" and button.attributes["ctrl-type1"]=="")
@@ -65,7 +65,7 @@ for _, case in ipairs(cases) do
     assert(active(a.View.rows[2])==0 and active(a.View.target)==0,"Every class hides out-of-range recipient upkeep")
     a.View.target.buffStrip.scripts.OnClick(nil,"LeftButton",false);assert(active(a.View.target)==0)
     C_Spell.IsSpellInRange=function() return true end
-    a.Buffs.Refresh();assert(active(a.View.target)==case.party)
+    a.Buffs.Refresh();assert(active(a.View.target)==(case.class=="DRUID" and 2 or case.class=="PRIEST" and 3 or case.party))
     a.View.target.buffStrip.scripts.OnClick(nil,"LeftButton",false)
     C_Spell.SpellHasRange=nil;C_Spell.IsSpellInRange=nil
     if case.self > 0 then
@@ -73,7 +73,7 @@ for _, case in ipairs(cases) do
         local groupID=({DRUID=21850,PRIEST=21564,MAGE=23028})[case.class] or id
         local function offered(row)
             for _,button in ipairs(row.upkeepButtons) do
-                if button.attributes.type1=="spell" and button.attributes.spell1==id then return true end
+                if button.attributes.type1==(row.unit=="player" and "spell" or "macro") and button.attributes.spell1==id then return true end
             end
         end
         for _,row in ipairs(a.View.supportRows) do

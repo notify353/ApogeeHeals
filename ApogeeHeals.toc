@@ -14,6 +14,7 @@ Bindings/Defaults.lua
 Buffs/Defaults.lua
 Buffs/Catalog.lua
 Buffs/Runtime.lua
+Buffs/Preferences.lua
 Buffs/View.lua
 Cleansing/Runtime.lua
 WeaponUpkeep/Runtime.lua

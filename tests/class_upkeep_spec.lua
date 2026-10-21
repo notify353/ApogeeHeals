@@ -6,6 +6,8 @@ assert(loadfile("Core/Access.lua"))("ApogeeHeals", a)
 assert(loadfile("Bindings/Runtime.lua"))("ApogeeHeals", a)
 assert(loadfile("Buffs/Runtime.lua"))("ApogeeHeals", a)
 assert(loadfile("Buffs/Catalog.lua"))("ApogeeHeals", a)
+assert(loadfile("Buffs/Defaults.lua"))("ApogeeHeals", a)
+assert(loadfile("Buffs/Preferences.lua"))("ApogeeHeals", a)
 local known, passive = {}, {}
 Enum.SpellBookSpellBank = {Player=0}
 C_Spell.GetSpellInfo = function(id) return {name="Spell "..id, spellID=id, iconID=id} end
@@ -34,11 +36,11 @@ local function has(list, id)
 end
 setup("DRUID", {1126,9885,467,9910,21850})
 local list, id, reason=choices("party1")
-assert(#list==2 and has(list,9885) and has(list,9910) and id==9885 and reason)
+assert(#list==1 and has(list,9885) and not has(list,9910) and id==9885 and reason)
 assert(not has(list,1126) and not has(list,21850))
 -- Family coverage accepts exact identities and client-localized rank names.
 list,id=choices("party1", {{spellId=1126,name="anything",sourceUnit="party4"}})
-assert(#list==1 and has(list,9910) and id==nil)
+assert(#list==0 and id==nil)
 role="TANK";m.units.party1.class="MAGE"
 list,id,reason=choices("party1", {{spellId=21849}})
 assert(#list==1 and id==9910 and reason:find("assigned tank",1,true))
@@ -54,21 +56,21 @@ a.db.buffs={{id=21850,enabled=false}};assert(not has(choices("party1"),1126))
 setup("MAGE", {1459,10157,23028,168,7301,7302,10220,6117,22783})
 list,id=choices();assert(#list==4 and id==10157)
 list,id=choices("party1");assert(#list==1 and id==10157)
-list,id=choices("target");assert(#list==1 and id==nil) -- No class/role proof for Intellect guidance.
+list,id=choices("target");assert(#list==0 and id==nil) -- Unknown recipient has no automatic Intellect reminder.
 assert(#choices("player",{{spellId=168}})==1)
 assert(#choices("player",{{spellId=23028}})==3)
 a.db.buffs={{id=168,enabled=false}}
-list=choices();assert(#list==3 and not has(list,7301) and has(list,10220) and has(list,22783))
-m.units.party1.class="WARRIOR";list,id=choices("party1");assert(#list==1 and id==nil)
+list=choices();assert(#list==1 and not has(list,7301) and not has(list,10220) and not has(list,22783))
+m.units.party1.class="WARRIOR";list,id=choices("party1");assert(#list==0 and id==nil)
 role="HEALER";list,id=choices("party1");assert(id==10157)
 setup("PRIEST", {1243,10938,14752,27841,976,10958,588,10952,21564,27681,27683})
-list,id=choices();assert(#list==4 and id==10938)
-list,id=choices("party1",{{spellId=21562}});assert(#list==2 and id==27841)
+list,id=choices();assert(#list==3 and id==10938)
+list,id=choices("party1",{{spellId=21562}});assert(#list==1 and id==27841)
 m.units.party1.class="WARRIOR"
-list,id=choices("party1",{{spellId=1243}});assert(#list==2 and id==nil)
+list,id=choices("party1",{{spellId=1243}});assert(#list==0 and id==nil)
 role="HEALER";list,id=choices("party1",{{spellId=1243}});assert(id==27841)
-list,id=choices("player",{{spellId=21564},{spellId=27681}});assert(#list==2 and id==10952)
-list,id=choices("party1",{{spellId=21564},{spellId=27681}});assert(#list==1 and id==nil and has(list,10958))
+list,id=choices("player",{{spellId=21564},{spellId=27681}});assert(#list==1 and id==10952)
+list,id=choices("party1",{{spellId=21564},{spellId=27681}});assert(#list==0 and id==nil)
 assert(#choices("party1",{{spellId=21564},{spellId=27681},{spellId=27683}})==0)
 local selfCases={
     {class="SHAMAN",ids={324,10432},best=10432,covered=325},
@@ -94,7 +96,7 @@ for _, class in ipairs({"ROGUE","PALADIN","UNKNOWN"}) do
     setup(class,{9885,9910,10938,19740});assert(#choices()==0)
 end
 setup("DRUID",{9885,9910,16864})
-passive[9885]=true;list,id=choices();assert(#list==1 and id==nil)
+passive[9885]=true;list,id=choices();assert(#list==0 and id==nil)
 assert(not C.Recognized(16864) and not C.Recognized(19740) and C.Recognized(21850) and C.Recognized(1299346))
 known={};assert(#choices()==0)
 setup("DRUID",{9885,9910})
@@ -107,7 +109,7 @@ assert(#choices("player",{{spellId=9885},{spellId=secret}})==0)
 m.units.player.class=secret;assert(#choices()==0)
 m.units.player.class="DRUID";role=secret;m.units.party1.class=secret
 list,id=choices("party1");assert(id==9885)
-list,id=choices("party1",{{spellId=9885}});assert(#list==1 and id==nil)
+list,id=choices("party1",{{spellId=9885}});assert(#list==0 and id==nil)
 UnitGroupRolesAssigned=nil;list,id=choices("party1");assert(id==9885)
 m.combat=true;assert(#choices()==0)
 -- A caller-owned cache lasts for one refresh, including failed rank probes.

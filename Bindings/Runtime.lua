@@ -1,6 +1,14 @@
 local _, A = ...
 local B = { slots = {}, byId = {} }
 A.Bindings = B
+-- Public tri-state range for the exact spell and fixed recipient. No yard guess.
+function B.SpellRange(id, unit)
+    if not id or not unit then return nil end
+    if unit == "player" or A.Access.Read(UnitIsUnit, unit, "player") == true then return true end
+    if A.Access.Read(C_Spell and C_Spell.SpellHasRange, id) == false then return true end
+    local result = A.Access.Read(C_Spell and C_Spell.IsSpellInRange, id, unit)
+    if type(result) == "boolean" then return result end
+end
 for row, prefix in ipairs({ "", "shift-", "ctrl-" }) do
     for button = 1, 5 do
         local slot = { id = prefix .. button, prefix = prefix, button = button, row = row,
@@ -116,9 +124,24 @@ function B.Apply()
             -- and empty modified slots must not fall through to another action.
             local fallback = button == 1 and prefix == "" and id == nil and "target" or ""
             local item = info and info.itemID
-            if prefix == "" and button == 1 then B.rangeSpell = info and not item and id or nil end
+            local castName
+            if info and not item then
+                local rank = A.Access.Read(C_Spell and C_Spell.GetSpellSubtext, id)
+                -- Compile only public client text outside combat. Never emit a second
+                -- recipient/empty conditional that could invoke automatic self casting.
+                if type(rank) == "string" and not info.name:find("[\r\n;%[%]]")
+                    and not rank:find("[\r\n;%[%]]") then
+                    castName = info.name .. (rank ~= "" and "(" .. rank .. ")" or "")
+                end
+            end
+            if prefix == "" and button == 1 then
+                B.rangeSpell = info and not item and id or nil
+            end
             for _, frame in ipairs(recipients) do
-                frame:SetAttribute(prefix .. "type" .. button, info and (item and "item" or "spell") or fallback)
+                frame:SetAttribute(prefix .. "type" .. button,
+                    info and (item and "item" or (castName and "macro" or "")) or fallback)
+                frame:SetAttribute(prefix .. "macrotext" .. button, castName
+                    and "/cast [@" .. frame.unit .. ",exists,help] " .. castName .. "\n/stopspelltarget" or nil)
                 frame:SetAttribute(prefix .. "spell" .. button, info and not item and id or nil)
                 frame:SetAttribute(prefix .. "item" .. button, item and "item:" .. item or nil)
             end

@@ -16,8 +16,8 @@ function R.RangePolling()
     R.rangeElapsed = 0
     A.View.RefreshRange()
     if R.suspended or A.View.unlocked then return end
-    if type(UnitDistanceSquared) ~= "function" and (not A.Bindings.rangeSpell
-        or not C_Spell or type(C_Spell.IsSpellInRange) ~= "function") then return end
+    if type(UnitDistanceSquared) ~= "function" and not A.Bindings.rangeSpell
+        and type(CheckInteractDistance) ~= "function" then return end
     R.driver:SetScript("OnUpdate", function(_, elapsed)
         R.rangeElapsed = R.rangeElapsed + elapsed
         if R.rangeElapsed < 0.2 then return end
@@ -28,7 +28,8 @@ end
 function R.Start()
     local driver = CreateFrame("Frame")
     R.driver = driver
-    for _, event in ipairs({ "PLAYER_ENTERING_WORLD", "GROUP_ROSTER_UPDATE",
+    for _, event in ipairs({ "PLAYER_ENTERING_WORLD", "GROUP_ROSTER_UPDATE", "PARTY_LEADER_CHANGED",
+        "ROLE_CHANGED_INFORM",
         "UNIT_HEALTH", "UNIT_MAXHEALTH", "UNIT_POWER_UPDATE", "UNIT_MAXPOWER",
         "UNIT_DISPLAYPOWER", "UNIT_FLAGS", "UNIT_CONNECTION", "UNIT_NAME_UPDATE",
         "UNIT_LEVEL", "PLAYER_TARGET_CHANGED", "UNIT_FACTION", "UNIT_TARGET",
@@ -38,7 +39,7 @@ function R.Start()
         "UNIT_AURA", "PLAYER_DEAD", "PLAYER_ALIVE", "PLAYER_UNGHOST",
         "UNIT_SPELLCAST_SUCCEEDED", "PLAYER_LEAVING_WORLD",
         "UNIT_HEAL_PREDICTION", "UNIT_HEAL_ABSORB_AMOUNT_CHANGED",
-        "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "SPELLS_CHANGED",
+        "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "SPELLS_CHANGED", "SPELL_TEXT_UPDATE",
         "UI_SCALE_CHANGED", "DISPLAY_SIZE_CHANGED", "GET_ITEM_INFO_RECEIVED",
         "UPDATE_SHAPESHIFT_FORM", "UPDATE_SHAPESHIFT_FORMS", "PLAYER_ROLES_ASSIGNED" }) do driver:RegisterEvent(event) end
     driver:SetScript("OnEvent", function(_, event, unit, castGUID, spellID)
@@ -58,6 +59,7 @@ function R.Start()
             end
         end
         if event == "PLAYER_TARGET_CHANGED" then
+            A.View.RefreshPartyActions()
             A.Buffs.CloseRecipient()
             A.View.RefreshTargetAuras()
             A.Buffs.HideTooltip(A.Buffs.tooltipButton); A.Cleansing.HideTooltip()
@@ -70,19 +72,24 @@ function R.Start()
             A.Buffs.HideTooltip(A.Buffs.tooltipButton)
         elseif event == "PLAYER_LEAVING_WORLD" then
             R.suspended = true
-            for _, row in ipairs(A.View.rows) do A.Drinking.Clear(row) end
+            A.View.RefreshPartyActions()
+            for _, row in ipairs(A.View.rows) do
+                A.Drinking.Clear(row); row.leader:Hide(); row.roleIcon:Hide()
+            end
             A.View.ClearTargetCast()
             A.Buffs.suspended = true
             A.Buffs.Stop()
             R.RangePolling()
             return
         elseif event == "PLAYER_REGEN_DISABLED" then
+            A.View.RefreshPartyActions()
             A.Buffs.Stop()
             A.BindingEditor.Close()
             A.View.Lock(); A.Settings.Refresh()
-            -- Clear drinking immediately; combat alone does not hide unit identity.
+            -- Hide ancillary indicators immediately, before the queued refresh.
             for _, row in ipairs(A.View.rows) do
                 A.Drinking.Clear(row)
+                row.leader:Hide(); row.roleIcon:Hide()
             end
         elseif event == "PLAYER_REGEN_ENABLED" then
             A.Cleansing.pending = true
@@ -100,7 +107,11 @@ function R.Start()
                 end
             end
             return
+        elseif event == "SPELL_TEXT_UPDATE" then
+            A.Buffs.actionRevision = (A.Buffs.actionRevision or 0) + 1
+            A.Bindings.Apply()
         elseif event == "SPELLS_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
+            A.Buffs.actionRevision = (A.Buffs.actionRevision or 0) + 1
             A.Cleansing.pending = true
             A.BuffDefaults.pending = true
             A.Buffs.spellNames, A.Buffs.nameGroups = nil, nil

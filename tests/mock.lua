@@ -75,6 +75,7 @@ function M.New()
     function methods:SetAllPoints(relative) self.allPoints=relative or self.parent end
     function methods:SetColorTexture(...) self.color = {...} end
     function methods:SetTexture(value) self.texture = value end
+    function methods:SetAtlas(value, useAtlasSize) self.atlas = value; self.useAtlasSize = useAtlasSize end
     function methods:SetDesaturated(value) self.desaturated = value end
     function methods:SetTexCoord(...) self.texCoord = {...} end
     function methods:SetStatusBarColor(...) self.color = {...} end
@@ -193,7 +194,7 @@ function M.New()
         return { SetType = function() end, AddPoint = function() end }
     end }
     C_Timer = { After = function(_, callback) m.timers[#m.timers + 1] = callback end }
-    C_Spell = { GetSpellInfo = function(id)
+    C_Spell = { GetSpellSubtext = function() return "" end, GetSpellInfo = function(id)
         if id == 430 then return { name = "Drink", spellID = id } end
     end }
     C_UnitAuras = { GetAuraDataByIndex = function(u, i, filter)

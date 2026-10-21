@@ -48,18 +48,18 @@ assert(partyAction.attributes.unit == "party1" and partyAction.attributes.spell1
 a.View.SetUnlocked(true)
 assert(partyAction.attributes.type1 == "" and partyAction.driver == "hide")
 a.View.SetUnlocked(false)
-assert(partyAction.attributes.type1 == "spell")
+assert(partyAction.attributes.type1 == "macro")
 print("PASS class-independent five-minute learning, ownership and other-caster/rank coverage")
 
 a.Buffs.OpenPicker()
-a.Buffs.checks[1]:SetChecked(false); a.Buffs.checks[1].scripts.OnClick(a.Buffs.checks[1])
+a.Buffs.preferenceRows[1].buttons.off.scripts.OnClick()
 assert(not a.db.buffs[1].enabled and not a.View.rows[2].buffReminders[1].shown)
 cast(700003,600)
 assert(#a.db.buffs==1 and a.db.buffs[1].id==700003 and not a.db.buffs[1].enabled)
 local saved=a.db
 m,a,cast=setup(saved)
 assert(#a.db.buffs==1 and not a.db.buffs[1].enabled)
-a.db.buffs[1].enabled=true
+a.SmartBuffs.Set(a.SmartBuffs.Key(a.db.buffs[1].id), "smart")
 m.units.party1.auras={{spellId=m.Secret(),name="Unknown"}}
 m.Event("UNIT_AURA","party1");m.Flush()
 assert(not a.View.rows[2].buffReminders[1].shown)
@@ -112,7 +112,7 @@ assert(not a.View.rows[1].buffReminders[1].shown)
 assert(a.View.rows[2].buffReminders[1].shown)
 assert(a.View.rows[2].buffButtons[1].attributes.unit=="party1")
 assert(a.View.rows[2].buffButtons[1].attributes.spell1==700001)
-a.Buffs.OpenPicker();assert(a.Buffs.checks[1].label.text=="Test Upkeep")
+a.Buffs.OpenPicker();assert(a.Buffs.preferenceRows[1].label.text=="Test Upkeep")
 C_Spell.IsSelfBuff=function() return true end
 a.Buffs.Refresh();assert(not a.View.rows[2].buffReminders[1].shown)
 C_Spell.IsSelfBuff=function() return m.Secret() end

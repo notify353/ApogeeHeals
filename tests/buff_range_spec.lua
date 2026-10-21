@@ -12,7 +12,7 @@ C_Spell.IsSpellInRange=function(id,unit)
     return not outside
 end
 local function shown(row)
-    for _,b in ipairs(row.blessingButtons) do if b.attributes.type1=="spell" then return true end end
+    for _,b in ipairs(row.blessingButtons) do if b.attributes.type1==(row.unit=="player" and "spell" or "macro") then return true end end
     return false
 end
 a.Buffs.Refresh()
