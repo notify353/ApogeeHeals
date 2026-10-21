@@ -84,6 +84,8 @@ guidance, native weapon displays, limitations and live acceptance checks.
 - Default placement aligns beneath Apogee Tank's Forever bars, with a 9px gap
   below its single-target layout. No Tank dependency or frame attachment is used.
   Existing saved positions remain unchanged; use **Reset positions** to adopt it.
+- Druid player, party, target and target-of-target rows split the existing power strip equally in cat/bear form:
+  blue mana above energy/rage. Caster form restores the full mana strip.
 - Apogee Tank styling with taller health bars: 112x14 health, 112x5 power, at 2x scale.
   Full character names use Blizzard's native class colors, left-aligned inside health bars with the
   original game font at the same smaller size as NPC names and dark shadow, including

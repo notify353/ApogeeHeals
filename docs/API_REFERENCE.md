@@ -1,3 +1,29 @@
+## Target druid power follow-up (October 20, 2026)
+
+Extend the same fixed split bars and existing explicit power-type reads to
+target and targettarget. Target casting temporarily fades all power artwork;
+stop/interruption restores the appropriate full or split strip. Missing targets
+clear both halves, and class/resource changes reset reused target rows.
+Source regressions cover all seven units, restricted mana sinks, target casting
+and combat geometry. Owner confirms the installed player split works; party
+and target native acceptance remain pending. No new API contracts.
+
+## Druid split power (October 20, 2026)
+
+Verified Forever 1.60.1.70450 / 16001 with the strict export checker.
+UnitDocumentation UnitPower and UnitPowerMax accept an explicit powerType;
+mana uses 0, rage 1 and energy 3. Public UnitClass class token and UnitPowerType
+select the split only for druid player/party rows using rage or energy.
+Restricted current/max amounts go directly to native StatusBar sinks.
+Two equal half-height bars are created once alongside the ordinary full bar;
+only alpha and native values change during combat. Existing UNIT_POWER_UPDATE,
+UNIT_MAXPOWER and UNIT_DISPLAYPOWER refresh both resources. Missing/dead/offline
+rows clear both halves; unknown class/power type restores ordinary power.
+API errors clear the affected fill without substituting another resource.
+No protected geometry/action changes, settings, saved state or target cast changes.
+Full source regressions pass; grouped mana availability, appearance and native
+combat/taint acceptance require owner in-game testing.
+
 ## Target action strip (October 20, 70450; supersedes party layouts below)
 
 Reverified matching Forever export. Existing checked UnitDocumentation defines

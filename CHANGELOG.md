@@ -1,3 +1,13 @@
+## Unreleased - Target druid power (2026-10-20)
+
+- Extend split mana/resource bars to target and target of target while retaining
+  player/party coverage and the temporary target cast indicator.
+
+## Unreleased - Druid mana in forms (2026-10-20)
+
+- Split druid player/party power strips equally in cat/bear form, with mana
+  above energy/rage; restore full mana in caster form.
+
 ## Unreleased - Target actions (2026-10-20)
 
 - Replace per-party actions with one fixed, compact Follow / Inspect / Talents
