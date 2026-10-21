@@ -105,12 +105,13 @@ local function createTargetActions(row)
         button.highlight:SetAllPoints(); button.highlight:SetColorTexture(0.65, 0.78, 1, 1)
         button.highlight:SetAlpha(0)
         button.icon = button:CreateTexture(nil, "ARTWORK")
-        button.icon:SetSize(10, 10)
+        local iconSize = talents and 13 or 10
+        button.icon:SetSize(iconSize, iconSize)
         button.icon:SetPoint("CENTER", button, "CENTER", 0, 0)
         if talents then button.icon:SetAtlas("UI-HUD-MicroMenu-SpecTalents-Up", false)
         elseif inspect then button.icon:SetAtlas("common-icon-search", false)
         else button.icon:SetTexture("Interface\\Icons\\Ability_Tracking") end
-        button.icon:SetDesaturated(true)
+        button.icon:SetDesaturated(not talents)
         button.icon:SetAlpha(0.75)
         button:SetScript("OnEnter", function()
             if InCombatLockdown() then return end

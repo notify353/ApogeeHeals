@@ -1,3 +1,7 @@
+## Unreleased - Talent icon readability (2026-10-20)
+
+- Enlarge the Inspect Talents artwork from 10 to 13 units and restore its color.
+
 ## Unreleased range refinement
 
 - Separate teammate proximity from per-spell click range; retain warrior proximity and neutral unknowns.

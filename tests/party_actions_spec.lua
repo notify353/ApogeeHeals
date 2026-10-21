@@ -29,7 +29,8 @@ assert(a.View.targetActions.driver == "[combat] hide; [@target,help,exists] show
 assert(a.View.targetActions.point[2] == row and a.View.targetActions.point[3] == "BOTTOM")
 assert(a.View.targetActions.height + 2 < a.Style.targetGap, "fits shared gap")
 for _, button in ipairs(row.partyActions) do
-    assert(button.height == 16 and button.icon.width == 10 and button.icon.desaturated)
+    assert(button.height == 16 and button.icon.width == (button == talents and 13 or 10))
+    assert(button.icon.desaturated == (button ~= talents))
     assert(button.icon.alpha == 0.75 and not button.label)
 end
 follow.scripts.OnEnter(); assert(follow.icon.alpha == 1)
