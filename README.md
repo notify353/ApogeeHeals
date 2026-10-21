@@ -28,7 +28,7 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 ## Prototype
 
 - Select another friendly player to show a compact Follow, Inspect and Talents
-  strip beneath the target bar. Muted icons and short labels brighten on hover.
+  strip beneath the target bar. Three centered icons brighten on hover; tooltips name each action.
   The fixed strip shares the space above your health bar with the combat-only
   damage display. It disappears in combat, while moving frames and while loading.
   Party rows have no action buttons; buffs never reposition the strip.

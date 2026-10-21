@@ -78,26 +78,22 @@ function V.RefreshPartyActions()
         local available = partyActionReason(row, index >= 2, false, index == 3) == nil
         button:SetEnabled(available)
         button.icon:SetAlpha(available and (button.hovered and 1 or 0.75) or 0.25)
-        local shade = available and (button.hovered and 1 or 0.78) or 0.35
-        button.label:SetTextColor(shade, shade, shade, 1)
         button.highlight:SetAlpha(available and button.hovered and 0.12 or 0)
         if not available and GameTooltip:IsOwned(button) then GameTooltip:Hide() end
     end
 end
 local function createTargetActions(row)
     local strip = CreateFrame("Frame", nil, V.root)
-    strip:SetSize(S.targetWidth, 16)
-    strip:SetPoint("TOPLEFT", row, "BOTTOMLEFT", 0, -2)
+    strip:SetSize(56, 16)
+    strip:SetPoint("TOP", row, "BOTTOM", 0, -2)
     strip:EnableMouse(false)
     V.targetActions = strip
     RegisterStateDriver(strip, "visibility", "[combat] hide; [@target,help,exists] show; hide")
     strip.content = CreateFrame("Frame", nil, strip)
     strip.content:SetAllPoints(); strip.content:EnableMouse(false)
     strip.content:Hide()
-    local background = strip.content:CreateTexture(nil, "BACKGROUND")
-    background:SetAllPoints(); background:SetColorTexture(0.04, 0.05, 0.07, 0.78)
     row.partyActions = {}
-    local width, gap = (S.targetWidth - 4) / 3, 2
+    local width, gap = 16, 4
     for index, label in ipairs({"Follow", "Inspect", "Talents"}) do
         local inspect, talents = index >= 2, index == 3
         local button = CreateFrame("Button", nil, strip.content)
@@ -110,16 +106,12 @@ local function createTargetActions(row)
         button.highlight:SetAlpha(0)
         button.icon = button:CreateTexture(nil, "ARTWORK")
         button.icon:SetSize(10, 10)
-        button.icon:SetPoint("LEFT", button, "LEFT", 2, 0)
+        button.icon:SetPoint("CENTER", button, "CENTER", 0, 0)
         if talents then button.icon:SetAtlas("UI-HUD-MicroMenu-SpecTalents-Up", false)
         elseif inspect then button.icon:SetAtlas("common-icon-search", false)
         else button.icon:SetTexture("Interface\\Icons\\Ability_Tracking") end
         button.icon:SetDesaturated(true)
         button.icon:SetAlpha(0.75)
-        button.label = S.Text(button, 6)
-        button.label:SetPoint("LEFT", button.icon, "RIGHT", 2, 0)
-        button.label:SetSize(width - 14, 12)
-        button.label:SetJustifyH("LEFT"); button.label:SetText(label)
         button:SetScript("OnEnter", function()
             if InCombatLockdown() then return end
             button.hovered = true
@@ -135,7 +127,6 @@ local function createTargetActions(row)
             button.hovered = false
             button.icon:SetAlpha(0.75)
             button.highlight:SetAlpha(0)
-            button.label:SetTextColor(0.78, 0.78, 0.78, 1)
             if GameTooltip:IsOwned(button) then GameTooltip:Hide() end
         end
         button:SetScript("OnLeave", hideTooltip)
