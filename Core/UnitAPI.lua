@@ -41,22 +41,22 @@ function U.PaintPower(bar, unit, kind)
     end)
     if not ok then U.Clear(bar) end
 end
-function U.ClearPartyPower(row)
+function U.ClearRowPower(row)
     U.Clear(row.power)
     U.Clear(row.manaPower); U.Clear(row.formPower)
     row.power:SetAlpha(1)
     row.manaPower:SetAlpha(0); row.formPower:SetAlpha(0)
 end
-function U.PaintPartyPower(row)
+function U.PaintRowPower(row, hidden)
     local ok, _, class = pcall(UnitClass, row.unit)
     local kind = R(UnitPowerType, row.unit)
     local split = ok and A.Access.Readable(class) and class == "DRUID"
         and (kind == 1 or kind == 3)
     -- Geometry is fixed at creation. Only native display values/alpha change
     -- during combat; restricted resource quantities never control the layout.
-    row.power:SetAlpha(split and 0 or 1)
-    row.manaPower:SetAlpha(split and 1 or 0)
-    row.formPower:SetAlpha(split and 1 or 0)
+    row.power:SetAlpha((hidden or split) and 0 or 1)
+    row.manaPower:SetAlpha(split and not hidden and 1 or 0)
+    row.formPower:SetAlpha(split and not hidden and 1 or 0)
     if split then
         U.PaintPower(row.manaPower, row.unit, 0)
         U.PaintPower(row.formPower, row.unit, kind)
