@@ -8,22 +8,16 @@
 - Split druid player/party power strips equally in cat/bear form, with mana
   above energy/rage; restore full mana in caster form.
 
-## Unreleased - Party Follow and Inspect (2026-10-20)
+## Unreleased - Target actions (2026-10-20)
 
-- Place the action group left of the healing bars with consistent spacing,
-  automatically clearing suggested/expanded buffs and returning when they close.
+- Replace per-party actions with one fixed, compact Follow / Inspect / Talents
+  strip beneath the target bar, visible for another friendly player outside combat.
+- Add clear short labels, muted icons and a gentle hover highlight in the existing
+  gap above the player's bar. Buff choices no longer move the controls.
+- Cancel pending talent inspection on target changes as well as combat, roster,
+  zoning and expiry; retain click-time native range and recipient checks.
 
-- Add a muted Inspect Talents button that opens the native inspected talent
-  tree after matching data arrives; cancel stale, combat and roster requests.
-
-- Make Follow/Inspect smaller, desaturated and translucent without button
-  backgrounds; brighten on hover and hide the controls completely in combat.
-
-- Add Follow and Inspect beside party-member cleansing buttons, with native
-  fixed-unit actions outside combat and click-time range checks. Preserve the
-  existing role and spell icons; move drinking/debuff displays right to fit.
-
-## Unreleased — Smart buffs
+## Unreleased â€” Smart buffs
 
 - Fill leveling Paladin recommendation gaps with suitable learned blessings:
   tank/unassigned Kings, Wisdom, Might; damage Might, Kings, Wisdom.

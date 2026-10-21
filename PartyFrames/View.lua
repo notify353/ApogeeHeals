@@ -2,9 +2,17 @@ local _, A = ...
 local V, S = {}, A.Style
 A.View = V
 local units = { "player", "party1", "party2", "party3", "party4" }
+local function eligibleTarget()
+    local read = A.Access.Read
+    return read(UnitExists, "target") == true
+        and read(UnitIsPlayer, "target") == true
+        and read(UnitCanAssist, "player", "target") == true
+        and read(UnitIsUnit, "player", "target") == false
+end
 local function partyActionReason(row, inspect, checkRange, talents)
     local read = A.Access.Read
     if InCombatLockdown() then return "Unavailable during combat." end
+    if not eligibleTarget() then return "Select another friendly player." end
     if A.Runtime.suspended or V.unlocked then return "Unavailable while moving frames or loading." end
     if read(UnitExists, row.unit) ~= true or read(UnitIsConnected, row.unit) ~= true
         or read(UnitIsDeadOrGhost, "player") ~= false then return "Player unavailable." end
@@ -52,7 +60,7 @@ local function inspectTalents(row)
     local request = {row = row, guid = guid}
     talentRequest = request
     for _, event in ipairs({"INSPECT_READY", "PLAYER_REGEN_DISABLED", "GROUP_ROSTER_UPDATE",
-        "PLAYER_LEAVING_WORLD"}) do talentEvents:RegisterEvent(event) end
+        "PLAYER_LEAVING_WORLD", "PLAYER_TARGET_CHANGED"}) do talentEvents:RegisterEvent(event) end
     -- Never leave a request able to open a window long after its initiating click.
     C_Timer.After(5, function()
         if talentRequest == request then cancelTalentRequest() end
@@ -60,76 +68,87 @@ local function inspectTalents(row)
     NotifyInspect(row.unit)
 end
 function V.RefreshPartyActions()
-    for _, row in ipairs(V.rows or {}) do
-        for index, button in ipairs(row.partyActions or {}) do
-            local available = partyActionReason(row, index >= 2, false, index == 3) == nil
-            button:SetEnabled(available)
-            button.icon:SetAlpha(available and (button.hovered and 0.8 or 0.45) or 0.2)
-            if not available and GameTooltip:IsOwned(button) then GameTooltip:Hide() end
-        end
+    local row, strip = V.target, V.targetActions
+    if not strip then return end
+    -- The native parent owns combat visibility; only ordinary content is toggled.
+    if not InCombatLockdown() then
+        strip.content:SetShown(eligibleTarget() and not A.Runtime.suspended and not V.unlocked)
     end
-end
-function V.LayoutPartyActions(row)
-    if InCombatLockdown() or not row.partyActions then return end
-    local slots = row.partyActionBuffSlots or 0
-    for _, lastSlot in pairs(row.partyActionChoiceEnds or {}) do slots = math.max(slots, lastSlot) end
-    if row.partyActionSlots == slots then return end
-    row.partyActionSlots = slots
-    local size, gap = S.sideIconSize, S.sideIconGap
     for index, button in ipairs(row.partyActions) do
-        button:ClearAllPoints()
-        button:SetPoint("TOPRIGHT", row.health, "TOPLEFT",
-            -6 - (slots + #row.partyActions - index) * (size + gap), S.sideIconY)
+        local available = partyActionReason(row, index >= 2, false, index == 3) == nil
+        button:SetEnabled(available)
+        button.icon:SetAlpha(available and (button.hovered and 1 or 0.75) or 0.25)
+        local shade = available and (button.hovered and 1 or 0.78) or 0.35
+        button.label:SetTextColor(shade, shade, shade, 1)
+        button.highlight:SetAlpha(available and button.hovered and 0.12 or 0)
+        if not available and GameTooltip:IsOwned(button) then GameTooltip:Hide() end
     end
 end
-local function createPartyActions(row)
-    if row.unit == "player" then return end
-    local size, gap = S.sideIconSize, S.sideIconGap
+local function createTargetActions(row)
+    local strip = CreateFrame("Frame", nil, V.root)
+    strip:SetSize(S.targetWidth, 16)
+    strip:SetPoint("TOPLEFT", row, "BOTTOMLEFT", 0, -2)
+    strip:EnableMouse(false)
+    V.targetActions = strip
+    RegisterStateDriver(strip, "visibility", "[combat] hide; [@target,help,exists] show; hide")
+    strip.content = CreateFrame("Frame", nil, strip)
+    strip.content:SetAllPoints(); strip.content:EnableMouse(false)
+    strip.content:Hide()
+    local background = strip.content:CreateTexture(nil, "BACKGROUND")
+    background:SetAllPoints(); background:SetColorTexture(0.04, 0.05, 0.07, 0.78)
     row.partyActions = {}
-    for index, label in ipairs({"Follow", "Inspect", "Inspect Talents"}) do
+    local width, gap = (S.targetWidth - 4) / 3, 2
+    for index, label in ipairs({"Follow", "Inspect", "Talents"}) do
         local inspect, talents = index >= 2, index == 3
-        local button = CreateFrame("Button", nil, row)
-        button:SetSize(size, size)
+        local button = CreateFrame("Button", nil, strip.content)
+        button:SetSize(width, 16)
+        button:SetPoint("LEFT", strip.content, "LEFT", (index - 1) * (width + gap), 0)
         button:SetPropagateMouseClicks(false)
         button:RegisterForClicks("LeftButtonUp")
+        button.highlight = button:CreateTexture(nil, "BACKGROUND")
+        button.highlight:SetAllPoints(); button.highlight:SetColorTexture(0.65, 0.78, 1, 1)
+        button.highlight:SetAlpha(0)
         button.icon = button:CreateTexture(nil, "ARTWORK")
         button.icon:SetSize(10, 10)
-        button.icon:SetPoint("CENTER", button, "CENTER", 0, 0)
+        button.icon:SetPoint("LEFT", button, "LEFT", 2, 0)
         if talents then button.icon:SetAtlas("UI-HUD-MicroMenu-SpecTalents-Up", false)
         elseif inspect then button.icon:SetAtlas("common-icon-search", false)
         else button.icon:SetTexture("Interface\\Icons\\Ability_Tracking") end
         button.icon:SetDesaturated(true)
-        button.icon:SetAlpha(0.45)
-        -- Native visibility removes both artwork and hit regions in combat.
-        -- Reserve the layout permanently so cleanse and debuff slots never move.
-        RegisterStateDriver(button, "visibility", "[combat] hide; show")
+        button.icon:SetAlpha(0.75)
+        button.label = S.Text(button, 6)
+        button.label:SetPoint("LEFT", button.icon, "RIGHT", 2, 0)
+        button.label:SetSize(width - 14, 12)
+        button.label:SetJustifyH("LEFT"); button.label:SetText(label)
         button:SetScript("OnEnter", function()
             if InCombatLockdown() then return end
             button.hovered = true
             V.RefreshPartyActions()
-            GameTooltip:SetOwner(button, "ANCHOR_RIGHT"); GameTooltip:SetText(label)
+            GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
+            GameTooltip:SetText(talents and "Inspect Talents" or label)
             GameTooltip:AddLine(partyActionReason(row, inspect, true, talents) or
-                (talents and "View this party member's talent points."
-                or inspect and "Inspect this party member." or "Follow this party member."), 0.8, 0.8, 0.8)
+                (talents and "View this player's talent points."
+                or inspect and "Inspect this player." or "Follow this player."), 0.8, 0.8, 0.8)
             GameTooltip:Show()
         end)
         local function hideTooltip()
             button.hovered = false
-            button.icon:SetAlpha(0.45)
+            button.icon:SetAlpha(0.75)
+            button.highlight:SetAlpha(0)
+            button.label:SetTextColor(0.78, 0.78, 0.78, 1)
             if GameTooltip:IsOwned(button) then GameTooltip:Hide() end
         end
         button:SetScript("OnLeave", hideTooltip)
         button:SetScript("OnHide", hideTooltip)
         button:SetScript("OnClick", function(_, mouseButton)
             if mouseButton ~= "LeftButton" or partyActionReason(row, inspect, true, talents) then return end
-            -- Only explicit clicks initiate requests; never retarget or queue follow.
+            -- Resolve the current target at the click; never retarget or queue follow.
             if talents then inspectTalents(row)
             elseif inspect then cancelTalentRequest(); InspectUnit(row.unit)
             else FollowUnit(row.unit) end
         end)
         row.partyActions[index] = button
     end
-    V.LayoutPartyActions(row)
 end
 local roleAtlases = {
     TANK = "roleicon-tiny-tank", HEALER = "roleicon-tiny-healer", DAMAGER = "roleicon-tiny-dps",
@@ -277,6 +296,7 @@ function V.SetUnlocked(value)
     -- The handle is independent of protected frames and can hide on combat entry.
     V.handle:SetShown(V.unlocked)
     A.Preview.SetShown(V.unlocked)
+    V.RefreshPartyActions()
     for _, row in ipairs(V.rows) do row:SetAlpha(V.unlocked and 0 or 1) end
     A.Cleansing.pending = true; A.Cleansing.Refresh()
     A.Buffs.Refresh()
@@ -311,7 +331,6 @@ function V.Create()
         row:SetAttribute("unit", unit); row:SetAttribute("type1", "target")
         buildRow(row, false, i == 1)
         A.Cleansing.Create(row)
-        createPartyActions(row)
         createDebuffs(row)
         A.Buffs.Create(row)
         row:Hide()
@@ -340,6 +359,7 @@ function V.Create()
     V.supportRows = {unpack(V.rows)}
     V.supportRows[#V.supportRows + 1] = V.target
     V.target:SetPoint("BOTTOMLEFT", V.rows[1], "TOPLEFT", 0, S.targetGap)
+    createTargetActions(V.target)
     V.target.cast = bar(V.target, S.powerHeight, -(S.healthHeight + S.barGap), S.targetWidth)
     V.target.cast:SetAlpha(0)
     RegisterStateDriver(V.target, "visibility", "[@target,exists] show; hide")
@@ -448,11 +468,11 @@ function V.RefreshTargetAuras()
     end
 end
 function V.RefreshTarget()
+    V.RefreshPartyActions()
     refreshTargetRow(V.target)
     V.RefreshTargetTarget()
 end
 function V.Refresh()
-    V.RefreshPartyActions()
     V.RefreshTarget()
     local showIndicators = not InCombatLockdown() and not A.Runtime.suspended
     for _, row in ipairs(V.rows) do

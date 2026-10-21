@@ -13,17 +13,16 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 
 ## Prototype
 
-- Follow (footprints), Inspect (magnifying glass) and Inspect Talents sit to the
-  left of each other party member's row. The group moves farther left to clear
-  buff suggestions and expanded choices. Left-click outside combat.
-  Move within native interaction range to use them. They do not change your
-  target; combat, loading and frame unlock prevent actions. Player and target
-  rows retain their existing controls. Small muted icons brighten on hover.
-  These buttons disappear completely during combat.
+- Select another friendly player to show a compact Follow, Inspect and Talents
+  strip beneath the target bar. Muted icons and short labels brighten on hover.
+  The fixed strip shares the space above your health bar with the combat-only
+  damage display. It disappears in combat, while moving frames and while loading.
+  Party rows have no action buttons; buffs never reposition the strip.
+  Actions use the current target and require native interaction range.
 
-- Inspect Talents beside Inspect opens the native talent window for that party
-  member after inspection data arrives. It shares the muted appearance and
-  combat hiding. Stay nearby; combat/roster changes cancel a pending request.
+- Talents opens the native inspected talent window after matching data arrives.
+  Target changes, combat, roster changes, zoning and a five-second timeout cancel
+  pending inspection. No automatic follow, retargeting or stored talent data.
 
 - **Threat demo (solo preview; ends in combat)** previews scripted threat bars
   and warrior debuff icons without live reads. The checkbox is session-only;

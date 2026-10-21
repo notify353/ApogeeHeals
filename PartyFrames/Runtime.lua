@@ -59,6 +59,7 @@ function R.Start()
             end
         end
         if event == "PLAYER_TARGET_CHANGED" then
+            A.View.RefreshPartyActions()
             A.Buffs.CloseRecipient()
             A.View.RefreshTargetAuras()
             A.Buffs.HideTooltip(A.Buffs.tooltipButton); A.Cleansing.HideTooltip()
