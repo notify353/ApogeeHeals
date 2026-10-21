@@ -1,3 +1,17 @@
+## Target action strip (October 20, 70450; supersedes party layouts below)
+
+Reverified matching Forever export. Existing checked UnitDocumentation defines
+UnitIsPlayer, UnitCanAssist and UnitIsUnit; guarded public results alone admit
+another friendly player. Fixed target token is resolved at click time. A single
+native state driver hides the strip in combat or without a friendly target;
+ordinary inner content handles player/self/loading/unlock eligibility out of combat.
+The 16-unit strip starts two units below the target row in the existing 19.5-unit
+gap above the player. Three equal-width buttons use 10-unit icons and short labels.
+Buff painters no longer affect action geometry. No extra polling or saved state.
+PLAYER_TARGET_CHANGED cancels pending talents and immediately refreshes visibility.
+Existing matching GUID/range rechecks and expiry remain. Actual spacing, readability,
+combat transitions and native inspection remain subject to in-game acceptance.
+
 ## Left-side party actions (October 20, 70450)
 
 Follow, Inspect and Inspect Talents retain their order from left to right.
