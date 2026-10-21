@@ -42,7 +42,7 @@ for _, case in ipairs(cases) do
     local function active(row)
         local count=0
         for _, button in ipairs(row.upkeepButtons) do
-            if button.attributes.type1=="spell" then
+            if button.attributes.type1==(row.unit=="player" and "spell" or "macro") then
                 count=count+1
                 assert(button.attributes.unit==row.unit and button.attributes.useOnKeyDown==false)
                 assert(button.clicks[1]=="LeftButtonUp" and button.attributes["ctrl-type1"]=="")
@@ -73,7 +73,7 @@ for _, case in ipairs(cases) do
         local groupID=({DRUID=21850,PRIEST=21564,MAGE=23028})[case.class] or id
         local function offered(row)
             for _,button in ipairs(row.upkeepButtons) do
-                if button.attributes.type1=="spell" and button.attributes.spell1==id then return true end
+                if button.attributes.type1==(row.unit=="player" and "spell" or "macro") and button.attributes.spell1==id then return true end
             end
         end
         for _,row in ipairs(a.View.supportRows) do

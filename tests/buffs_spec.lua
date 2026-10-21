@@ -48,7 +48,7 @@ assert(partyAction.attributes.unit == "party1" and partyAction.attributes.spell1
 a.View.SetUnlocked(true)
 assert(partyAction.attributes.type1 == "" and partyAction.driver == "hide")
 a.View.SetUnlocked(false)
-assert(partyAction.attributes.type1 == "spell")
+assert(partyAction.attributes.type1 == "macro")
 print("PASS class-independent five-minute learning, ownership and other-caster/rank coverage")
 
 a.Buffs.OpenPicker()

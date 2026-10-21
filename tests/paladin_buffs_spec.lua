@@ -114,7 +114,7 @@ for _,row in ipairs(a.View.rows) do
     assert(#row.blessingButtons==#variants)
     for index,button in ipairs(row.blessingButtons) do
         assert(button.attributes.spell1==variants[index] and button.attributes.unit==row.unit)
-        assert(button.attributes.type1=="spell" and button.attributes["shift-type1"]=="")
+        assert(button.attributes.type1==(row.unit=="player" and "spell" or "macro") and button.attributes["shift-type1"]=="")
         assert(button.attributes.useOnKeyDown==false and button.clicks[1]=="LeftButtonUp")
         assert(button.width==a.Style.sideIconSize and not button.scripts.OnClick)
     end

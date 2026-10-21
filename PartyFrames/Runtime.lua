@@ -107,8 +107,10 @@ function R.Start()
             end
             return
         elseif event == "SPELL_TEXT_UPDATE" then
+            A.Buffs.actionRevision = (A.Buffs.actionRevision or 0) + 1
             A.Bindings.Apply()
         elseif event == "SPELLS_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
+            A.Buffs.actionRevision = (A.Buffs.actionRevision or 0) + 1
             A.Cleansing.pending = true
             A.BuffDefaults.pending = true
             A.Buffs.spellNames, A.Buffs.nameGroups = nil, nil

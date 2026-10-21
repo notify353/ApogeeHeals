@@ -1,5 +1,10 @@
 # Apogee Heals
 
+Buff buttons on party and target rows now explicitly cast only on that row's
+recipient, using the selected rank without an alternate self target. Player-row
+buffs, auras and aspects keep their intentional self-cast behavior. Native
+range/line-of-sight acceptance of this buff extension is pending.
+
 Settings appear under **Apogee** (or **Apogee DEV**) with a one-word child label. Only enabled, loaded addons with settings appear; changes to enabled addons take effect after reload.
 
 Minimal five-player healing frames for **WoW Forever 1.60.x, interface 16001**.

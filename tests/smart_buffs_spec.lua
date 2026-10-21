@@ -22,7 +22,7 @@ local function setup(class, ids, saved)
 end
 local function offered(row, key, id)
     for _, button in ipairs(row[key] or {}) do
-        if button.attributes.type1 == "spell" and button.attributes.spell1 == id then return button end
+        if button.attributes.type1 == (row.unit == "player" and "spell" or "macro") and button.attributes.spell1 == id then return button end
     end
 end
 local m, a, known = setup("PRIEST", {1243,14752,976,588})

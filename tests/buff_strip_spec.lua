@@ -38,7 +38,7 @@ assert(a.Buffs.recipientRow==row)
 assert(not row.recipientPanel and not row.recipientButtons)
 local button=row.blessingButtons[1]
 assert(button.attributes.unit=="player" and button.attributes.spell1==19740)
-assert(button.attributes.type1=="spell" and not button.scripts.OnClick)
+assert(button.attributes.type1==(row.unit=="player" and "spell" or "macro") and not button.scripts.OnClick)
 assert(row.blessingButtons[2].attributes.spell1==19742)
 assert(row.blessingButtons[2].attributes.unit=="player")
 assert(button.point[1]=="TOPRIGHT" and button.point[2]==row.health and button.point[3]=="TOPLEFT")

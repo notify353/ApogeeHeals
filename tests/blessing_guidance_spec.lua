@@ -83,7 +83,7 @@ assert(GameTooltip.extra:find("assigned tank",1,true) and GameTooltip.shown)
 m.units.party1.role="DAMAGER";m.Event("PLAYER_ROLES_ASSIGNED");m.Flush()
 assert(not GameTooltip.shown and selected().attributes.spell1==19740)
 for _,b in ipairs(row.blessingButtons) do
-    assert(b.attributes.unit=="party1" and b.attributes.type1=="spell" and not b.scripts.OnClick)
+    assert(b.attributes.unit=="party1" and b.attributes.type1=="macro" and not b.scripts.OnClick)
 end
 m.combat=true;m.Event("PLAYER_REGEN_DISABLED");assert(not selected())
 m.units.party1.role="TANK";m.Event("PLAYER_ROLES_ASSIGNED");m.Flush();assert(not selected())

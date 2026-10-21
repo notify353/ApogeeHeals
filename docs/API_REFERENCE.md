@@ -1,3 +1,25 @@
+## Strict buff recipients (October 20, 2026)
+
+Reverified matching Forever 70450 / 16001 export. Both buff action builders
+(generic reminders and shared blessing/catalog/expanded choices) now use the
+accepted healing program for non-player rows: one explicit fixed-recipient
+`/cast [@unit,exists,help] Name(Rank)` followed by `/stopspelltarget`. No empty
+conditional, alternate target, CVar edit or selected-target fallback is added.
+Player-row buffs, auras and aspects retain native fixed-player spell actions.
+Tooltip/rank identity, range filtering, coverage and foreign-buff protection stay.
+
+Public spell name/rank text is resolved outside combat. Missing/restricted or
+unsafe text hides/disables the action and retries on the next refresh. Cached
+actions include a revision invalidated by SPELL_TEXT_UPDATE, SPELLS_CHANGED and
+world entry; combat defers protected writes. Removed/replaced choices clear old
+macro text. Unchanged valid reminders do not re-register secure visibility.
+
+Source regressions cover both builders, all party tokens and target, ranks,
+clearing/replacement, text recovery, modifier isolation, self-only actions and
+combat deferral. Matching SecureTemplates macro dispatch is exercised; the native
+macro parser and server range/LOS are not emulated. Healing acceptance remains
+valid for its unchanged code; this buff extension needs separate owner acceptance.
+
 ## Druid split power (October 20, 2026)
 
 Verified Forever 1.60.1.70450 / 16001 with the strict export checker.

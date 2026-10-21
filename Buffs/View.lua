@@ -1,5 +1,29 @@
 local _, A = ...
 local B = A.Buffs
+local function configureAction(button, id, unit)
+    if InCombatLockdown() then return end
+    local revision = B.actionRevision or 0
+    if button.configured and button.configuredSpell == id
+        and button.configuredRevision == revision then return end
+    local text
+    if id and unit ~= "player" then
+        local info = B.Info(id)
+        local rank = A.Access.Read(C_Spell and C_Spell.GetSpellSubtext, id)
+        -- Same explicit recipient/rank program as the accepted healing fix.
+        -- Missing text fails closed and retries on the next out-of-combat refresh.
+        if info and type(rank) == "string" and not info.name:find("[\r\n;%[%]]")
+            and not rank:find("[\r\n;%[%]]") then
+            local name = info.name .. (rank ~= "" and "(" .. rank .. ")" or "")
+            text = "/cast [@" .. unit .. ",exists,help] " .. name .. "\n/stopspelltarget"
+        end
+    end
+    local active = id and (unit == "player" or text ~= nil)
+    button:SetAttribute("type1", active and (unit == "player" and "spell" or "macro") or "")
+    button:SetAttribute("spell1", id)
+    button:SetAttribute("macrotext1", text)
+    RegisterStateDriver(button, "visibility", active and "[combat] hide; show" or "hide")
+    button.configured, button.configuredSpell, button.configuredRevision = not id or active, id, revision
+end
 local function createTimer(button)
     button.buffTimer = A.Style.CleanText(button, 5.5)
     local font = button.buffTimer:GetFont()
@@ -95,12 +119,7 @@ function B.Paint(row, missing)
         if not InCombatLockdown() then
             -- Cache only our public configured spell identity, never aura data.
             -- Combat painting leaves this untouched so deferred changes still apply.
-            if not button.configured or button.configuredSpell ~= id then
-                button:SetAttribute("type1", entry and "spell" or "")
-                button:SetAttribute("spell1", id)
-                RegisterStateDriver(button, "visibility", entry and "[combat] hide; show" or "hide")
-                button.configured, button.configuredSpell = true, id
-            end
+            configureAction(button, id, row.unit)
         end
     end
     row.buffOverflow:SetText(#missing > 4 and "+" .. (#missing - 4) or "")
@@ -161,12 +180,7 @@ local function paintChoices(row, key, choices, offset, recommendedID, recommenda
                     button:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - position * (size + gap), A.Style.sideIconY)
                     button.configuredPosition = position
                 end
-                if not button.configured or button.configuredSpell ~= id then
-                    button:SetAttribute("type1", entry and "spell" or "")
-                    button:SetAttribute("spell1", id)
-                    RegisterStateDriver(button, "visibility", entry and "[combat] hide; show" or "hide")
-                    button.configured, button.configuredSpell = true, id
-                end
+                configureAction(button, id, row.unit)
             end
         end
     end
