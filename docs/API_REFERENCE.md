@@ -351,7 +351,7 @@ extra-click workflow. The marking module, loader entry, startup/runtime hooks
 and dedicated tests are removed. Existing raid-icon display remains independent.
 No addon action assigns or clears raid markers.
 
-## Forty-yard party fallback (70205, 2026-10-03)
+## Historical forty-yard party fallback (superseded October 20, 2026)
 
 Owner approved a 40-yard fallback when slot one lacks a usable range result.
 Reviewed UnitDistanceSquared and native CompactUnitFrame_UpdateDistance in the

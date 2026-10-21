@@ -111,7 +111,7 @@ guidance, native weapon displays, limitations and live acceptance checks.
   during combat. Restricted names stay blank. Long names truncate. Health-state and active-resource colors remain.
   A muted level appears immediately to the left of each name; unavailable levels
   show a question mark. Names and levels remain visible in combat; status messages
-  still replace them for dead, offline or out-of-range units.
+  still replace them for dead or offline units. Range never hides identity.
 - A fine opaque rule divides health from power. A slim Blizzard class-color strip sits flush inside each row's left
   edge, spanning health and power with a dark separator. It remains visible in combat.
   Fully transparent spaces separate
@@ -277,14 +277,15 @@ are locked during combat; confirming an already-open dialog in combat does nothi
 
 ## Spell range
 
-Rows fade and show OUT OF RANGE when the exact unmodified left-click spell
-reports that recipient out of range, including the learned class default.
-Checks use each row's fixed unit, independent of the selected target. They update
-about five times a second without scanning auras. Missing, restricted or invalid
-results restore normal presentation without claiming the spell is in range.
-No mapping means no spell-range feedback. Combat keeps the actually installed
-mapping until deferred binding changes can apply safely. Native combat behavior
-still needs live confirmation.
+Each applied click assignment checks its exact spell against the row recipient.
+L/R/M/4/5 on the power strip are green for in range, red for out of range and gray
+for unknown, including bandages. Shift/Ctrl select their respective layers.
+Near/Far is a separate 40-yard proximity cue; ? yd means distance is unavailable.
+That cue remains useful with no spells assigned and never overrides spell range.
+Rows and buff icons stay fully opaque. Checks update about five times a second
+without aura scans. Combat retains the applied bindings until pending edits can
+be installed safely. Range does not establish line of sight or cast success.
+Native combat behavior and readability still need owner confirmation.
 
 ## Drinking limitations
 
