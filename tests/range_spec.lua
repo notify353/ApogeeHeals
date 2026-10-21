@@ -83,5 +83,5 @@ a.View.SetUnlocked(true);assert(row.alpha==0 and row.health.alpha==1 and not a.R
 a.View.SetUnlocked(false);assert(a.Runtime.driver.scripts.OnUpdate)
 m.Event("PLAYER_LEAVING_WORLD");assert(row.health.alpha==1 and not a.Runtime.driver.scripts.OnUpdate)
 m.Event("PLAYER_ENTERING_WORLD");m.Flush()
-UnitDistanceSquared=nil;a.Runtime.RangePolling();assert(row.health.alpha==1 and not a.Runtime.driver.scripts.OnUpdate)
+UnitDistanceSquared=nil;CheckInteractDistance=nil;a.Runtime.RangePolling();assert(row.health.alpha==1 and not a.Runtime.driver.scripts.OnUpdate)
 print("PASS left-click-only health fade, independent buffs, neutral unknowns, warrior/bandage proximity, targets and combat lifecycle")

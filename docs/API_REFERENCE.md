@@ -12,6 +12,17 @@ No casting or recipient changes. Native appearance/combat acceptance pending.
 
 ## Superseded per-click labels (October 20, 2026)
 
+## Shared target action availability (October 20, 70450)
+
+Matching export rechecked. Existing CheckInteractDistance indices 4 (Follow)
+and 1 (Inspect), CanInspect and capability/recipient guards must all succeed
+before showing ordinary strip content. Restricted/unknown reads hide it.
+Existing 0.2-second range polling updates the group without triggering actions;
+retain polling when only interaction range is available. Native combat hiding
+and click-time rechecks remain. Native range cannot guarantee server success.
+
+## Spell-aware range and separate proximity (October 20, 2026)
+
 Party and target rows remain fully opaque so healing range cannot dim buff icons.
 The power strip shows Near (within 40 yards), Far (beyond 40 yards), or ? yd
 when public distance is unavailable. This general proximity cue works without
