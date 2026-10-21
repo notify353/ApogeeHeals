@@ -61,5 +61,32 @@ for _, row in ipairs(a.View.rows) do
     assert(row.point==point and row.height==height)
     assert(row.manaPower.point==manaPoint and row.formPower.point==formPoint)
 end
-assert(a.View.target.manaPower==nil and a.View.targetTarget.manaPower==nil)
+for _, row in ipairs({a.View.target,a.View.targetTarget}) do
+    local u={name="Druid target",class="DRUID",health=80,maxHealth=100,
+        connected=true,dead=false,kind=3,power=70,maxPower=100,mana=140,maxMana=200,auras={}}
+    m.units[row.unit]=u
+    local point,height=row.point,row.height
+    for _, kind in ipairs({3,1,0,3}) do
+        u.kind=kind;m.Event("UNIT_DISPLAYPOWER",row.unit);m.Flush()
+        assert(row.power.alpha==(kind==0 and 1 or 0))
+        assert(row.manaPower.alpha==(kind==0 and 0 or 1))
+        if kind~=0 then assert(row.manaPower.value==140 and row.formPower.value==70) end
+    end
+    u.mana=m.Secret();u.maxMana=m.Secret()
+    m.Event("UNIT_POWER_UPDATE",row.unit,"MANA");m.Flush()
+    assert(row.manaPower.value==u.mana and row.manaPower.max==u.maxMana)
+    if row.cast then
+        UnitCastingInfo=function() return "Cast" end
+        UnitCastingDuration=function() return m.Secret() end
+        m.Event("UNIT_SPELLCAST_START","target")
+        assert(row.cast.alpha==1 and row.power.alpha==0 and row.manaPower.alpha==0 and row.formPower.alpha==0)
+        UnitCastingInfo=function() end;m.Event("UNIT_SPELLCAST_STOP","target")
+        assert(row.cast.alpha==0 and row.power.alpha==0 and row.manaPower.alpha==1 and row.formPower.alpha==1)
+    end
+    u.class="WARRIOR";a.View.Refresh();assert(row.manaPower.alpha==0 and row.power.alpha==1)
+    u.class="DRUID";a.View.Refresh();assert(row.manaPower.alpha==1)
+    m.units[row.unit]=nil;a.View.Refresh()
+    assert(row.manaPower.alpha==0 and row.formPower.alpha==0 and row.manaPower.value==0)
+    assert(row.point==point and row.height==height)
+end
 print("PASS druid split power: every party unit, cat/bear/caster transitions, mana updates, restricted sinks, failures, slot reuse and combat geometry")

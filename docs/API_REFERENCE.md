@@ -20,6 +20,16 @@ combat deferral. Matching SecureTemplates macro dispatch is exercised; the nativ
 macro parser and server range/LOS are not emulated. Healing acceptance remains
 valid for its unchanged code; this buff extension needs separate owner acceptance.
 
+## Target druid power follow-up (October 20, 2026)
+
+Extend the same fixed split bars and existing explicit power-type reads to
+target and targettarget. Target casting temporarily fades all power artwork;
+stop/interruption restores the appropriate full or split strip. Missing targets
+clear both halves, and class/resource changes reset reused target rows.
+Source regressions cover all seven units, restricted mana sinks, target casting
+and combat geometry. Owner confirms the installed player split works; party
+and target native acceptance remain pending. No new API contracts.
+
 ## Druid split power (October 20, 2026)
 
 Verified Forever 1.60.1.70450 / 16001 with the strict export checker.
