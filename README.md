@@ -32,7 +32,8 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
   The fixed strip shares the space above your health bar with the combat-only
   damage display. It disappears in combat, while moving frames and while loading.
   Party rows have no action buttons; buffs never reposition the strip.
-  Actions use the current target and require native interaction range.
+  All three appear together only when Follow and inspection range/availability checks pass.
+  Movement refreshes the group; clicks still recheck the current target.
 
 - Talents opens the native inspected talent window after matching data arrives.
   Target changes, combat, roster changes, zoning and a five-second timeout cancel

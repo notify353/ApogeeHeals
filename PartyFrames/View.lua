@@ -72,7 +72,10 @@ function V.RefreshPartyActions()
     if not strip then return end
     -- The native parent owns combat visibility; only ordinary content is toggled.
     if not InCombatLockdown() then
-        strip.content:SetShown(eligibleTarget() and not A.Runtime.suspended and not V.unlocked)
+        local available = partyActionReason(row, false, true) == nil
+            and partyActionReason(row, true, true) == nil
+            and partyActionReason(row, true, true, true) == nil
+        strip.content:SetShown(available)
     end
     for index, button in ipairs(row.partyActions) do
         local available = partyActionReason(row, index >= 2, false, index == 3) == nil
@@ -440,6 +443,7 @@ function V.PaintRange(row, state)
     row.name:SetShown(showName); row.level:SetShown(showName)
 end
 function V.RefreshRange()
+    V.RefreshPartyActions()
     for _, row in ipairs(V.rows) do V.PaintRange(row, A.UnitAPI.State(row.unit)) end
     for _, row in ipairs({V.target, V.targetTarget}) do
         V.PaintRange(row, A.UnitAPI.State(row.unit))

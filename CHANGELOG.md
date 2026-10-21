@@ -1,3 +1,7 @@
+## Unreleased - Shared target action range
+
+- Show all three target actions together only when Follow and both Inspect actions pass native availability and range checks; refresh while moving.
+
 ## Unreleased - Talent icon readability (2026-10-20)
 
 - Enlarge the Inspect Talents artwork from 10 to 13 units and restore its color.

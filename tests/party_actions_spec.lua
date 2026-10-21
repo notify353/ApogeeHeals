@@ -1,6 +1,7 @@
 local Mock = dofile("tests/mock.lua")
 local m = Mock.New()
 local calls, inRange, inspectable = {}, true, true
+local followRange, inspectRange = true, true
 local requests, opened, guid = {}, {}, "Party-First"
 NotifyInspect = function(unit) requests[#requests + 1] = unit end
 PlayerSpellsUtil = {OpenToClassTalentsTab = function(unit) opened[#opened + 1] = unit end}
@@ -10,6 +11,8 @@ CanInspect = function() return inspectable end
 CheckInteractDistance = function(unit, distance)
     assert(unit == "target")
     assert(distance == 1 or distance == 4)
+    if distance == 4 and not followRange then return false end
+    if distance == 1 and not inspectRange then return false end
     return inRange
 end
 m.units.target = {name="First", connected=true, dead=false, health=90, maxHealth=100, auras={}}
@@ -53,6 +56,15 @@ for _, kind in ipairs({"hostile", "npc", "self", "restricted"}) do
 end
 friendly, player, selfTarget = true, true, false
 a.View.RefreshPartyActions(); assert(a.View.targetActions.content.shown)
+-- Movement alone refreshes the entire group using both native ranges.
+local function tick() a.Runtime.driver.scripts.OnUpdate(a.Runtime.driver, 0.2) end
+followRange = false; tick(); assert(not a.View.targetActions.content.shown)
+followRange, inspectRange = true, false; tick(); assert(not a.View.targetActions.content.shown)
+inspectRange = true; tick(); assert(a.View.targetActions.content.shown)
+inspectable = false; tick(); assert(not a.View.targetActions.content.shown)
+inspectable = true; inRange = m.Secret(); tick(); assert(not a.View.targetActions.content.shown)
+inRange = true; tick(); assert(a.View.targetActions.content.shown)
+assert(#calls == 0 and #requests == 0, "range polling never initiates actions")
 click(follow); click(inspect)
 assert(#calls == 2 and calls[1][1] == "follow" and calls[1][2] == "target")
 assert(calls[2][1] == "inspect" and calls[2][2] == "target")

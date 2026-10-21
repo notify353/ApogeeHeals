@@ -16,7 +16,8 @@ function R.RangePolling()
     R.rangeElapsed = 0
     A.View.RefreshRange()
     if R.suspended or A.View.unlocked then return end
-    if type(UnitDistanceSquared) ~= "function" and not next(A.Bindings.rangeActions) then return end
+    if type(UnitDistanceSquared) ~= "function" and not next(A.Bindings.rangeActions)
+        and type(CheckInteractDistance) ~= "function" then return end
     R.driver:SetScript("OnUpdate", function(_, elapsed)
         R.rangeElapsed = R.rangeElapsed + elapsed
         if R.rangeElapsed < 0.2 then return end
