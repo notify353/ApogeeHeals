@@ -88,7 +88,7 @@ end
 local function createTargetActions(row)
     local strip = CreateFrame("Frame", nil, V.root)
     strip:SetSize(56, 16)
-    strip:SetPoint("TOP", row, "BOTTOM", 0, -2)
+    strip:SetPoint("TOP", row, "BOTTOM", 0, 0)
     strip:EnableMouse(false)
     V.targetActions = strip
     RegisterStateDriver(strip, "visibility", "[combat] hide; [@target,help,exists] show; hide")

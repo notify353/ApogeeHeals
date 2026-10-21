@@ -1,3 +1,7 @@
+## Unreleased - Target action spacing
+
+- Raise the action icons four screen pixels to sit directly beneath the target bar.
+
 ## Unreleased - Simple left-click range
 
 - Restore health-only range fading from unmodified left click; retain non-caster proximity and independent buff range. Remove extra indicators.
