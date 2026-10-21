@@ -1,3 +1,7 @@
+## Unreleased - Icon-only target actions
+
+- Remove action labels and the wide background; center three evenly spaced icons beneath the target bar. Retain hover tooltips and combat hiding.
+
 ## Unreleased - Target druid power (2026-10-20)
 
 - Extend split mana/resource bars to target and target of target while retaining

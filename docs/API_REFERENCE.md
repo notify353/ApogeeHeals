@@ -1,3 +1,9 @@
+## Icon-only target actions (October 20)
+
+Visual-only revision: a centered 56-by-16 strip, three 16-unit hit areas with
+four-unit gaps and centered 10-unit icons. No labels or persistent background.
+Existing native APIs, tooltip labels, guards and combat visibility retained.
+
 ## Strict buff recipients (October 20, 2026)
 
 Reverified matching Forever 70450 / 16001 export. Both buff action builders
