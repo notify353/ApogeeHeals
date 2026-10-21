@@ -240,9 +240,11 @@ local function buildRow(row, preview, first, width)
     row.status:SetJustifyH("CENTER"); row.status:SetJustifyV("MIDDLE")
     row.status:SetTextColor(unpack(S.muted))
     row.status:SetShadowColor(0, 0, 0, 1); row.status:SetShadowOffset(1, -1)
-    row.rangeStatus = S.Text(row.nameLayer, 8)
-    row.rangeStatus:SetAllPoints(row.status)
-    row.rangeStatus:SetJustifyH("CENTER"); row.rangeStatus:SetJustifyV("MIDDLE")
+    row.rangeStatus = S.Text(row.nameLayer, 5)
+    row.rangeStatus:SetPoint("TOPRIGHT", row.health, "BOTTOMRIGHT", -2, -S.barGap)
+    row.rangeStatus:SetSize(width - 4, S.powerHeight)
+    row.rangeStatus:SetJustifyH("RIGHT"); row.rangeStatus:SetJustifyV("MIDDLE")
+    row.rangeStatus:SetShadowColor(0, 0, 0, 1); row.rangeStatus:SetShadowOffset(1, -1)
     row.rangeStatus:SetTextColor(unpack(S.muted)); row.rangeStatus:SetText("")
     row.rangeStatus:Hide()
     -- Smaller artwork in an inset dark frame, attached closely to the row.
@@ -407,36 +409,49 @@ function V.Lock()
     V.SetUnlocked(false)
     if A.Settings then A.Settings.Refresh() end
 end
+local function proximity(unit)
+    if unit == "player" or A.Access.Read(UnitIsUnit, unit, "player") == true then return true end
+    if type(UnitDistanceSquared) ~= "function" then return nil end
+    local ok, distance, checked = pcall(UnitDistanceSquared, unit)
+    if ok and A.Access.Readable(distance, checked) and checked == true
+        and type(distance) == "number" and distance >= 0 and distance < math.huge then
+        return distance <= 40 * 40
+    end
+end
 function V.PaintRange(row, state)
-    local result
     local active = not V.unlocked and not A.Runtime.suspended and state == "alive"
+    local prefix = active and A.Bindings.RangePrefix()
+    local labels, states = {}, {}
+    row.proximity = nil
     if active then
-        if A.Bindings.rangeSpell
-            and A.Access.Read(C_Spell and C_Spell.SpellHasRange,A.Bindings.rangeSpell) ~= false then
-            result = A.Access.Read(C_Spell and C_Spell.IsSpellInRange, A.Bindings.rangeSpell, row.unit)
-        end
-        if type(result) ~= "boolean" then
-            result = nil
-            if row.unit == "player" then result = true
-            else
-                local ok, distance, checked = pcall(UnitDistanceSquared,row.unit)
-                if ok and A.Access.Readable(distance,checked) and checked == true
-                    and type(distance) == "number" and distance >= 0 and distance < math.huge then
-                    result = distance <= 40*40
-                end
+        row.proximity = proximity(row.unit)
+        labels[1] = row.proximity == true and "|cff80df9aNear|r"
+            or row.proximity == false and "|cffff6666Far|r" or "|cffa6b3c7? yd|r"
+    end
+    if prefix then
+        for button, label in ipairs({"L", "R", "M", "4", "5"}) do
+            local action = A.Bindings.rangeActions[prefix .. button]
+            if action then
+                local result = A.Bindings.SpellRange(action.spell, row.unit)
+                states[button] = result == true and "in" or result == false and "out" or "unknown"
+                local color = result == true and "ff80df9a" or result == false and "ffff6666" or "ffa6b3c7"
+                labels[#labels + 1] = "|c" .. color .. label .. "|r"
             end
         end
     end
-    -- Unknown distance is distinct from both confirmed nearby and out of range.
-    local outside = result == false
-    local unknown = active and result == nil
-    row.rangeStatus:Hide()
-    row:SetAlpha(V.unlocked and 0 or (outside and 0.45 or (unknown and 0.65 or 1)))
+    row.rangeStates = states
+    row.rangeStatus:SetText(table.concat(labels, " "))
+    row.rangeStatus:SetShown(#labels > 0)
+    -- Buffs, debuffs and identity must never inherit another action's range fade.
+    row:SetAlpha(V.unlocked and 0 or 1)
     local showName = state ~= "missing" and state ~= "dead" and state ~= "offline"
     row.name:SetShown(showName); row.level:SetShown(showName)
 end
 function V.RefreshRange()
     for _, row in ipairs(V.rows) do V.PaintRange(row, A.UnitAPI.State(row.unit)) end
+    for _, row in ipairs({V.target, V.targetTarget}) do
+        V.PaintRange(row, A.UnitAPI.State(row.unit))
+    end
 end
 local function refreshTargetRow(row)
     A.UnitAPI.PaintTargetIdentity(row)

@@ -1,3 +1,17 @@
+## Spell-aware range and separate proximity (October 20, 2026)
+
+Party and target rows remain fully opaque so healing range cannot dim buff icons.
+The power strip shows Near (within 40 yards), Far (beyond 40 yards), or ? yd
+when public distance is unavailable. This general proximity cue works without
+spell assignments, including warriors with bandages; it does not predict a cast.
+L/R/M/4/5 indicators show each applied click assignment's exact native spell range:
+green is in range, red is out, gray is unknown (including bandages). Holding
+Shift or Ctrl selects that binding layer; unsupported modifier combinations show
+no spell indicators. Buff choices share the exact-spell guarded range check.
+Unknown/restricted spell results never inherit the proximity result. No range
+result guarantees line of sight, resources, cooldown or successful casting.
+Native appearance and combat acceptance remain pending after offline checks.
+
 ## Strict buff recipients (October 20, 2026)
 
 Reverified matching Forever 70450 / 16001 export. Both buff action builders

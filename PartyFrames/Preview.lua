@@ -32,10 +32,11 @@ local function render(time)
         end
         row.incoming.bar:SetValue(incoming)
         row.drinkIcon:SetShown(sample.drinking == true and time >= 5 and time < 10 and power < 90)
+        row.rangeStatus:Hide()
         row:SetAlpha(1); row.name:Show(); row.level:Show(); row.status:SetText("")
         -- Demonstration only: no live range API or synthetic state in live frames.
         if index == 4 and time >= 5 and time < 8 then
-            row:SetAlpha(0.45); row.name:Hide(); row.level:Hide(); row.status:SetText("OUT OF RANGE")
+            row.rangeStatus:SetText("|cffff6666L|r |cff80df9aR|r"); row.rangeStatus:Show()
         elseif (index == 5 and time >= 6 and time < 9)
             or (index == 1 and time >= 7 and time < 9) then
             row.name:Hide(); row.level:Hide(); row.status:SetText(index == 5 and "OFFLINE" or "DEAD")

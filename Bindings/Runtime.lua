@@ -1,6 +1,19 @@
 local _, A = ...
-local B = { slots = {}, byId = {} }
+local B = { slots = {}, byId = {}, rangeActions = {} }
 A.Bindings = B
+-- Public tri-state range for the exact spell and fixed recipient. No yard guess.
+function B.SpellRange(id, unit)
+    if not id or not unit then return nil end
+    if unit == "player" or A.Access.Read(UnitIsUnit, unit, "player") == true then return true end
+    if A.Access.Read(C_Spell and C_Spell.SpellHasRange, id) == false then return true end
+    local result = A.Access.Read(C_Spell and C_Spell.IsSpellInRange, id, unit)
+    if type(result) == "boolean" then return result end
+end
+function B.RangePrefix()
+    local alt, ctrl, shift = A.Access.Read(IsAltKeyDown), A.Access.Read(IsControlKeyDown), A.Access.Read(IsShiftKeyDown)
+    if alt ~= false or type(ctrl) ~= "boolean" or type(shift) ~= "boolean" or (ctrl and shift) then return nil end
+    return ctrl and "ctrl-" or shift and "shift-" or ""
+end
 for row, prefix in ipairs({ "", "shift-", "ctrl-" }) do
     for button = 1, 5 do
         local slot = { id = prefix .. button, prefix = prefix, button = button, row = row,
@@ -99,6 +112,7 @@ end
 function B.Apply()
     if InCombatLockdown() then B.pending = true; return end
     B.pending = nil
+    B.rangeActions = {}
     local recipients = { unpack(A.View.rows) }
     recipients[#recipients + 1] = A.View.target
     recipients[#recipients + 1] = A.View.targetTarget
@@ -126,7 +140,9 @@ function B.Apply()
                     castName = info.name .. (rank ~= "" and "(" .. rank .. ")" or "")
                 end
             end
-            if prefix == "" and button == 1 then B.rangeSpell = info and not item and id or nil end
+            if info and (item or castName) then
+                B.rangeActions[prefix .. button] = { spell = not item and id or nil }
+            end
             for _, frame in ipairs(recipients) do
                 frame:SetAttribute(prefix .. "type" .. button,
                     info and (item and "item" or (castName and "macro" or "")) or fallback)

@@ -1,3 +1,7 @@
+## Unreleased range refinement
+
+- Separate teammate proximity from per-spell click range; retain warrior proximity and neutral unknowns.
+
 ## Unreleased - Target druid power (2026-10-20)
 
 - Extend split mana/resource bars to target and target of target while retaining

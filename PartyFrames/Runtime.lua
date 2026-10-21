@@ -16,8 +16,7 @@ function R.RangePolling()
     R.rangeElapsed = 0
     A.View.RefreshRange()
     if R.suspended or A.View.unlocked then return end
-    if type(UnitDistanceSquared) ~= "function" and (not A.Bindings.rangeSpell
-        or not C_Spell or type(C_Spell.IsSpellInRange) ~= "function") then return end
+    if type(UnitDistanceSquared) ~= "function" and not next(A.Bindings.rangeActions) then return end
     R.driver:SetScript("OnUpdate", function(_, elapsed)
         R.rangeElapsed = R.rangeElapsed + elapsed
         if R.rangeElapsed < 0.2 then return end

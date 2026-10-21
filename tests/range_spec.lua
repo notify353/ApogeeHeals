@@ -12,83 +12,79 @@ C_Spell.IsSpellHarmful=function() return false end
 C_Spell.IsSpellPassive=function() return false end
 C_SpellBook={IsSpellInSpellBook=function(id) return known[id]==true end,
     IsSpellKnown=function(id) return known[id]==true end}
-local results, calls = {player=true,party1=false,party2=true}, {}
-C_Spell.IsSpellInRange=function(id,unit)
-    calls[#calls+1]={id,unit};return results[unit]
-end
+local results = {[700001]=false, [700002]=true, [2050]=true}
+C_Spell.IsSpellInRange=function(id,unit) return results[id] end
 ApogeeHealsDB={defaultSpells={enabled=true,time=1,serial=0}}
 local a=m.Load();m.Event("ADDON_LOADED","ApogeeHeals");m.Flush()
-assert(a.Bindings.rangeSpell==2050)
-for _,call in ipairs(calls) do assert(call[1]==2050 and call[2]~="target") end
 local row=a.View.rows[2]
-assert(row.alpha==0.45 and not row.rangeStatus.shown and row.name.shown and row.level.shown)
-assert(a.View.rows[1].alpha==1 and not a.View.rows[4].rangeStatus.shown)
-assert(a.Bindings.Put("1",700001));assert(a.Bindings.rangeSpell==700001)
-assert(a.Bindings.Put("shift-1",700002));assert(a.Bindings.rangeSpell==700001)
-local reads=m.auraReads;calls={}
-a.Runtime.driver.scripts.OnUpdate(nil,0.1);assert(#calls==0)
-a.Runtime.driver.scripts.OnUpdate(nil,0.1);assert(#calls==5 and m.auraReads==reads)
-for _,call in ipairs(calls) do assert(call[1]==700001) end
-for _,value in ipairs({true,m.Secret(),0,1,"false",m.InaccessibleTable()}) do
-    results.party1=value;a.View.RefreshRange();assert(row.alpha==1 and not row.rangeStatus.shown)
+assert(a.Bindings.Put("1",700001)); assert(a.Bindings.Put("2",700002))
+a.View.RefreshRange()
+assert(row.alpha==1 and row.name.shown and row.level.shown)
+assert(row.rangeStates[1]=="out" and row.rangeStates[2]=="in")
+-- Buffs use the same exact-spell contract, never the left-click range.
+assert(not a.Buffs.OutOfRange(700002,"party1"))
+assert(a.Buffs.OutOfRange(700001,"party1"))
+-- Proximity is separate from cast range, including beyond 40 yards.
+m.units.party1.distanceSquared=1601; a.View.RefreshRange()
+assert(row.proximity==false and row.rangeStates[2]=="in" and row.alpha==1)
+m.units.party1.distanceSquared=1600; a.View.RefreshRange(); assert(row.proximity==true)
+for _,value in ipairs({m.Secret(),m.InaccessibleTable(),-1,math.huge,0/0,"1600"}) do
+    UnitDistanceSquared=function() return value,true end
+    a.View.RefreshRange(); assert(row.proximity==nil and row.rangeStates[2]=="in")
 end
-results.party1=nil;a.View.RefreshRange();assert(not row.rangeStatus.shown)
+UnitDistanceSquared=function() return 1601,m.Secret() end
+a.View.RefreshRange(); assert(row.proximity==nil)
+UnitDistanceSquared=function() error("unavailable") end
+a.View.RefreshRange(); assert(row.proximity==nil)
+-- Unknown spell results cannot be replaced by proximity or another spell.
+for _,value in ipairs({m.Secret(),m.InaccessibleTable(),0,1,"false"}) do
+    results[700001]=value; a.View.RefreshRange()
+    assert(row.rangeStates[1]=="unknown" and not a.Buffs.OutOfRange(700001,"party1"))
+end
+results[700001]=nil; a.View.RefreshRange(); assert(row.rangeStates[1]=="unknown")
 C_Spell.IsSpellInRange=function() error("unavailable") end
-a.View.RefreshRange();assert(not row.rangeStatus.shown)
-C_Spell.IsSpellInRange=function(id,unit) calls[#calls+1]={id,unit};return false end
-m.combat=true;m.Event("PLAYER_REGEN_DISABLED");m.Flush()
-assert(not row.rangeStatus.shown and row.name.shown and row.level.shown and row.attributes.spell1==700001)
-a.db.bindings["1"]=700002;a.Bindings.Apply();a.View.RefreshRange()
-assert(a.Bindings.rangeSpell==700001 and calls[#calls][1]==700001)
-m.combat=false;m.Event("PLAYER_REGEN_ENABLED");m.Flush()
-assert(a.Bindings.rangeSpell==700002 and row.attributes.spell1==700002)
+a.View.RefreshRange(); assert(row.rangeStates[2]=="unknown")
+C_Spell.IsSpellInRange=function(id,unit) return results[id] end
+C_Spell.SpellHasRange=function() return false end
+a.View.RefreshRange(); assert(row.rangeStates[1]=="in")
+C_Spell.SpellHasRange=function() return true end
+results[700001]=false
+assert(a.Bindings.Put("shift-1",700002)); m.shift=true
+a.View.RefreshRange(); assert(row.rangeStates[1]=="in" and row.rangeStates[2]==nil)
+assert(a.Bindings.Put("ctrl-1",700001)); m.shift=false; m.ctrl=true
+a.View.RefreshRange(); assert(row.rangeStates[1]=="out")
+m.shift=true; a.View.RefreshRange(); assert(not next(row.rangeStates))
+m.shift=false; m.ctrl=false; m.alt=true; a.View.RefreshRange(); assert(not next(row.rangeStates))
+m.alt=false
+-- Applied assignments, not pending edits, determine range during combat.
+m.combat=true; m.Event("PLAYER_REGEN_DISABLED"); m.Flush()
+a.db.bindings["1"]=700002; a.Bindings.Apply(); a.View.RefreshRange()
+assert(row.rangeStates[1]=="out" and row.attributes.spell1==700001)
+m.combat=false; m.Event("PLAYER_REGEN_ENABLED"); m.Flush()
+assert(row.rangeStates[1]=="in" and row.attributes.spell1==700002)
+-- Both target rows get independent recipient checks too.
+m.units.target=m.units.party1; m.units.targettarget=m.units.party1
+local calls={}
+C_Spell.IsSpellInRange=function(id,unit) calls[unit]=true; return unit~="target" end
+a.View.RefreshRange()
+assert(calls.target and calls.targettarget)
+assert(a.View.target.rangeStates[1]=="out" and a.View.targetTarget.rangeStates[1]=="in")
+local reads=m.auraReads
+a.Runtime.driver.scripts.OnUpdate(nil,0.2); assert(m.auraReads==reads)
 for _,field in ipairs({"dead","connected"}) do
-    m.units.party1[field]=field=="dead";a.View.Refresh()
+    m.units.party1[field]=field=="dead"; a.View.RefreshRange()
     assert(not row.rangeStatus.shown and row.alpha==1)
     m.units.party1[field]=field=="connected"
 end
-m.units.party1=nil;a.View.Refresh();assert(not row.rangeStatus.shown)
-a.View.SetUnlocked(true);assert(not a.Runtime.driver.scripts.OnUpdate)
-for _,r in ipairs(a.View.rows) do assert(r.alpha==0 and not r.rangeStatus.shown) end
-a.View.SetUnlocked(false);assert(a.Runtime.driver.scripts.OnUpdate)
-m.Event("PLAYER_LEAVING_WORLD");assert(not a.Runtime.driver.scripts.OnUpdate)
-for _,r in ipairs(a.View.rows) do assert(not r.rangeStatus.shown) end
-m.Event("PLAYER_ENTERING_WORLD");m.Flush();assert(a.Runtime.driver.scripts.OnUpdate)
-known[700002]=false;m.Event("SPELLS_CHANGED");m.Flush()
-assert(not a.Bindings.rangeSpell and a.Runtime.driver.scripts.OnUpdate)
-assert(row.attributes.type1=="")
-a.Bindings.Put("1",nil);assert(a.Bindings.rangeSpell==2050)
-m.units.player.class="WARRIOR";a.Bindings.Apply()
-assert(not a.Bindings.rangeSpell and a.View.rows[1].attributes.type1=="target")
-C_Spell.IsSpellInRange=nil;a.Bindings.Put("1",700001)
-assert(a.Runtime.driver.scripts.OnUpdate and row.alpha==1)
--- The fallback remains active without a usable slot-one spell.
-m.units.party1={name="Party",health=80,maxHealth=100,connected=true,dead=false,distanceSquared=1600}
-a.View.RefreshRange(); assert(row.alpha==1 and not row.rangeStatus.shown)
-m.units.party1.distanceSquared=1601
-a.Runtime.driver.scripts.OnUpdate(nil,0.2)
-assert(row.alpha==0.45 and not row.rangeStatus.shown and row.name.shown and row.level.shown)
-m.units.party1.distanceChecked=false; a.View.RefreshRange()
-assert(row.alpha==0.65 and not row.rangeStatus.shown and row.name.shown and row.level.shown)
-local distanceAPI=UnitDistanceSquared
-for _,value in ipairs({m.Secret(),m.InaccessibleTable(),-1,math.huge,0/0,"1600"}) do
-    UnitDistanceSquared=function() return value,true end
-    a.View.RefreshRange(); assert(row.alpha==0.65 and not row.rangeStatus.shown and row.name.shown and row.level.shown)
-end
-UnitDistanceSquared=function() return 0,m.Secret() end
-a.View.RefreshRange(); assert(row.alpha==0.65)
-UnitDistanceSquared=function() error("unavailable") end
-a.View.RefreshRange(); assert(row.alpha==0.65)
-UnitDistanceSquared=nil;a.Runtime.RangePolling()
-assert(not a.Runtime.driver.scripts.OnUpdate and row.alpha==0.65)
-UnitDistanceSquared=distanceAPI;m.units.party1.distanceChecked=true
--- A valid spell result still takes precedence over fallback distance.
-C_Spell.IsSpellInRange=function() return true end
-a.Runtime.RangePolling();assert(row.alpha==1)
-C_Spell.SpellHasRange=function() return false end
-a.View.RefreshRange();assert(row.alpha==0.45)
-C_Spell.SpellHasRange=function() return true end
-C_Spell.IsSpellInRange=function() return nil end
-a.View.RefreshRange();assert(row.alpha==0.45)
-print("PASS 40-yard inclusive fallback, unavailable/restricted uncertainty, persistent polling and spell precedence")
-print("PASS exact applied left-spell/fixed-unit range, guarded unknowns, combat deferral, polling isolation and lifecycle cleanup")
+a.View.SetUnlocked(true); assert(not a.Runtime.driver.scripts.OnUpdate and row.alpha==0)
+a.View.SetUnlocked(false); assert(a.Runtime.driver.scripts.OnUpdate)
+m.Event("PLAYER_LEAVING_WORLD"); assert(not row.rangeStatus.shown and not a.Runtime.driver.scripts.OnUpdate)
+m.Event("PLAYER_ENTERING_WORLD"); m.Flush()
+-- A warrior without any spells still has proximity, never invented spell range.
+m.units.player.class="WARRIOR"; a.db.bindings={}; a.Bindings.Apply()
+UnitDistanceSquared=function() return 1601,true end
+a.Runtime.RangePolling(); assert(a.Runtime.driver.scripts.OnUpdate)
+assert(row.proximity==false and not next(row.rangeStates) and row.alpha==1)
+UnitDistanceSquared=nil; a.Runtime.RangePolling()
+assert(not a.Runtime.driver.scripts.OnUpdate and row.proximity==nil)
+print("PASS independent exact spell ranges, modifiers, guarded unknowns, combat deferral, targets and separate warrior proximity")

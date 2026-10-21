@@ -79,11 +79,7 @@ function B.Coverage(auras)
     return result
 end
 function B.OutOfRange(id, unit)
-    if not unit or unit == "player" or A.Access.Read(UnitIsUnit, unit, "player") == true then return false end
-    if A.Access.Read(C_Spell and C_Spell.SpellHasRange, id) == false then return false end
-    -- Test the buff itself against its fixed recipient, not the healing binding.
-    -- Unknown/restricted range is not evidence that the recipient is too far away.
-    return A.Access.Read(C_Spell and C_Spell.IsSpellInRange, id, unit) == false
+    return A.Bindings.SpellRange(id, unit) == false
 end
 function B.WithTimers(choices, auras, nativeMode, unit)
     local result = {}
