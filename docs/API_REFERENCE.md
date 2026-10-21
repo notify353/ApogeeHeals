@@ -1,3 +1,14 @@
+## Player-only druid mana (October 20, 2026)
+
+Owner live checks: other bear druid reports public DRUID/rage; mana quantities
+are restricted, and native text displays 0 / 350 despite full mana on the
+druid client. This observation does not establish a universal client contract.
+Owner therefore requests split display only for the literal player row when
+the player is a druid using rage/energy. All party/target/targettarget rows
+use the normal active-resource bar, even when targeting the player. No cached
+mana estimates, remote mana queries or sharing protocol are introduced.
+Existing native display contracts and fixed geometry remain unchanged.
+
 ## Simple health-bar range (October 20, 2026)
 
 The applied, unmodified left-click spell alone controls health-bar fading.
