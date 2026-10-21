@@ -2,6 +2,11 @@
 
 - Place three eight-unit action icons inside the right end of target health, matching role-icon size and spacing. Reserve name space to avoid overlap.
 
+## Unreleased - Player-only druid mana (2026-10-20)
+
+- Keep split mana/form power only on your own druid player bar. Party, target
+  and target-of-target bars show one active resource, including self targets.
+
 ## Unreleased - Target action spacing
 
 - Raise the action icons four screen pixels to sit directly beneath the target bar.

@@ -50,7 +50,7 @@ end
 function U.PaintRowPower(row, hidden)
     local ok, _, class = pcall(UnitClass, row.unit)
     local kind = R(UnitPowerType, row.unit)
-    local split = ok and A.Access.Readable(class) and class == "DRUID"
+    local split = row.unit == "player" and ok and A.Access.Readable(class) and class == "DRUID"
         and (kind == 1 or kind == 3)
     -- Geometry is fixed at creation. Only native display values/alpha change
     -- during combat; restricted resource quantities never control the layout.
