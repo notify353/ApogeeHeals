@@ -1,3 +1,11 @@
+## Target actions beside name (October 20)
+
+Three eight-unit icons sit in ten-unit-wide hit areas at the right of target
+health, on its existing text layer above incoming-heal fills. The final artwork
+ends two units inside the bar, matching party role indicators. A fixed 32-unit
+name/status reservation avoids overlap and combat relayout. Existing native
+visibility, shared range checks, tooltips and click guards remain unchanged.
+
 ## Simple health-bar range (October 20, 2026)
 
 The applied, unmodified left-click spell alone controls health-bar fading.

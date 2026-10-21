@@ -29,16 +29,17 @@ for _, party in ipairs(a.View.rows) do assert(not party.partyActions) end
 assert(not a.View.targetTarget.partyActions)
 assert(follow.propagateMouseClicks == false and inspect.propagateMouseClicks == false)
 assert(a.View.targetActions.driver == "[combat] hide; [@target,help,exists] show; hide")
-assert(a.View.targetActions.point[2] == row and a.View.targetActions.point[3] == "BOTTOM")
-assert(a.View.targetActions.height + 2 < a.Style.targetGap, "fits shared gap")
+assert(a.View.targetActions.point[2] == row.health and a.View.targetActions.point[3] == "RIGHT")
+assert(a.View.targetActions.parent == row.nameLayer and a.View.targetActions.width == 30)
+assert(row.name.width == a.Style.targetWidth - 22.5 - 32, "reserve target name space")
 for _, button in ipairs(row.partyActions) do
-    assert(button.height == 16 and button.icon.width == (button == talents and 13 or 10))
+    assert(button.height == a.Style.healthHeight and button.icon.width == 8)
     assert(button.icon.desaturated == (button ~= talents))
     assert(button.icon.alpha == 0.75 and not button.label)
 end
 follow.scripts.OnEnter(); assert(follow.icon.alpha == 1)
 follow.scripts.OnLeave(); assert(follow.icon.alpha == 0.75)
-assert(inspect.point[4] == follow.width + 4)
+assert(inspect.point[4] == follow.width)
 assert(talents.point[4] + talents.width == a.View.targetActions.width)
 local oldPoint = a.View.targetActions.point
 a.Buffs.Paint(row, {{id=1}, {id=2}})

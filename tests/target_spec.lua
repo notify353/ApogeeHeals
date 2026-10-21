@@ -8,7 +8,7 @@ assert(row.attributes.type1 == "target" and row.driver == "[@target,exists] show
 assert(row.point[1] == "BOTTOMLEFT" and row.point[2] == a.View.rows[1] and row.point[3] == "TOPLEFT")
 assert(row.point[4] == 0 and row.point[5] == row.height)
 assert(row.width == a.Style.width and row.health.width == a.Style.width and row.incoming.bar.width == a.Style.width)
-assert(row.power.width == a.Style.width and row.name.width == 89.5)
+assert(row.power.width == a.Style.width and row.name.width == 57.5)
 assert(row.name.text == "" and row.health.value == 0)
 m.units.target = {name="High Priestess of the Silver Moon",health=80,maxHealth=100,
     power=20,maxPower=100,kind=0,level=61,class="MAGE",auras={}}

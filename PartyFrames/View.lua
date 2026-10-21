@@ -86,9 +86,9 @@ function V.RefreshPartyActions()
     end
 end
 local function createTargetActions(row)
-    local strip = CreateFrame("Frame", nil, V.root)
-    strip:SetSize(56, 16)
-    strip:SetPoint("TOP", row, "BOTTOM", 0, 0)
+    local strip = CreateFrame("Frame", nil, row.nameLayer)
+    strip:SetSize(30, S.healthHeight)
+    strip:SetPoint("RIGHT", row.health, "RIGHT", -1, 0)
     strip:EnableMouse(false)
     V.targetActions = strip
     RegisterStateDriver(strip, "visibility", "[combat] hide; [@target,help,exists] show; hide")
@@ -96,11 +96,11 @@ local function createTargetActions(row)
     strip.content:SetAllPoints(); strip.content:EnableMouse(false)
     strip.content:Hide()
     row.partyActions = {}
-    local width, gap = 16, 4
+    local width, gap = 10, 0
     for index, label in ipairs({"Follow", "Inspect", "Talents"}) do
         local inspect, talents = index >= 2, index == 3
         local button = CreateFrame("Button", nil, strip.content)
-        button:SetSize(width, 16)
+        button:SetSize(width, S.healthHeight)
         button:SetPoint("LEFT", strip.content, "LEFT", (index - 1) * (width + gap), 0)
         button:SetPropagateMouseClicks(false)
         button:RegisterForClicks("LeftButtonUp")
@@ -108,7 +108,7 @@ local function createTargetActions(row)
         button.highlight:SetAllPoints(); button.highlight:SetColorTexture(0.65, 0.78, 1, 1)
         button.highlight:SetAlpha(0)
         button.icon = button:CreateTexture(nil, "ARTWORK")
-        local iconSize = talents and 13 or 10
+        local iconSize = 8
         button.icon:SetSize(iconSize, iconSize)
         button.icon:SetPoint("CENTER", button, "CENTER", 0, 0)
         if talents then button.icon:SetAtlas("UI-HUD-MicroMenu-SpecTalents-Up", false)
@@ -204,7 +204,7 @@ local function buildRow(row, preview, first, width)
     row.nameLayer:SetAllPoints(row.health)
     row.nameLayer:SetFrameLevel(row.incoming.bar:GetFrameLevel() + 1)
     row.nameLayer:EnableMouse(false)
-    local indicatorSpace = 0
+    local indicatorSpace = row.unit == "target" and 32 or 0
     if preview or row.unit == "player" or row.unit:match("^party%d$") then
         indicatorSpace = 20
         row.leader = row.nameLayer:CreateTexture(nil, "OVERLAY")

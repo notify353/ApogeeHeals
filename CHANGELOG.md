@@ -1,3 +1,7 @@
+## Unreleased - Target actions beside name
+
+- Place three eight-unit action icons inside the right end of target health, matching role-icon size and spacing. Reserve name space to avoid overlap.
+
 ## Unreleased - Target action spacing
 
 - Raise the action icons four screen pixels to sit directly beneath the target bar.
