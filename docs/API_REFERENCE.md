@@ -1,4 +1,16 @@
-## Spell-aware range and separate proximity (October 20, 2026)
+## Simple health-bar range (October 20, 2026)
+
+The applied, unmodified left-click spell alone controls health-bar fading.
+Confirmed out of range fades health artwork and its text/incoming-heal children
+to 45%; in-range or unknown stays fully opaque. Buff buttons are sibling frames
+and retain their own exact-spell range checks without inheriting this fade.
+An empty left slot or bandage uses guarded 40-yard proximity (inclusive), keeping
+non-caster group distance useful. A spell's unknown range never falls back to
+proximity. Right-click and modifier bindings do not alter this cue. The Near/Far
+and per-click labels are removed. Power and support icons retain normal opacity.
+No casting or recipient changes. Native appearance/combat acceptance pending.
+
+## Superseded per-click labels (October 20, 2026)
 
 Party and target rows remain fully opaque so healing range cannot dim buff icons.
 The power strip shows Near (within 40 yards), Far (beyond 40 yards), or ? yd

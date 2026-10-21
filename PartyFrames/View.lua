@@ -232,11 +232,9 @@ local function buildRow(row, preview, first, width)
     row.status:SetJustifyH("CENTER"); row.status:SetJustifyV("MIDDLE")
     row.status:SetTextColor(unpack(S.muted))
     row.status:SetShadowColor(0, 0, 0, 1); row.status:SetShadowOffset(1, -1)
-    row.rangeStatus = S.Text(row.nameLayer, 5)
-    row.rangeStatus:SetPoint("TOPRIGHT", row.health, "BOTTOMRIGHT", -2, -S.barGap)
-    row.rangeStatus:SetSize(width - 4, S.powerHeight)
-    row.rangeStatus:SetJustifyH("RIGHT"); row.rangeStatus:SetJustifyV("MIDDLE")
-    row.rangeStatus:SetShadowColor(0, 0, 0, 1); row.rangeStatus:SetShadowOffset(1, -1)
+    row.rangeStatus = S.Text(row.nameLayer, 8)
+    row.rangeStatus:SetAllPoints(row.status)
+    row.rangeStatus:SetJustifyH("CENTER"); row.rangeStatus:SetJustifyV("MIDDLE")
     row.rangeStatus:SetTextColor(unpack(S.muted)); row.rangeStatus:SetText("")
     row.rangeStatus:Hide()
     -- Smaller artwork in an inset dark frame, attached closely to the row.
@@ -411,30 +409,19 @@ local function proximity(unit)
     end
 end
 function V.PaintRange(row, state)
-    local active = not V.unlocked and not A.Runtime.suspended and state == "alive"
-    local prefix = active and A.Bindings.RangePrefix()
-    local labels, states = {}, {}
-    row.proximity = nil
-    if active then
-        row.proximity = proximity(row.unit)
-        labels[1] = row.proximity == true and "|cff80df9aNear|r"
-            or row.proximity == false and "|cffff6666Far|r" or "|cffa6b3c7? yd|r"
-    end
-    if prefix then
-        for button, label in ipairs({"L", "R", "M", "4", "5"}) do
-            local action = A.Bindings.rangeActions[prefix .. button]
-            if action then
-                local result = A.Bindings.SpellRange(action.spell, row.unit)
-                states[button] = result == true and "in" or result == false and "out" or "unknown"
-                local color = result == true and "ff80df9a" or result == false and "ffff6666" or "ffa6b3c7"
-                labels[#labels + 1] = "|c" .. color .. label .. "|r"
-            end
+    local result
+    if not V.unlocked and not A.Runtime.suspended and state == "alive" then
+        if A.Bindings.rangeSpell then
+            -- Unknown spell range stays unknown; distance cannot prove cast range.
+            result = A.Bindings.SpellRange(A.Bindings.rangeSpell, row.unit)
+        else
+            result = proximity(row.unit)
         end
     end
-    row.rangeStates = states
-    row.rangeStatus:SetText(table.concat(labels, " "))
-    row.rangeStatus:SetShown(#labels > 0)
-    -- Buffs, debuffs and identity must never inherit another action's range fade.
+    row.rangeStatus:Hide()
+    -- Only health artwork (including its text/incoming heals) inherits the fade.
+    -- Buff buttons are siblings, so their own spell range remains independent.
+    row.health:SetAlpha(result == false and 0.45 or 1)
     row:SetAlpha(V.unlocked and 0 or 1)
     local showName = state ~= "missing" and state ~= "dead" and state ~= "offline"
     row.name:SetShown(showName); row.level:SetShown(showName)

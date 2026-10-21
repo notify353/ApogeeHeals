@@ -1,16 +1,14 @@
-## Spell-aware range and separate proximity (October 20, 2026)
+## Simple health-bar range (October 20, 2026)
 
-Party and target rows remain fully opaque so healing range cannot dim buff icons.
-The power strip shows Near (within 40 yards), Far (beyond 40 yards), or ? yd
-when public distance is unavailable. This general proximity cue works without
-spell assignments, including warriors with bandages; it does not predict a cast.
-L/R/M/4/5 indicators show each applied click assignment's exact native spell range:
-green is in range, red is out, gray is unknown (including bandages). Holding
-Shift or Ctrl selects that binding layer; unsupported modifier combinations show
-no spell indicators. Buff choices share the exact-spell guarded range check.
-Unknown/restricted spell results never inherit the proximity result. No range
-result guarantees line of sight, resources, cooldown or successful casting.
-Native appearance and combat acceptance remain pending after offline checks.
+The applied, unmodified left-click spell alone controls health-bar fading.
+Confirmed out of range fades health artwork and its text/incoming-heal children
+to 45%; in-range or unknown stays fully opaque. Buff buttons are sibling frames
+and retain their own exact-spell range checks without inheriting this fade.
+An empty left slot or bandage uses guarded 40-yard proximity (inclusive), keeping
+non-caster group distance useful. A spell's unknown range never falls back to
+proximity. Right-click and modifier bindings do not alter this cue. The Near/Far
+and per-click labels are removed. Power and support icons retain normal opacity.
+No casting or recipient changes. Native appearance/combat acceptance pending.
 
 # Apogee Heals
 
@@ -277,15 +275,15 @@ are locked during combat; confirming an already-open dialog in combat does nothi
 
 ## Spell range
 
-Each applied click assignment checks its exact spell against the row recipient.
-L/R/M/4/5 on the power strip are green for in range, red for out of range and gray
-for unknown, including bandages. Shift/Ctrl select their respective layers.
-Near/Far is a separate 40-yard proximity cue; ? yd means distance is unavailable.
-That cue remains useful with no spells assigned and never overrides spell range.
-Rows and buff icons stay fully opaque. Checks update about five times a second
-without aura scans. Combat retains the applied bindings until pending edits can
-be installed safely. Range does not establish line of sight or cast success.
-Native combat behavior and readability still need owner confirmation.
+The applied, unmodified left-click spell alone controls health-bar fading.
+Confirmed out of range fades health artwork and its text/incoming-heal children
+to 45%; in-range or unknown stays fully opaque. Buff buttons are sibling frames
+and retain their own exact-spell range checks without inheriting this fade.
+An empty left slot or bandage uses guarded 40-yard proximity (inclusive), keeping
+non-caster group distance useful. A spell's unknown range never falls back to
+proximity. Right-click and modifier bindings do not alter this cue. The Near/Far
+and per-click labels are removed. Power and support icons retain normal opacity.
+No casting or recipient changes. Native appearance/combat acceptance pending.
 
 ## Drinking limitations
 

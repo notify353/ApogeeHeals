@@ -1,3 +1,7 @@
+## Unreleased - Simple left-click range
+
+- Restore health-only range fading from unmodified left click; retain non-caster proximity and independent buff range. Remove extra indicators.
+
 ## Unreleased - Talent icon readability (2026-10-20)
 
 - Enlarge the Inspect Talents artwork from 10 to 13 units and restore its color.
