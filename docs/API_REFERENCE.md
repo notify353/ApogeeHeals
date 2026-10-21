@@ -1,3 +1,19 @@
+## Druid split power (October 20, 2026)
+
+Verified Forever 1.60.1.70450 / 16001 with the strict export checker.
+UnitDocumentation UnitPower and UnitPowerMax accept an explicit powerType;
+mana uses 0, rage 1 and energy 3. Public UnitClass class token and UnitPowerType
+select the split only for druid player/party rows using rage or energy.
+Restricted current/max amounts go directly to native StatusBar sinks.
+Two equal half-height bars are created once alongside the ordinary full bar;
+only alpha and native values change during combat. Existing UNIT_POWER_UPDATE,
+UNIT_MAXPOWER and UNIT_DISPLAYPOWER refresh both resources. Missing/dead/offline
+rows clear both halves; unknown class/power type restores ordinary power.
+API errors clear the affected fill without substituting another resource.
+No protected geometry/action changes, settings, saved state or target cast changes.
+Full source regressions pass; grouped mana availability, appearance and native
+combat/taint acceptance require owner in-game testing.
+
 ## Left-side party actions (October 20, 70450)
 
 Follow, Inspect and Inspect Talents retain their order from left to right.

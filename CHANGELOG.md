@@ -1,3 +1,8 @@
+## Unreleased - Druid mana in forms (2026-10-20)
+
+- Split druid player/party power strips equally in cat/bear form, with mana
+  above energy/rage; restore full mana in caster form.
+
 ## Unreleased - Party Follow and Inspect (2026-10-20)
 
 - Place the action group left of the healing bars with consistent spacing,

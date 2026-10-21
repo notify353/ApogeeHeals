@@ -243,6 +243,12 @@ local function buildRow(row, preview, first, width)
     A.Drinking.CreateTooltip(row, preview)
     A.Drinking.CreateTimer(row, preview)
     row.power = bar(row, S.powerHeight, -(S.healthHeight + S.barGap), width)
+    if not preview and (row.unit == "player" or row.unit:match("^party%d$")) then
+        local top = -(S.healthHeight + S.barGap)
+        row.manaPower = bar(row, S.powerHeight / 2, top, width)
+        row.formPower = bar(row, S.powerHeight / 2, top - S.powerHeight / 2, width)
+        row.manaPower:SetAlpha(0); row.formPower:SetAlpha(0)
+    end
     S.RowEdges(row, first, width)
 end
 function V.ApplyPosition()
@@ -478,11 +484,11 @@ function V.Refresh()
             if A.UnitAPI.PaintHealth(row.health, row.unit, V.curve) then
                 A.IncomingHeals.Paint(row.incoming, row.unit)
             else A.IncomingHeals.Clear(row.incoming) end
-            A.UnitAPI.PaintPower(row.power, row.unit)
+            A.UnitAPI.PaintPartyPower(row)
             A.Drinking.Paint(row)
         else
             A.Drinking.Clear(row)
-            A.UnitAPI.Clear(row.health); A.UnitAPI.Clear(row.power)
+            A.UnitAPI.Clear(row.health); A.UnitAPI.ClearPartyPower(row)
             A.IncomingHeals.Clear(row.incoming)
             if state == "offline" then row.status:SetText("OFFLINE")
             elseif state == "dead" then row.status:SetText("DEAD") end
