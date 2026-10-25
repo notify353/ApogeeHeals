@@ -1,5 +1,6 @@
 local M = {}
 function M.New()
+    dofile("tests/launcher_stub.lua")
     local m = { frames = {}, timers = {}, combat = false, raid = false, units = {
         player = { name = "Priest", health = 80, maxHealth = 100, power = 50, maxPower = 100,
             kind = 0, connected = true, dead = false, auras = {} },

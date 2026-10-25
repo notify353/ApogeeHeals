@@ -82,24 +82,17 @@ a2.View.SetUnlocked(true)
 for _, row in ipairs(a2.Preview.rows) do assert(not row.protected and row.attributes.type2 == nil) end
 print("PASS reload persistence, invalid storage filtering and inert preview")
 
-local minimap = a2.Minimap
-local click = minimap.button.scripts.OnClick
-assert(minimap.button.enabled and minimap.border.vertexColor[2] == 1)
-click(minimap.button, "LeftButton")
-assert(a2.BindingEditor.frame:IsShown() and minimap.border.vertexColor[2] == 0.8)
-click(minimap.button, "LeftButton")
-assert(not a2.BindingEditor.frame:IsShown() and minimap.border.vertexColor[2] == 1)
-a2.BindingEditor.Open(); a2.BindingEditor.frame:Hide()
-assert(minimap.border.vertexColor[2] == 1)
+local action = ApogeeUI.components.heals.actions[1]
+assert(not a2.Minimap.button)
+action.run(); assert(a2.BindingEditor.frame:IsShown() and action.checked())
+action.run()
+assert(not a2.BindingEditor.frame:IsShown() and not action.checked())
+a2.BindingEditor.Open(); a2.BindingEditor.frame:Hide(); assert(not action.checked())
 a2.BindingEditor.Open(); m2.combat = true; m2.Event("PLAYER_REGEN_DISABLED")
-assert(not minimap.button.enabled and not a2.BindingEditor.frame:IsShown())
-click(minimap.button, "LeftButton"); assert(not a2.BindingEditor.frame:IsShown())
-m2.combat = false; m2.Event("PLAYER_REGEN_ENABLED"); assert(minimap.button.enabled)
-local opened
-a2.Settings.category.GetID = function() return 123 end
-Settings.OpenToCategory = function(id) opened = id end
-click(minimap.button, "RightButton"); assert(opened == 123)
-print("PASS minimap toggle, settings shortcut, Escape state and combat lock")
+assert(not a2.BindingEditor.frame:IsShown())
+action.run(); assert(not a2.BindingEditor.frame:IsShown())
+m2.combat = false; m2.Event("PLAYER_REGEN_ENABLED")
+print("PASS launcher editor callback, Escape state and editor combat lock")
 
 local lm, la, learned = setup()
 assert(#la.Bindings.slots == 15)

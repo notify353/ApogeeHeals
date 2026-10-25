@@ -5,6 +5,8 @@
 ## Author: notify353
 ## Version: 0.1.0-dev
 ## SavedVariablesPerCharacter: ApogeeHealsDB
+## Dependencies: ApogeeUI
+## X-Apogee-UI-API: 1
 
 Core/Access.lua
 Core/Client.lua

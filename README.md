@@ -1,3 +1,12 @@
+## Shared launcher candidate
+
+Requires matching Apogee UI shared support from the complete distribution.
+Left-click the green button for actions, right-click for Apogee settings, and
+right-drag to save its position per character. Editors remain independent.
+DEV/PROD and clients keep separate state. Component Defaults does not reset the
+launcher. New support folder requires a full game restart after installation.
+Forever remains source-only until matching fresh client validation.
+
 ## Simple health-bar range (October 20, 2026)
 
 The applied, unmodified left-click spell alone controls health-bar fading.

@@ -1,3 +1,9 @@
+## Unreleased - shared Apogee launcher
+
+- Join the required Apogee UI support addon: one green launcher, independent
+  editor actions, shared settings and per-character position. No gameplay reset.
+- Era validation is separate; Forever source preparation awaits fresh authority.
+
 ## Unreleased - Era party aura compatibility
 
 - Restore party/friendly-target debuff icons and learned cleansing highlights through a private Era reader. Preserve secure actions, fixed geometry and Forever runtime.
