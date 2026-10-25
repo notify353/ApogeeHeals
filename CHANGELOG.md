@@ -1,3 +1,11 @@
+## Unreleased - left-click healing defaults
+
+- Empty left-click defaults to the highest learned rank of Priest Lesser Heal,
+  Paladin Holy Light, Druid Healing Touch or Shaman Healing Wave when shared
+  default spells are enabled. No automatic right-click or modifier defaults.
+- Manual spells and bandages take priority; clearing restores the default.
+  Preserve manually assigned shields and update the editor's explanation.
+
 ## Unreleased - combined minimap controls
 
 - Left-click toggles available editors together. Right-click lists component

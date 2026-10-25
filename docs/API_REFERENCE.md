@@ -1,3 +1,15 @@
+## Left-only healing defaults (October 25, 2026)
+
+The shared opt-in default-spells policy now fills empty plain Left for Priest,
+Paladin, Druid and Shaman using their starting heal's highest learned listed
+rank. No right-click or modifier defaults. Bindings.Effective still checks saved
+assignments first, including unavailable spells; removing an assignment restores
+the class fallback. Manually assigned shields/bandages are preserved. Existing
+Resolve guards, exact ranks, fixed recipients and combat deferral remain intact.
+Era authority verifies the same spell/secure APIs; no new API is introduced.
+Generated Era and future Forever tests cover class defaults and saved overrides.
+Fresh Forever authority and native acceptance remain separate prerequisites.
+
 ## Target actions beside name (October 20)
 
 Three eight-unit icons sit in ten-unit-wide hit areas at the right of target

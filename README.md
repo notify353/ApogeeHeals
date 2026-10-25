@@ -159,13 +159,14 @@ Pickup followed by clicking a slot also works. The selected spell ID/rank is kep
 hover to see its name and rank. Active helpful spells (including friendly buffs)
 are accepted; harmful and passive spells are rejected. New manual assignments start empty.
 
-Priests automatically get **Lesser Heal on plain Left** and **Power Word: Shield
-on plain Right**. Paladins get **Holy Light on plain Left**.
+With default spells enabled, empty plain Left uses Priest **Lesser Heal**,
+Paladin **Holy Light**, Druid **Healing Touch** or Shaman **Healing Wave**.
+Right-click and modifier slots have no automatic defaults.
 Each uses its highest learned rank. Defaults are
 class-specific and do not write saved assignments.
 Your manual spell always takes priority, even if it becomes unavailable. Removing
 the override restores the default. The default icon has no remove control; drop a
-spell onto it to override. Other classes and combinations have no defaults yet.
+spell or bandage onto it to override. Other classes have no healing default.
 
 Drag a tile onto another to move or swap; dropping outside cancels. Use its small
 x to remove it. Escape or the minimap button closes the editor. Drag the header to move it
