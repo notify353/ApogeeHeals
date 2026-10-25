@@ -187,7 +187,8 @@ assert(ha.View.rows[1].attributes.spell1 == 25292)
 hm.combat = false; hm.Event("PLAYER_REGEN_ENABLED")
 assert(ha.View.rows[1].attributes.spell1 == 639)
 hm.units.player.class = "MAGE"; hm.Event("SPELLS_CHANGED")
-assert(ha.View.rows[1].attributes.type1 == "target")
+-- This fixture has no item metadata; the Mage's bandage default stays inactive.
+assert(ha.Bindings.Effective("1").id == 1251 and ha.View.rows[1].attributes.type1 == "")
 print("PASS Paladin Holy Light default, rank upgrades, manual priority, combat deferral and class isolation")
 
 -- Missing opt-in on an existing character must preserve custom slots exactly.

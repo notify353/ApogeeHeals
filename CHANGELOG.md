@@ -1,3 +1,10 @@
+## Unreleased - Linen Bandage default
+
+- With defaults enabled, Warrior, Rogue, Hunter, Mage and Warlock get Linen
+  Bandage on empty Left. Manual spells/bandages override it; clearing restores it.
+- Keep the item selected without supplies; native item-use requirements apply.
+  No Right defaults, settings reset or change to the four healing-class defaults.
+
 ## Unreleased - left-click healing defaults
 
 - Empty left-click defaults to the highest learned rank of Priest Lesser Heal,

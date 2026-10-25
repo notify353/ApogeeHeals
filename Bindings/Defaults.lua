@@ -12,10 +12,14 @@ local classes = { PRIEST = {
 }, SHAMAN = {
     ["1"] = { 25357, 10396, 10395, 8005, 959, 939, 913, 547, 332, 331 }, -- Healing Wave
 } }
-function D.Spell(slot)
+local bandageClasses = { WARRIOR=true, ROGUE=true, HUNTER=true, MAGE=true, WARLOCK=true }
+function D.Action(slot)
     if not A.db or type(A.db.defaultSpells) ~= "table" or A.db.defaultSpells.enabled ~= true then return nil end
     local ok, _, class = pcall(UnitClass, "player")
     if not ok or not A.Access.Readable(class) or type(class) ~= "string" then return nil end
+    -- Keep the item selected even without stock or usable item information. The
+    -- existing resolver and native item action enforce readiness/use requirements.
+    if slot == "1" and bandageClasses[class] then return {kind="item", id=1251} end
     local ranks = classes[class] and classes[class][slot]
     if not ranks then return nil end
     for _, id in ipairs(ranks) do

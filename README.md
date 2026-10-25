@@ -166,7 +166,9 @@ Each uses its highest learned rank. Defaults are
 class-specific and do not write saved assignments.
 Your manual spell always takes priority, even if it becomes unavailable. Removing
 the override restores the default. The default icon has no remove control; drop a
-spell or bandage onto it to override. Other classes have no healing default.
+spell or bandage onto it to override. Warrior, Rogue, Hunter, Mage and Warlock
+instead default to **Linen Bandage** on empty Left. It stays selected when you
+run out; carry Linen Bandages and meet the item's use requirements to use it.
 
 Drag a tile onto another to move or swap; dropping outside cancels. Use its small
 x to remove it. Escape or the minimap button closes the editor. Drag the header to move it

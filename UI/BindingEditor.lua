@@ -129,8 +129,8 @@ function E.Create()
         GameTooltip:AddLine("Drag the header to move. Drop spells or bag bandages onto the tiles.", 0.8, 0.85, 0.9, true)
         GameTooltip:AddLine("Columns: Left, Right, Middle, Mouse 4, Mouse 5.", 0.8, 0.85, 0.9, true)
         GameTooltip:AddLine("Rows: plain, Shift (S-), Ctrl (C-). L = Left, R = Right, M = Middle.", 0.8, 0.85, 0.9, true)
-        GameTooltip:AddLine("When defaults are enabled, healing classes get a starting heal on empty Left. Your assignments take priority. Right has no default.", 0.8, 0.85, 0.9, true)
-        GameTooltip:AddLine("Without an assignment or learned default, plain Left targets.", 0.8, 0.85, 0.9, true)
+        GameTooltip:AddLine("When defaults are enabled, empty Left gets your class's starting heal or Linen Bandage. Your assignments take priority. Right has no default.", 0.8, 0.85, 0.9, true)
+        GameTooltip:AddLine("An empty Left slot without a default targets the clicked unit.", 0.8, 0.85, 0.9, true)
         GameTooltip:AddLine("Escape or the minimap button closes.", 0.8, 0.85, 0.9, true)
         GameTooltip:Show()
     end)
@@ -185,7 +185,9 @@ function E.Create()
             else GameTooltip:AddLine(reason or (id == "1" and "Empty: targets the clicked unit."
                 or "Empty: drop a learned healing spell or bandage.")) end
             if automatic then
-                GameTooltip:AddLine("Class default: highest learned rank. Drop a spell or bandage to override.", 0.8, 0.85, 0.9, true)
+                GameTooltip:AddLine(type(spell) == "table"
+                    and "Default: Linen Bandage. Carry bandages and meet their use requirements. Drop a spell or bandage to override."
+                    or "Class default: highest learned rank. Drop a spell or bandage to override.", 0.8, 0.85, 0.9, true)
             else
                 GameTooltip:AddLine("Drag to move or swap. Use x to restore the default.", 0.8, 0.85, 0.9, true)
             end

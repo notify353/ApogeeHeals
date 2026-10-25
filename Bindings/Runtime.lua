@@ -88,7 +88,7 @@ end
 function B.Effective(slot)
     local assigned = A.db.bindings[slot]
     if assigned ~= nil then return assigned, false end
-    local id = A.BindingDefaults.Spell(slot)
+    local id = A.BindingDefaults.Action(slot)
     return id, id ~= nil
 end
 local mouseButtons = { LeftButton=1, RightButton=2, MiddleButton=3, Button4=4, Button5=5 }

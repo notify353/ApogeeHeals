@@ -1,3 +1,16 @@
+## Linen Bandage default (October 25, 2026)
+
+The existing opt-in now supplies item 1251 on empty plain Left for Warrior,
+Rogue, Hunter, Mage and Warlock. The shared private default resolver returns a
+spell ID or the existing item descriptor. Saved assignments win; defaults never
+write the binding table. Item metadata uses the existing guarded ResolveItem
+path and fixed-unit secure item action. Missing/restricted metadata leaves the
+action inactive until the existing item-info event refreshes it outside combat.
+Inventory and First Aid readiness remain native use requirements, not gates on
+the default's identity. No new API, item scan or protected action is introduced.
+Generated Era and future Forever coverage includes all five classes, overrides,
+reload, replenishment-independent selection, metadata recovery and combat deferral.
+
 ## Left-only healing defaults (October 25, 2026)
 
 The shared opt-in default-spells policy now fills empty plain Left for Priest,
