@@ -430,3 +430,7 @@
 ## Defaults update
 
 - Provide one confirmed top-right Defaults control; consolidate reset controls and preserve combat safeguards.
+# Unreleased - Era live threat debuffs
+
+- Add an Era-only public-aura renderer for player-owned Sunder Armor, Thunder Clap and Demoralizing Shout, including Sunder stacks. Era has no native Forever aura-container widget.
+- Preserve stable threat rows, demo behavior and Forever rendering; fail closed on unreadable/failed scans and reuse fixed artwork without combat layout changes.

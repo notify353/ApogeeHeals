@@ -1396,3 +1396,32 @@ Addon-specific resets preserve this shared preference. Native acceptance pending
 October 17 placement correction: only Keybinds supplies the checkbox container,
 inside its feature settings page above the rule toggles. Heals still joins the
 shared preference without creating a control. No native layout lookup is needed.
+## Isolated Era threat debuffs (October 25, 2026)
+
+Fresh Classic Era 1.15.9.70003 authority: UnitAuraDocumentation defines
+C_UnitAuras.GetAuraDataByIndex(unit,index,filter) returning nullable AuraData.
+The fresh FrameXMLUtil.toc selects shared AuraUtil.lua plus Classic overrides.
+Its UnpackAuraData identifies applications, sourceUnit and spellId. The fresh
+Blizzard_UnitFrame_Classic.toc selects Classic/TargetFrame.lua, which enumerates
+HARMFUL with INCLUDE_NAME_PLATE_ONLY and displays application counts above one.
+Stale Vanilla/suffixed utility TOCs are not authority. The current Era export
+contains no CustomAuraContainerTemplate implementation; the former shared
+PrepareDebuffs guard silently created no live threat aura display on this path.
+
+The private Era adapter replaces only ThreatView.PrepareDebuffs and
+ThreatModel.PaintDebuffs. It reads at most 64 harmful auras plus an end probe
+per painted row, within the existing 0.1-second threat refresh. It uses the same
+Classic rank IDs as the unchanged Forever renderer, verifies readable source
+identity with UnitIsUnit(sourceUnit,player), and paints the existing fixed
+spell-family artwork. It never stores aura records or changes protected geometry.
+Only Sunder has stack text; one/zero are unnumbered and unreadable counts show ?
+only after effect/ownership confirmation. Failed/unreadable/truncated scans clear
+icons; blank is not a proven absence. Demo stays scripted, and normal lifecycle
+clears icons on removal, reuse, disable and zoning. No global replacement API.
+
+Source/generated Era tests reproduce the old missing icon and exercise rank,
+stack, ownership, public-data guards, scan bounds, partial failure and lifecycle.
+Generated checks execute the fresh native unpack helper under mocks. Default
+Forever tests continue to require native containers and prohibit Lua aura scans.
+This correction is scoped to the tank threat stack; native acceptance remains
+user-owned and does not establish broader Era aura-widget compatibility.
