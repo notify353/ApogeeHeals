@@ -1,3 +1,8 @@
+# Unreleased - isolated Classic Era candidate
+
+- Add a separately selected Era adapter and TOC; default Forever loading and pins remain unchanged.
+- Era behavior is provisional until native acceptance; see Era/README.md.
+
 ## Unreleased - Target actions beside name
 
 - Place three eight-unit action icons inside the right end of target health, matching role-icon size and spacing. Reserve name space to avoid overlap.
