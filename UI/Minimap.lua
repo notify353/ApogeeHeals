@@ -8,7 +8,7 @@ function M.Create()
     local ui=service(); if not ui or not A.started then return end
     ui.RegisterComponent("heals", {apiVersion=1, label="Heals", category=A.Settings.category,
         available=function() return A.started == true end,
-        actions={{id="bindings", label="Healing bindings",
+        actions={{id="bindings", label="Healing bindings", primary=true,
             checked=function() return A.BindingEditor.frame ~= nil and A.BindingEditor.frame:IsShown() end,
             run=function()
                 if A.BindingEditor.frame and A.BindingEditor.frame:IsShown() then A.BindingEditor.Close()

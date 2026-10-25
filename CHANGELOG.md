@@ -1,3 +1,8 @@
+## Unreleased - combined minimap controls
+
+- Left-click toggles available editors together. Right-click lists component
+  settings directly and Reset minimap position. Keep saved position and combat guards.
+
 ## Unreleased - shared Apogee launcher
 
 - Join the required Apogee UI support addon: one green launcher, independent

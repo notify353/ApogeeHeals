@@ -1,8 +1,10 @@
 ## Shared launcher candidate
 
 Requires matching Apogee UI shared support from the complete distribution.
-Left-click the green button for actions, right-click for Apogee settings, and
-right-drag to save its position per character. Editors remain independent.
+Left-click the green button to toggle available editors together: open all if
+any is closed, otherwise close all. Right-click for direct component settings
+and Reset minimap position; right-drag to save its position per character.
+Editors can still be closed independently through their existing controls.
 DEV/PROD and clients keep separate state. Component Defaults does not reset the
 launcher. New support folder requires a full game restart after installation.
 Forever remains source-only until matching fresh client validation.
