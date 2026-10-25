@@ -10,7 +10,15 @@ try {
     $toc = Get-Content ApogeeHeals.toc
     if ($toc -notcontains '## Interface: 16001') { throw 'Wrong interface.' }
     if ($toc -notcontains '## SavedVariablesPerCharacter: ApogeeHealsDB') { throw 'Wrong storage contract.' }
-    if ($toc -match '^## (SavedVariables:|Dependencies:|RequiredDeps:|OptionalDeps:)') { throw 'Unexpected dependency or storage.' }
+    if ($toc -match '^## (SavedVariables:|RequiredDeps:|OptionalDeps:)') { throw 'Unexpected dependency or storage.' }
+    $dependencies = @($toc | Where-Object { $_ -match '^## Dependencies:' })
+    if ($dependencies.Count -ne 1 -or $dependencies[0] -cne '## Dependencies: ApogeeUI') {
+        throw 'Expected exactly the shared ApogeeUI source dependency.'
+    }
+    $uiVersions = @($toc | Where-Object { $_ -match '^## X-Apogee-UI-API:' })
+    if ($uiVersions.Count -ne 1 -or $uiVersions[0] -cne '## X-Apogee-UI-API: 1') {
+        throw 'Expected shared UI interface version 1.'
+    }
     foreach ($line in $toc) {
         if ($line -match '^[^#].*\.lua$' -and -not (Test-Path -LiteralPath $line)) { throw "Missing TOC file: $line" }
     }

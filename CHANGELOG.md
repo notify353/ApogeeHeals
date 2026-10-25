@@ -1,3 +1,9 @@
+## Unreleased - local validation repair
+
+- Accept the required shared UI source dependency in the local test runner;
+  still reject missing, duplicate, cross-family or extra dependencies and wrong
+  launcher interface versions. No runtime or saved-data change.
+
 ## Unreleased - Linen Bandage default
 
 - With defaults enabled, Warrior, Rogue, Hunter, Mage and Warlock get Linen
