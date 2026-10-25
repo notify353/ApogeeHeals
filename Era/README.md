@@ -16,3 +16,14 @@ the effect is absent. The shared stable rows and 0.1-second refresh remain.
 Threat demo is scripted and does not read live auras. The live reader reuses
 preallocated fixed artwork, makes no protected changes in combat, and never
 modifies global aura APIs. This correction covers the tank threat stack only.
+## Era.6 party debuffs and cleansing
+
+Era.6 supplies the missing public-aura display for player/party rows and the
+friendly target: eight debuff icons in native order and cleansing highlights
+for learned player spells. The archived Era aura/dispel readers identified the
+missing native-container dependency; no archived runtime or settings are loaded.
+All icons are preallocated. Combat changes artwork only, never the fixed secure
+recipient/spell or geometry. A bounded, complete scan detects dispel types beyond
+the eight displayed icons; failed/restricted/truncated snapshots clear artwork.
+Tooltips are read-only and out of combat. Preview, death, target changes and
+world transitions clear stale visuals. Pet cleansing remains intentionally absent.

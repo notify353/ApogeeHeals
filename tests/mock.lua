@@ -62,6 +62,7 @@ function M.New()
     function methods:SetPropagateMouseClicks(value) protected(self); self.propagateMouseClicks = value end
     function methods:RegisterForDrag(...) self.drags = {...} end
     function methods:EnableMouse(v) self.mouse = v end
+    function methods:SetMouseMotionEnabled(v) protected(self); self.mouseMotion = v end
     function methods:SetScript(k, v) self.scripts[k] = v end
     function methods:HookScript(k, v)
         local previous = self.scripts[k]

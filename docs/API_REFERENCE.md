@@ -1425,3 +1425,26 @@ Generated checks execute the fresh native unpack helper under mocks. Default
 Forever tests continue to require native containers and prohibit Lua aura scans.
 This correction is scoped to the tank threat stack; native acceptance remains
 user-owned and does not establish broader Era aura-widget compatibility.
+## Isolated Era party aura correction (October 25, 2026)
+
+Era/PartyAuras.lua is loaded only by the central Era TOC after the private
+adapter. Era 1.15.9.70003 lacks CustomAuraContainerTemplate. Archived APHB
+PartyFrames/Auras.lua and Reminders/CleanseData.lua use public harmful aura
+records and dispelName; current selected AuraUtil/TargetFrame sources confirm
+these fields. The new adapter uses HARMFUL scans (64 plus a terminating probe),
+shows the first eight icons, and matches all scanned dispel types against the
+shared learned cleanse spell definitions. It does not infer unknown absence.
+
+Eight fixed frames per support row and fixed cleanse border textures are created
+out of combat. Only alpha/texture/desaturation change during combat. Aura data
+never changes action attributes or recipient tokens. Mouse motion is enabled
+without mouse clicks, using SimpleScriptRegion's separate motion API; tooltip
+records are refreshed/cleared with the snapshot and hidden in combat. Fresh
+BuffFrame.toc/BuffFrame.lua select the same aura-instance tooltip method.
+
+The shared coalesced refresh updates artwork even when secure cleansing rebuilds
+are deferred. Target swaps clear immediately; leaving world clears and suspended
+refreshes cannot repaint. Shared Forever files/TOC are unchanged. Source and
+generated Era tests cover all player cleansing classes, non-cleansing warriors,
+restricted/failed/truncated reads, types beyond eight icons, secure combat guards,
+tooltips, preview, target replacement, death and world transitions.

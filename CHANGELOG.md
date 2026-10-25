@@ -1,3 +1,8 @@
+## Unreleased - Era party aura compatibility
+
+- Restore party/friendly-target debuff icons and learned cleansing highlights through a private Era reader. Preserve secure actions, fixed geometry and Forever runtime.
+- Add regressions for combat updates, all cleanse classes, unknown data, tooltips and lifecycle cleanup.
+
 # Unreleased - isolated Classic Era candidate
 
 - Add a separately selected Era adapter and TOC; default Forever loading and pins remain unchanged.

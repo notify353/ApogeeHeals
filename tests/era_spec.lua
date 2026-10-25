@@ -125,3 +125,4 @@ if export then
     print("PASS fresh native Era AuraUtil field contract under mocks")
 end
 print("PASS Era live threat auras: ranks, own caster, stacks, guards, bounded refresh and lifecycle")
+dofile("tests/era_party_auras.lua")
