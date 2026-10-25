@@ -1,3 +1,7 @@
+## Unreleased - reset UI positions
+
+- Add shared position-only reset without changing bindings or gameplay settings.
+
 ## Unreleased - concise healing tooltip
 
 - Reduce the healing editor header tooltip to automatic versus assigned spell

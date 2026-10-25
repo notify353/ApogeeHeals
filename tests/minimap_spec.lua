@@ -7,6 +7,9 @@ local A={started=true,Settings={category={}},BindingEditor={frame={IsShown=funct
     Open=function() open=true end,Close=function() open=false end}}
 assert(loadfile("UI/Minimap.lua"))("ApogeeHeals",A)
 A.Minimap.Create(); assert(registered and registered.category==A.Settings.category and registered.available())
+local reset=false
+A.Settings.ResetPositions=function() reset=true end
+registered.resetPositions(); assert(reset)
 local action=registered.actions[1]; assert(action.label=="Healing bindings" and action.primary==true)
 action.run(); assert(open and action.checked()); action.run(); assert(not open)
 A.Minimap.Refresh(); assert(refreshes); A.Minimap.ResetPosition(); assert(not A.Minimap.button)
