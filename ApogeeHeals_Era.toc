@@ -32,6 +32,6 @@ Threat/Model.lua
 Threat/View.lua
 Threat/Runtime.lua
 Threat/Diagnostics.lua
-Era/Adapter.lua
 Era/PartyAuras.lua
+Era/Adapter.lua
 ApogeeHeals.lua

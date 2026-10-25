@@ -1427,8 +1427,8 @@ This correction is scoped to the tank threat stack; native acceptance remains
 user-owned and does not establish broader Era aura-widget compatibility.
 ## Isolated Era party aura correction (October 25, 2026)
 
-Era/PartyAuras.lua is loaded only by the central Era TOC after the private
-adapter. Era 1.15.9.70003 lacks CustomAuraContainerTemplate. Archived APHB
+Era/PartyAuras.lua is loaded only by the central Era TOC before the private
+adapter and startup. Era 1.15.9.70003 lacks CustomAuraContainerTemplate. Archived APHB
 PartyFrames/Auras.lua and Reminders/CleanseData.lua use public harmful aura
 records and dispelName; current selected AuraUtil/TargetFrame sources confirm
 these fields. The new adapter uses HARMFUL scans (64 plus a terminating probe),
