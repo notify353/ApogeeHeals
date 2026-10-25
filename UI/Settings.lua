@@ -83,6 +83,12 @@ function S.ResetPositions()
     S.Refresh()
 end
 function S.Refresh()
+    if A.startupState == "failed" then
+        for _, control in pairs({S.defaults,S.buffs,S.threat,S.threatDiagnostics,S.threatDemo}) do
+            pcall(control.SetEnabled,control,false)
+        end
+        return
+    end
     A.Minimap.Refresh()
     if not S.defaults then return end
     S.defaults:SetEnabled(not InCombatLockdown())

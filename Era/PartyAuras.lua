@@ -113,6 +113,7 @@ function V.Create()
         end
     end
     local driver=CreateFrame("Frame")
+    E.driver=driver
     driver:RegisterEvent("PLAYER_LEAVING_WORLD")
     driver:SetScript("OnEvent",function()
         hovered=nil

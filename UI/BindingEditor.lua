@@ -12,7 +12,7 @@ local function finite(value)
         and value == value and math.abs(value) < 100000
 end
 function E.Place()
-    if not E.frame or InCombatLockdown() or E.moving or E.customPosition then return end
+    if A.startupState == "failed" or not E.frame or InCombatLockdown() or E.moving or E.customPosition then return end
     local saved = A.db.editorPosition
     E.frame:ClearAllPoints()
     if type(saved) == "table" and finite(saved.x) and finite(saved.y) then
@@ -96,6 +96,7 @@ function E.Drop(id)
     E.Refresh()
 end
 function E.Open()
+    if A.startupState == "failed" then return end
     if InCombatLockdown() then return end
     if not E.frame then E.Create() end
     E.Cancel()

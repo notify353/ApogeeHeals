@@ -1,3 +1,8 @@
+## Unreleased - targeted startup hardening
+
+- Track pending/initializing/active/failed startup; stop partial UI and owned drivers on failure without clearing assignments or preferences.
+- Register the launcher only after successful startup; presentation failures do not disable healing. Recovery from startup failure requires reload.
+
 ## Unreleased - reset UI positions
 
 - Add shared position-only reset without changing bindings or gameplay settings.
