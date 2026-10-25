@@ -1,3 +1,8 @@
+## Unreleased - concise healing tooltip
+
+- Reduce the healing editor header tooltip to automatic versus assigned spell
+  rank behavior. No binding or gameplay changes.
+
 ## Unreleased - Classic bandage classification
 
 - Accept the ten standard Linen-through-Runecloth bandages when the client
