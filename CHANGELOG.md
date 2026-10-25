@@ -1,3 +1,10 @@
+## Unreleased - Classic bandage classification
+
+- Accept the ten standard Linen-through-Runecloth bandages when the client
+  reports generic consumable metadata. Keep dedicated bandage-category support.
+- Repair bag drops and the automatic Linen icon/action without accepting other
+  generic consumables or changing saved assignments and combat restrictions.
+
 ## Unreleased - local validation repair
 
 - Accept the required shared UI source dependency in the local test runner;

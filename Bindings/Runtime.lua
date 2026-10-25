@@ -21,6 +21,15 @@ local function validID(id)
     return A.Access.Readable(id) and type(id) == "number"
         and id > 0 and id < 2147483647 and id % 1 == 0
 end
+-- Traditional bandages can be generic consumables (subclass 0) on Classic.
+-- Do not accept the whole generic category or infer identity from localized text.
+local standardBandages = {
+    [1251]=true, [2581]=true, -- Linen, Heavy Linen
+    [3530]=true, [3531]=true, -- Wool, Heavy Wool
+    [6450]=true, [6451]=true, -- Silk, Heavy Silk
+    [8544]=true, [8545]=true, -- Mageweave, Heavy Mageweave
+    [14529]=true, [14530]=true, -- Runecloth, Heavy Runecloth
+}
 function B.ResolveItem(id)
     if not validID(id) then return nil, "Invalid bandage." end
     if not C_Item or type(C_Item.GetItemInfoInstant) ~= "function" then
@@ -30,8 +39,11 @@ function B.ResolveItem(id)
     if not ok or not A.Access.Readable(resolved, icon, class, subclass) then
         return nil, "Item information unavailable."
     end
-    if resolved ~= id or not Enum or not Enum.ItemClass or not Enum.ItemConsumableSubclass
-        or class ~= Enum.ItemClass.Consumable or subclass ~= Enum.ItemConsumableSubclass.Bandage then
+    local bandageSubclass = Enum and Enum.ItemConsumableSubclass and Enum.ItemConsumableSubclass.Bandage
+    local isBandage = (bandageSubclass ~= nil and subclass == bandageSubclass)
+        or (subclass == 0 and standardBandages[id] == true)
+    if resolved ~= id or not Enum or not Enum.ItemClass
+        or class ~= Enum.ItemClass.Consumable or not isBandage then
         return nil, "Choose a bandage from your bags."
     end
     local name = A.Access.Read(C_Item.GetItemNameByID, id)

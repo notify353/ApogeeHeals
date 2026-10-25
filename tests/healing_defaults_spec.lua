@@ -5,14 +5,15 @@ local era=os.getenv('APOGEE_HEALS_TEST_ERA')=='1'
 local function setup(class,known,saved)
     local m=Mock.New(); m.units.player.class=class
     Enum.SpellBookSpellBank={Player=0}
-    Enum.ItemClass={Consumable=0}; Enum.ItemConsumableSubclass={Bandage=7}
+    Enum.ItemClass={Consumable=0}; Enum.ItemConsumableSubclass={Generic=0,Bandage=7}
     C_Spell.GetSpellInfo=function(id) return {name='Heal '..id,iconID=123,spellID=id} end
     C_Spell.IsSpellHelpful=function() return true end
     C_Spell.IsSpellHarmful=function() return false end
     C_Spell.IsSpellPassive=function() return false end
     C_SpellBook={IsSpellKnown=function(id) return known[id]==true end,
         IsSpellInSpellBook=function(id) return known[id]==true end}
-    C_Item={GetItemInfoInstant=function(id) return id,'Consumable','Bandage','',123,0,7 end,
+    -- Traditional Era bandages are generic consumables, not subclass 7.
+    C_Item={GetItemInfoInstant=function(id) return id,'Consommable','Consommable','',123,0,0 end,
         GetItemNameByID=function() return 'Bandage' end}
     if era then
         WOW_PROJECT_ID=2; WOW_PROJECT_CLASSIC=2
@@ -84,6 +85,7 @@ for _,class in ipairs({'WARRIOR','ROGUE','HUNTER','MAGE','WARLOCK'}) do
     C_Item.GetItemCount=function() error('Default selection must not depend on stock') end
     a.Bindings.Apply(); checkBandage()
     a.BindingEditor.Open()
+    assert(a.BindingEditor.buttons['1'].icon.texture==123)
     local lines={}; GameTooltip.AddLine=function(_,line) lines[#lines+1]=line end
     a.BindingEditor.buttons['1'].scripts.OnEnter()
     assert(table.concat(lines,'\n'):find('Default: Linen Bandage.',1,true))
@@ -119,4 +121,30 @@ local m,a=setup('UNKNOWN',{})
 assert(a.View.rows[1].attributes.type1=='target')
 UnitClass=function() return 'Unknown',m.Secret() end
 a.Bindings.Apply(); assert(a.View.rows[1].attributes.type1=='target')
+-- Exercise the actual cursor/drop path for every standard bandage, with Era
+-- generic metadata and modern dedicated metadata. Never trust localized names.
+for _,subclass in ipairs({0,7}) do
+    local m,a=setup('WARRIOR',{})
+    a.BindingEditor.Open()
+    C_Item.GetItemInfoInstant=function(id) return id,'Localized','Localized','',456,0,subclass end
+    for _,id in ipairs({1251,2581,3530,3531,6450,6451,8544,8545,14529,14530}) do
+        m.cursor={'item',id,'item:'..id}
+        a.BindingEditor.buttons['1'].scripts.OnReceiveDrag()
+        assert(m.cursor==nil and a.db.bindings['1'].id==id)
+        assert(a.View.rows[1].attributes.type1=='item' and a.View.rows[1].attributes.item1=='item:'..id)
+    end
+    if subclass==0 then
+        -- An ordinary consumable must not overwrite the existing bandage.
+        m.cursor={'item',118,'item:118'}
+        a.BindingEditor.buttons['1'].scripts.OnReceiveDrag()
+        assert(m.cursor and a.db.bindings['1'].id==14530)
+        C_Item.GetItemInfoInstant=function() return 1251,'','', '',456,7,0 end
+        assert(not a.Bindings.ResolveItem(1251))
+        C_Item.GetItemInfoInstant=function() return 2581,'','', '',456,0,0 end
+        assert(not a.Bindings.ResolveItem(1251))
+    else
+        -- A dedicated bandage category still supports client-specific items.
+        assert(a.Bindings.Put('2',{kind='item',id=99999}))
+    end
+end
 print('PASS left-only defaults: four healing classes, five Linen Bandage classes, overrides/reload, no stock dependency, metadata recovery and combat deferral')

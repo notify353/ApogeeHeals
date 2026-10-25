@@ -1,3 +1,20 @@
+## Classic bandage classification correction (October 25, 2026)
+
+Owner native evidence: Linen default showed a question mark and "Choose a
+bandage from your bags"; bag drops produced the same rejection. The strict
+subclass-7 test excluded traditional bandages reported as generic consumables.
+ResolveItem now additionally recognizes ten standard bandage IDs only when
+the guarded returned ID matches, class is Consumable and subclass is 0. It still
+accepts dedicated Bandage-category items, including client-specific additions.
+No localized-name matching, broad consumable acceptance or new API is used.
+Fresh Era ItemDocumentation verifies GetItemInfoInstant's return order; the
+existing matching authority check verifies that reference. Item classification
+data is separate from enum availability. Previous mocks incorrectly modeled
+all standard bandages as subclass 7. Updated generated Era/future Forever tests
+exercise both classifications, real cursor/drop handlers, wrong IDs/classes,
+unrelated consumables, metadata recovery and existing combat deferral. Native
+use/retest remains user-owned; installed Forever beta remains unchanged.
+
 ## Linen Bandage default (October 25, 2026)
 
 The existing opt-in now supplies item 1251 on empty plain Left for Warrior,
