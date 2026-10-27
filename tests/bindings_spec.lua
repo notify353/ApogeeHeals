@@ -82,24 +82,17 @@ a2.View.SetUnlocked(true)
 for _, row in ipairs(a2.Preview.rows) do assert(not row.protected and row.attributes.type2 == nil) end
 print("PASS reload persistence, invalid storage filtering and inert preview")
 
-local minimap = a2.Minimap
-local click = minimap.button.scripts.OnClick
-assert(minimap.button.enabled and minimap.border.vertexColor[2] == 1)
-click(minimap.button, "LeftButton")
-assert(a2.BindingEditor.frame:IsShown() and minimap.border.vertexColor[2] == 0.8)
-click(minimap.button, "LeftButton")
-assert(not a2.BindingEditor.frame:IsShown() and minimap.border.vertexColor[2] == 1)
-a2.BindingEditor.Open(); a2.BindingEditor.frame:Hide()
-assert(minimap.border.vertexColor[2] == 1)
+local action = ApogeeUI.components.heals.actions[1]
+assert(not a2.Minimap.button)
+action.run(); assert(a2.BindingEditor.frame:IsShown() and action.checked())
+action.run()
+assert(not a2.BindingEditor.frame:IsShown() and not action.checked())
+a2.BindingEditor.Open(); a2.BindingEditor.frame:Hide(); assert(not action.checked())
 a2.BindingEditor.Open(); m2.combat = true; m2.Event("PLAYER_REGEN_DISABLED")
-assert(not minimap.button.enabled and not a2.BindingEditor.frame:IsShown())
-click(minimap.button, "LeftButton"); assert(not a2.BindingEditor.frame:IsShown())
-m2.combat = false; m2.Event("PLAYER_REGEN_ENABLED"); assert(minimap.button.enabled)
-local opened
-a2.Settings.category.GetID = function() return 123 end
-Settings.OpenToCategory = function(id) opened = id end
-click(minimap.button, "RightButton"); assert(opened == 123)
-print("PASS minimap toggle, settings shortcut, Escape state and combat lock")
+assert(not a2.BindingEditor.frame:IsShown())
+action.run(); assert(not a2.BindingEditor.frame:IsShown())
+m2.combat = false; m2.Event("PLAYER_REGEN_ENABLED")
+print("PASS launcher editor callback, Escape state and editor combat lock")
 
 local lm, la, learned = setup()
 assert(#la.Bindings.slots == 15)
@@ -156,24 +149,24 @@ print("PASS Priest class default, learned ranks, manual priority, removal and co
 local sm, sa, shieldKnown = setup({defaultSpells={enabled=true,time=1,serial=0}}, "PRIEST")
 assert(sa.View.rows[1].attributes.type2 == "")
 shieldKnown[17] = true; sm.Event("SPELLS_CHANGED")
-assert(sa.View.rows[1].attributes.spell2 == 17 and sa.db.bindings["2"] == nil)
+assert(sa.View.rows[1].attributes.type2 == "" and sa.db.bindings["2"] == nil)
 shieldKnown[592] = true; sm.Event("SPELLS_CHANGED")
-assert(sa.View.rows[1].attributes.spell2 == 592)
+assert(sa.View.rows[1].attributes.spell2 == nil)
 assert(sa.Bindings.Put("2", 2050))
 shieldKnown[10901] = true; sm.Event("SPELLS_CHANGED")
 assert(sa.View.rows[1].attributes.spell2 == 2050)
 assert(sa.Bindings.Put("2", nil))
 for _, row in ipairs(sa.View.rows) do
-    assert(row.attributes.spell2 == 10901 and row.attributes["shift-type2"] == "")
+    assert(row.attributes.spell2 == nil and row.attributes["shift-type2"] == "")
 end
 sa.BindingEditor.Open(); assert(not sa.BindingEditor.buttons["2"].remove.shown)
 sm.combat = true; shieldKnown[10901] = nil; sm.Event("SPELLS_CHANGED")
-assert(sa.View.rows[1].attributes.spell2 == 10901)
+assert(sa.View.rows[1].attributes.spell2 == nil)
 sm.combat = false; sm.Event("PLAYER_REGEN_ENABLED")
-assert(sa.View.rows[1].attributes.spell2 == 592)
+assert(sa.View.rows[1].attributes.spell2 == nil)
 sm.units.player.class = "MAGE"; sm.Event("SPELLS_CHANGED")
 assert(sa.View.rows[1].attributes.type2 == "")
-print("PASS Priest right-click shield default, rank upgrades, override priority and class isolation")
+print("PASS no automatic right-click shield; manual assignments remain supported")
 
 local hm, ha, holyKnown = setup({defaultSpells={enabled=true,time=1,serial=0}}, "PALADIN")
 assert(ha.View.rows[1].attributes.type1 == "target")
@@ -194,7 +187,8 @@ assert(ha.View.rows[1].attributes.spell1 == 25292)
 hm.combat = false; hm.Event("PLAYER_REGEN_ENABLED")
 assert(ha.View.rows[1].attributes.spell1 == 639)
 hm.units.player.class = "MAGE"; hm.Event("SPELLS_CHANGED")
-assert(ha.View.rows[1].attributes.type1 == "target")
+-- This fixture has no item metadata; the Mage's bandage default stays inactive.
+assert(ha.Bindings.Effective("1").id == 1251 and ha.View.rows[1].attributes.type1 == "")
 print("PASS Paladin Holy Light default, rank upgrades, manual priority, combat deferral and class isolation")
 
 -- Missing opt-in on an existing character must preserve custom slots exactly.

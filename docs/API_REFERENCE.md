@@ -1,3 +1,45 @@
+## Classic bandage classification correction (October 25, 2026)
+
+Owner native evidence: Linen default showed a question mark and "Choose a
+bandage from your bags"; bag drops produced the same rejection. The strict
+subclass-7 test excluded traditional bandages reported as generic consumables.
+ResolveItem now additionally recognizes ten standard bandage IDs only when
+the guarded returned ID matches, class is Consumable and subclass is 0. It still
+accepts dedicated Bandage-category items, including client-specific additions.
+No localized-name matching, broad consumable acceptance or new API is used.
+Fresh Era ItemDocumentation verifies GetItemInfoInstant's return order; the
+existing matching authority check verifies that reference. Item classification
+data is separate from enum availability. Previous mocks incorrectly modeled
+all standard bandages as subclass 7. Updated generated Era/future Forever tests
+exercise both classifications, real cursor/drop handlers, wrong IDs/classes,
+unrelated consumables, metadata recovery and existing combat deferral. Native
+use/retest remains user-owned; installed Forever beta remains unchanged.
+
+## Linen Bandage default (October 25, 2026)
+
+The existing opt-in now supplies item 1251 on empty plain Left for Warrior,
+Rogue, Hunter, Mage and Warlock. The shared private default resolver returns a
+spell ID or the existing item descriptor. Saved assignments win; defaults never
+write the binding table. Item metadata uses the existing guarded ResolveItem
+path and fixed-unit secure item action. Missing/restricted metadata leaves the
+action inactive until the existing item-info event refreshes it outside combat.
+Inventory and First Aid readiness remain native use requirements, not gates on
+the default's identity. No new API, item scan or protected action is introduced.
+Generated Era and future Forever coverage includes all five classes, overrides,
+reload, replenishment-independent selection, metadata recovery and combat deferral.
+
+## Left-only healing defaults (October 25, 2026)
+
+The shared opt-in default-spells policy now fills empty plain Left for Priest,
+Paladin, Druid and Shaman using their starting heal's highest learned listed
+rank. No right-click or modifier defaults. Bindings.Effective still checks saved
+assignments first, including unavailable spells; removing an assignment restores
+the class fallback. Manually assigned shields/bandages are preserved. Existing
+Resolve guards, exact ranks, fixed recipients and combat deferral remain intact.
+Era authority verifies the same spell/secure APIs; no new API is introduced.
+Generated Era and future Forever tests cover class defaults and saved overrides.
+Fresh Forever authority and native acceptance remain separate prerequisites.
+
 ## Target actions beside name (October 20)
 
 Three eight-unit icons sit in ten-unit-wide hit areas at the right of target
@@ -1396,3 +1438,55 @@ Addon-specific resets preserve this shared preference. Native acceptance pending
 October 17 placement correction: only Keybinds supplies the checkbox container,
 inside its feature settings page above the rule toggles. Heals still joins the
 shared preference without creating a control. No native layout lookup is needed.
+## Isolated Era threat debuffs (October 25, 2026)
+
+Fresh Classic Era 1.15.9.70003 authority: UnitAuraDocumentation defines
+C_UnitAuras.GetAuraDataByIndex(unit,index,filter) returning nullable AuraData.
+The fresh FrameXMLUtil.toc selects shared AuraUtil.lua plus Classic overrides.
+Its UnpackAuraData identifies applications, sourceUnit and spellId. The fresh
+Blizzard_UnitFrame_Classic.toc selects Classic/TargetFrame.lua, which enumerates
+HARMFUL with INCLUDE_NAME_PLATE_ONLY and displays application counts above one.
+Stale Vanilla/suffixed utility TOCs are not authority. The current Era export
+contains no CustomAuraContainerTemplate implementation; the former shared
+PrepareDebuffs guard silently created no live threat aura display on this path.
+
+The private Era adapter replaces only ThreatView.PrepareDebuffs and
+ThreatModel.PaintDebuffs. It reads at most 64 harmful auras plus an end probe
+per painted row, within the existing 0.1-second threat refresh. It uses the same
+Classic rank IDs as the unchanged Forever renderer, verifies readable source
+identity with UnitIsUnit(sourceUnit,player), and paints the existing fixed
+spell-family artwork. It never stores aura records or changes protected geometry.
+Only Sunder has stack text; one/zero are unnumbered and unreadable counts show ?
+only after effect/ownership confirmation. Failed/unreadable/truncated scans clear
+icons; blank is not a proven absence. Demo stays scripted, and normal lifecycle
+clears icons on removal, reuse, disable and zoning. No global replacement API.
+
+Source/generated Era tests reproduce the old missing icon and exercise rank,
+stack, ownership, public-data guards, scan bounds, partial failure and lifecycle.
+Generated checks execute the fresh native unpack helper under mocks. Default
+Forever tests continue to require native containers and prohibit Lua aura scans.
+This correction is scoped to the tank threat stack; native acceptance remains
+user-owned and does not establish broader Era aura-widget compatibility.
+## Isolated Era party aura correction (October 25, 2026)
+
+Era/PartyAuras.lua is loaded only by the central Era TOC before the private
+adapter and startup. Era 1.15.9.70003 lacks CustomAuraContainerTemplate. Archived APHB
+PartyFrames/Auras.lua and Reminders/CleanseData.lua use public harmful aura
+records and dispelName; current selected AuraUtil/TargetFrame sources confirm
+these fields. The new adapter uses HARMFUL scans (64 plus a terminating probe),
+shows the first eight icons, and matches all scanned dispel types against the
+shared learned cleanse spell definitions. It does not infer unknown absence.
+
+Eight fixed frames per support row and fixed cleanse border textures are created
+out of combat. Only alpha/texture/desaturation change during combat. Aura data
+never changes action attributes or recipient tokens. Mouse motion is enabled
+without mouse clicks, using SimpleScriptRegion's separate motion API; tooltip
+records are refreshed/cleared with the snapshot and hidden in combat. Fresh
+BuffFrame.toc/BuffFrame.lua select the same aura-instance tooltip method.
+
+The shared coalesced refresh updates artwork even when secure cleansing rebuilds
+are deferred. Target swaps clear immediately; leaving world clears and suspended
+refreshes cannot repaint. Shared Forever files/TOC are unchanged. Source and
+generated Era tests cover all player cleansing classes, non-cleansing warriors,
+restricted/failed/truncated reads, types beyond eight icons, secure combat guards,
+tooltips, preview, target replacement, death and world transitions.

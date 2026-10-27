@@ -14,7 +14,7 @@ C_Item={GetItemInfoInstant=function(id) return id,"Consumable","Bandage","",1,0,
 ApogeeHealsDB={defaultSpells={enabled=true,time=1,serial=0}}
 local a=m.Start();local targets={a.View.target,a.View.targetTarget}
 for _,row in ipairs(targets) do
-    assert(row.attributes.spell1==2050 and row.attributes.spell2==17) -- learned Priest defaults
+    assert(row.attributes.spell1==2050 and row.attributes.spell2==nil) -- left-only Priest default
     assert(row.attributes.type1=="macro" and #row.clicks==5)
 end
 for _,slot in ipairs(a.Bindings.slots) do assert(a.Bindings.Put(slot.id,2050)) end

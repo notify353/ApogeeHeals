@@ -23,7 +23,7 @@ test("live events never contaminate preview or persist sample data", function()
     m.Event("GROUP_ROSTER_UPDATE"); m.Flush()
     assert(a.Preview.rows[1].name.text == "Priest" and a.Preview.rows[1].health.value == 100)
     assert(a.View.rows[1].health.value == 10)
-    for key in pairs(a.db) do assert(key == "version" or key == "position" or key == "bindings" or key == "buffs" or key == "smartBuffs") end
+    for key in pairs(a.db) do assert(key == "version" or key == "position" or key == "bindings" or key == "buffs" or key == "smartBuffs" or key == "defaultSpells") end
     assert(next(a.db.bindings) == nil)
     a.View.SetUnlocked(false)
     assert(not a.Preview.root.shown and a.View.rows[1].alpha == 1)

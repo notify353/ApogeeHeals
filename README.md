@@ -1,3 +1,14 @@
+## Shared launcher candidate
+
+Requires matching Apogee UI shared support from the complete distribution.
+Left-click the green button to toggle available editors together: open all if
+any is closed, otherwise close all. Right-click for direct component settings
+and Reset minimap position; right-drag to save its position per character.
+Editors can still be closed independently through their existing controls.
+DEV/PROD and clients keep separate state. Component Defaults does not reset the
+launcher. New support folder requires a full game restart after installation.
+Forever remains source-only until matching fresh client validation.
+
 ## Simple health-bar range (October 20, 2026)
 
 The applied, unmodified left-click spell alone controls health-bar fading.
@@ -148,13 +159,16 @@ Pickup followed by clicking a slot also works. The selected spell ID/rank is kep
 hover to see its name and rank. Active helpful spells (including friendly buffs)
 are accepted; harmful and passive spells are rejected. New manual assignments start empty.
 
-Priests automatically get **Lesser Heal on plain Left** and **Power Word: Shield
-on plain Right**. Paladins get **Holy Light on plain Left**.
+With default spells enabled, empty plain Left uses Priest **Lesser Heal**,
+Paladin **Holy Light**, Druid **Healing Touch** or Shaman **Healing Wave**.
+Right-click and modifier slots have no automatic defaults.
 Each uses its highest learned rank. Defaults are
 class-specific and do not write saved assignments.
 Your manual spell always takes priority, even if it becomes unavailable. Removing
 the override restores the default. The default icon has no remove control; drop a
-spell onto it to override. Other classes and combinations have no defaults yet.
+spell or bandage onto it to override. Warrior, Rogue, Hunter, Mage and Warlock
+instead default to **Linen Bandage** on empty Left. It stays selected when you
+run out; carry Linen Bandages and meet the item's use requirements to use it.
 
 Drag a tile onto another to move or swap; dropping outside cancels. Use its small
 x to remove it. Escape or the minimap button closes the editor. Drag the header to move it

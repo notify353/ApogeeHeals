@@ -1,0 +1,39 @@
+## Interface: 11509
+## Title: Apogee Heals
+## IconTexture: Interface/AddOns/ApogeeHeals/Media/Textures/ApogeeLogo.png
+## Notes: Minimal five-player healing frames for Classic Era.
+## Author: notify353
+## Version: 0.1.0-dev
+## SavedVariablesPerCharacter: ApogeeHealsDB
+## Dependencies: ApogeeUI
+## X-Apogee-UI-API: 1
+
+Core/Access.lua
+Core/Client.lua
+Core/Storage.lua
+Bindings/Runtime.lua
+Bindings/Defaults.lua
+Buffs/Defaults.lua
+Buffs/Catalog.lua
+Buffs/Runtime.lua
+Buffs/Preferences.lua
+Buffs/View.lua
+Cleansing/Runtime.lua
+WeaponUpkeep/Runtime.lua
+UI/Style.lua
+Core/UnitAPI.lua
+Drinking/Runtime.lua
+IncomingHeals/View.lua
+PartyFrames/Preview.lua
+PartyFrames/View.lua
+UI/Settings.lua
+UI/BindingEditor.lua
+UI/Minimap.lua
+PartyFrames/Runtime.lua
+Threat/Model.lua
+Threat/View.lua
+Threat/Runtime.lua
+Threat/Diagnostics.lua
+Era/PartyAuras.lua
+Era/Adapter.lua
+ApogeeHeals.lua
