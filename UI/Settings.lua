@@ -65,40 +65,12 @@ end
 
 -- Each independent addon joins one family-local native settings parent.
 local function RegisterApogeeCategory(panel, label, standaloneTitle)
-    if type(Settings.RegisterCanvasLayoutSubcategory) ~= "function" then
-        return Settings.RegisterCanvasLayoutCategory(panel, standaloneTitle)
-    end
-    local registry = _G.ApogeeSettingsRegistry
-    if registry ~= nil and (type(registry) ~= "table" or registry.schema ~= 1
-        or type(registry.category) ~= "table" or type(registry.category.GetID) ~= "function"
-        or type(registry.children) ~= "table") then return nil end
-    if not registry then
-        local parentName = addonName:sub(-3) == "Dev" and "Apogee DEV" or "Apogee"
-        local overview = CreateFrame("Frame")
-        local background = overview:CreateTexture(nil, "BACKGROUND")
-        background:SetAllPoints(overview)
-        background:SetColorTexture(0.035, 0.035, 0.045, 0.96)
-        local title = overview:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-        title:SetPoint("TOPLEFT", 16, -16); title:SetText(parentName)
-        local description = overview:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        description:SetPoint("TOPLEFT", 16, -52)
-        description:SetPoint("TOPRIGHT", -16, -52)
-        description:SetJustifyH("LEFT"); description:SetTextColor(0.8, 0.8, 0.8)
-        description:SetText("Select an enabled addon's settings from the list on the left.")
-        local parent = Settings.RegisterCanvasLayoutCategory(overview, parentName)
-        Settings.RegisterAddOnCategory(parent)
-        registry = {schema = 1, category = parent, children = {}, overview = overview}
-        _G.ApogeeSettingsRegistry = registry
-    end
+    local ui = ApogeeUI
+    if type(ui) ~= "table" or ui.apiVersion ~= 1 then return nil end
+    local registry = ui.EnsureSettingsParent()
+    if not registry then return nil end
     JoinDefaultSpells(registry, function() return A.db end, function() A.Bindings.Apply() end)
-    local existing = registry.children[label]
-    if existing ~= nil then
-        if type(existing) == "table" and type(existing.GetID) == "function" then return existing end
-        return nil
-    end
-    local category = Settings.RegisterCanvasLayoutSubcategory(registry.category, panel, label)
-    registry.children[label] = category
-    return category
+    return ui.RegisterSettings("heals", panel, label)
 end
 
 local S = {}
@@ -106,11 +78,17 @@ A.Settings = S
 function S.ResetPositions()
     if InCombatLockdown() then return end
     A.View.Lock(); A.View.pendingPosition = nil
-    A.View.ResetPosition(); A.BindingEditor.ResetPosition(); A.Minimap.ResetPosition()
+    A.View.ResetPosition(); A.BindingEditor.ResetPosition()
     if A.ThreatView.root then A.ThreatView.ResetPosition() end
     S.Refresh()
 end
 function S.Refresh()
+    if A.startupState == "failed" then
+        for _, control in pairs({S.defaults,S.buffs,S.threat,S.threatDiagnostics,S.threatDemo}) do
+            pcall(control.SetEnabled,control,false)
+        end
+        return
+    end
     A.Minimap.Refresh()
     if not S.defaults then return end
     S.defaults:SetEnabled(not InCombatLockdown())

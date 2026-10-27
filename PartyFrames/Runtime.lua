@@ -100,7 +100,8 @@ function R.Start()
             A.View.ApplyPosition(); A.Settings.Refresh()
         elseif event == "GET_ITEM_INFO_RECEIVED" then
             if A.Access.Readable(unit) then
-                for _, assigned in pairs(A.db.bindings) do
+                for _, slot in ipairs(A.Bindings.slots) do
+                    local assigned = A.Bindings.Effective(slot.id)
                     if type(assigned) == "table" and assigned.kind == "item" and assigned.id == unit then
                         A.Bindings.Apply(); break
                     end

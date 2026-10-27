@@ -12,7 +12,7 @@ local function finite(value)
         and value == value and math.abs(value) < 100000
 end
 function E.Place()
-    if not E.frame or InCombatLockdown() or E.moving or E.customPosition then return end
+    if A.startupState == "failed" or not E.frame or InCombatLockdown() or E.moving or E.customPosition then return end
     local saved = A.db.editorPosition
     E.frame:ClearAllPoints()
     if type(saved) == "table" and finite(saved.x) and finite(saved.y) then
@@ -96,6 +96,7 @@ function E.Drop(id)
     E.Refresh()
 end
 function E.Open()
+    if A.startupState == "failed" then return end
     if InCombatLockdown() then return end
     if not E.frame then E.Create() end
     E.Cancel()
@@ -126,12 +127,8 @@ function E.Create()
     handle:SetScript("OnEnter", function()
         if InCombatLockdown() then return end
         GameTooltip:SetOwner(handle, "ANCHOR_RIGHT"); GameTooltip:SetText("Healing bindings")
-        GameTooltip:AddLine("Drag the header to move. Drop spells or bag bandages onto the tiles.", 0.8, 0.85, 0.9, true)
-        GameTooltip:AddLine("Columns: Left, Right, Middle, Mouse 4, Mouse 5.", 0.8, 0.85, 0.9, true)
-        GameTooltip:AddLine("Rows: plain, Shift (S-), Ctrl (C-). L = Left, R = Right, M = Middle.", 0.8, 0.85, 0.9, true)
-        GameTooltip:AddLine("Priest defaults: Left Lesser Heal, Right Power Word: Shield.", 0.8, 0.85, 0.9, true)
-        GameTooltip:AddLine("Without an assignment or learned default, plain Left targets.", 0.8, 0.85, 0.9, true)
-        GameTooltip:AddLine("Escape or the minimap button closes.", 0.8, 0.85, 0.9, true)
+        GameTooltip:AddLine("Default spells use their highest learned rank.", 0.8, 0.85, 0.9, true)
+        GameTooltip:AddLine("Spells you assign keep the rank you choose.", 0.8, 0.85, 0.9, true)
         GameTooltip:Show()
     end)
     handle:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -185,7 +182,9 @@ function E.Create()
             else GameTooltip:AddLine(reason or (id == "1" and "Empty: targets the clicked unit."
                 or "Empty: drop a learned healing spell or bandage.")) end
             if automatic then
-                GameTooltip:AddLine("Class default: highest learned rank. Drop a spell or bandage to override.", 0.8, 0.85, 0.9, true)
+                GameTooltip:AddLine(type(spell) == "table"
+                    and "Default: Linen Bandage. Carry bandages and meet their use requirements. Drop a spell or bandage to override."
+                    or "Class default: highest learned rank. Drop a spell or bandage to override.", 0.8, 0.85, 0.9, true)
             else
                 GameTooltip:AddLine("Drag to move or swap. Use x to restore the default.", 0.8, 0.85, 0.9, true)
             end

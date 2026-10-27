@@ -86,6 +86,8 @@ function V.RefreshPartyActions()
     end
 end
 local function createTargetActions(row)
+    -- Era has no native talent inspection; do not split Forever's shared strip.
+    if A.disableTargetActions then return end
     local strip = CreateFrame("Frame", nil, row.nameLayer)
     strip:SetSize(30, S.healthHeight)
     strip:SetPoint("RIGHT", row.health, "RIGHT", -1, 0)

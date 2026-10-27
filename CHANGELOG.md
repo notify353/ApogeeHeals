@@ -1,3 +1,66 @@
+## Unreleased - targeted startup hardening
+
+- Track pending/initializing/active/failed startup; stop partial UI and owned drivers on failure without clearing assignments or preferences.
+- Register the launcher only after successful startup; presentation failures do not disable healing. Recovery from startup failure requires reload.
+
+## Unreleased - reset UI positions
+
+- Add shared position-only reset without changing bindings or gameplay settings.
+
+## Unreleased - concise healing tooltip
+
+- Reduce the healing editor header tooltip to automatic versus assigned spell
+  rank behavior. No binding or gameplay changes.
+
+## Unreleased - Classic bandage classification
+
+- Accept the ten standard Linen-through-Runecloth bandages when the client
+  reports generic consumable metadata. Keep dedicated bandage-category support.
+- Repair bag drops and the automatic Linen icon/action without accepting other
+  generic consumables or changing saved assignments and combat restrictions.
+
+## Unreleased - local validation repair
+
+- Accept the required shared UI source dependency in the local test runner;
+  still reject missing, duplicate, cross-family or extra dependencies and wrong
+  launcher interface versions. No runtime or saved-data change.
+
+## Unreleased - Linen Bandage default
+
+- With defaults enabled, Warrior, Rogue, Hunter, Mage and Warlock get Linen
+  Bandage on empty Left. Manual spells/bandages override it; clearing restores it.
+- Keep the item selected without supplies; native item-use requirements apply.
+  No Right defaults, settings reset or change to the four healing-class defaults.
+
+## Unreleased - left-click healing defaults
+
+- Empty left-click defaults to the highest learned rank of Priest Lesser Heal,
+  Paladin Holy Light, Druid Healing Touch or Shaman Healing Wave when shared
+  default spells are enabled. No automatic right-click or modifier defaults.
+- Manual spells and bandages take priority; clearing restores the default.
+  Preserve manually assigned shields and update the editor's explanation.
+
+## Unreleased - combined minimap controls
+
+- Left-click toggles available editors together. Right-click lists component
+  settings directly and Reset minimap position. Keep saved position and combat guards.
+
+## Unreleased - shared Apogee launcher
+
+- Join the required Apogee UI support addon: one green launcher, independent
+  editor actions, shared settings and per-character position. No gameplay reset.
+- Era validation is separate; Forever source preparation awaits fresh authority.
+
+## Unreleased - Era party aura compatibility
+
+- Restore party/friendly-target debuff icons and learned cleansing highlights through a private Era reader. Preserve secure actions, fixed geometry and Forever runtime.
+- Add regressions for combat updates, all cleanse classes, unknown data, tooltips and lifecycle cleanup.
+
+# Unreleased - isolated Classic Era candidate
+
+- Add a separately selected Era adapter and TOC; default Forever loading and pins remain unchanged.
+- Era behavior is provisional until native acceptance; see Era/README.md.
+
 ## Unreleased - Target actions beside name
 
 - Place three eight-unit action icons inside the right end of target health, matching role-icon size and spacing. Reserve name space to avoid overlap.
@@ -425,3 +488,7 @@
 ## Defaults update
 
 - Provide one confirmed top-right Defaults control; consolidate reset controls and preserve combat safeguards.
+# Unreleased - Era live threat debuffs
+
+- Add an Era-only public-aura renderer for player-owned Sunder Armor, Thunder Clap and Demoralizing Shout, including Sunder stacks. Era has no native Forever aura-container widget.
+- Preserve stable threat rows, demo behavior and Forever rendering; fail closed on unreadable/failed scans and reuse fixed artwork without combat layout changes.
