@@ -66,7 +66,7 @@ end
 -- Each independent addon joins one family-local native settings parent.
 local function RegisterApogeeCategory(panel, label, standaloneTitle)
     local ui = ApogeeUI
-    if type(ui) ~= "table" or ui.apiVersion ~= 1 then return nil end
+    if type(ui) ~= "table" or type(ui.EnsureSettingsParent) ~= "function" or type(ui.RegisterSettings) ~= "function" then return nil end
     local registry = ui.EnsureSettingsParent()
     if not registry then return nil end
     JoinDefaultSpells(registry, function() return A.db end, function() A.Bindings.Apply() end)

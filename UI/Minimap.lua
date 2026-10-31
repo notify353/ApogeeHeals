@@ -1,6 +1,6 @@
 local _, A = ...
 local M = {}; A.Minimap = M
-local function service() return type(ApogeeUI) == "table" and ApogeeUI.apiVersion == 1 and ApogeeUI end
+local function service() return type(ApogeeUI) == "table" and type(ApogeeUI.RegisterComponent) == "function" and type(ApogeeUI.RefreshComponent) == "function" and type(ApogeeUI.UnregisterComponent) == "function" and ApogeeUI end
 function M.Refresh() local ui=service(); if ui then ui.RefreshComponent("heals") end end
 function M.StopDrag() end
 function M.ResetPosition() end -- Shared position is reset only from the launcher.

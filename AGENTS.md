@@ -1,5 +1,19 @@
 # Apogee Heals
 
+## Current runtime policy — 2026-10-31
+
+Owner policy supersedes earlier runtime version and package-verification gates:
+on Classic Era and Forever, in DEV and PROD, never disable an addon or feature
+solely because client/build/interface text, package versions, advertised API/schema
+revisions or legacy/unverified metadata differ. Select the native client adapter
+and check actual methods and data contracts. Preserve combat/protected-action,
+restricted-value, failed-initialization, incompatible saved-data and actual
+DEV/PROD ownership safeguards. Do not infer binding ownership from APHB metadata.
+Exact exports, immutable source pins and installer/release validation remain
+offline development/distribution requirements, not runtime expiry rules.
+Current policy implementation is coordinated by ApogeeForever's
+`distribution/RUNTIME_CAPABILITIES.md`; historical release bytes remain frozen.
+
 - Independent Forever-only addon; other Apogee repositories are read-only references.
 - Verify directory, branch, remotes and dirty state before changes. Preserve user work.
 - Read docs/API_REFERENCE.md and run scripts/check-wow-api-export.ps1 before API work.

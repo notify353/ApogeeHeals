@@ -17,7 +17,7 @@ for line in io.lines(prefix..(runtime and name..".toc" or name.."_Era.toc")) do
 end
 M.addon=A; M.Event("ADDON_LOADED",name); M.Flush()
 assert(A.db and #A.View.rows==5,"Era frames must start")
-assert(not A.View.targetActions,"No partial native inspection strip")
+assert(A.View.targetActions and #A.View.target.partyActions==3,"Era target actions use individual capabilities")
 M.cursor={"spell",3,"spell"}; assert(A.Bindings.Cursor()==2050)
 M.cursor={"spell",3,"pet"}; assert(A.Bindings.Cursor()==nil)
 M.cursor={"spell",4,"spell"}; assert(A.Bindings.Cursor()==nil)

@@ -59,10 +59,10 @@ friendly, player, selfTarget = true, true, false
 a.View.RefreshPartyActions(); assert(a.View.targetActions.content.shown)
 -- Movement alone refreshes the entire group using both native ranges.
 local function tick() a.Runtime.driver.scripts.OnUpdate(a.Runtime.driver, 0.2) end
-followRange = false; tick(); assert(not a.View.targetActions.content.shown)
-followRange, inspectRange = true, false; tick(); assert(not a.View.targetActions.content.shown)
+followRange = false; tick(); assert(a.View.targetActions.content.shown)
+followRange, inspectRange = true, false; tick(); assert(a.View.targetActions.content.shown)
 inspectRange = true; tick(); assert(a.View.targetActions.content.shown)
-inspectable = false; tick(); assert(not a.View.targetActions.content.shown)
+inspectable = false; tick(); assert(a.View.targetActions.content.shown)
 inspectable = true; inRange = m.Secret(); tick(); assert(not a.View.targetActions.content.shown)
 inRange = true; tick(); assert(a.View.targetActions.content.shown)
 assert(#calls == 0 and #requests == 0, "range polling never initiates actions")
@@ -111,4 +111,9 @@ m.Event("INSPECT_READY", guid); assert(#opened == 1, "gear inspection supersedes
 local count = #requests
 guid = m.Secret(); click(talents); assert(#requests == count)
 guid = "Party-Final"; inRange = false; click(talents); assert(#requests == count)
+inRange=true; PlayerSpellsUtil=nil; a.View.RefreshPartyActions()
+assert(a.View.targetActions.content.shown and follow.enabled and inspect.enabled and not talents.enabled,
+    "Unavailable talent API must not hide supported follow/inspect actions")
+local before=#calls; click(follow); click(inspect); click(talents)
+assert(#calls==before+2 and #requests==count)
 print("party_actions_spec: OK")
