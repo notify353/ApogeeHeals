@@ -73,8 +73,8 @@ function V.RefreshPartyActions()
     -- The native parent owns combat visibility; only ordinary content is toggled.
     if not InCombatLockdown() then
         local available = partyActionReason(row, false, true) == nil
-            and partyActionReason(row, true, true) == nil
-            and partyActionReason(row, true, true, true) == nil
+            or partyActionReason(row, true, true) == nil
+            or partyActionReason(row, true, true, true) == nil
         strip.content:SetShown(available)
     end
     for index, button in ipairs(row.partyActions) do
@@ -86,8 +86,7 @@ function V.RefreshPartyActions()
     end
 end
 local function createTargetActions(row)
-    -- Era has no native talent inspection; do not split Forever's shared strip.
-    if A.disableTargetActions then return end
+    -- Each action checks its native capabilities; no client-wide suppression.
     local strip = CreateFrame("Frame", nil, row.nameLayer)
     strip:SetSize(30, S.healthHeight)
     strip:SetPoint("RIGHT", row.health, "RIGHT", -1, 0)

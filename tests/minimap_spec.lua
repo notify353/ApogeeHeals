@@ -14,5 +14,7 @@ local action=registered.actions[1]; assert(action.label=="Healing bindings" and 
 action.run(); assert(open and action.checked()); action.run(); assert(not open)
 A.Minimap.Refresh(); assert(refreshes); A.Minimap.ResetPosition(); assert(not A.Minimap.button)
 A.started=false; assert(not registered.available()); A.Minimap.Unregister(); assert(removed)
-ApogeeUI.apiVersion=2; registered=nil; A.started=true; A.Minimap.Create(); assert(not registered)
+ApogeeUI.apiVersion=2; registered=nil; A.started=true; A.Minimap.Create(); assert(registered)
+ApogeeUI.apiVersion=nil; registered=nil; A.Minimap.Create(); assert(registered)
+ApogeeUI.RegisterComponent=nil; registered=nil; A.Minimap.Create(); assert(not registered)
 print("PASS Heals launcher registration, editor callback, deactivation and no private button")

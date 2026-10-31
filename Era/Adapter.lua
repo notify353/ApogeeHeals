@@ -1,7 +1,6 @@
 -- Selected only by the Era TOC, after shared modules and before startup.
 local _, A = ...
 if A.__ApogeeClient ~= "classic-era" then return end
-A.disableTargetActions = true
 function A.CheckClient()
     for _, name in ipairs({"issecretvalue", "canaccessvalue", "canaccesstable",
         "RegisterStateDriver", "InCombatLockdown", "UnitHealth", "UnitHealthMax",
