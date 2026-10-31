@@ -1,5 +1,3 @@
-## Classic bandage classification correction (October 25, 2026)
-
 ## Current runtime policy — 2026-10-31
 
 Owner policy supersedes earlier runtime version and package-verification gates:
@@ -13,6 +11,8 @@ Exact exports, immutable source pins and installer/release validation remain
 offline development/distribution requirements, not runtime expiry rules.
 Current policy implementation is coordinated by ApogeeForever's
 `distribution/RUNTIME_CAPABILITIES.md`; historical release bytes remain frozen.
+
+## Classic bandage classification correction (October 25, 2026)
 
 Owner native evidence: Linen default showed a question mark and "Choose a
 bandage from your bags"; bag drops produced the same rejection. The strict

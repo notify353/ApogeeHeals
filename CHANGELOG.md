@@ -1,6 +1,9 @@
 ## Unreleased
 
-- Apply capability-based runtime admission across Era/Forever and DEV/PROD; version and legacy-package labels no longer disable working features. - targeted startup hardening
+- Apply capability-based runtime admission across Era/Forever and DEV/PROD; version and legacy-package labels no longer disable working features.
+- Keep Follow/Inspect available independently when talent inspection or another action is unavailable; retain per-action range and combat checks.
+
+## Unreleased - targeted startup hardening
 
 - Track pending/initializing/active/failed startup; stop partial UI and owned drivers on failure without clearing assignments or preferences.
 - Register the launcher only after successful startup; presentation failures do not disable healing. Recovery from startup failure requires reload.
