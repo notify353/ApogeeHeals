@@ -230,7 +230,7 @@ local function buildRow(row, preview, first, width)
     row.name:SetSize(width - 22.5 - indicatorSpace, S.healthHeight)
     row.name:SetJustifyH("LEFT"); row.name:SetJustifyV("MIDDLE")
     row.name:SetShadowColor(0, 0, 0, 1); row.name:SetShadowOffset(1, -1)
-    row.status = S.Text(row.nameLayer, 8)
+    row.status = S.Text(row.nameLayer, (row.unit == "target" or row.unit == "targettarget") and 6 or 8)
     row.status:SetPoint("CENTER", row.health, "CENTER", -indicatorSpace / 2, 0)
     row.status:SetSize(width - 8 - indicatorSpace, S.healthHeight)
     row.status:SetJustifyH("CENTER"); row.status:SetJustifyV("MIDDLE")
@@ -338,6 +338,12 @@ function V.Create()
         local row = CreateFrame("Button", nil, V.root, "SecureActionButtonTemplate")
         row.unit = unit
         buildRow(row, false, false, S.targetWidth)
+        -- The status shares the name area, never the secure action icons.
+        row.targetNameWidth = row.name:GetWidth()
+        row.status:ClearAllPoints()
+        row.status:SetPoint("RIGHT", row.health, "RIGHT", unit == "target" and -36 or -4, 0)
+        row.status:SetSize(26, S.healthHeight)
+        row.status:SetJustifyH("RIGHT")
         row:RegisterForClicks("LeftButtonUp")
         row:SetAttribute("useOnKeyDown", false)
         row:SetAttribute("unit", unit); row:SetAttribute("type1", "target")
@@ -428,6 +434,14 @@ function V.PaintRange(row, state)
     row.health:SetAlpha(result == false and 0.45 or 1)
     row:SetAlpha(V.unlocked and 0 or 1)
     local showName = state ~= "missing" and state ~= "dead" and state ~= "offline"
+    if row.targetNameWidth then
+        -- A selected corpse still has an identity. Only text regions change;
+        -- secure row geometry and fixed-unit attributes stay untouched.
+        showName = state ~= "missing"
+        local status = state == "dead" and "DEAD" or state == "offline" and "OFFLINE" or ""
+        row.status:SetText(status)
+        row.name:SetSize(row.targetNameWidth - (status ~= "" and 30 or 0), S.healthHeight)
+    end
     row.name:SetShown(showName); row.level:SetShown(showName)
 end
 function V.RefreshRange()
@@ -439,9 +453,11 @@ function V.RefreshRange()
 end
 local function refreshTargetRow(row)
     A.UnitAPI.PaintTargetIdentity(row)
+    local state = A.UnitAPI.State(row.unit)
+    V.PaintRange(row, state)
     -- Unknown/restricted state must not prevent native health/power display.
-    if A.Access.Read(UnitExists, row.unit) == false then
-        if row.cast then V.ClearTargetCast() end
+    if A.Access.Read(UnitExists, row.unit) == false or state == "dead" or state == "offline" then
+        if row.cast then row.cast:SetAlpha(0) end
         A.UnitAPI.Clear(row.health); A.UnitAPI.ClearRowPower(row)
         A.IncomingHeals.Clear(row.incoming)
         return

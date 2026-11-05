@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Keep dead target and target-of-target names visible, label DEAD/OFFLINE, and clear stale health, power and cast artwork.
+
 - Apply capability-based runtime admission across Era/Forever and DEV/PROD; version and legacy-package labels no longer disable working features. - targeted startup hardening
 
 - Track pending/initializing/active/failed startup; stop partial UI and owned drivers on failure without clearing assignments or preferences.
