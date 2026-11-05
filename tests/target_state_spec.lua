@@ -6,6 +6,7 @@ for _, unit in ipairs({"target", "targettarget"}) do
     m.units[unit] = {name="Long Selected Creature Name", health=80, maxHealth=100,
         power=50, maxPower=100, kind=0, level=6, connected=true, dead=false, auras={}}
     m.Event("UNIT_HEALTH", unit)
+    a.View.RefreshRange()
     assert(row.name.shown and row.level.shown and (row.status.text or "") == "")
     assert(row.health.value == 80 and row.power.value == 50)
     m.combat = true
