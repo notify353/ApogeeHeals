@@ -1,5 +1,9 @@
 ## Unreleased
 
+- Recognize the centrally reviewed Forever70790 build without a stale warning; retain warnings on unreviewed builds and required API checks.
+
+- Keep dead target and target-of-target names visible, label DEAD/OFFLINE, and clear stale health, power and cast artwork.
+
 - Apply capability-based runtime admission across Era/Forever and DEV/PROD; version and legacy-package labels no longer disable working features.
 - Keep Follow/Inspect available independently when talent inspection or another action is unavailable; retain per-action range and combat checks.
 

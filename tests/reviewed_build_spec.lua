@@ -9,6 +9,8 @@ local messages={}; local originalPrint=print
 print=function(message) messages[#messages+1]=message end
 local A={}; assert(loadfile("Core/Client.lua"))("ApogeeHeals",A)
 assert(A.CheckClient() and #messages==0,"Reviewed build must not produce an unreviewed-build warning")
+build="70790"
+assert(A.CheckClient() and #messages==0,"Current live reviewed build must be quiet")
 build=tostring(tonumber(build)+1)
 assert(A.CheckClient() and #messages==1,"An unreviewed build must still warn and use capability checks")
 canaccessvalue=nil
