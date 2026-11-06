@@ -1,3 +1,12 @@
+## Reviewed live build warning (November 6, 2026)
+
+Central distribution verified the matching Forever1.60.1.70790 executable/export
+and all244 references. Recognize70790 alongside the retained historical70450
+review for startup warnings; newer unreviewed builds still warn and use capability
+checks. No gameplay API or runtime admission changes. Central generated-family
+checks compare startup silence with the current live lock, including future-build
+warnings and missing-method rejection. This does not claim native acceptance.
+
 ## Classic bandage classification correction (October 25, 2026)
 
 ## Current runtime policy — 2026-10-31
