@@ -1,5 +1,3 @@
-## Shared launcher candidate
-
 ## Current runtime policy — 2026-10-31
 
 Owner policy supersedes earlier runtime version and package-verification gates:
@@ -13,6 +11,8 @@ Exact exports, immutable source pins and installer/release validation remain
 offline development/distribution requirements, not runtime expiry rules.
 Current policy implementation is coordinated by ApogeeForever's
 `distribution/RUNTIME_CAPABILITIES.md`; historical release bytes remain frozen.
+
+## Shared launcher candidate
 
 Requires matching Apogee UI shared support from the complete distribution.
 Left-click the green button to toggle available editors together: open all if
