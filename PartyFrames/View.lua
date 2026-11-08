@@ -280,10 +280,10 @@ local function buildRow(row, preview, first, width)
     if not preview then row:SetHitRectInsets(S.classStripHitWidth, 0, 0, 0) end
     row.health = bar(row, S.healthHeight, 0, width)
     row.incoming = A.IncomingHeals.Create(row.health, preview, width)
-    -- A separate text layer stays above both the health fill and incoming heals.
+    -- Text stays above health, incoming heals and the absorb overlay.
     row.nameLayer = CreateFrame("Frame", nil, row.health)
     row.nameLayer:SetAllPoints(row.health)
-    row.nameLayer:SetFrameLevel(row.incoming.bar:GetFrameLevel() + 1)
+    row.nameLayer:SetFrameLevel(row.incoming.bar:GetFrameLevel() + 2)
     row.nameLayer:EnableMouse(false)
     local indicatorSpace = row.unit == "target" and 32 or 0
     if preview or row.unit == "player" or row.unit:match("^party%d$") then

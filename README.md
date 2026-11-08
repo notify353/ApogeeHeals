@@ -50,6 +50,12 @@ the appearance in game; full live acceptance remains pending. Not released. Clas
 
 ## Prototype
 
+- Pale-blue striped shield overlays show remaining damage absorption from all
+  casters on friendly health bars. Width uses maximum health as its scale. The
+  segment follows the health edge when it fits; otherwise it draws inward from
+  the right edge, remaining visible at full health. Amounts above maximum health
+  fill the bar. Names, white HoT strips and normal healing clicks remain visible.
+
 - Select another friendly player to show a compact Follow, Inspect and Talents
   group inside the right end of the target health bar. Three role-sized icons brighten on hover; tooltips name each action.
   The target name reserves space for the icons. It disappears in combat, while moving frames and while loading.

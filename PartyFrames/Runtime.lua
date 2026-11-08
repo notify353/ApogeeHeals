@@ -38,7 +38,7 @@ function R.Start()
         "UNIT_SPELLCAST_CHANNEL_START", "UNIT_SPELLCAST_CHANNEL_UPDATE", "UNIT_SPELLCAST_CHANNEL_STOP",
         "UNIT_AURA", "PLAYER_DEAD", "PLAYER_ALIVE", "PLAYER_UNGHOST",
         "UNIT_SPELLCAST_SUCCEEDED", "PLAYER_LEAVING_WORLD",
-        "UNIT_HEAL_PREDICTION", "UNIT_HEAL_ABSORB_AMOUNT_CHANGED",
+        "UNIT_HEAL_PREDICTION", "UNIT_HEAL_ABSORB_AMOUNT_CHANGED", "UNIT_ABSORB_AMOUNT_CHANGED",
         "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "SPELLS_CHANGED", "SPELL_TEXT_UPDATE",
         "UI_SCALE_CHANGED", "DISPLAY_SIZE_CHANGED", "GET_ITEM_INFO_RECEIVED",
         "UPDATE_SHAPESHIFT_FORM", "UPDATE_SHAPESHIFT_FORMS", "PLAYER_ROLES_ASSIGNED" }) do driver:RegisterEvent(event) end
@@ -77,7 +77,10 @@ function R.Start()
             A.View.RefreshPartyActions()
             for _, row in ipairs(A.View.rows) do
                 A.Drinking.Clear(row); row.leader:Hide(); row.roleIcon:Hide()
+                A.IncomingHeals.Clear(row.incoming)
             end
+            A.IncomingHeals.Clear(A.View.target.incoming)
+            A.IncomingHeals.Clear(A.View.targetTarget.incoming)
             A.View.ClearTargetCast()
             A.Buffs.suspended = true
             A.Buffs.Stop()

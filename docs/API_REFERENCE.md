@@ -1,3 +1,30 @@
+## Shield overlay review (November 8, 2026)
+
+Fresh Forever70862 authority exposes the prediction calculator in Environment All.
+GetTotalDamageAbsorbs supplies total remaining shields from every caster, independent
+of incoming heals and heal-absorb debuffs. MissingHealthWithoutIncomingHeals and the
+second GetDamageAbsorbs return choose overflow placement through the public frame
+SetAlphaFromBoolean sink (AllowedWhenTainted, secret Alpha aspect). Two fixed bars
+share the health maximum; the forward one anchors to the native health fill edge,
+and the reverse one to the health frame right edge. Only one is visible. When the
+whole shield exceeds missing health it shifts inward; no secret arithmetic,
+comparison, boolean branch, dimension read, dynamic anchor or frame relocation is
+performed. Native status bars cap shields larger than maximum health at full width.
+
+Shield artwork uses Blizzard's tiled Interface/RaidFrame/Shield-Overlay texture,
+as referenced in Shared/StatusBarOverlaySegment.xml, over pale-blue translucent fill.
+SimpleTextureBaseAPIDocumentation supplies its tiling setters. Artwork is above
+incoming healing but below names and white HoT strips, with mouse input disabled.
+Incoming healing has independent failure handling. UNIT_ABSORB_AMOUNT_CHANGED is
+coalesced with health/max-health events; death, offline, absent units, failed samples,
+hostile targets and zoning clear shields. Friendly target aliases are rechecked.
+No new protected action, setting, runtime path or saved-data key is introduced.
+
+Tests cover live-state transitions, fixed geometry, secret sinks, optional API
+absence and generated families. Public export contracts are checked separately;
+mock geometry and source contracts do not prove C++ clipping or native combat taint.
+Owner in-game rendering and interaction acceptance remains pending.
+
 ## Fresh timer and cleanse review (November 8, 2026)
 
 After the owner confirmed the timer renders, they requested larger digits without
