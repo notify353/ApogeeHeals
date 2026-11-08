@@ -1608,6 +1608,19 @@ exclusion; native tooltip population and secure release dispatch are executed.
 These tests do not simulate native restricted-frame hit testing or establish
 taint/tooltip/click-through acceptance on 70862. User reload and in-game testing
 remain required; current export review is explicitly deferred.
+
+The follow-up bug sweep reproduced preview-to-combat loss of cleanse bindings:
+preview cleared attributes, then automatic locking could not restore them under
+combat lockdown. Fixed slots now preserve learned actions during preview and
+configure the native gate as [combat,@unit,help,nodead] show; hide before combat.
+The gate hides preview input out of combat and restores it through trusted state
+evaluation when combat starts. Native icon activity resumes through the existing
+auto-lock path; normal gate conditions return after combat. A failing regression
+was added before the fix and passes after it. The sweep reproduced the same
+loss when zoning out of combat and entering the next world in combat. Temporary
+world suspension now uses the same gate and preserves learned actions; native
+displays stay disabled during suspension. Failed initialization remains distinct:
+it clears actions outside combat, hides the gate and stops native displays.
 ## Isolated Era party aura correction (October 25, 2026)
 
 Era/PartyAuras.lua is loaded only by the central Era TOC before the private

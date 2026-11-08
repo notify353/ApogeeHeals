@@ -87,6 +87,7 @@ local function createFixed(row)
     end
     local icons, highlights = container(), container()
     row.fixedDebuffs, row.cleanseButtons = true, {}
+    row.fixedDebuffGate = gate
     row.debuffContainer, row.cleanseIndicator = icons, highlights
     row.cleanseSlotCount = 5
     row.drinkIcon:ClearAllPoints()
@@ -242,6 +243,13 @@ function P.Refresh()
     local hasGlow, hasFixed = false, false
     for _, row in ipairs(A.View.supportRows or A.View.rows) do
         if row.fixedDebuffs then
+            -- Preview or loading may end after combat lockdown begins. Keep learned
+            -- actions bound and let the preconfigured native gate reveal them;
+            -- addon code cannot restore cleared spell attributes in combat.
+            local condition = (A.View.unlocked or A.Runtime.suspended) and "[combat,@" or "[@"
+            local failed = A.startupState == "failed"
+            RegisterStateDriver(row.fixedDebuffGate, "visibility", failed and "hide"
+                or condition .. row.unit .. ",help,nodead] show; hide")
             for index, button in ipairs(row.cleanseButtons) do
                 local kind, result = dispelTypes[index]
                 for spellIndex, spell in ipairs(spells or {}) do
@@ -249,7 +257,7 @@ function P.Refresh()
                         result = resolved[spellIndex]; break
                     end
                 end
-                local enabled = result ~= nil and not A.View.unlocked and not A.Runtime.suspended
+                local enabled = result ~= nil and not failed
                 button.spell = enabled and result.id or nil
                 button:SetAttribute("type1", enabled and "spell" or "")
                 button:SetAttribute("spell1", button.spell)

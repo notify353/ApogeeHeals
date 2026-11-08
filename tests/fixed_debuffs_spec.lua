@@ -119,7 +119,10 @@ for class, expected in pairs(cases) do
     a.View.SetUnlocked(true)
     for _,row in ipairs(a.View.supportRows) do
         assert(not row.debuffContainer.enabled and not row.cleanseIndicator.enabled)
-        for _,button in ipairs(row.cleanseButtons) do assert(button.driver=="hide" and not button.spell) end
+        assert(row.fixedDebuffGate.driver=="[combat,@"..row.unit..",help,nodead] show; hide")
+        for index,button in ipairs(row.cleanseButtons) do
+            assert(button.spell==(expected[index] or nil))
+        end
     end
     a.View.SetUnlocked(false)
     local reads=m.auraReads
@@ -139,16 +142,45 @@ for class, expected in pairs(cases) do
     m.Event("PLAYER_LEAVING_WORLD"); m.Flush()
     for _,row in ipairs(a.View.supportRows) do
         assert(not row.debuffContainer.enabled and not row.cleanseIndicator.enabled)
-        for _,button in ipairs(row.cleanseButtons) do assert(not button.spell) end
+        assert(row.fixedDebuffGate.driver=="[combat,@"..row.unit..",help,nodead] show; hide")
+        for i,id in ipairs(fallback[class] or {false,false,false,false}) do
+            assert(row.cleanseButtons[i].spell==(id or nil))
+        end
     end
     m.Event("PLAYER_ENTERING_WORLD"); m.Flush()
     assert(a.View.target.debuffContainer.enabled and a.View.target.cleanseIndicator.enabled)
+end
+-- Auto-locking preview at combat entry must not leave cleanses unbound until
+-- combat ends. Only the native visibility gate changes availability in preview.
+local previewMock,previewAddon=fixture("PRIEST")
+previewAddon.View.SetUnlocked(true)
+previewMock.combat=true; previewMock.Event("PLAYER_REGEN_DISABLED"); previewMock.Flush()
+assert(not previewAddon.View.unlocked)
+for _,row in ipairs(previewAddon.View.supportRows) do
+    assert(row.cleanseButtons[1].spell==988, "combat entry from preview lost cleanse binding")
+    assert(row.cleanseButtons[1].driver=="show")
+    assert(row.fixedDebuffGate.driver=="[combat,@"..row.unit..",help,nodead] show; hide")
+    assert(row.debuffContainer.enabled and row.cleanseIndicator.enabled)
+end
+previewMock.combat=false; previewMock.Event("PLAYER_REGEN_ENABLED"); previewMock.Flush()
+for _,row in ipairs(previewAddon.View.supportRows) do
+    assert(row.fixedDebuffGate.driver=="[@"..row.unit..",help,nodead] show; hide")
 end
 local _,failed=fixture("PRIEST",{fail=true})
 for _,row in ipairs(failed.View.supportRows) do
     assert(not row.debuffContainer.enabled and not row.cleanseIndicator.enabled)
     for _,button in ipairs(row.cleanseButtons) do assert(not button.spell) end
 end
+local zoneMock,zoneAddon=fixture("PRIEST")
+zoneMock.Event("PLAYER_LEAVING_WORLD"); zoneMock.Flush()
+zoneMock.combat=true; zoneMock.Event("PLAYER_ENTERING_WORLD"); zoneMock.Flush()
+for _,row in ipairs(zoneAddon.View.supportRows) do
+    assert(row.cleanseButtons[1].spell==988, "combat world entry lost cleanse binding")
+    assert(row.fixedDebuffGate.driver=="[combat,@"..row.unit..",help,nodead] show; hide")
+    assert(row.debuffContainer.enabled and row.cleanseIndicator.enabled)
+end
+zoneMock.combat=false; zoneMock.Event("PLAYER_REGEN_ENABLED"); zoneMock.Flush()
+assert(zoneAddon.View.target.fixedDebuffGate.driver=="[@target,help,nodead] show; hide")
 local _,fallback=fixture("PRIEST",{noSort=true})
 assert(not fallback.View.target.fixedDebuffs and #fallback.View.target.cleanseButtons==3)
 print("PASS fixed type slots, native hover/click separation, learned ranks, empty/Other slots, lifecycle, combat deferral and capability fallback")
@@ -188,3 +220,29 @@ for _,instance in ipairs(instances) do
     end
 end
 print("PASS retained-export fixed type action exact-recipient/rank release dispatch")
+
+-- The engine parses conditions; execute its real visibility resolver with a
+-- small condition fixture to verify preview/combat, hostile and dead gating.
+file=assert(io.open(root.."/Blizzard_RestrictedAddOnEnvironment/SecureStateDriver.lua","rb"))
+source=file:read("*a"):gsub("\r\n","\n"); file:close()
+local combat,helpful,dead=false,true,false
+env.SecureCmdOptionParse=function(expression)
+    local preview,unit=expression:match("^%[(combat,)@(%w+),help,nodead%] show; hide$")
+    if not unit then unit=expression:match("^%[@(%w+),help,nodead%] show; hide$") end
+    assert(unit)
+    return (not preview or combat) and helpful and not dead and "show" or "hide"
+end
+local resolver=execute(definition("resolveDriver").."\nreturn resolveDriver")
+local visibility={Show=function(self) self.shown=true end,Hide=function(self) self.shown=false end,
+    SetAttribute=function() end}
+for _,row in ipairs(previewAddon.View.supportRows) do
+    local driver="[combat,@"..row.unit..",help,nodead] show; hide"
+    combat,helpful,dead=false,true,false
+    resolver(visibility,"state-visibility",driver); assert(not visibility.shown)
+    combat=true; resolver(visibility,"state-visibility",driver); assert(visibility.shown)
+    helpful=false; resolver(visibility,"state-visibility",driver); assert(not visibility.shown)
+    helpful,dead=true,true; resolver(visibility,"state-visibility",driver); assert(not visibility.shown)
+    combat,dead=false,false
+    resolver(visibility,"state-visibility",row.fixedDebuffGate.driver); assert(visibility.shown)
+end
+print("PASS retained-export preview/combat visibility resolver with friendly/living conditions")
