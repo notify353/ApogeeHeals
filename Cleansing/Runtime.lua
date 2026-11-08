@@ -2,7 +2,8 @@ local _, A = ...
 local P = { pending = true }
 A.Cleansing = P
 -- Candidate IDs only: every action still requires a learned player-book spell.
--- Cure/Abolish are separate choices; only ranks of the same action collapse.
+-- Fixed type slots prefer the first learned action below, then its highest rank.
+-- The legacy/Era renderer keeps Cure/Abolish as separate choices.
 -- Felhunter is deferred: native type="pet" passes a fixed unit, but action is
 -- a mutable pet-bar slot. It has no expected-spell-ID guard at click time;
 -- an out-of-combat Devour Magic lookup cannot establish combat slot identity.
@@ -52,8 +53,142 @@ function P.HideTooltip()
     if P.tooltip and GameTooltip:IsOwned(P.tooltip) then GameTooltip:Hide() end
     P.tooltip = nil
 end
+-- Permanent action positions; native slots alone select and display aura data.
+local dispelTypes = {"Magic", "Disease", "Poison", "Curse"}
+local allDispelTypes = {Magic=true, Disease=true, Poison=true, Curse=true}
+local timerFormatter
+local function countdownFormatter()
+    if timerFormatter then return timerFormatter end
+    if not C_StringUtil or type(C_StringUtil.CreateNumericRuleFormatter) ~= "function"
+        or not Enum or not Enum.NumericRuleFormatRounding then return end
+    local formatter = C_StringUtil.CreateNumericRuleFormatter()
+    if type(formatter.SetBreakpoints) ~= "function" then return end
+    -- Native formatting samples remaining time, including crossing the minute
+    -- boundary. No secret duration or rendered text is inspected by addon Lua.
+    formatter:SetBreakpoints({
+        {threshold=0, step=1, rounding=Enum.NumericRuleFormatRounding.Up, min=1, format="%.0f"},
+        {threshold=60, format=""},
+    })
+    timerFormatter = formatter
+    return formatter
+end
+local function supportsSlots(container)
+    for _, method in ipairs({"AddAuraSlot", "SetAuraSlotCandidateFilters", "SetUnit", "SetEnabled"}) do
+        if type(container[method]) ~= "function" then return false end
+    end
+    return true
+end
+local function createFixed(row)
+    if A.__ApogeeClient == "classic-era" then return false end
+    local sort = AuraContainerSortMethod and AuraContainerSortMethod.AuraInstanceIDOnly
+    local direction = AuraContainerSortDirection and AuraContainerSortDirection.Reverse
+    local info = A.Access.Read(C_XMLUtil and C_XMLUtil.GetTemplateInfo, "CustomAuraContainerTemplate")
+    if not info or not A.Access.Readable(info.type) or info.type ~= "AuraContainer"
+        or not A.Access.Readable(sort) or type(sort) ~= "number"
+        or not A.Access.Readable(direction) or type(direction) ~= "number"
+        or type(row.SetMouseMotionEnabled) ~= "function" then return false end
+    local size, gap = A.Style.sideIconSize, A.Style.sideIconGap
+    local width = 5 * size + 4 * gap
+    local gate = CreateFrame("Frame", nil, row.supportFrame or row, "SecureHandlerStateTemplate")
+    gate:SetSize(width, size)
+    gate:SetPoint("TOPLEFT", row.health, "TOPRIGHT", gap, A.Style.sideIconY)
+    gate:EnableMouse(false)
+    local level = A.Access.Read(row.health.GetFrameLevel, row.health)
+    if type(level) ~= "number" or level < 0 or level >= 10000 or level % 1 ~= 0 then level = 1 end
+    local function container()
+        local result = CreateFrame("AuraContainer", nil, gate, "CustomAuraContainerTemplate")
+        -- The mixin definitions live in Blizzard's secure Lua environment.
+        -- Check the public inbound methods on the actual object instead.
+        if not supportsSlots(result) then return nil end
+        result:SetAllPoints(gate); result:SetSize(width, size)
+        result:EnableMouse(false); result:SetUnit(row.unit)
+        return result
+    end
+    local icons, highlights = container(), container()
+    if not icons or not highlights then gate:Hide(); return false end
+    RegisterStateDriver(gate, "visibility", "[@" .. row.unit .. ",help,nodead] show; hide")
+    row.fixedDebuffs, row.cleanseButtons = true, {}
+    row.fixedDebuffGate = gate
+    row.debuffContainer, row.cleanseIndicator = icons, highlights
+    row.cleanseSlotCount = 5
+    row.drinkIcon:ClearAllPoints()
+    row.drinkIcon:SetPoint("TOPLEFT", row.health, "TOPRIGHT", gap + 5 * (size + gap), A.Style.sideIconY)
+    for index = 1, 5 do
+        local kind = dispelTypes[index] or "Other"
+        local x = (index - 1) * (size + gap)
+        local function place(frame, layer)
+            frame:SetSize(size, size); frame:SetFrameLevel(level + layer)
+            frame:SetPoint("TOPLEFT", gate, "TOPLEFT", x, 0)
+            frame:EnableMouse(false); frame:SetCancelAuraButtons(nil)
+        end
+        icons:AddAuraSlot(kind, "HARMFUL", {
+            sortMethod=sort, sortDirection=direction,
+            candidateFilters=index <= 4 and {includeDispelTypes={[kind]=true}}
+                or {excludeDispelTypes=allDispelTypes},
+            initializeFrame=function(frame)
+                place(frame, 5)
+                -- Hover belongs to the intrinsic aura tooltip; clicks hit the
+                -- ordinary secure sibling below. No propagation or custom scripts.
+                frame:SetMouseMotionEnabled(true)
+                frame:SetTooltipAnchorPoint("ANCHOR_RIGHT")
+                frame:SetHideTooltipInCombat(false)
+                local background = frame:CreateTexture(nil, "BACKGROUND")
+                background:SetAllPoints(frame); background:SetColorTexture(0.15, 0.15, 0.15, 1)
+                local icon = frame:CreateTexture(nil, "ARTWORK")
+                icon:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
+                icon:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1)
+                icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+                frame:SetIcon(icon)
+                if type(frame.SetDurationText) == "function" and C_AuraContainerUtil
+                    and type(C_AuraContainerUtil.ProcessCustomAuraButtonDurationTextOptions) == "function" then
+                    local formatter = countdownFormatter()
+                    if formatter then
+                        local remaining = A.Style.CleanText(frame, 10)
+                        local font = remaining:GetFont()
+                        remaining:SetFont(font, 10, "OUTLINE")
+                        remaining:SetPoint("CENTER", frame, "CENTER", 0, 0)
+                        remaining:SetSize(size - 3, 12)
+                        remaining:SetJustifyH("CENTER")
+                        remaining:SetShadowColor(0, 0, 0, 1)
+                        remaining:SetShadowOffset(0.5, -0.5)
+                        frame:SetDurationText(remaining, {textFormatter=formatter})
+                    end
+                end
+            end,
+        })
+        if index <= 4 then
+            local button = CreateFrame("Button", nil, gate, "SecureActionButtonTemplate")
+            button:SetSize(size, size); button:SetFrameLevel(level + 4)
+            button:SetPoint("TOPLEFT", gate, "TOPLEFT", x, 0)
+            button:SetAttribute("unit", row.unit); button:SetAttribute("useOnKeyDown", false)
+            button:RegisterForClicks("LeftButtonUp")
+            for _, prefix in ipairs({"shift-", "ctrl-", "ctrl-shift-", "alt-", "alt-shift-", "alt-ctrl-", "alt-ctrl-shift-"}) do
+                button:SetAttribute(prefix .. "type1", "")
+            end
+            row.cleanseButtons[index] = button
+            highlights:AddAuraSlot(kind, "HARMFUL", {
+                sortMethod=sort, sortDirection=direction,
+                candidateFilters={includeDispelTypes={}},
+                initializeFrame=function(frame)
+                    place(frame, 6)
+                    -- Only four edges: a full background here would cover the icon.
+                    for _, edge in ipairs({"TOP", "BOTTOM", "LEFT", "RIGHT"}) do
+                        local texture = frame:CreateTexture(nil, "OVERLAY")
+                        texture:SetColorTexture(1, 0.75, 0.1, 1)
+                        texture:SetPoint(edge, frame, edge, 0, 0)
+                        texture:SetSize((edge == "TOP" or edge == "BOTTOM") and size or 1,
+                            (edge == "LEFT" or edge == "RIGHT") and size or 1)
+                    end
+                end,
+            })
+        end
+    end
+    icons:SetEnabled(true); highlights:SetEnabled(true)
+    return true
+end
 function P.Create(row)
     if InCombatLockdown() or row.cleanseButtons then return end
+    if createFixed(row) then return end
     local spells = classSpells()
     if not spells then return end
     local size, gap, offset = A.Style.sideIconSize, A.Style.sideIconGap, A.Style.sideIconGap
@@ -65,6 +200,9 @@ function P.Create(row)
     local container
     if info and A.Access.Readable(info.type) and info.type == "AuraContainer" then
         container = CreateFrame("AuraContainer", nil, row.supportFrame or row, "CustomAuraContainerTemplate")
+        if not supportsSlots(container) then container:Hide(); container = nil end
+    end
+    if container then
         container:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset, A.Style.sideIconY)
         container:SetSize(#spells * size + (#spells - 1) * gap, size)
         container:SetUnit(row.unit)
@@ -141,9 +279,33 @@ function P.Refresh()
             end
         end
     end
-    local hasGlow = false
+    local hasGlow, hasFixed = false, false
     for _, row in ipairs(A.View.supportRows or A.View.rows) do
-        if row.cleanseButtons then
+        if row.fixedDebuffs then
+            -- Preview or loading may end after combat lockdown begins. Keep learned
+            -- actions bound and let the preconfigured native gate reveal them;
+            -- addon code cannot restore cleared spell attributes in combat.
+            local condition = (A.View.unlocked or A.Runtime.suspended) and "[combat,@" or "[@"
+            local failed = A.startupState == "failed"
+            RegisterStateDriver(row.fixedDebuffGate, "visibility", failed and "hide"
+                or condition .. row.unit .. ",help,nodead] show; hide")
+            for index, button in ipairs(row.cleanseButtons) do
+                local kind, result = dispelTypes[index]
+                for spellIndex, spell in ipairs(spells or {}) do
+                    if spell.types[kind] and resolved[spellIndex] then
+                        result = resolved[spellIndex]; break
+                    end
+                end
+                local enabled = result ~= nil and not failed
+                button.spell = enabled and result.id or nil
+                button:SetAttribute("type1", enabled and "spell" or "")
+                button:SetAttribute("spell1", button.spell)
+                RegisterStateDriver(button, "visibility", enabled and "show" or "hide")
+                row.cleanseIndicator:SetAuraSlotCandidateFilters(kind,
+                    {includeDispelTypes=enabled and {[kind]=true} or {}})
+            end
+            hasGlow, hasFixed = true, true
+        elseif row.cleanseButtons then
             for index, button in ipairs(row.cleanseButtons) do
                 local spell = row.cleanseSpells[index]
                 local result = row.cleanseSpells == spells and resolved[index] or nil
@@ -163,8 +325,20 @@ function P.Refresh()
         end
     end
     if not spells then P.status = "No supported player-cast cleansing actions for this class."
-    elseif not hasAction then P.status = "Learn a class cleansing spell to show cleansing buttons."
+    elseif not hasAction then P.status = "Learn a class cleansing spell to enable cleansing."
+    elseif hasFixed then P.status = "Matching debuff borders highlight; left-click to cleanse."
     elseif hasGlow then P.status = "Cleansing buttons glow for matching debuff types."
     else P.status = "Cleansing buttons available; native glow unavailable." end
     if A.Settings and A.Settings.cleanseStatus then A.Settings.cleanseStatus:SetText(P.status) end
+end
+function P.RefreshActivity()
+    local enabled = not A.Runtime.suspended and not A.View.unlocked
+    for _, row in ipairs(A.View.supportRows or {}) do
+        if row.fixedDebuffs then
+            row.debuffContainer:SetEnabled(enabled)
+            row.cleanseIndicator:SetEnabled(enabled)
+        end
+    end
+    P.pending = true
+    P.Refresh()
 end

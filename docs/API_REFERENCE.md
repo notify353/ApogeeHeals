@@ -1,3 +1,90 @@
+## Final-minute buff reminders (November 8, 2026)
+
+Own-buff expiry reminders now use one shared60-second window instead of120.
+Exactly60 seconds remains covered; below60 the reminder appears with a rounded-up
+seconds-only countdown. Font10 centered white outlined text matches the debuff
+style. Manual recipient expansion retains spell choices but leaves timers blank
+at60 seconds or more. Missing buffs remain actionable without a timer. Other
+casters, unknown timing, permanent buffs, combat and recipient rules are unchanged.
+This is public out-of-combat timing; no new API or secret-value arithmetic.
+
+## Shield overlay review (November 8, 2026)
+
+Fresh Forever70862 authority exposes the prediction calculator in Environment All.
+GetTotalDamageAbsorbs supplies total remaining shields from every caster, independent
+of incoming heals and heal-absorb debuffs. MissingHealthWithoutIncomingHeals and the
+second GetDamageAbsorbs return choose overflow placement through the public frame
+SetAlphaFromBoolean sink (AllowedWhenTainted, secret Alpha aspect). Two fixed bars
+share the health maximum; the forward one anchors to the native health fill edge,
+and the reverse one to the health frame right edge. Only one is visible. When the
+whole shield exceeds missing health it shifts inward; no secret arithmetic,
+comparison, boolean branch, dimension read, dynamic anchor or frame relocation is
+performed. Native status bars cap shields larger than maximum health at full width.
+
+Shield artwork uses Blizzard's tiled Interface/RaidFrame/Shield-Overlay texture,
+as referenced in Shared/StatusBarOverlaySegment.xml, over pale-blue translucent fill.
+SimpleTextureBaseAPIDocumentation supplies its tiling setters. Artwork is above
+incoming healing but below names and white HoT strips, with mouse input disabled.
+Incoming healing has independent failure handling. UNIT_ABSORB_AMOUNT_CHANGED is
+coalesced with health/max-health events; death, offline, absent units, failed samples,
+hostile targets and zoning clear shields. Friendly target aliases are rechecked.
+No new protected action, setting, runtime path or saved-data key is introduced.
+
+Tests cover live-state transitions, fixed geometry, secret sinks, optional API
+absence and generated families. Public export contracts are checked separately;
+mock geometry and source contracts do not prove C++ clipping or native combat taint.
+Owner in-game rendering and interaction acceptance remains pending.
+
+## Fresh timer and cleanse review (November 8, 2026)
+
+After the owner confirmed the timer renders, they requested larger digits without
+the seconds suffix and no timer for effects above60 seconds remaining. The label
+now uses10-unit centered Number12Font with a white outline/shadow. A cached native
+C_StringUtil.CreateNumericRuleFormatter supplies two public configuration rules:
+threshold0 uses step1, Up rounding, minimum1 and %.0f; threshold60 uses an empty
+format. The native duration binding samples remaining duration and applies these
+rules, including transitions into/out of the final minute; addon Lua neither
+reads duration nor formats secret values. At exactly60 the label is blank; just
+below60 it displays60, then descends to1. The icon always remains visible.
+
+Fresh70862 StringUtilDocumentation, NumericRuleFormatterAPIDocumentation and
+NumericRuleFormatterSharedDocumentation (already in central authority) expose
+the factory and SetBreakpoints in Environment All. Zero numeric specifiers are
+permitted for the blank rule. Native SetDurationText accepts textFormatter and
+assigns it after its default formatter. Fixtures model documented public rule
+semantics at/below/above60, fractional rounding and refresh into a long duration;
+exported native Lua verifies custom formatter handoff. C++ formatted output and
+new typography still require owner native acceptance. Existing private-mixin
+namespace regression and public object capability checks remain in force.
+
+Live screenshot follow-up: a red legacy debuff icon remained without a timer.
+The fixed renderer incorrectly required CustomAuraContainerSharedMixin,
+CustomAuraButtonSharedMixin and AuraButtonSharedMixin as addon globals. The
+exported Blizzard_AuraContainer.toc uses UseSecureEnvironment:1 for these Lua
+definitions; XML alone loads globally and exposes inbound object methods through
+public partitions. Shared sort enums are explicitly copied to _G, but the mixins
+are not. This made the renderer silently fall back before creating its timer.
+The fixture had incorrectly exposed those private mixins, masking the failure.
+
+The corrected fixture reproduces the failure with private globals absent; the
+fix checks AddAuraSlot/SetAuraSlotCandidateFilters/SetUnit/SetEnabled on actual
+container objects. Missing public methods hide the unused gate and retain the
+capability fallback. Native-source tests now verify TOC environments, explicit
+enum exports and XML public inbound partitions. Prior successful byte/mock
+checks did not establish live rendering; this correction still requires reload
+and native timer/hover/click acceptance from the owner.
+
+The owner exported current Forever1.60.1.70862. All244 previously tracked
+references are fresh and byte-identical to70790; central authority adds the
+reviewed aura-slot implementation, duration-options documentation and priority
+table implementation for247 references. Active wowf metadata, executable version
+and export freshness agree. Native duration text, permanent/replacement handling,
+fixed slots, mouse motion, tooltip and secure release contracts remain compatible.
+Source and generated timer/cleanse regressions use this fresh export. No timer
+adaptation was needed; recognize70862 for Heals startup warnings while preserving
+capability checks and future-build warnings. This supersedes the API deferral for
+the new DEV candidate; native in-game timing/taint acceptance remains separate.
+
 ## Reviewed live build warning (November 6, 2026)
 
 Central distribution verified the matching Forever1.60.1.70790 executable/export
@@ -320,6 +407,77 @@ implement the native macro parser or reproduce server range/line-of-sight failur
 Owner acceptance must verify both clicks with Auto Self Cast enabled, blocked and
 out-of-range party recipients, and normal party/self healing.
 
+## Own primary HoT duration strip (2026-11-07)
+
+Owner requested only their own HoTs and explicitly deferred refreshing the export.
+The installed Forever client is now 1.60.1.70862; the existing 70790 export predates
+the executable. The following is an existing-source contract review, not a fresh
+70862 authority check or native acceptance. Export metadata is not advanced.
+
+Blizzard_CustomAuraContainer accepts includeSpellIDs for helpful auras on friendly
+units. Blizzard_AuraContainerUtil rejects unfilterable identities; HELPFUL|PLAYER
+is forwarded unchanged to native filtering. Classic Renew/Rejuvenation and Forever Riptide rank IDs
+select the player's class family. CustomAuraButton SetDurationBar binds a child
+StatusBar; native ApplyDurationBar passes its opaque duration to SetTimerDuration
+with RemainingTime. The addon never reads aura records, native slot visibility,
+timer state or restricted quantities, and does not calculate remaining time.
+
+Seven precreated fixed-unit containers each have one mouse-disabled slot. A native
+help/nodead visibility gate covers friendliness/death; each slot's native aura
+visibility handles expiry/removal. White artwork overlays the bottom 1.5 logical
+pixels of health to the right of the class rail. Power, cast strips and protected
+healing actions retain their geometry. Target changes and roster changes explicitly
+refresh native recipients; targettarget reuses its existing 0.2-second alias poll.
+Preview, world suspension and startup failure disable containers; combat does not.
+Missing actual native capabilities omit this optional display, including current
+Era. Source and exported-function mocks do not establish engine permission, live
+rank coverage, timer rendering or updated-client compatibility.
+
+November 7 class expansion adds Shaman Riptide ranks 1/2/3 (408521,1239242,
+1239243). Blizzard's [November 2 class notes](https://us.forums.blizzard.com/en/wow/t/2360696)
+confirm Riptide is a HoT. Spell-data records identify the actual aura ranks:
+[rank 1](https://wow-forever.gg/db/spells/408521-riptide/),
+[rank 2](https://wow-forever.gg/db/spells/1239242-riptide/),
+[rank 3](https://wow-forever.gg/db/spells/1239243-riptide/).
+This is a spell-identity update, not an API/export review. Do not use Retail
+Riptide IDs, the NPC spell 22419 or the rune wrapper 409954. Paladin Oath of Light
+enhances subsequent heals and Light's Vigil triggers a subsequent Holy Shock;
+neither is periodic healing. Regrowth/Wild Growth were initially excluded and
+are added by the November 8 follow-up below. Pet channels,
+totem pulses and passive self-heals remain outside the primary party-HoT scope.
+The owner's white-bar confirmation applies to the earlier observed behavior;
+new Shaman coverage still requires native testing. No timer/filter API changed.
+
+### Separate Druid HoTs (2026-11-08)
+
+Owner requested Regrowth and Wild Growth as separate white bars. Each of seven
+fixed recipients now has three independently filtered native containers for
+Druids (21 total), sharing one help/nodead visibility gate per recipient. Other
+classes retain one container per recipient. The native methods are unchanged;
+the same historical export/explicit deferral applies. No aura/timer reads or
+dynamic protected layout were added. All lanes refresh on target/targettarget
+changes and roster updates, and disable on preview, world exit or startup failure.
+
+Rejuvenation, Regrowth, Wild Growth occupy fixed bottom-to-top lanes even when
+an intervening aura is absent. Each Druid line is 0.5 logical units high with a
+0.5-unit gap: a 2.5-unit stack inside the 14-unit health area, below centered
+8-unit artwork and 6-unit names. At the normal 2x row scale this is three 1px
+white lines separated by 1px gaps. Single-HoT classes retain their 1.5-unit line.
+No frame/text/icon/power/cast geometry changes. Actual rasterization and visual
+clarity at the owner's UI scale still require native testing.
+
+[Regrowth spell-data ranks](https://wow-forever.gg/db/spells/8936-regrowth/):
+8936,8938,8939,8940,8941,9750,9856,9857,9858. The countdown represents its HoT,
+not its initial direct heal. [Wild Growth rank 1](https://wow-forever.gg/db/spells/408120-wild-growth/),
+[rank 2](https://wow-forever.gg/db/spells/1238214-wild-growth/) and
+[rank 3](https://wow-forever.gg/db/spells/1238215-wild-growth/) use
+408120,1238214,1238215. Exclude NPC/other-client Regrowth copies, Wild Growth
+rune wrapper409810 and Retail48438. Native aura presence on each recipient
+determines Wild Growth coverage; never infer it from the cast target or party.
+Source/generated tests cover ranks, fixed separated geometry, every recipient,
+all-lane refresh/suspension, independent native duration refresh/removal and white
+color. Mocks do not establish live Druid acceptance.
+
 ## Exclusive class-strip input (October 12)
 
 Reviewed matching 70338 SimpleFrame SetHitRectInsets and SimpleScriptRegion
@@ -386,13 +544,13 @@ Rechecked matching 70338 BuffFrame.lua: expirationTime minus GetTime is remainin
 time; duration/expiration zero denotes untimed coverage. The existing guarded
 HELPFUL scan is unchanged. Duration and expiration must both be public finite
 positive numbers before arithmetic. Unknown/secret/invalid timing retains coverage
-and has no timer. Known remaining time below 120 seconds stops suppressing upkeep
+and has no timer. Known remaining time below 60 seconds stops suppressing upkeep
 choices. Equivalent higher ranks/group variants and any-caster coverage remain;
 other long-lived copies still suppress early reminders. Timer identity is scoped
 to matching spell/name or blessing/catalog variant, never an unrelated choice.
 One shared one-second refresh handles threshold crossings without aura events;
 it performs no aura work in combat, preview or world suspension. Timers use the
-existing native FontString display with public m:ss strings and clear on Stop.
+existing native FontString display with public rounded-up seconds-only strings and clear on Stop.
 This supersedes the original absence-only policy below. No saved state or secure
 action changes. Native readability, appearance and taint acceptance remain pending.
 
@@ -1490,6 +1648,79 @@ Generated checks execute the fresh native unpack helper under mocks. Default
 Forever tests continue to require native containers and prohibit Lua aura scans.
 This correction is scoped to the tank threat stack; native acceptance remains
 user-owned and does not establish broader Era aura-widget compatibility.
+
+## Fixed debuff categories (November 8, 2026)
+
+The owner accepted fixed type positions with one representative icon and asked
+to install DEV while deferring the export refresh. Implementation uses retained
+Forever 1.60.1.70790 contracts, not a claimed review of active 1.60.1.70862.
+No export/build evidence is advanced. The Era renderer remains unchanged.
+
+Blizzard_AuraContainerShared.lua exposes AuraContainerSortMethod.AuraInstanceIDOnly
+and AuraContainerSortDirection.Reverse. Blizzard_AuraContainerUtil.lua maps this
+to AuraUtil.AuraInstanceIDOnlyAuraCompare, swapping arguments for reverse order.
+Blizzard_FrameXMLUtil/AuraUtil.lua compares instance IDs; this is not an API
+guarantee of application time, refresh time or severity. AddAuraSlot uses the
+trusted priority table and chooses one candidate. Removal exposes the next
+highest ID; refreshing the same instance does not change its position.
+
+Five permanent slots use HARMFUL: includeDispelTypes for Magic, Disease, Poison,
+Curse, then excludeDispelTypes for Other (including untyped Weakened Soul).
+Four matching native highlight slots use identical sorting and type filters,
+enabled only for publicly verified learned player spells. Spell selection is
+fixed outside combat: first learned class candidate, highest rank within it.
+Cure/Purify precedes Abolish/Cleanse for Disease/Poison; Magic uses Dispel Magic
+or Cleanse. Other has no secure button. Highlights express type capability,
+not range, resources, immunity, cooldown or guaranteed removal of that icon.
+
+SimpleScriptRegion documents EnableMouse and SetMouseMotionEnabled separately.
+During native frame initialization only, icons disable mouse input then enable
+motion for intrinsic OnEnter/OnLeave and the native aura tooltip; clicks hit an
+ordinary secure sibling below. Gold edge-only native visuals above are entirely
+mouse-disabled. SetTooltipAnchorPoint, SetHideTooltipInCombat(false), SetIcon and
+SetCancelAuraButtons(nil) are inbound configuration. No native aura frame is
+retained, queried, scripted, used as an anchor for a secure action, or composed
+with SecureActionButtonTemplate. AlwaysPropagateInput remains forbidden and no
+propagation call is used. Secure buttons retain exact row units, release-only
+left clicks and blank modified actions. A fixed friendly/living state gate owns
+visibility; preview/world/startup cleanup disables native displays. Learned
+actions cannot depend on secret icon visibility, so blank slots can still cast.
+
+Source/generated fixtures cover all classes, six recipients, independent slot
+geometry, layer/input configuration, unknown spells, rank changes, combat
+deferral, target replacement, preview, world transitions and initialization
+failure. Retained exported priority-table/slot/comparator/filter implementations
+verify newest-instance selection, same-ID refresh, removal/clear and Other
+exclusion; native tooltip population and secure release dispatch are executed.
+These tests do not simulate native restricted-frame hit testing or establish
+taint/tooltip/click-through acceptance on 70862. User reload and in-game testing
+remain required; current export review is explicitly deferred.
+
+The follow-up bug sweep reproduced preview-to-combat loss of cleanse bindings:
+preview cleared attributes, then automatic locking could not restore them under
+combat lockdown. Fixed slots now preserve learned actions during preview and
+configure the native gate as [combat,@unit,help,nodead] show; hide before combat.
+The gate hides preview input out of combat and restores it through trusted state
+evaluation when combat starts. Native icon activity resumes through the existing
+auto-lock path; normal gate conditions return after combat. A failing regression
+was added before the fix and passes after it. The sweep reproduced the same
+loss when zoning out of combat and entering the next world in combat. Temporary
+world suspension now uses the same gate and preserves learned actions; native
+displays stay disabled during suspension. Failed initialization remains distinct:
+it clears actions outside combat, hides the gate and stops native displays.
+
+November 8 countdown follow-up: each fixed icon initializes a white, outlined
+7-unit FontString inside its lower edge, then hands it to SetDurationText with
+default options. CustomAuraButtonSharedMixin:SetDurationText validates its child
+FontString, adds Text/Alpha/VertexColor secret aspects and binds the native aura
+duration. The default formatter uses one abbreviated unit (seconds/minutes/etc.).
+CustomAuraButtonPrivateMixin:ApplyDurationText reassigns the duration and enables
+the binding only for nonzero duration objects, hiding permanent-effect text.
+No Lua timer, duration read, text read or extra mouse surface is introduced.
+Missing SetDurationText/options-processing capability omits only the timer.
+Retained70790 native binding/formatter contracts and source/generated fixtures
+cover initialization, timed/permanent/replacement behavior and preserved input;
+the owner's active70862 export deferral and separate native acceptance remain.
 ## Isolated Era party aura correction (October 25, 2026)
 
 Era/PartyAuras.lua is loaded only by the central Era TOC before the private

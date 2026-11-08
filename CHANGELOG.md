@@ -1,5 +1,20 @@
 ## Unreleased
 
+- Show automatic expiring-buff reminders only in their final minute, with large
+  centered seconds-only countdowns matching the debuff style.
+
+- Show pale-blue striped total-absorb overlays on friendly health frames, with
+  native full-health overflow placement and immediate shield-consumption updates.
+
+- Give Druids separate white Rejuvenation, Regrowth and Wild Growth countdowns
+  in fixed rows inside each friendly health bar, showing only their own casts.
+  Keep the existing frame size, names, power and cast bars.
+
+- Show your own Renew/Rejuvenation/Riptide duration as a thin white health-bar strip on
+  friendly self, party and both target frames when native aura timers are available.
+  Riptide includes all three Forever ranks; only your own casts are selected.
+  Export refresh for the updated client was deferred; native acceptance is pending.
+
 - Recognize the centrally reviewed Forever70790 build without a stale warning; retain warnings on unreviewed builds and required API checks.
 
 - Keep dead target and target-of-target names visible, label DEAD/OFFLINE, and clear stale health, power and cast artwork.

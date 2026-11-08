@@ -1,5 +1,5 @@
 local _, A = ...
-local B = { candidates = {}, limit = 32 }
+local B = { candidates = {}, limit = 32, reminderWindow = 60 }
 A.Buffs = B
 function B.OnCast(unit, id)
     if InCombatLockdown() or not A.Access.Readable(unit, id) or unit ~= "player"
@@ -74,7 +74,7 @@ function B.Coverage(auras)
     local result = {}
     for _, aura in ipairs(auras) do
         local remaining = B.Remaining(aura)
-        if not B.OwnApplication(aura) or not remaining or remaining >= 120 then result[#result + 1] = aura end
+        if not B.OwnApplication(aura) or not remaining or remaining >= B.reminderWindow then result[#result + 1] = aura end
     end
     return result
 end

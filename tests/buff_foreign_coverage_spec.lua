@@ -23,7 +23,7 @@ for _,unit in ipairs({"player","party1","target"}) do
     for _,id in ipairs({19740,19834,25782,25916,999999}) do
         local aura={spellId=id,name="Might",duration=300,expirationTime=159,sourceUnit="party2"}
         m.units[unit].auras={aura};a.Buffs.Refresh()
-        assert(not offered(row,"might") and not offered(row,"wisdom"), "Foreign blessing remains coverage below two minutes")
+        assert(not offered(row,"might") and not offered(row,"wisdom"), "Foreign blessing remains coverage below one minute")
         row.buffStrip.scripts.OnClick(nil,"LeftButton",false)
         assert(not offered(row,"might") and offered(row,"wisdom"), "Manual alternatives must not offer a protected same-family replacement")
         local first=row.blessingButtons[1]
