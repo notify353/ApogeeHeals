@@ -77,3 +77,45 @@ local intrinsic=read("Blizzard_AuraContainer/Blizzard_AuraButton.xml")
 assert(intrinsic:find('method="OnEnter_Intrinsic"',1,true))
 assert(intrinsic:find('aspect="AlwaysPropagateInput"',1,true))
 print("PASS retained-export newest-instance priority, refresh/removal fallback, disjoint type filters and native aura tooltip")
+
+-- The native binding, not addon polling or arithmetic, owns countdown text.
+local custom=read("Blizzard_AuraContainer/Blizzard_CustomAuraButton.lua")
+env.CustomAuraButtonSharedMixin={}; env.CustomAuraButtonPrivateMixin={}
+env.Enum={SecretAspect={Text=1,Alpha=2,VertexColor=3}}
+env.securecopy=function(value) assert(value==nil); return value end
+env.C_AuraContainerUtil={ProcessCustomAuraButtonDurationTextOptions=function(value)
+    assert(value==nil); return {}
+end}
+env.AuraContainerUtil.RequireObjectType=function(kind) assert(kind=="FontString"); return kind end
+env.AuraContainerUtil.ValidateInboundScriptObject=function(font,parent,kind)
+    assert(font.parent==parent and kind=="FontString")
+end
+env.AuraContainerUtil.InitializeInboundScriptObject=function(font) return font end
+local formatter={}
+env.addonTable={DefaultAuraDurationFormatter=formatter}
+env.PackDisplayElement=function(value) return value end
+execute(definition(custom,"CustomAuraButtonSharedMixin:SetDurationText"))
+execute(definition(custom,"CustomAuraButtonPrivateMixin:ApplyDurationText"))
+local binding={SetToDefaults=function(self) self.defaults=true end,
+    SetFormatter=function(self,value) self.formatter=value end,
+    SetFontString=function(self,value) self.font=value end,
+    SetDuration=function(self,value) self.duration=value end,
+    SetEnabled=function(self,value) self.enabled=value end}
+local frame={GetDurationTextBinding=function() return binding end,
+    GetAuraDuration=function() return nil end,UpdateAuraDisplay=function(self) self.updated=true end}
+local font={parent=frame,aspects={},AddSecretAspect=function(self,value) self.aspects[value]=true end}
+env.CustomAuraButtonSharedMixin.SetDurationText(frame,font,nil)
+assert(frame.durationText==font and frame.updated and binding.font==font)
+assert(binding.defaults and binding.formatter==formatter and font.aspects[1] and font.aspects[2] and font.aspects[3])
+local timed={IsZero=function() return false end}
+local permanent={IsZero=function() return true end}
+env.CustomAuraButtonPrivateMixin.ApplyDurationText(frame,"party1",{},timed)
+assert(binding.duration==timed and binding.enabled)
+env.CustomAuraButtonPrivateMixin.ApplyDurationText(frame,"party1",{},permanent)
+assert(binding.duration==permanent and not binding.enabled)
+local replacement={IsZero=function() return false end}
+env.CustomAuraButtonPrivateMixin.ApplyDurationText(frame,"party1",{},replacement)
+assert(binding.duration==replacement and binding.enabled)
+assert(shared:find("DefaultAuraDurationFormatter:SetDesiredUnitCount(1)",1,true))
+assert(shared:find("DefaultAuraDurationFormatter:SetDefaultAbbreviation(Enum.SecondsFormatterAbbreviation.OneLetter)",1,true))
+print("PASS native duration text binding, compact formatter, timed/permanent/replacement lifecycle and restricted text aspects")

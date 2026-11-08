@@ -118,6 +118,20 @@ local function createFixed(row)
                 icon:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -1, 1)
                 icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
                 frame:SetIcon(icon)
+                if type(frame.SetDurationText) == "function" and C_AuraContainerUtil
+                    and type(C_AuraContainerUtil.ProcessCustomAuraButtonDurationTextOptions) == "function" then
+                    local remaining = A.Style.CleanText(frame, 7)
+                    local font = remaining:GetFont()
+                    remaining:SetFont(font, 7, "OUTLINE")
+                    remaining:SetPoint("BOTTOM", frame, "BOTTOM", 0, 1.5)
+                    remaining:SetSize(size - 3, 8)
+                    remaining:SetJustifyH("CENTER")
+                    remaining:SetShadowColor(0, 0, 0, 1)
+                    remaining:SetShadowOffset(0.5, -0.5)
+                    -- Native binding formats/updates remaining time and hides
+                    -- permanent effects. Never read duration or text back in Lua.
+                    frame:SetDurationText(remaining)
+                end
             end,
         })
         if index <= 4 then

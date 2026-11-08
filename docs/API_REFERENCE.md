@@ -1621,6 +1621,19 @@ loss when zoning out of combat and entering the next world in combat. Temporary
 world suspension now uses the same gate and preserves learned actions; native
 displays stay disabled during suspension. Failed initialization remains distinct:
 it clears actions outside combat, hides the gate and stops native displays.
+
+November 8 countdown follow-up: each fixed icon initializes a white, outlined
+7-unit FontString inside its lower edge, then hands it to SetDurationText with
+default options. CustomAuraButtonSharedMixin:SetDurationText validates its child
+FontString, adds Text/Alpha/VertexColor secret aspects and binds the native aura
+duration. The default formatter uses one abbreviated unit (seconds/minutes/etc.).
+CustomAuraButtonPrivateMixin:ApplyDurationText reassigns the duration and enables
+the binding only for nonzero duration objects, hiding permanent-effect text.
+No Lua timer, duration read, text read or extra mouse surface is introduced.
+Missing SetDurationText/options-processing capability omits only the timer.
+Retained70790 native binding/formatter contracts and source/generated fixtures
+cover initialization, timed/permanent/replacement behavior and preserved input;
+the owner's active70862 export deferral and separate native acceptance remain.
 ## Isolated Era party aura correction (October 25, 2026)
 
 Era/PartyAuras.lua is loaded only by the central Era TOC before the private

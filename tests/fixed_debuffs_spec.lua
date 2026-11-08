@@ -20,7 +20,7 @@ local function fixture(class, option)
     C_SpellBook = {IsSpellInSpellBook=function(id, bank, overrides)
         assert(bank==0 and overrides==false); return not m.unknown[id]
     end, IsSpellKnown=function(id) return not m.unknown[id] end}
-    local globals = {"C_XMLUtil", "AuraContainerSortMethod", "AuraContainerSortDirection",
+    local globals = {"C_XMLUtil", "C_AuraContainerUtil", "AuraContainerSortMethod", "AuraContainerSortDirection",
         "CustomAuraContainerSharedMixin", "CustomAuraButtonSharedMixin", "AuraButtonSharedMixin"}
     local previous = {}
     for _, key in ipairs(globals) do previous[key]=_G[key] end
@@ -30,6 +30,7 @@ local function fixture(class, option)
     CustomAuraButtonSharedMixin = {SetIcon=function() end}
     AuraButtonSharedMixin = {SetHideTooltipInCombat=function() end}
     C_XMLUtil = {GetTemplateInfo=function() return {type="AuraContainer"} end}
+    C_AuraContainerUtil = not option.noDuration and {ProcessCustomAuraButtonDurationTextOptions=function() end} or nil
     if option.noSort then AuraContainerSortMethod=nil end
     local create = CreateFrame
     CreateFrame = function(kind, name, parent, template)
@@ -46,6 +47,11 @@ local function fixture(class, option)
                 function visual:SetTooltipAnchorPoint(value) self.tooltipAnchor=value end
                 function visual:SetHideTooltipInCombat(value) self.hideTooltipInCombat=value end
                 function visual:SetIcon(value) self.nativeIcon=value end
+                function visual:SetDurationText(value, options)
+                    assert(options==nil, "use native compact remaining-time formatter")
+                    self.durationText=value
+                    value.GetText=function() error("addon read secret duration text") end
+                end
                 config.initializeFrame(visual)
                 assert(not next(visual.scripts) and not next(visual.attributes))
                 visual.IsShown=function() error("addon read native aura visibility") end
@@ -85,6 +91,13 @@ for class, expected in pairs(cases) do
             assert(visual.mouse==false and visual.mouseMotion==true)
             assert(visual.tooltipAnchor=="ANCHOR_RIGHT" and visual.hideTooltipInCombat==false)
             assert(visual.nativeIcon and not visual.nativeIcon.texture, "native aura icon must supply artwork")
+            local remaining=assert(visual.durationText)
+            assert(remaining.parent==visual and remaining.drawLayer=="OVERLAY")
+            assert(remaining.font[2]==7 and remaining.font[3]=="OUTLINE")
+            assert(remaining.point[1]=="BOTTOM" and remaining.point[5]==1.5)
+            assert(remaining.width==a.Style.sideIconSize-3 and remaining.height==8)
+            assert(remaining.justify=="CENTER" and remaining.wrap==false)
+            for channel=1,4 do assert(remaining.color[channel]==1) end
             assert(visual.point[2]==icons.parent and visual.point[4]==(index-1)*(a.Style.sideIconSize+a.Style.sideIconGap))
             if index<=4 then
                 assert(slot.filters.includeDispelTypes[kind])
@@ -102,6 +115,7 @@ for class, expected in pairs(cases) do
                 assert((glow.filters.includeDispelTypes[kind]==true)==(expected[index]~=false))
                 assert(glow.config.sortMethod==slot.config.sortMethod and glow.config.sortDirection==slot.config.sortDirection)
                 assert(glow.frame.mouse==false and not glow.frame.mouseMotion)
+                assert(not glow.frame.durationText, "only the representative icon gets a timer")
                 assert(button.level<visual.level and visual.level<glow.frame.level)
                 local edges=0
                 for _,child in ipairs(m.frames) do
@@ -183,6 +197,9 @@ zoneMock.combat=false; zoneMock.Event("PLAYER_REGEN_ENABLED"); zoneMock.Flush()
 assert(zoneAddon.View.target.fixedDebuffGate.driver=="[@target,help,nodead] show; hide")
 local _,fallback=fixture("PRIEST",{noSort=true})
 assert(not fallback.View.target.fixedDebuffs and #fallback.View.target.cleanseButtons==3)
+local _,noDuration=fixture("PRIEST",{noDuration=true})
+assert(noDuration.View.target.fixedDebuffs and noDuration.View.target.cleanseButtons[1].spell==988)
+for _,slot in pairs(noDuration.View.target.debuffContainer.slots) do assert(not slot.frame.durationText) end
 print("PASS fixed type slots, native hover/click separation, learned ranks, empty/Other slots, lifecycle, combat deferral and capability fallback")
 
 -- Exercise exact native release dispatch for the new transparent secure buttons.
