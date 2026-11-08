@@ -491,21 +491,32 @@ function V.Lock()
     V.SetUnlocked(false)
     if A.Settings then A.Settings.Refresh() end
 end
-local function proximity(unit)
+local function proximity(unit, spell)
     if unit == "player" or A.Access.Read(UnitIsUnit, unit, "player") == true then return true end
     if type(UnitDistanceSquared) ~= "function" then return nil end
+    local minimum, maximum = 0, 40
+    if spell then
+        local info = A.Access.Read(C_Spell and C_Spell.GetSpellInfo, spell)
+        if type(info) ~= "table" or not A.Access.Readable(info.minRange, info.maxRange) then return nil end
+        minimum, maximum = info.minRange, info.maxRange
+        if type(minimum) ~= "number" or type(maximum) ~= "number"
+            or not (minimum >= 0 and maximum > 0 and minimum <= maximum
+                and maximum * maximum < math.huge) then return nil end
+    end
     local ok, distance, checked = pcall(UnitDistanceSquared, unit)
     if ok and A.Access.Readable(distance, checked) and checked == true
         and type(distance) == "number" and distance >= 0 and distance < math.huge then
-        return distance <= 40 * 40
+        return distance >= minimum * minimum and distance <= maximum * maximum
     end
 end
 function V.PaintRange(row, state)
     local result
-    if not V.unlocked and not A.Runtime.suspended and state == "alive" then
+    local active = not V.unlocked and not A.Runtime.suspended and state == "alive"
+    if active then
         if A.Bindings.rangeSpell then
-            -- Unknown spell range stays unknown; distance cannot prove cast range.
             result = A.Bindings.SpellRange(A.Bindings.rangeSpell, row.unit)
+            -- Public proximity is an estimate, never an override of native spell range.
+            if result == nil then result = proximity(row.unit, A.Bindings.rangeSpell) end
         else
             result = proximity(row.unit)
         end
@@ -513,7 +524,7 @@ function V.PaintRange(row, state)
     row.rangeStatus:Hide()
     -- Only health artwork (including its text/incoming heals) inherits the fade.
     -- Buff buttons are siblings, so their own spell range remains independent.
-    row.health:SetAlpha(result == false and 0.45 or 1)
+    row.health:SetAlpha(result == false and 0.45 or (active and result == nil and 0.7 or 1))
     row:SetAlpha(V.unlocked and 0 or 1)
     local showName = state ~= "missing" and state ~= "dead" and state ~= "offline"
     if row.targetNameWidth then
