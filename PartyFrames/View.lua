@@ -239,7 +239,7 @@ local function createHot(row, width)
             local duration = CreateFrame("StatusBar", nil, button)
             duration:SetAllPoints(button); duration:EnableMouse(false)
             duration:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
-            duration:SetStatusBarColor(1, 0.78, 0.22, 1)
+            duration:SetStatusBarColor(1, 1, 1, 1)
             duration:SetMinMaxValues(0, 1); duration:SetValue(0)
             button:SetDurationBar(duration, {interpolation = interpolation, direction = direction})
         end,

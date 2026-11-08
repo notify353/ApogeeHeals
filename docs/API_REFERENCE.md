@@ -337,7 +337,7 @@ timer state or restricted quantities, and does not calculate remaining time.
 
 Seven precreated fixed-unit containers each have one mouse-disabled slot. A native
 help/nodead visibility gate covers friendliness/death; each slot's native aura
-visibility handles expiry/removal. Gold artwork overlays the bottom 1.5 logical
+visibility handles expiry/removal. White artwork overlays the bottom 1.5 logical
 pixels of health to the right of the class rail. Power, cast strips and protected
 healing actions retain their geometry. Target changes and roster changes explicitly
 refresh native recipients; targettarget reuses its existing 0.2-second alias poll.

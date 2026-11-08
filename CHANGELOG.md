@@ -1,6 +1,6 @@
 ## Unreleased
 
-- Show your own Renew/Rejuvenation duration as a thin gold health-bar strip on
+- Show your own Renew/Rejuvenation duration as a thin white health-bar strip on
   friendly self, party and both target frames when native aura timers are available.
   Export refresh for the updated client was deferred; native acceptance is pending.
 

@@ -149,7 +149,7 @@ guidance, native weapon displays, limitations and live acceptance checks.
 - Incoming heals from all healers appear as a pale-green segment immediately
   after current health. Forever's native calculator caps it at missing health
   and accounts for healing absorption. No numbers or extra settings are added.
-- A thin gold strip inside the bottom of each friendly health bar counts down
+- A thin white strip inside the bottom of each friendly health bar counts down
   your own primary HoT: priest Renew or druid Rejuvenation, including Classic
   ranks. It covers self, party, target and target-of-target. Native aura filtering
   excludes other healers; refresh/removal follows the actual aura. The strip
