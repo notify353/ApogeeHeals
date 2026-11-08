@@ -355,11 +355,41 @@ confirm Riptide is a HoT. Spell-data records identify the actual aura ranks:
 This is a spell-identity update, not an API/export review. Do not use Retail
 Riptide IDs, the NPC spell 22419 or the rune wrapper 409954. Paladin Oath of Light
 enhances subsequent heals and Light's Vigil triggers a subsequent Holy Shock;
-neither is periodic healing. Regrowth/Wild Growth are additional Druid effects,
-not the single primary Rejuvenation family selected for this strip. Pet channels,
+neither is periodic healing. Regrowth/Wild Growth were initially excluded and
+are added by the November 8 follow-up below. Pet channels,
 totem pulses and passive self-heals remain outside the primary party-HoT scope.
 The owner's white-bar confirmation applies to the earlier observed behavior;
 new Shaman coverage still requires native testing. No timer/filter API changed.
+
+### Separate Druid HoTs (2026-11-08)
+
+Owner requested Regrowth and Wild Growth as separate white bars. Each of seven
+fixed recipients now has three independently filtered native containers for
+Druids (21 total), sharing one help/nodead visibility gate per recipient. Other
+classes retain one container per recipient. The native methods are unchanged;
+the same historical export/explicit deferral applies. No aura/timer reads or
+dynamic protected layout were added. All lanes refresh on target/targettarget
+changes and roster updates, and disable on preview, world exit or startup failure.
+
+Rejuvenation, Regrowth, Wild Growth occupy fixed bottom-to-top lanes even when
+an intervening aura is absent. Each Druid line is 0.5 logical units high with a
+0.5-unit gap: a 2.5-unit stack inside the 14-unit health area, below centered
+8-unit artwork and 6-unit names. At the normal 2x row scale this is three 1px
+white lines separated by 1px gaps. Single-HoT classes retain their 1.5-unit line.
+No frame/text/icon/power/cast geometry changes. Actual rasterization and visual
+clarity at the owner's UI scale still require native testing.
+
+[Regrowth spell-data ranks](https://wow-forever.gg/db/spells/8936-regrowth/):
+8936,8938,8939,8940,8941,9750,9856,9857,9858. The countdown represents its HoT,
+not its initial direct heal. [Wild Growth rank 1](https://wow-forever.gg/db/spells/408120-wild-growth/),
+[rank 2](https://wow-forever.gg/db/spells/1238214-wild-growth/) and
+[rank 3](https://wow-forever.gg/db/spells/1238215-wild-growth/) use
+408120,1238214,1238215. Exclude NPC/other-client Regrowth copies, Wild Growth
+rune wrapper409810 and Retail48438. Native aura presence on each recipient
+determines Wild Growth coverage; never infer it from the cast target or party.
+Source/generated tests cover ranks, fixed separated geometry, every recipient,
+all-lane refresh/suspension, independent native duration refresh/removal and white
+color. Mocks do not establish live Druid acceptance.
 
 ## Exclusive class-strip input (October 12)
 

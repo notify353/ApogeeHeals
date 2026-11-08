@@ -157,6 +157,12 @@ guidance, native weapon displays, limitations and live acceptance checks.
   does not replace power or cast bars, and adds no click action or setting.
   This display requires the client's native custom aura duration-bar capability;
   clients without it (including the current Era adapter) omit the strip.
+  Druids also get separate white Regrowth and Wild Growth countdowns. The fixed
+  order from bottom to top is Rejuvenation, Regrowth, Wild Growth. Each line
+  hides independently without moving the others. Three thin lines and gaps fit
+  below the name inside the existing health bar; frame size stays unchanged.
+  Regrowth includes all nine Classic ranks; Wild Growth includes all three
+  Forever ranks. Only your own HoT on that recipient appears in each lane.
   Classes without a matching primary HoT show no strip; Paladin Oath of Light
   and Light's Vigil are not periodic heals and are not included.
 - Native left-click targeting when unassigned, with healing click bindings on Left, Right,

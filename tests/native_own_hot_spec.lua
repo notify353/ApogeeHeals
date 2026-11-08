@@ -61,4 +61,28 @@ env.CustomAuraButtonPrivateMixin.ApplyVisibility(frame,"party1",{})
 assert(frame.shown)
 env.CustomAuraButtonPrivateMixin.ApplyVisibility(frame,"party1",nil)
 assert(not frame.shown)
+-- Three simultaneous Druid aura identities feed separate native timer sinks.
+-- Refreshing/removing Regrowth must leave Rejuvenation/Wild Growth untouched.
+friendly=true
+local lanes, spells = {}, {774,8936,408120}
+for lane, id in ipairs(spells) do
+    for _, other in ipairs(spells) do
+        assert(filter("party1",{isHelpful=true,spellId=other},{includeSpellIDs={[id]=true}})==(id==other))
+    end
+    local sink={SetTimerDuration=bar.SetTimerDuration}
+    local button={durationBar={element=sink,options={interpolation=0,direction=1}},
+        IsShown=frame.IsShown,SetShown=frame.SetShown}
+    local token=setmetatable({}, {__sub=function() error("restricted arithmetic") end})
+    env.CustomAuraButtonPrivateMixin.ApplyDurationBar(button,"party1",{},token,1)
+    env.CustomAuraButtonPrivateMixin.ApplyVisibility(button,"party1",{})
+    lanes[lane]={button=button,sink=sink,token=token}
+end
+local refreshed={}
+env.CustomAuraButtonPrivateMixin.ApplyDurationBar(lanes[2].button,"party1",{},refreshed,1)
+assert(lanes[2].sink.duration==refreshed)
+env.CustomAuraButtonPrivateMixin.ApplyVisibility(lanes[2].button,"party1",nil)
+assert(not lanes[2].button.shown)
+for _, lane in ipairs({1,3}) do
+    assert(lanes[lane].sink.duration==lanes[lane].token and lanes[lane].button.shown)
+end
 print("PASS exported native friendly HoT identity filters, player-only filter forwarding, opaque duration refresh and removal visibility; live acceptance remains separate")

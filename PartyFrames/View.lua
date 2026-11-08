@@ -193,20 +193,26 @@ local function bar(parent, height, y, width)
     S.Background(result); A.UnitAPI.Clear(result)
     return result
 end
--- Classic Renew/Rejuvenation and Forever Riptide rank identities.
+-- Classic Renew/Rejuvenation/Regrowth and Forever Riptide/Wild Growth ranks.
 -- The native PLAYER filter owns caster selection.
 -- No aura records, native slot visibility or timer values are read back.
-local hotRanks = {
-    PRIEST = {[139]=true,[6074]=true,[6075]=true,[6076]=true,[6077]=true,
-        [6078]=true,[10927]=true,[10928]=true,[10929]=true,[25315]=true},
-    DRUID = {[774]=true,[1058]=true,[1430]=true,[2090]=true,[2091]=true,
-        [3627]=true,[8910]=true,[9839]=true,[9840]=true,[9841]=true,[25299]=true},
-    SHAMAN = {[408521]=true,[1239242]=true,[1239243]=true},
+local hotFamilies = {
+    PRIEST = {{[139]=true,[6074]=true,[6075]=true,[6076]=true,[6077]=true,
+        [6078]=true,[10927]=true,[10928]=true,[10929]=true,[25315]=true}},
+    -- Fixed bottom-to-top lanes: Rejuvenation, Regrowth, Wild Growth.
+    DRUID = {
+        {[774]=true,[1058]=true,[1430]=true,[2090]=true,[2091]=true,
+            [3627]=true,[8910]=true,[9839]=true,[9840]=true,[9841]=true,[25299]=true},
+        {[8936]=true,[8938]=true,[8939]=true,[8940]=true,[8941]=true,
+            [9750]=true,[9856]=true,[9857]=true,[9858]=true},
+        {[408120]=true,[1238214]=true,[1238215]=true},
+    },
+    SHAMAN = {{[408521]=true,[1239242]=true,[1239243]=true}},
 }
 local function createHot(row, width)
     local ok, _, class = pcall(UnitClass, "player")
-    local ids = ok and A.Access.Readable(class) and hotRanks[class]
-    if not ids or not C_AuraContainerUtil
+    local families = ok and A.Access.Readable(class) and hotFamilies[class]
+    if not families or not C_AuraContainerUtil
         or type(C_AuraContainerUtil.ProcessCustomAuraButtonDurationBarOptions) ~= "function"
         or not Enum or not Enum.StatusBarTimerDirection or not Enum.StatusBarInterpolation then return end
     local direction, interpolation = Enum.StatusBarTimerDirection.RemainingTime, Enum.StatusBarInterpolation.Immediate
@@ -214,38 +220,48 @@ local function createHot(row, width)
         or type(direction) ~= "number" or type(interpolation) ~= "number" then return end
     local info = A.Access.Read(C_XMLUtil and C_XMLUtil.GetTemplateInfo, "CustomAuraContainerTemplate")
     if type(info) ~= "table" or not A.Access.Readable(info.type) or info.type ~= "AuraContainer" then return end
-    local height, inset = 1.5, S.classStripHitWidth
+    -- At the normal 2x row scale, Druid gets three 1px lines with 1px gaps.
+    -- The 2.5-unit stack stays below the centered 8-unit role/name artwork.
+    local height, gap, inset = #families > 1 and 0.5 or 1.5, 0.5, S.classStripHitWidth
     width = (width or S.width) - inset
     -- Native visibility keeps the artwork friendly/alive even during combat.
     local gate = CreateFrame("Frame", nil, row, "SecureHandlerStateTemplate")
-    gate:SetSize(width, height)
+    gate:SetSize(width, #families * height + (#families - 1) * gap)
     gate:SetPoint("BOTTOMLEFT", row.health, "BOTTOMLEFT", inset, 0)
     gate:SetFrameLevel(row.nameLayer:GetFrameLevel() + 2)
     gate:EnableMouse(false)
     RegisterStateDriver(gate, "visibility", "[@" .. row.unit .. ",help,nodead] show; hide")
-    local container = CreateFrame("AuraContainer", nil, gate, "CustomAuraContainerTemplate")
-    row.hotContainer = container
+    row.hotContainers = {}
     V.hotContainers = V.hotContainers or {}
-    V.hotContainers[#V.hotContainers + 1] = container
-    container:SetSize(width, height); container:SetPoint("TOPLEFT", gate, "TOPLEFT", 0, 0)
-    container:EnableMouse(false)
-    container:SetEnabled(false)
-    container:SetUnit(row.unit)
-    container:AddAuraGroup("ownPrimaryHot", "HELPFUL|PLAYER", {
-        maxFrameCount = 1, candidateFilters = {includeSpellIDs = ids},
-        layout = {elementWidth = width, elementHeight = height, elementSpacing = 0},
-        initializeFrame = function(button)
-            button:SetSize(width, height); button:SetCancelAuraButtons(nil)
-            button:EnableMouse(false)
-            if type(button.SetDurationBar) ~= "function" then return end
-            local duration = CreateFrame("StatusBar", nil, button)
-            duration:SetAllPoints(button); duration:EnableMouse(false)
-            duration:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
-            duration:SetStatusBarColor(1, 1, 1, 1)
-            duration:SetMinMaxValues(0, 1); duration:SetValue(0)
-            button:SetDurationBar(duration, {interpolation = interpolation, direction = direction})
-        end,
-    })
+    for lane, ids in ipairs(families) do
+        local container = CreateFrame("AuraContainer", nil, gate, "CustomAuraContainerTemplate")
+        row.hotContainers[lane] = container
+        V.hotContainers[#V.hotContainers + 1] = container
+        container:SetSize(width, height)
+        container:SetPoint("BOTTOMLEFT", gate, "BOTTOMLEFT", 0, (lane - 1) * (height + gap))
+        container:EnableMouse(false)
+        container:SetEnabled(false)
+        container:SetUnit(row.unit)
+        container:AddAuraGroup("ownHot", "HELPFUL|PLAYER", {
+            maxFrameCount = 1, candidateFilters = {includeSpellIDs = ids},
+            layout = {elementWidth = width, elementHeight = height, elementSpacing = 0},
+            initializeFrame = function(button)
+                button:SetSize(width, height); button:SetCancelAuraButtons(nil)
+                button:EnableMouse(false)
+                if type(button.SetDurationBar) ~= "function" then return end
+                local duration = CreateFrame("StatusBar", nil, button)
+                duration:SetAllPoints(button); duration:EnableMouse(false)
+                duration:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
+                duration:SetStatusBarColor(1, 1, 1, 1)
+                duration:SetMinMaxValues(0, 1); duration:SetValue(0)
+                button:SetDurationBar(duration, {interpolation = interpolation, direction = direction})
+            end,
+        })
+    end
+end
+local function refreshRowHots(row)
+    if A.Runtime.suspended or V.unlocked then return end
+    for _, container in ipairs(row.hotContainers or {}) do container:UpdateAllAuras() end
 end
 function V.RefreshHotActivity()
     local enabled = not A.Runtime.suspended and not V.unlocked
@@ -540,15 +556,16 @@ function V.RefreshTargetTarget()
     if not A.Runtime.suspended then
         refreshTargetRow(V.targetTarget)
         -- This alias can change without its own UNIT_AURA notification.
-        if V.targetTarget.hotContainer and not V.unlocked then V.targetTarget.hotContainer:UpdateAllAuras() end
+        refreshRowHots(V.targetTarget)
     end
 end
 function V.RefreshTargetAuras()
     -- Only invoke the public inbound refresh; never inspect native aura state.
-    for _, key in ipairs({"debuffContainer", "cleanseIndicator", "hotContainer"}) do
+    for _, key in ipairs({"debuffContainer", "cleanseIndicator"}) do
         local container = V.target[key]
         if container and type(container.UpdateAllAuras) == "function" then container:UpdateAllAuras() end
     end
+    refreshRowHots(V.target)
 end
 function V.RefreshTarget()
     V.RefreshPartyActions()

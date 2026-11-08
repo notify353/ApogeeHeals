@@ -1,5 +1,9 @@
 ## Unreleased
 
+- Give Druids separate white Rejuvenation, Regrowth and Wild Growth countdowns
+  in fixed rows inside each friendly health bar, showing only their own casts.
+  Keep the existing frame size, names, power and cast bars.
+
 - Show your own Renew/Rejuvenation/Riptide duration as a thin white health-bar strip on
   friendly self, party and both target frames when native aura timers are available.
   Riptide includes all three Forever ranks; only your own casts are selected.
