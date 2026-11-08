@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Fix distant party members appearing in range when the healing-spell check is
+  unavailable. Use guarded spell-specific proximity and a distinct unknown fade.
+
 - Show automatic expiring-buff reminders only in their final minute, with large
   centered seconds-only countdowns matching the debuff style.
 

@@ -27,11 +27,14 @@ Forever remains source-only until matching fresh client validation.
 
 The applied, unmodified left-click spell alone controls health-bar fading.
 Confirmed out of range fades health artwork and its text/incoming-heal children
-to 45%; in-range or unknown stays fully opaque. Buff buttons are sibling frames
+to 45%; in-range stays fully opaque and unavailable range uses 70% opacity.
+Buff buttons are sibling frames
 and retain their own exact-spell range checks without inheriting this fade.
 An empty left slot or bandage uses guarded 40-yard proximity (inclusive), keeping
-non-caster group distance useful. A spell's unknown range never falls back to
-proximity. Right-click and modifier bindings do not alter this cue. The Near/Far
+non-caster group distance useful. An unavailable spell check falls back to readable
+distance using that spell's reported minimum/maximum range, never a fixed 40-yard
+guess. This estimates proximity, not line of sight or cast success. Valid native
+spell results always win. Right-click and modifier bindings do not alter this cue. The Near/Far
 and per-click labels are removed. Power and support icons retain normal opacity.
 No casting or recipient changes. Native appearance/combat acceptance pending.
 

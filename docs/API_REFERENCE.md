@@ -1257,7 +1257,16 @@ No automatic reset runs during upgrade. Live dialog/layout acceptance is pending
 C_Spell.IsSpellInRange(spellIdentifier, targetUnit) returns a nullable boolean and
 accepts the explicit fixed row recipient. True means in range, false out of range,
 and nil invalid/unknown. Access.Read rejects secret/inaccessible results before
-comparison. No distance estimate, target fallback or UnitInRange substitute is used.
+comparison. When unavailable, public UnitDistanceSquared with checkedDistance=true
+and readable GetSpellInfo minRange/maxRange supply a proximity estimate for the
+same fixed recipient and applied spell. No hard-coded 40-yard spell cap, target
+fallback or UnitInRange substitute is used. Native spell results always win.
+Unknown range uses70% health opacity; out of range45%; in range100%. Inactive,
+dead, offline and missing rows reset the cue. Self stays fully opaque. Unknown
+metadata, restricted values, nonfinite distances and failed API calls stay unknown.
+This November8 correction uses existing fresh Forever70862 SpellDocumentation
+and UnitDocumentation contracts. Proximity cannot establish line of sight,
+hitbox-adjusted distance or all talent range modifiers; native testing is required.
 EnableSpellRangeCheck/SPELL_RANGE_CHECK_UPDATE only track the current target and
 cannot supply party-row updates. A 0.2-second range-only OnUpdate samples at most
 five units without aura scans; it stops during preview/world exit or without an
