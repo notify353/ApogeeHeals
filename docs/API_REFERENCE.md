@@ -1,3 +1,16 @@
+## Fresh timer and cleanse review (November 8, 2026)
+
+The owner exported current Forever1.60.1.70862. All244 previously tracked
+references are fresh and byte-identical to70790; central authority adds the
+reviewed aura-slot implementation, duration-options documentation and priority
+table implementation for247 references. Active wowf metadata, executable version
+and export freshness agree. Native duration text, permanent/replacement handling,
+fixed slots, mouse motion, tooltip and secure release contracts remain compatible.
+Source and generated timer/cleanse regressions use this fresh export. No timer
+adaptation was needed; recognize70862 for Heals startup warnings while preserving
+capability checks and future-build warnings. This supersedes the API deferral for
+the new DEV candidate; native in-game timing/taint acceptance remains separate.
+
 ## Reviewed live build warning (November 6, 2026)
 
 Central distribution verified the matching Forever1.60.1.70790 executable/export

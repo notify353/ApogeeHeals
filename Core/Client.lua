@@ -10,8 +10,8 @@ function A.CheckClient()
         if type(_G[name]) ~= "function" then return false, "Missing client API: " .. name end
     end
     if not C_Timer or type(C_Timer.After) ~= "function" then return false, "Missing timer API." end
-    -- Current live Forever70790 API export is reviewed by central distribution.
-    if tostring(build) ~= "70450" and tostring(build) ~= "70790" then
+    -- Live Forever70862 API export is reviewed by central distribution.
+    if tostring(build) ~= "70450" and tostring(build) ~= "70790" and tostring(build) ~= "70862" then
         print("Apogee Heals: unreviewed Forever build; in-game validation is required.")
     end
     return true
