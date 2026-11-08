@@ -1,5 +1,9 @@
 ## Unreleased
 
+- Show your own Renew/Rejuvenation duration as a thin gold health-bar strip on
+  friendly self, party and both target frames when native aura timers are available.
+  Export refresh for the updated client was deferred; native acceptance is pending.
+
 - Recognize the centrally reviewed Forever70790 build without a stale warning; retain warnings on unreviewed builds and required API checks.
 
 - Keep dead target and target-of-target names visible, label DEAD/OFFLINE, and clear stale health, power and cast artwork.

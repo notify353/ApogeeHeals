@@ -149,6 +149,13 @@ guidance, native weapon displays, limitations and live acceptance checks.
 - Incoming heals from all healers appear as a pale-green segment immediately
   after current health. Forever's native calculator caps it at missing health
   and accounts for healing absorption. No numbers or extra settings are added.
+- A thin gold strip inside the bottom of each friendly health bar counts down
+  your own primary HoT: priest Renew or druid Rejuvenation, including Classic
+  ranks. It covers self, party, target and target-of-target. Native aura filtering
+  excludes other healers; refresh/removal follows the actual aura. The strip
+  does not replace power or cast bars, and adds no click action or setting.
+  This display requires the client's native custom aura duration-bar capability;
+  clients without it (including the current Era adapter) omit the strip.
 - Native left-click targeting when unassigned, with healing click bindings on Left, Right,
   Middle, Mouse 4 and Mouse 5 (plain, Shift and Ctrl). No global binding overrides.
   Standard native target actions also retain the client's spell/item cursor behavior.
@@ -215,7 +222,7 @@ Combat routing, target preservation, invalid-recipient behavior and visual layou
 also require live acceptance. Test installations do not establish live acceptance.
 
 The addon leaves Blizzard frames and other Apogee addons alone. It does not need
-Tank, Keybinds or Party Health Bars installed. No raid/pet frames, shield/HoT overlays,
+Tank, Keybinds or Party Health Bars installed. No raid/pet frames or shield overlays,
 dispel coverage, health/power numbers, profiles
 or drinking countdowns.
 

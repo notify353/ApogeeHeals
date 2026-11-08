@@ -68,10 +68,12 @@ function R.Start()
         elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
             A.Buffs.OnCast(unit, spellID)
         elseif event == "GROUP_ROSTER_UPDATE" then
+            A.View.RefreshHotRecipients()
             A.Buffs.CloseRecipient()
             A.Buffs.HideTooltip(A.Buffs.tooltipButton)
         elseif event == "PLAYER_LEAVING_WORLD" then
             R.suspended = true
+            A.View.RefreshHotActivity()
             A.View.RefreshPartyActions()
             for _, row in ipairs(A.View.rows) do
                 A.Drinking.Clear(row); row.leader:Hide(); row.roleIcon:Hide()
@@ -118,6 +120,7 @@ function R.Start()
             A.Buffs.spellNames, A.Buffs.nameGroups = nil, nil
             if event == "PLAYER_ENTERING_WORLD" then
                 R.suspended, A.Buffs.suspended = nil, nil
+                A.View.RefreshHotActivity()
             end
             A.Bindings.Apply()
             A.Drinking.Resolve()

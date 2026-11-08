@@ -320,6 +320,32 @@ implement the native macro parser or reproduce server range/line-of-sight failur
 Owner acceptance must verify both clicks with Auto Self Cast enabled, blocked and
 out-of-range party recipients, and normal party/self healing.
 
+## Own primary HoT duration strip (2026-11-07)
+
+Owner requested only their own HoTs and explicitly deferred refreshing the export.
+The installed Forever client is now 1.60.1.70862; the existing 70790 export predates
+the executable. The following is an existing-source contract review, not a fresh
+70862 authority check or native acceptance. Export metadata is not advanced.
+
+Blizzard_CustomAuraContainer accepts includeSpellIDs for helpful auras on friendly
+units. Blizzard_AuraContainerUtil rejects unfilterable identities; HELPFUL|PLAYER
+is forwarded unchanged to native filtering. Classic Renew/Rejuvenation rank IDs
+select the player's class family. CustomAuraButton SetDurationBar binds a child
+StatusBar; native ApplyDurationBar passes its opaque duration to SetTimerDuration
+with RemainingTime. The addon never reads aura records, native slot visibility,
+timer state or restricted quantities, and does not calculate remaining time.
+
+Seven precreated fixed-unit containers each have one mouse-disabled slot. A native
+help/nodead visibility gate covers friendliness/death; each slot's native aura
+visibility handles expiry/removal. Gold artwork overlays the bottom 1.5 logical
+pixels of health to the right of the class rail. Power, cast strips and protected
+healing actions retain their geometry. Target changes and roster changes explicitly
+refresh native recipients; targettarget reuses its existing 0.2-second alias poll.
+Preview, world suspension and startup failure disable containers; combat does not.
+Missing actual native capabilities omit this optional display, including current
+Era. Source and exported-function mocks do not establish engine permission, live
+rank coverage, timer rendering or updated-client compatibility.
+
 ## Exclusive class-strip input (October 12)
 
 Reviewed matching 70338 SimpleFrame SetHitRectInsets and SimpleScriptRegion

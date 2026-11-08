@@ -14,6 +14,7 @@ end
 local function fail(reason)
     A.started, A.startupState = false, "failed"
     A.Runtime.suspended, A.Buffs.suspended = true, true
+    pcall(A.View.RefreshHotActivity)
     A.Runtime.pending, A.Bindings.pending, A.Cleansing.pending = nil, nil, nil
     loader:UnregisterAllEvents()
     pcall(A.Minimap.Unregister)
