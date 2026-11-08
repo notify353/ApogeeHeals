@@ -14,7 +14,7 @@ Reviewed against Forever 1.60.1.70009 on September 27, 2026. Candidates are
 validated against the live learned spellbook; database presence never grants an
 action. This is a pre-combat upkeep guide, not an encounter optimizer.
 
-| Class | Left-side upkeep | Friendly cleanse buttons |
+| Class | Left-side upkeep | Learned friendly cleanse candidates |
 | --- | --- | --- |
 | Paladin | Existing lasting blessing choices and own aura picker | Purify; Cleanse |
 | Druid | Mark of the Wild; Thorns | Cure Poison; Abolish Poison; Remove Curse |

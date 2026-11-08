@@ -1561,6 +1561,53 @@ Generated checks execute the fresh native unpack helper under mocks. Default
 Forever tests continue to require native containers and prohibit Lua aura scans.
 This correction is scoped to the tank threat stack; native acceptance remains
 user-owned and does not establish broader Era aura-widget compatibility.
+
+## Fixed debuff categories (November 8, 2026)
+
+The owner accepted fixed type positions with one representative icon and asked
+to install DEV while deferring the export refresh. Implementation uses retained
+Forever 1.60.1.70790 contracts, not a claimed review of active 1.60.1.70862.
+No export/build evidence is advanced. The Era renderer remains unchanged.
+
+Blizzard_AuraContainerShared.lua exposes AuraContainerSortMethod.AuraInstanceIDOnly
+and AuraContainerSortDirection.Reverse. Blizzard_AuraContainerUtil.lua maps this
+to AuraUtil.AuraInstanceIDOnlyAuraCompare, swapping arguments for reverse order.
+Blizzard_FrameXMLUtil/AuraUtil.lua compares instance IDs; this is not an API
+guarantee of application time, refresh time or severity. AddAuraSlot uses the
+trusted priority table and chooses one candidate. Removal exposes the next
+highest ID; refreshing the same instance does not change its position.
+
+Five permanent slots use HARMFUL: includeDispelTypes for Magic, Disease, Poison,
+Curse, then excludeDispelTypes for Other (including untyped Weakened Soul).
+Four matching native highlight slots use identical sorting and type filters,
+enabled only for publicly verified learned player spells. Spell selection is
+fixed outside combat: first learned class candidate, highest rank within it.
+Cure/Purify precedes Abolish/Cleanse for Disease/Poison; Magic uses Dispel Magic
+or Cleanse. Other has no secure button. Highlights express type capability,
+not range, resources, immunity, cooldown or guaranteed removal of that icon.
+
+SimpleScriptRegion documents EnableMouse and SetMouseMotionEnabled separately.
+During native frame initialization only, icons disable mouse input then enable
+motion for intrinsic OnEnter/OnLeave and the native aura tooltip; clicks hit an
+ordinary secure sibling below. Gold edge-only native visuals above are entirely
+mouse-disabled. SetTooltipAnchorPoint, SetHideTooltipInCombat(false), SetIcon and
+SetCancelAuraButtons(nil) are inbound configuration. No native aura frame is
+retained, queried, scripted, used as an anchor for a secure action, or composed
+with SecureActionButtonTemplate. AlwaysPropagateInput remains forbidden and no
+propagation call is used. Secure buttons retain exact row units, release-only
+left clicks and blank modified actions. A fixed friendly/living state gate owns
+visibility; preview/world/startup cleanup disables native displays. Learned
+actions cannot depend on secret icon visibility, so blank slots can still cast.
+
+Source/generated fixtures cover all classes, six recipients, independent slot
+geometry, layer/input configuration, unknown spells, rank changes, combat
+deferral, target replacement, preview, world transitions and initialization
+failure. Retained exported priority-table/slot/comparator/filter implementations
+verify newest-instance selection, same-ID refresh, removal/clear and Other
+exclusion; native tooltip population and secure release dispatch are executed.
+These tests do not simulate native restricted-frame hit testing or establish
+taint/tooltip/click-through acceptance on 70862. User reload and in-game testing
+remain required; current export review is explicitly deferred.
 ## Isolated Era party aura correction (October 25, 2026)
 
 Era/PartyAuras.lua is loaded only by the central Era TOC before the private

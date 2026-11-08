@@ -113,10 +113,11 @@ guidance, native weapon displays, limitations and live acceptance checks.
   game's assigned role on each player/party row. Unassigned or unavailable roles
   stay blank. Both role and leader icons hide immediately in combat and refresh
   from current assignments afterward; class is never used to guess a role.
-- Up to eight native debuff icons extend right of each player/party health bar,
-  after the reserved drinking-icon space. Hover for the native aura tooltip.
-  All harmful aura types qualify, including effects you cannot dispel. Native
-  code owns ordering, updates and combat display; the icons themselves do not cast.
+- Five fixed debuff positions extend right of each friendly player/party/target
+  health bar: Magic, Disease, Poison, Curse, Other. Each shows one native aura
+  icon; empty positions stay blank. Hover for its native tooltip. A gold border
+  marks a type your learned cleanse can remove; left-click casts on that row.
+  The drinking indicator follows the fixed strip.
 - Target sits above the player with a full-row gap; target's target stays
   closely above target. Both retain their size and align with the stack's left
   edge. The drag handle sits above the pair; no helper caption is shown.
@@ -283,26 +284,34 @@ Their entries use the same controls, and opt-outs survive relearning and rank
 changes. Short effects, passive spells, items and pet casts are not learned.
 Battle Shout remains handled by Keybinds. See [class support](docs/CLASS_SUPPORT.md).
 
-## Paladin cleansing buttons
+## Fixed debuff slots and cleansing
 
-Learned Purify and Cleanse have permanent buttons to the right of each player/party
-health bar, followed by the drinking indicator and the debuff strip. Left-click
-casts that spell on the row's player, including in combat. Modified clicks do
-nothing. Unlearned spells are hidden; other classes do not get these buttons.
+Magic, Disease, Poison and Curse each have a permanent position. A fifth Other
+position shows effects such as Weakened Soul without a cleanse highlight or
+action. Only debuff artwork is drawn; there are no separate cleanse-spell icons.
+The native container selects the highest aura instance ID within each category.
+When it disappears, the next instance appears in the same position. Refreshing
+an existing instance does not make it newest. Instance ordering is not a promise
+of exact application timestamps or danger priority.
 
-A separate native gold halo appears for matching harmful-aura types: poison and
-disease for Purify, plus magic for Cleanse. Both can glow for poison/disease.
-The glow indicates a matching type, not guaranteed success, range or mana.
-Idle cleansing icons are gray at 30% opacity. A matching native indicator adds
-the full-color spell image and gold edge without changing the button's action.
-The game chooses the effects removed; clicking a button never selects one debuff.
-Buttons stay visible with no debuffs. Native icons themselves remain display-only.
-Buff reminders on the left and right-side icons are square and span the combined health and power bar height,
-aligned at both edges, with a narrow gap between icons.
+Hover shows the selected aura's native tooltip, including during combat.
+Left-button release casts the learned cleanse for that type on the fixed row
+recipient; modified clicks do nothing. Magic uses Priest Dispel Magic's highest
+learned rank or Paladin Cleanse. Disease/Poison prefer a learned Cure/Purify,
+falling back to Abolish/Cleanse. Curse uses the class's learned removal spell.
+Only player-spellbook actions qualify; no pet or unlearned actions are guessed.
 
-The earlier rejected AuraButton/secure-action composition remains unused. These
-are independent, permanently configured secure buttons and native visual siblings.
-Native clicks, glow layering and combat behavior require in-game acceptance.
+The gold border means a learned spell matches the type, not that range, mana,
+cooldown or immunity will permit success. The game chooses which effects the
+spell removes, which may differ from the representative icon. A blank learned
+slot can still cast: secure click availability cannot depend on secret aura
+visibility. Slots do not move or expand in combat. Preview disables them.
+
+Native aura visuals and transparent secure actions are separate siblings;
+no intrinsic OnClick replacement, propagation or secret aura reads are used.
+Era and clients lacking the required native methods retain the older separate
+spell-button/debuff-strip renderer. Native hover, click-through, layering and
+combat acceptance remain separate from offline tests.
 
 ## Healing Mouse placement
 

@@ -155,6 +155,7 @@ function V.PaintRole(row, role)
     row.roleIcon:SetShown(atlas ~= nil and atlas ~= false)
 end
 local function createDebuffs(row)
+    if row.fixedDebuffs then return end
     -- All aura selection, ordering, visibility and updates stay in native code.
     -- Never retain or inspect the native aura buttons after initialization.
     local info = A.Access.Read(C_XMLUtil and C_XMLUtil.GetTemplateInfo, "CustomAuraContainerTemplate")
@@ -266,6 +267,7 @@ end
 function V.RefreshHotActivity()
     local enabled = not A.Runtime.suspended and not V.unlocked
     for _, container in ipairs(V.hotContainers or {}) do container:SetEnabled(enabled) end
+    A.Cleansing.RefreshActivity()
 end
 function V.RefreshHotRecipients()
     if A.Runtime.suspended or V.unlocked then return end
