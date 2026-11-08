@@ -9,7 +9,7 @@ end
 local fixture = read("tests/mock.lua"):gsub("ApogeeHeals", name)
 local realDofile, realLoadfile = dofile, loadfile
 local standalone = {["Core/Access.lua"]=true,["Bindings/Runtime.lua"]=true,
-    ["Buffs/Catalog.lua"]=true,["WeaponUpkeep/Runtime.lua"]=true}
+    ["Buffs/Catalog.lua"]=true,["WeaponUpkeep/Runtime.lua"]=true,["UI/Minimap.lua"]=true}
 loadfile = function(path)
     if not standalone[path] then return realLoadfile(path) end
     local chunk = assert(realLoadfile(root .. "/" .. path))
@@ -19,6 +19,12 @@ loadfile = function(path)
     end
 end
 dofile = function(path)
+    if path == "tests/launcher_stub.lua" then
+        -- Generated consumers use the DEV shared UI dependency too.
+        local data = read(path):gsub("ApogeeUI", "ApogeeUIDev")
+            :gsub("ApogeeSettingsRegistry", "ApogeeDevSettingsRegistry")
+        return assert(loadstring(data, "@" .. path .. " (DEV fixture)"))()
+    end
     if path == "tests/purify_fixture.lua" then
         local data = read(path):gsub("ApogeeHeals", name)
         return assert(loadstring(data, "@" .. path .. " (DEV fixture)"))()
@@ -47,6 +53,7 @@ for _, path in ipairs({ "tests/threat_debuffs_spec.lua", "tests/threat_demo_spec
     "tests/names_spec.lua", "tests/full_names_spec.lua", "tests/class_names_spec.lua", "tests/compact_layout_spec.lua", "tests/target_cast_spec.lua",
     "tests/purify_spec.lua", "tests/native_purify_spec.lua", "tests/range_spec.lua", "tests/editor_position_spec.lua", "tests/debuffs_spec.lua", "tests/drinking_timer_spec.lua", "tests/paladin_aura_spec.lua", "tests/blessing_guidance_spec.lua", "tests/target_support_spec.lua", "tests/class_cleansing_spec.lua", "tests/class_upkeep_spec.lua", "tests/hunter_aspects_spec.lua", "tests/weapon_upkeep_spec.lua", "tests/class_integration_spec.lua" }) do
     local fixtureTest = read(path):gsub("ApogeeHeals", name)
+        :gsub("ApogeeUI", "ApogeeUIDev"):gsub("ApogeeSettingsRegistry", "ApogeeDevSettingsRegistry")
         :gsub("APOGEE_HEALS_RESET_CHARACTER", "APOGEE_HEALS_DEV_RESET_CHARACTER")
     assert(loadstring(fixtureTest, "@" .. path .. " (DEV fixture)"))()
 end
