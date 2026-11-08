@@ -150,12 +150,15 @@ guidance, native weapon displays, limitations and live acceptance checks.
   after current health. Forever's native calculator caps it at missing health
   and accounts for healing absorption. No numbers or extra settings are added.
 - A thin white strip inside the bottom of each friendly health bar counts down
-  your own primary HoT: priest Renew or druid Rejuvenation, including Classic
+  your own primary HoT: priest Renew, druid Rejuvenation or shaman Riptide,
+  including all Classic Renew/Rejuvenation ranks and all three Forever Riptide
   ranks. It covers self, party, target and target-of-target. Native aura filtering
   excludes other healers; refresh/removal follows the actual aura. The strip
   does not replace power or cast bars, and adds no click action or setting.
   This display requires the client's native custom aura duration-bar capability;
   clients without it (including the current Era adapter) omit the strip.
+  Classes without a matching primary HoT show no strip; Paladin Oath of Light
+  and Light's Vigil are not periodic heals and are not included.
 - Native left-click targeting when unassigned, with healing click bindings on Left, Right,
   Middle, Mouse 4 and Mouse 5 (plain, Shift and Ctrl). No global binding overrides.
   Standard native target actions also retain the client's spell/item cursor behavior.

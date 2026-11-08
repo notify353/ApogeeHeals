@@ -329,7 +329,7 @@ the executable. The following is an existing-source contract review, not a fresh
 
 Blizzard_CustomAuraContainer accepts includeSpellIDs for helpful auras on friendly
 units. Blizzard_AuraContainerUtil rejects unfilterable identities; HELPFUL|PLAYER
-is forwarded unchanged to native filtering. Classic Renew/Rejuvenation rank IDs
+is forwarded unchanged to native filtering. Classic Renew/Rejuvenation and Forever Riptide rank IDs
 select the player's class family. CustomAuraButton SetDurationBar binds a child
 StatusBar; native ApplyDurationBar passes its opaque duration to SetTimerDuration
 with RemainingTime. The addon never reads aura records, native slot visibility,
@@ -345,6 +345,21 @@ Preview, world suspension and startup failure disable containers; combat does no
 Missing actual native capabilities omit this optional display, including current
 Era. Source and exported-function mocks do not establish engine permission, live
 rank coverage, timer rendering or updated-client compatibility.
+
+November 7 class expansion adds Shaman Riptide ranks 1/2/3 (408521,1239242,
+1239243). Blizzard's [November 2 class notes](https://us.forums.blizzard.com/en/wow/t/2360696)
+confirm Riptide is a HoT. Spell-data records identify the actual aura ranks:
+[rank 1](https://wow-forever.gg/db/spells/408521-riptide/),
+[rank 2](https://wow-forever.gg/db/spells/1239242-riptide/),
+[rank 3](https://wow-forever.gg/db/spells/1239243-riptide/).
+This is a spell-identity update, not an API/export review. Do not use Retail
+Riptide IDs, the NPC spell 22419 or the rune wrapper 409954. Paladin Oath of Light
+enhances subsequent heals and Light's Vigil triggers a subsequent Holy Shock;
+neither is periodic healing. Regrowth/Wild Growth are additional Druid effects,
+not the single primary Rejuvenation family selected for this strip. Pet channels,
+totem pulses and passive self-heals remain outside the primary party-HoT scope.
+The owner's white-bar confirmation applies to the earlier observed behavior;
+new Shaman coverage still requires native testing. No timer/filter API changed.
 
 ## Exclusive class-strip input (October 12)
 

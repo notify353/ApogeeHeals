@@ -193,13 +193,15 @@ local function bar(parent, height, y, width)
     S.Background(result); A.UnitAPI.Clear(result)
     return result
 end
--- Classic rank identities; the native PLAYER filter owns caster selection.
+-- Classic Renew/Rejuvenation and Forever Riptide rank identities.
+-- The native PLAYER filter owns caster selection.
 -- No aura records, native slot visibility or timer values are read back.
 local hotRanks = {
     PRIEST = {[139]=true,[6074]=true,[6075]=true,[6076]=true,[6077]=true,
         [6078]=true,[10927]=true,[10928]=true,[10929]=true,[25315]=true},
     DRUID = {[774]=true,[1058]=true,[1430]=true,[2090]=true,[2091]=true,
         [3627]=true,[8910]=true,[9839]=true,[9840]=true,[9841]=true,[25299]=true},
+    SHAMAN = {[408521]=true,[1239242]=true,[1239243]=true},
 }
 local function createHot(row, width)
     local ok, _, class = pcall(UnitClass, "player")

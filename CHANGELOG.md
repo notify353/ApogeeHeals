@@ -1,7 +1,8 @@
 ## Unreleased
 
-- Show your own Renew/Rejuvenation duration as a thin white health-bar strip on
+- Show your own Renew/Rejuvenation/Riptide duration as a thin white health-bar strip on
   friendly self, party and both target frames when native aura timers are available.
+  Riptide includes all three Forever ranks; only your own casts are selected.
   Export refresh for the updated client was deferred; native acceptance is pending.
 
 - Recognize the centrally reviewed Forever70790 build without a stale warning; retain warnings on unreviewed builds and required API checks.

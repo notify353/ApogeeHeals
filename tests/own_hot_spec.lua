@@ -39,7 +39,12 @@ local function fixture(class, unavailable, failStartup)
     assert(a.started == not failStartup)
     return m, a, containers
 end
-for _, class in ipairs({"PRIEST", "DRUID"}) do
+local expectedRanks = {
+    PRIEST = {139,6074,6075,6076,6077,6078,10927,10928,10929,25315},
+    DRUID = {774,1058,1430,2090,2091,3627,8910,9839,9840,9841,25299},
+    SHAMAN = {408521,1239242,1239243},
+}
+for _, class in ipairs({"PRIEST", "DRUID", "SHAMAN"}) do
     local m, a, containers = fixture(class)
     assert(#containers==7)
     local rows = {unpack(a.View.rows)}
@@ -49,15 +54,20 @@ for _, class in ipairs({"PRIEST", "DRUID"}) do
         assert(row.hotContainer==c and c.enabled and c.unit==row.unit)
         assert(c.filter=="HELPFUL|PLAYER" and c.options.maxFrameCount==1)
         local ids = c.options.candidateFilters.includeSpellIDs
-        assert(ids[class=="PRIEST" and 139 or 774])
-        assert(ids[class=="PRIEST" and 25315 or 25299])
-        assert(not ids[class=="PRIEST" and 774 or 139] and not ids[17])
+        for _, id in ipairs(expectedRanks[class]) do assert(ids[id], "missing HoT rank "..id) end
+        local count=0
+        for _ in pairs(ids) do count=count+1 end
+        assert(count==#expectedRanks[class], "unexpected HoT identity")
+        -- Exclude shields, Regrowth, NPC Riptide, its rune wrapper and Retail ranks.
+        assert(not ids[17] and not ids[8936] and not ids[22419]
+            and not ids[409954] and not ids[61295])
         assert(c.parent.driver=="[@"..row.unit..",help,nodead] show; hide")
         assert(c.parent.point[2]==row.health and c.parent.point[1]=="BOTTOMLEFT")
         assert(c.parent.width==a.Style.width-a.Style.classStripHitWidth and c.parent.height==1.5)
         assert(c.parent.level>row.nameLayer.level and c.parent.mouse==false)
         assert(c.button.mouse==false and c.button.duration.mouse==false)
-        assert(c.button.duration.allPoints==c.button and c.button.duration.color[1]==1)
+        assert(c.button.duration.allPoints==c.button)
+        for channel=1,4 do assert(c.button.duration.color[channel]==1, "HoT must stay white") end
         assert(c.button.settings.direction==Enum.StatusBarTimerDirection.RemainingTime)
         assert(c.button.settings.interpolation==Enum.StatusBarInterpolation.Immediate)
         assert(not next(c.button.scripts) and not next(c.button.attributes))
@@ -85,8 +95,10 @@ for _, class in ipairs({"PRIEST", "DRUID"}) do
     m.Event("PLAYER_ENTERING_WORLD"); m.Flush()
     for _, c in ipairs(containers) do assert(c.enabled) end
 end
-local _, _, unsupported = fixture("WARRIOR")
-assert(#unsupported==0)
+for _, class in ipairs({"WARRIOR", "PALADIN", "HUNTER", "ROGUE", "MAGE", "WARLOCK"}) do
+    local _, _, unsupported = fixture(class)
+    assert(#unsupported==0)
+end
 local _, _, absent = fixture("PRIEST", true)
 assert(#absent==0)
 local m, a, failed = fixture("PRIEST", false, true)
