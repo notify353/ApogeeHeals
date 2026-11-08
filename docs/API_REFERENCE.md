@@ -1,3 +1,40 @@
+## Final-minute buff reminders (November 8, 2026)
+
+Own-buff expiry reminders now use one shared60-second window instead of120.
+Exactly60 seconds remains covered; below60 the reminder appears with a rounded-up
+seconds-only countdown. Font10 centered white outlined text matches the debuff
+style. Manual recipient expansion retains spell choices but leaves timers blank
+at60 seconds or more. Missing buffs remain actionable without a timer. Other
+casters, unknown timing, permanent buffs, combat and recipient rules are unchanged.
+This is public out-of-combat timing; no new API or secret-value arithmetic.
+
+## Shield overlay review (November 8, 2026)
+
+Fresh Forever70862 authority exposes the prediction calculator in Environment All.
+GetTotalDamageAbsorbs supplies total remaining shields from every caster, independent
+of incoming heals and heal-absorb debuffs. MissingHealthWithoutIncomingHeals and the
+second GetDamageAbsorbs return choose overflow placement through the public frame
+SetAlphaFromBoolean sink (AllowedWhenTainted, secret Alpha aspect). Two fixed bars
+share the health maximum; the forward one anchors to the native health fill edge,
+and the reverse one to the health frame right edge. Only one is visible. When the
+whole shield exceeds missing health it shifts inward; no secret arithmetic,
+comparison, boolean branch, dimension read, dynamic anchor or frame relocation is
+performed. Native status bars cap shields larger than maximum health at full width.
+
+Shield artwork uses Blizzard's tiled Interface/RaidFrame/Shield-Overlay texture,
+as referenced in Shared/StatusBarOverlaySegment.xml, over pale-blue translucent fill.
+SimpleTextureBaseAPIDocumentation supplies its tiling setters. Artwork is above
+incoming healing but below names and white HoT strips, with mouse input disabled.
+Incoming healing has independent failure handling. UNIT_ABSORB_AMOUNT_CHANGED is
+coalesced with health/max-health events; death, offline, absent units, failed samples,
+hostile targets and zoning clear shields. Friendly target aliases are rechecked.
+No new protected action, setting, runtime path or saved-data key is introduced.
+
+Tests cover live-state transitions, fixed geometry, secret sinks, optional API
+absence and generated families. Public export contracts are checked separately;
+mock geometry and source contracts do not prove C++ clipping or native combat taint.
+Owner in-game rendering and interaction acceptance remains pending.
+
 ## Fresh timer and cleanse review (November 8, 2026)
 
 After the owner confirmed the timer renders, they requested larger digits without
@@ -507,13 +544,13 @@ Rechecked matching 70338 BuffFrame.lua: expirationTime minus GetTime is remainin
 time; duration/expiration zero denotes untimed coverage. The existing guarded
 HELPFUL scan is unchanged. Duration and expiration must both be public finite
 positive numbers before arithmetic. Unknown/secret/invalid timing retains coverage
-and has no timer. Known remaining time below 120 seconds stops suppressing upkeep
+and has no timer. Known remaining time below 60 seconds stops suppressing upkeep
 choices. Equivalent higher ranks/group variants and any-caster coverage remain;
 other long-lived copies still suppress early reminders. Timer identity is scoped
 to matching spell/name or blessing/catalog variant, never an unrelated choice.
 One shared one-second refresh handles threshold crossings without aura events;
 it performs no aura work in combat, preview or world suspension. Timers use the
-existing native FontString display with public m:ss strings and clear on Stop.
+existing native FontString display with public rounded-up seconds-only strings and clear on Stop.
 This supersedes the original absence-only policy below. No saved state or secure
 action changes. Native readability, appearance and taint acceptance remain pending.
 

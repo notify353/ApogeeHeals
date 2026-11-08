@@ -26,7 +26,7 @@ Focus audio request. Earlier pending entries remain detailed regression checklis
   and generic relearning. Legacy disabled entries stay Off until explicitly changed.
 - Existing recognized group buffs satisfy their family. Foreign/unknown-source
   buffs remain protected even in expanded choices. Own buffs can reappear below
-  two minutes with a timer; unknown aura data does not establish missing coverage.
+  one minute with large seconds-only digits; unknown aura data does not establish missing coverage.
 - Click icons on self, party and friendly-player target: one intended native cast
   per click, unchanged selected target, no action for modified clicks. Native range,
   mana, reagent and recipient failures must not redirect a cast. Friendly NPCs,

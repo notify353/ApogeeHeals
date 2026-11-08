@@ -1,4 +1,4 @@
-## Current runtime policy — 2026-10-31
+## Current runtime policy â€” 2026-10-31
 
 Owner policy supersedes earlier runtime version and package-verification gates:
 on Classic Era and Forever, in DEV and PROD, never disable an addon or feature
@@ -49,6 +49,12 @@ Prototype 0.1.0-dev; reviewed against local export 1.60.1.70450. The owner confi
 the appearance in game; full live acceptance remains pending. Not released. Classic Era is deliberately unsupported.
 
 ## Prototype
+
+- Pale-blue striped shield overlays show remaining damage absorption from all
+  casters on friendly health bars. Width uses maximum health as its scale. The
+  segment follows the health edge when it fits; otherwise it draws inward from
+  the right edge, remaining visible at full health. Amounts above maximum health
+  fill the bar. Names, white HoT strips and normal healing clicks remain visible.
 
 - Select another friendly player to show a compact Follow, Inspect and Talents
   group inside the right end of the target health bar. Three role-sized icons brighten on hover; tooltips name each action.
@@ -271,7 +277,7 @@ show an empty state rather than unrelated spell choices.
 
 Recognized ranks and group versions satisfy their family, including another
 caster's buffs. Independent families stay independent. Own buffs can reappear
-with a remaining-time label below two minutes; another caster's or unknown-source
+with a remaining-time label below one minute; another caster's or unknown-source
 buff is preserved until it disappears. Unreadable observations never mean missing.
 Group versions such as Prayers/Gift/Brilliance count as coverage but are not new
 casting actions; Greater Paladin blessings retain their existing explicit actions.
@@ -439,9 +445,9 @@ are already active. Click an icon to recast or change the buff. Click the strip
 again to return to normal missing-buff reminders. Expansion works outside combat
 only and resets on combat entry or target/group changes. No extra panel opens.
 
-Buff icons also appear when a buff has less than two minutes remaining. A small
-m:ss timer on the icon counts down once per second below two minutes; longer
-durations use compact minute/hour labels. Refreshing the buff hides
+Buff reminders also appear when your buff has less than 60 seconds remaining.
+Large centered white digits count down once per second without a seconds suffix,
+matching the debuff timers. Long durations stay unnumbered in manual expansion. Refreshing the buff hides
 the reminder again. Missing buffs have no timer; permanent or unreadable durations
 are never guessed. Expanded options show known remaining times as well.
 

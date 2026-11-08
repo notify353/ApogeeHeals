@@ -35,6 +35,10 @@ function M.New()
     function methods:IsMouseOver() return self.hovered == true end
     function methods:GetFrameLevel() return self.level or 1 end
     function methods:SetAlpha(value) self.alpha = value end
+    function methods:SetAlphaFromBoolean(value, yes, no)
+        self.alphaCondition, self.alphaYes, self.alphaNo = value, yes, no
+        self.alpha = issecretvalue(value) and value or (value and yes or no)
+    end
     function methods:GetEffectiveScale() return self.scale * (self.parent and self.parent:GetEffectiveScale() or 1) end
     function methods:GetWidth() return self.width end
     function methods:GetHeight() return self.height end
@@ -77,6 +81,8 @@ function M.New()
     function methods:SetAllPoints(relative) self.allPoints=relative or self.parent end
     function methods:SetColorTexture(...) self.color = {...} end
     function methods:SetTexture(value) self.texture = value end
+    function methods:SetHorizTile(value) self.horizTile = value end
+    function methods:SetVertTile(value) self.vertTile = value end
     function methods:SetAtlas(value, useAtlasSize) self.atlas = value; self.useAtlasSize = useAtlasSize end
     function methods:SetDesaturated(value) self.desaturated = value end
     function methods:SetTexCoord(...) self.texCoord = {...} end
@@ -118,6 +124,7 @@ function M.New()
     WOW_PROJECT_ID = 1
     GetBuildInfo = function() return "1.60.1", "70170", "", 16001 end
     UnitCanAttack = function(_, unit) return m.units[unit] and m.units[unit].hostile == true end
+    UnitCanAssist = function(_, unit) return m.units[unit] ~= nil and not m.units[unit].hostile end
     UnitDetailedThreatSituation, UnitThreatLeadSituation, UnitThreatPercentageOfLead, GetRaidTargetIndex, C_NamePlate = nil, nil, nil, nil, nil
     local secrets = setmetatable({}, {__mode = "k"})
     function m.Secret()
@@ -167,13 +174,22 @@ function M.New()
     Enum.UnitMaximumHealthMode = { Default = 0 }
     Enum.UnitIncomingHealClampMode = { MissingHealth = 0 }
     Enum.UnitHealAbsorbMode = { ReducedByIncomingHeals = 0 }
+    Enum.UnitDamageAbsorbClampMode = { MissingHealthWithoutIncomingHeals = 1 }
     CreateUnitHealPredictionCalculator = function()
         return {
             SetMaximumHealthMode = function(self, value) self.healthMode = value end,
             SetIncomingHealClampMode = function(self, value) self.clampMode = value end,
             SetIncomingHealOverflowPercent = function(self, value) self.overflow = value end,
             SetHealAbsorbMode = function(self, value) self.absorbMode = value end,
-            ResetPredictedValues = function(self) self.maximum, self.incoming = 0, 0 end,
+            SetDamageAbsorbClampMode = function(self, value) self.damageClamp = value end,
+            ResetPredictedValues = function(self)
+                self.maximum, self.incoming, self.damage, self.damageOverflow = 0, 0, 0, false
+            end,
+            GetTotalDamageAbsorbs = function(self)
+                if m.absorbError then error("absorb unavailable") end
+                return self.damage
+            end,
+            GetDamageAbsorbs = function(self) return 0, self.damageOverflow end,
             GetMaximumHealth = function(self) return self.maximum end,
             GetIncomingHeals = function(self) return self.incoming, 123, 456, false end,
         }
@@ -184,12 +200,16 @@ function M.New()
         if m.predictionEmpty then return end
         local data = m.units[unit]
         calculator.maximum = data.maxHealth
-        if m.secretPrediction then calculator.incoming = m.secretPrediction
+        if m.secretPrediction then
+            calculator.incoming, calculator.damage = m.secretPrediction, m.secretPrediction
+            calculator.damageOverflow = m.secretOverflow or false
         else
             -- Engine simulation only. Addon code must never perform this arithmetic.
             if issecretvalue(data.health) or issecretvalue(data.maxHealth) then error("supply secret fixture") end
             calculator.incoming = math.min(math.max(0, (data.incoming or 0) - (data.healAbsorb or 0)),
                 math.max(0, data.maxHealth - data.health))
+            calculator.damage = data.absorbs or 0
+            calculator.damageOverflow = calculator.damage > math.max(0, data.maxHealth - data.health)
         end
     end
     C_CurveUtil = { CreateColorCurve = function()
