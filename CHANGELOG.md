@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Show automatic expiring-buff reminders only in their final minute, with large
+  centered seconds-only countdowns matching the debuff style.
+
 - Show pale-blue striped total-absorb overlays on friendly health frames, with
   native full-health overflow placement and immediate shield-consumption updates.
 
