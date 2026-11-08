@@ -56,6 +56,22 @@ end
 -- Permanent action positions; native slots alone select and display aura data.
 local dispelTypes = {"Magic", "Disease", "Poison", "Curse"}
 local allDispelTypes = {Magic=true, Disease=true, Poison=true, Curse=true}
+local timerFormatter
+local function countdownFormatter()
+    if timerFormatter then return timerFormatter end
+    if not C_StringUtil or type(C_StringUtil.CreateNumericRuleFormatter) ~= "function"
+        or not Enum or not Enum.NumericRuleFormatRounding then return end
+    local formatter = C_StringUtil.CreateNumericRuleFormatter()
+    if type(formatter.SetBreakpoints) ~= "function" then return end
+    -- Native formatting samples remaining time, including crossing the minute
+    -- boundary. No secret duration or rendered text is inspected by addon Lua.
+    formatter:SetBreakpoints({
+        {threshold=0, step=1, rounding=Enum.NumericRuleFormatRounding.Up, min=1, format="%.0f"},
+        {threshold=60, format=""},
+    })
+    timerFormatter = formatter
+    return formatter
+end
 local function supportsSlots(container)
     for _, method in ipairs({"AddAuraSlot", "SetAuraSlotCandidateFilters", "SetUnit", "SetEnabled"}) do
         if type(container[method]) ~= "function" then return false end
@@ -125,17 +141,18 @@ local function createFixed(row)
                 frame:SetIcon(icon)
                 if type(frame.SetDurationText) == "function" and C_AuraContainerUtil
                     and type(C_AuraContainerUtil.ProcessCustomAuraButtonDurationTextOptions) == "function" then
-                    local remaining = A.Style.CleanText(frame, 7)
-                    local font = remaining:GetFont()
-                    remaining:SetFont(font, 7, "OUTLINE")
-                    remaining:SetPoint("BOTTOM", frame, "BOTTOM", 0, 1.5)
-                    remaining:SetSize(size - 3, 8)
-                    remaining:SetJustifyH("CENTER")
-                    remaining:SetShadowColor(0, 0, 0, 1)
-                    remaining:SetShadowOffset(0.5, -0.5)
-                    -- Native binding formats/updates remaining time and hides
-                    -- permanent effects. Never read duration or text back in Lua.
-                    frame:SetDurationText(remaining)
+                    local formatter = countdownFormatter()
+                    if formatter then
+                        local remaining = A.Style.CleanText(frame, 10)
+                        local font = remaining:GetFont()
+                        remaining:SetFont(font, 10, "OUTLINE")
+                        remaining:SetPoint("CENTER", frame, "CENTER", 0, 0)
+                        remaining:SetSize(size - 3, 12)
+                        remaining:SetJustifyH("CENTER")
+                        remaining:SetShadowColor(0, 0, 0, 1)
+                        remaining:SetShadowOffset(0.5, -0.5)
+                        frame:SetDurationText(remaining, {textFormatter=formatter})
+                    end
                 end
             end,
         })

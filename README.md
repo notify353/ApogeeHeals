@@ -295,8 +295,9 @@ an existing instance does not make it newest. Instance ordering is not a promise
 of exact application timestamps or danger priority.
 
 Hover shows the selected aura's native tooltip, including during combat.
-Small white outlined text at the bottom of each icon shows its native remaining
-duration. Permanent effects have no countdown; the label adds no extra space.
+Large centered white outlined digits show the final minute, without a seconds
+suffix. Timers stay blank at 60 seconds or more remaining, then count down from
+60 as fractional seconds round up. Permanent effects have no countdown.
 Left-button release casts the learned cleanse for that type on the fixed row
 recipient; modified clicks do nothing. Magic uses Priest Dispel Magic's highest
 learned rank or Paladin Cleanse. Disease/Poison prefer a learned Cure/Purify,

@@ -96,9 +96,9 @@ print("PASS retained-export newest-instance priority, refresh/removal fallback, 
 local custom=read("Blizzard_AuraContainer/Blizzard_CustomAuraButton.lua")
 env.CustomAuraButtonSharedMixin={}; env.CustomAuraButtonPrivateMixin={}
 env.Enum={SecretAspect={Text=1,Alpha=2,VertexColor=3}}
-env.securecopy=function(value) assert(value==nil); return value end
+env.securecopy=function(value) return value end
 env.C_AuraContainerUtil={ProcessCustomAuraButtonDurationTextOptions=function(value)
-    assert(value==nil); return {}
+    return value or {}
 end}
 env.AuraContainerUtil.RequireObjectType=function(kind) assert(kind=="FontString"); return kind end
 env.AuraContainerUtil.ValidateInboundScriptObject=function(font,parent,kind)
@@ -121,6 +121,9 @@ local font={parent=frame,aspects={},AddSecretAspect=function(self,value) self.as
 env.CustomAuraButtonSharedMixin.SetDurationText(frame,font,nil)
 assert(frame.durationText==font and frame.updated and binding.font==font)
 assert(binding.defaults and binding.formatter==formatter and font.aspects[1] and font.aspects[2] and font.aspects[3])
+local digitsOnlyFormatter={}
+env.CustomAuraButtonSharedMixin.SetDurationText(frame,font,{textFormatter=digitsOnlyFormatter})
+assert(binding.formatter==digitsOnlyFormatter, "native binding must apply the supplied numeric formatter")
 local timed={IsZero=function() return false end}
 local permanent={IsZero=function() return true end}
 env.CustomAuraButtonPrivateMixin.ApplyDurationText(frame,"party1",{},timed)
@@ -133,3 +136,11 @@ assert(binding.duration==replacement and binding.enabled)
 assert(shared:find("DefaultAuraDurationFormatter:SetDesiredUnitCount(1)",1,true))
 assert(shared:find("DefaultAuraDurationFormatter:SetDefaultAbbreviation(Enum.SecondsFormatterAbbreviation.OneLetter)",1,true))
 print("PASS native duration text binding, compact formatter, timed/permanent/replacement lifecycle and restricted text aspects")
+local numeric=read("Blizzard_APIDocumentationGenerated/NumericRuleFormatterAPIDocumentation.lua")
+local numericShared=read("Blizzard_APIDocumentationGenerated/NumericRuleFormatterSharedDocumentation.lua")
+local stringUtil=read("Blizzard_APIDocumentationGenerated/StringUtilDocumentation.lua")
+assert(numeric:find('Environment = "All"',1,true) and numeric:find('Name = "SetBreakpoints"',1,true))
+assert(stringUtil:find('Environment = "All"',1,true) and stringUtil:find('Name = "CreateNumericRuleFormatter"',1,true))
+assert(numericShared:find('Name = "Up"',1,true) and numericShared:find('Name = "threshold"',1,true))
+assert(numericShared:find('at-most one numeric format specifier',1,true))
+print("PASS public numeric formatter contract and custom formatter handoff; C++ rendering requires native acceptance")

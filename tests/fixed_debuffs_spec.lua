@@ -20,7 +20,7 @@ local function fixture(class, option)
     C_SpellBook = {IsSpellInSpellBook=function(id, bank, overrides)
         assert(bank==0 and overrides==false); return not m.unknown[id]
     end, IsSpellKnown=function(id) return not m.unknown[id] end}
-    local globals = {"C_XMLUtil", "C_AuraContainerUtil", "AuraContainerSortMethod", "AuraContainerSortDirection",
+    local globals = {"C_XMLUtil", "C_AuraContainerUtil", "C_StringUtil", "AuraContainerSortMethod", "AuraContainerSortDirection",
         "CustomAuraContainerSharedMixin", "CustomAuraButtonSharedMixin", "AuraButtonSharedMixin"}
     local previous = {}
     for _, key in ipairs(globals) do previous[key]=_G[key] end
@@ -31,6 +31,13 @@ local function fixture(class, option)
     CustomAuraContainerSharedMixin, CustomAuraButtonSharedMixin, AuraButtonSharedMixin = nil, nil, nil
     C_XMLUtil = {GetTemplateInfo=function() return {type="AuraContainer"} end}
     C_AuraContainerUtil = not option.noDuration and {ProcessCustomAuraButtonDurationTextOptions=function() end} or nil
+    Enum.NumericRuleFormatRounding={Up=1}
+    m.formatters={}
+    C_StringUtil=not option.noFormatter and {CreateNumericRuleFormatter=function()
+        local formatter={SetBreakpoints=function(self,rules) self.rules=rules end}
+        m.formatters[#m.formatters+1]=formatter
+        return formatter
+    end} or nil
     if option.noSort then AuraContainerSortMethod=nil end
     local create = CreateFrame
     CreateFrame = function(kind, name, parent, template)
@@ -48,8 +55,9 @@ local function fixture(class, option)
                 function visual:SetHideTooltipInCombat(value) self.hideTooltipInCombat=value end
                 function visual:SetIcon(value) self.nativeIcon=value end
                 function visual:SetDurationText(value, options)
-                    assert(options==nil, "use native compact remaining-time formatter")
+                    assert(options and options.textFormatter)
                     self.durationText=value
+                    self.durationOptions=options
                     value.GetText=function() error("addon read secret duration text") end
                 end
                 config.initializeFrame(visual)
@@ -94,9 +102,23 @@ for class, expected in pairs(cases) do
             assert(visual.nativeIcon and not visual.nativeIcon.texture, "native aura icon must supply artwork")
             local remaining=assert(visual.durationText)
             assert(remaining.parent==visual and remaining.drawLayer=="OVERLAY")
-            assert(remaining.font[2]==7 and remaining.font[3]=="OUTLINE")
-            assert(remaining.point[1]=="BOTTOM" and remaining.point[5]==1.5)
-            assert(remaining.width==a.Style.sideIconSize-3 and remaining.height==8)
+            assert(remaining.font[2]==10 and remaining.font[3]=="OUTLINE")
+            assert(remaining.point[1]=="CENTER" and remaining.point[5]==0)
+            assert(remaining.width==a.Style.sideIconSize-3 and remaining.height==12)
+            assert(#m.formatters==1 and visual.durationOptions.textFormatter==m.formatters[1])
+            local rules=visual.durationOptions.textFormatter.rules
+            -- Model documented numeric-breakpoint semantics using public fixture
+            -- values. The live C++ formatter and secret durations stay native.
+            local function render(seconds)
+                local rule=rules[1]
+                for _,candidate in ipairs(rules) do if seconds>=candidate.threshold then rule=candidate end end
+                if rule.format=="" then return "" end
+                assert(rule.rounding==Enum.NumericRuleFormatRounding.Up and rule.step==1)
+                return string.format(rule.format,math.max(rule.min,math.ceil(seconds)))
+            end
+            for _,case in ipairs({{300,""},{60.1,""},{60,""},{59.9,"60"},{45.2,"46"},{10,"10"},{0.1,"1"}}) do
+                assert(render(case[1])==case[2], "numeric countdown threshold/rounding")
+            end
             assert(remaining.justify=="CENTER" and remaining.wrap==false)
             for channel=1,4 do assert(remaining.color[channel]==1) end
             assert(visual.point[2]==icons.parent and visual.point[4]==(index-1)*(a.Style.sideIconSize+a.Style.sideIconGap))
@@ -201,6 +223,9 @@ assert(not fallback.View.target.fixedDebuffs and #fallback.View.target.cleanseBu
 local _,noDuration=fixture("PRIEST",{noDuration=true})
 assert(noDuration.View.target.fixedDebuffs and noDuration.View.target.cleanseButtons[1].spell==988)
 for _,slot in pairs(noDuration.View.target.debuffContainer.slots) do assert(not slot.frame.durationText) end
+local _,noFormatter=fixture("PRIEST",{noFormatter=true})
+assert(noFormatter.View.target.fixedDebuffs and noFormatter.View.target.cleanseButtons[1].spell==988)
+for _,slot in pairs(noFormatter.View.target.debuffContainer.slots) do assert(not slot.frame.durationText) end
 local _,noSlots=fixture("PRIEST",{noSlots=true})
 assert(not noSlots.View.target.fixedDebuffs and noSlots.View.target.debuffContainer.group)
 assert(not noSlots.View.target.cleanseIndicator and noSlots.View.target.cleanseButtons[1].spell==988)

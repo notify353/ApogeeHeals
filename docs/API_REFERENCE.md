@@ -1,5 +1,25 @@
 ## Fresh timer and cleanse review (November 8, 2026)
 
+After the owner confirmed the timer renders, they requested larger digits without
+the seconds suffix and no timer for effects above60 seconds remaining. The label
+now uses10-unit centered Number12Font with a white outline/shadow. A cached native
+C_StringUtil.CreateNumericRuleFormatter supplies two public configuration rules:
+threshold0 uses step1, Up rounding, minimum1 and %.0f; threshold60 uses an empty
+format. The native duration binding samples remaining duration and applies these
+rules, including transitions into/out of the final minute; addon Lua neither
+reads duration nor formats secret values. At exactly60 the label is blank; just
+below60 it displays60, then descends to1. The icon always remains visible.
+
+Fresh70862 StringUtilDocumentation, NumericRuleFormatterAPIDocumentation and
+NumericRuleFormatterSharedDocumentation (already in central authority) expose
+the factory and SetBreakpoints in Environment All. Zero numeric specifiers are
+permitted for the blank rule. Native SetDurationText accepts textFormatter and
+assigns it after its default formatter. Fixtures model documented public rule
+semantics at/below/above60, fractional rounding and refresh into a long duration;
+exported native Lua verifies custom formatter handoff. C++ formatted output and
+new typography still require owner native acceptance. Existing private-mixin
+namespace regression and public object capability checks remain in force.
+
 Live screenshot follow-up: a red legacy debuff icon remained without a timer.
 The fixed renderer incorrectly required CustomAuraContainerSharedMixin,
 CustomAuraButtonSharedMixin and AuraButtonSharedMixin as addon globals. The
