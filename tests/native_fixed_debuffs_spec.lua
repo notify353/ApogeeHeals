@@ -13,6 +13,20 @@ end
 local env=setmetatable({}, {__index=_G})
 local function execute(code) local f=assert(loadstring(code)); setfenv(f,env); return f() end
 local shared=read("Blizzard_AuraContainer/Blizzard_AuraContainerShared.lua")
+local toc=read("Blizzard_AuraContainer/Blizzard_AuraContainer.toc")
+assert(toc:find("## UseSecureEnvironment: 1",1,true))
+assert(toc:find("\nBlizzard_CustomAuraContainer.lua\n",1,true))
+assert(toc:find("\nBlizzard_CustomAuraButton.lua\n",1,true))
+assert(toc:find("Blizzard_CustomAuraContainer.xml [LoadIntoEnvironment global]",1,true))
+assert(shared:find("_G.AuraContainerSortMethod = securecopy(AuraContainerSortMethod)",1,true))
+assert(shared:find("_G.AuraContainerSortDirection = securecopy(AuraContainerSortDirection)",1,true))
+local containerXML=read("Blizzard_AuraContainer/Blizzard_CustomAuraContainer.xml")
+local buttonXML=read("Blizzard_AuraContainer/Blizzard_CustomAuraButton.xml")
+assert(containerXML:find('key="CustomAuraContainerInboundMixin" source="secure" targetPartition="public"',1,true))
+assert(buttonXML:find('key="CustomAuraButtonInboundMixin" source="secure" targetPartition="public"',1,true))
+for _,name in ipairs({"Blizzard_CustomAuraContainer.lua","Blizzard_CustomAuraButton.lua","Blizzard_AuraButton.lua"}) do
+    assert(not read("Blizzard_AuraContainer/"..name):find("_G.",1,true), "review changes to exported mixin visibility")
+end
 for _,name in ipairs({"AuraContainerSortMethod","AuraContainerSortDirection","AuraContainerAuraDataType"}) do
     execute(assert(shared:match(name.." =\n%{.-\n%};")))
 end

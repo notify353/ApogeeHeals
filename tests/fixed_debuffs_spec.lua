@@ -26,9 +26,9 @@ local function fixture(class, option)
     for _, key in ipairs(globals) do previous[key]=_G[key] end
     AuraContainerSortMethod = {AuraInstanceIDOnly=8}
     AuraContainerSortDirection = {Reverse=1}
-    CustomAuraContainerSharedMixin = {AddAuraSlot=function() end,SetAuraSlotCandidateFilters=function() end}
-    CustomAuraButtonSharedMixin = {SetIcon=function() end}
-    AuraButtonSharedMixin = {SetHideTooltipInCombat=function() end}
+    -- Blizzard_AuraContainer's Lua runs in UseSecureEnvironment. Only inbound
+    -- object methods and explicitly copied enums are public, not these mixins.
+    CustomAuraContainerSharedMixin, CustomAuraButtonSharedMixin, AuraButtonSharedMixin = nil, nil, nil
     C_XMLUtil = {GetTemplateInfo=function() return {type="AuraContainer"} end}
     C_AuraContainerUtil = not option.noDuration and {ProcessCustomAuraButtonDurationTextOptions=function() end} or nil
     if option.noSort then AuraContainerSortMethod=nil end
@@ -61,6 +61,7 @@ local function fixture(class, option)
             function frame:SetAuraSlotCandidateFilters(key, filters)
                 assert(not m.combat); self.slots[key].filters=filters
             end
+            if option.noSlots then frame.AddAuraSlot=nil end
         end
         return frame
     end
@@ -200,6 +201,9 @@ assert(not fallback.View.target.fixedDebuffs and #fallback.View.target.cleanseBu
 local _,noDuration=fixture("PRIEST",{noDuration=true})
 assert(noDuration.View.target.fixedDebuffs and noDuration.View.target.cleanseButtons[1].spell==988)
 for _,slot in pairs(noDuration.View.target.debuffContainer.slots) do assert(not slot.frame.durationText) end
+local _,noSlots=fixture("PRIEST",{noSlots=true})
+assert(not noSlots.View.target.fixedDebuffs and noSlots.View.target.debuffContainer.group)
+assert(not noSlots.View.target.cleanseIndicator and noSlots.View.target.cleanseButtons[1].spell==988)
 print("PASS fixed type slots, native hover/click separation, learned ranks, empty/Other slots, lifecycle, combat deferral and capability fallback")
 
 -- Exercise exact native release dispatch for the new transparent secure buttons.

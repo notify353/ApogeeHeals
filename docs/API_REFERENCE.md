@@ -1,5 +1,22 @@
 ## Fresh timer and cleanse review (November 8, 2026)
 
+Live screenshot follow-up: a red legacy debuff icon remained without a timer.
+The fixed renderer incorrectly required CustomAuraContainerSharedMixin,
+CustomAuraButtonSharedMixin and AuraButtonSharedMixin as addon globals. The
+exported Blizzard_AuraContainer.toc uses UseSecureEnvironment:1 for these Lua
+definitions; XML alone loads globally and exposes inbound object methods through
+public partitions. Shared sort enums are explicitly copied to _G, but the mixins
+are not. This made the renderer silently fall back before creating its timer.
+The fixture had incorrectly exposed those private mixins, masking the failure.
+
+The corrected fixture reproduces the failure with private globals absent; the
+fix checks AddAuraSlot/SetAuraSlotCandidateFilters/SetUnit/SetEnabled on actual
+container objects. Missing public methods hide the unused gate and retain the
+capability fallback. Native-source tests now verify TOC environments, explicit
+enum exports and XML public inbound partitions. Prior successful byte/mock
+checks did not establish live rendering; this correction still requires reload
+and native timer/hover/click acceptance from the owner.
+
 The owner exported current Forever1.60.1.70862. All244 previously tracked
 references are fresh and byte-identical to70790; central authority adds the
 reviewed aura-slot implementation, duration-options documentation and priority

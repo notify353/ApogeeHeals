@@ -56,6 +56,12 @@ end
 -- Permanent action positions; native slots alone select and display aura data.
 local dispelTypes = {"Magic", "Disease", "Poison", "Curse"}
 local allDispelTypes = {Magic=true, Disease=true, Poison=true, Curse=true}
+local function supportsSlots(container)
+    for _, method in ipairs({"AddAuraSlot", "SetAuraSlotCandidateFilters", "SetUnit", "SetEnabled"}) do
+        if type(container[method]) ~= "function" then return false end
+    end
+    return true
+end
 local function createFixed(row)
     if A.__ApogeeClient == "classic-era" then return false end
     local sort = AuraContainerSortMethod and AuraContainerSortMethod.AuraInstanceIDOnly
@@ -64,11 +70,6 @@ local function createFixed(row)
     if not info or not A.Access.Readable(info.type) or info.type ~= "AuraContainer"
         or not A.Access.Readable(sort) or type(sort) ~= "number"
         or not A.Access.Readable(direction) or type(direction) ~= "number"
-        or not CustomAuraContainerSharedMixin
-        or type(CustomAuraContainerSharedMixin.AddAuraSlot) ~= "function"
-        or type(CustomAuraContainerSharedMixin.SetAuraSlotCandidateFilters) ~= "function"
-        or not CustomAuraButtonSharedMixin or type(CustomAuraButtonSharedMixin.SetIcon) ~= "function"
-        or not AuraButtonSharedMixin or type(AuraButtonSharedMixin.SetHideTooltipInCombat) ~= "function"
         or type(row.SetMouseMotionEnabled) ~= "function" then return false end
     local size, gap = A.Style.sideIconSize, A.Style.sideIconGap
     local width = 5 * size + 4 * gap
@@ -76,16 +77,20 @@ local function createFixed(row)
     gate:SetSize(width, size)
     gate:SetPoint("TOPLEFT", row.health, "TOPRIGHT", gap, A.Style.sideIconY)
     gate:EnableMouse(false)
-    RegisterStateDriver(gate, "visibility", "[@" .. row.unit .. ",help,nodead] show; hide")
     local level = A.Access.Read(row.health.GetFrameLevel, row.health)
     if type(level) ~= "number" or level < 0 or level >= 10000 or level % 1 ~= 0 then level = 1 end
     local function container()
         local result = CreateFrame("AuraContainer", nil, gate, "CustomAuraContainerTemplate")
+        -- The mixin definitions live in Blizzard's secure Lua environment.
+        -- Check the public inbound methods on the actual object instead.
+        if not supportsSlots(result) then return nil end
         result:SetAllPoints(gate); result:SetSize(width, size)
         result:EnableMouse(false); result:SetUnit(row.unit)
         return result
     end
     local icons, highlights = container(), container()
+    if not icons or not highlights then gate:Hide(); return false end
+    RegisterStateDriver(gate, "visibility", "[@" .. row.unit .. ",help,nodead] show; hide")
     row.fixedDebuffs, row.cleanseButtons = true, {}
     row.fixedDebuffGate = gate
     row.debuffContainer, row.cleanseIndicator = icons, highlights
@@ -178,6 +183,9 @@ function P.Create(row)
     local container
     if info and A.Access.Readable(info.type) and info.type == "AuraContainer" then
         container = CreateFrame("AuraContainer", nil, row.supportFrame or row, "CustomAuraContainerTemplate")
+        if not supportsSlots(container) then container:Hide(); container = nil end
+    end
+    if container then
         container:SetPoint("TOPLEFT", row.health, "TOPRIGHT", offset, A.Style.sideIconY)
         container:SetSize(#spells * size + (#spells - 1) * gap, size)
         container:SetUnit(row.unit)
