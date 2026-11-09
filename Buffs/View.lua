@@ -146,17 +146,19 @@ function B.RefreshRebirth()
         end
     end
 end
-function B.RefreshRebirthRange()
+function B.RefreshRebirthRange(refreshRange)
     local enabled = not B.suspended and not A.View.unlocked and A.startupState ~= "failed"
     for _, row in ipairs(A.View.supportRows or A.View.rows or {}) do
         local button = row.rebirthButton
         if button then
             -- Combat updates touch artwork only. Unknown/secret range is neutral.
-            local outside = enabled and button.reminderSpell
-                and A.Bindings.SpellRange(button.reminderSpell, row.unit) == false or false
-            button.icon:SetDesaturated(outside)
-            local brightness = outside and 0.45 or 1
-            button.icon:SetVertexColor(brightness, brightness, brightness, 1)
+            if refreshRange ~= false then
+                local outside = enabled and button.reminderSpell
+                    and A.Bindings.SpellRange(button.reminderSpell, row.unit) == false or false
+                button.icon:SetDesaturated(outside)
+                local brightness = outside and 0.45 or 1
+                button.icon:SetVertexColor(brightness, brightness, brightness, 1)
+            end
             button.icon:SetAlpha(enabled and 1 or 0)
             if not enabled then B.HideTooltip(button) end
         end

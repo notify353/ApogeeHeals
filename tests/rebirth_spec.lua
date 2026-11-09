@@ -49,6 +49,14 @@ C_Spell.SpellHasRange = function() return true end
 C_Spell.IsSpellInRange = function() return false end
 local function tick() a.Buffs.timerDriver.scripts.OnUpdate(a.Buffs.timerDriver, 1) end
 tick(); assert(button.icon.desaturated and button.icon.vertexColor[1] == 0.45)
+local rangeReads = 0
+C_Spell.IsSpellInRange = function(id)
+    if rankOf[id] then rangeReads = rangeReads + 1 end
+    return false
+end
+for i = 1, 100 do m.Event("UNIT_HEALTH", "party1"); m.Flush() end
+assert(rangeReads == 0, "Combat health events must not bypass the Rebirth range polling budget")
+tick(); assert(rangeReads == 5, "One range sample per fixed recipient on the existing timer")
 C_Spell.IsSpellInRange = function() return true end
 tick(); assert(not button.icon.desaturated and button.icon.vertexColor[1] == 1)
 C_Spell.IsSpellInRange = function() return m.Secret() end

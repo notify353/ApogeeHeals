@@ -515,6 +515,14 @@ world-to-combat and failure cleanup. Matching exported SecureTemplates macro
 dispatch and SecureStateDriver resolver run with simulated engine conditions;
 real combat input, secure provenance and taint remain native acceptance checks.
 
+The requested follow-up bug sweep reproduced excess combat range polling:
+ordinary health-event refreshes were querying all five Rebirth recipients between
+timer ticks. Combat refresh now updates activity only and preserves range color;
+the existing one-second timer samples range. The regression fails before the fix
+and verifies100 separate health-event flushes add zero Rebirth range reads, then
+one timer tick samples exactly five fixed recipients. Combat-entry cleanup may
+take an immediate initial sample; out-of-combat event refresh remains unchanged.
+
 Owner confirmed DEV.3 icon visibility and click-to-resurrect work, then requested
 grey range feedback and line of sight if supported. Reviewed70862 SpellDocumentation
 IsSpellInRange provides nullable range only; no general line-of-sight query was

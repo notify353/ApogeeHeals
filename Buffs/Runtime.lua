@@ -209,7 +209,8 @@ function B.CanResurrect(unit, spell)
 end
 function B.Refresh()
     B.RefreshRebirth()
-    B.RefreshRebirthRange()
+    -- Frequent combat unit events restore activity only; the timer owns range.
+    B.RefreshRebirthRange(not InCombatLockdown())
     if InCombatLockdown() or B.suspended then return end
     B.nameGroups = {}
     A.BuffDefaults.Seed()
