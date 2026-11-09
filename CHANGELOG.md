@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Detect learned resurrection spells even when Forever classifies them as not
+  helpful; retain active/non-harmful checks and the strict ordinary healing filter.
+
 - Keep resurrection available after release without filtering by unit range;
   let the first target-side button remain visible for dead recipients.
 

@@ -174,9 +174,18 @@ function B.ResurrectionSpell()
         or A.UnitAPI.State("player") ~= "alive" then return end
     local ok, _, class = pcall(UnitClass, "player")
     if not ok or not A.Access.Readable(class) or type(class) ~= "string" then return end
+    local bank = Enum and Enum.SpellBookSpellBank and Enum.SpellBookSpellBank.Player
+    if not bank or not C_SpellBook then return end
     for _, id in ipairs(resurrectionRanks[class] or {}) do
-        local info = A.Bindings.Resolve(id)
-        if info then return {id=id, icon=info.iconID, name=info.name, resurrection=true} end
+        -- Forever resurrection reports IsSpellHelpful=false. Only these explicit
+        -- class/rank candidates bypass the generic healing-assignment filter.
+        local info = B.Info(id)
+        if info and A.Access.Read(C_SpellBook.IsSpellInSpellBook, id, bank, false) == true
+            and A.Access.Read(C_SpellBook.IsSpellKnown, id, bank) == true
+            and A.Access.Read(C_Spell.IsSpellHarmful, id) == false
+            and A.Access.Read(C_Spell.IsSpellPassive, id) == false then
+            return {id=id, icon=info.iconID, name=info.name, resurrection=true}
+        end
     end
 end
 function B.CanResurrect(unit, spell)

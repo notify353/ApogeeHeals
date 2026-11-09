@@ -14,6 +14,9 @@ for class, ranks in pairs(families) do
     C_Spell.GetSpellSubtext = function(id) return "Rank " .. names[id] end
     C_SpellBook.IsSpellKnown = function(id) return learned[id] == true end
     C_SpellBook.IsSpellInSpellBook = C_SpellBook.IsSpellKnown
+    -- Observed on the owner's Forever priest: learned/in-book=true, helpful=false,
+    -- harmful=false, passive=false. Resurrection is not a normal healing spell.
+    C_Spell.IsSpellHelpful = function() return false end
     UnitIsPlayer = function(unit) return unit ~= "target" or not m.npc end
     m.units.party1 = {connected=true, dead=true, auras={}}
     m.units.target = {connected=true, dead=true, auras={}}
@@ -95,6 +98,18 @@ for class, ranks in pairs(families) do
     C_Spell.GetSpellSubtext = function() return "Rank 4\n/cast Other" end
     m.Event("SPELL_TEXT_UPDATE"); m.Flush(); absent()
     m.units.player.class = "WARRIOR"; refresh(); absent()
+    m.units.player.class = class
+    C_Spell.GetSpellSubtext = function() return "Rank 4" end
+    C_Spell.IsSpellHarmful = function() return true end
+    refresh(); absent()
+    C_Spell.IsSpellHarmful = function() return m.Secret() end
+    refresh(); absent()
+    C_Spell.IsSpellHarmful = function() return false end
+    C_Spell.IsSpellPassive = function() return true end
+    refresh(); absent()
+    C_Spell.IsSpellPassive = function() return false end
+    refresh(); assert(button.attributes.type1 == "macro")
+    assert(not a.Bindings.Resolve(ranks[1]), "Normal healing assignment filter stays strict")
     UnitIsPlayer = nil
 end
 print("PASS resurrection: learned ranks, strict dead recipients, styling, range, combat and lifecycle")

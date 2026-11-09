@@ -480,6 +480,16 @@ color. Mocks do not establish live Druid acceptance.
 
 ## Resurrection buttons (November 8, 2026)
 
+Owner's native priest diagnostic established the actual missing-icon cause:
+Resurrection2006 is known=true, inSpellBook=true, helpful=false, harmful=false,
+passive=false, with DEV loaded. The generic healing resolver rejected it.
+Known resurrection class/rank candidates now use readable spell info, exact
+player spellbook/known checks and non-harmful/non-passive predicates directly.
+Only that allowlist omits the helpful classification; normal healing/buff
+assignment rules are unchanged. The observed predicate fixture fails before
+the correction and passes afterward for all three supported resurrection classes.
+No new API dependency. Native icon/casting retest remains required.
+
 Released-recipient follow-up: remove the unit/spell range visibility filter for
 resurrection. Neither that result nor the ghost's location establishes corpse
 reachability; native casting decides. The target's first reminder button now
