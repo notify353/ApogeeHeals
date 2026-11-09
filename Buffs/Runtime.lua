@@ -184,7 +184,9 @@ function B.CanResurrect(unit, spell)
         or A.UnitAPI.State(unit) ~= "dead" or A.Access.Read(UnitIsConnected, unit) ~= true
         or A.Access.Read(UnitCanAssist, "player", unit) ~= true then return false end
     if unit == "target" and A.Access.Read(UnitIsPlayer, unit) ~= true then return false end
-    return A.Bindings.SpellRange(spell.id, unit) ~= false
+    -- Unit/spell range does not establish corpse reachability after release.
+    -- Keep the dead recipient's action available; the native cast validates it.
+    return true
 end
 function B.Refresh()
     if InCombatLockdown() or B.suspended then return end

@@ -26,6 +26,8 @@ local function configureAction(button, id, unit, resurrection)
     local visibility = "[combat] hide; show"
     if resurrection then
         visibility = "[combat][@player,dead] hide; [@" .. unit .. ",exists,help,dead] show; hide"
+    elseif button.deadRecipientSlot then
+        visibility = "[combat] hide; [@target,help,nodead] show; hide"
     end
     RegisterStateDriver(button, "visibility", active and visibility or "hide")
     button.configured, button.configuredSpell, button.configuredRevision = not id or active, id, revision
@@ -85,7 +87,11 @@ function B.Create(row)
     local size, gap = A.Style.sideIconSize, A.Style.sideIconGap
     row.buffReminders, row.buffButtons = {}, {}
     for index = 1, 4 do
-        local button = CreateFrame("Button", nil, row.supportFrame or row, "SecureActionButtonTemplate")
+        -- The first slot also hosts resurrection. Target support hides dead
+        -- units, so this slot owns its native living/dead visibility directly.
+        local parent = index == 1 and row or (row.supportFrame or row)
+        local button = CreateFrame("Button", nil, parent, "SecureActionButtonTemplate")
+        button.deadRecipientSlot = index == 1 and row.unit == "target"
         row.buffButtons[index] = button
         button:SetSize(size, size)
         button:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - (index - 1) * (size + gap), A.Style.sideIconY)

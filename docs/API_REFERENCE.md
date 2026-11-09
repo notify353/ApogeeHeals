@@ -480,6 +480,16 @@ color. Mocks do not establish live Druid acceptance.
 
 ## Resurrection buttons (November 8, 2026)
 
+Released-recipient follow-up: remove the unit/spell range visibility filter for
+resurrection. Neither that result nor the ghost's location establishes corpse
+reachability; native casting decides. The target's first reminder button now
+parents directly to its row, bypassing the support frame's unconditional nodead
+gate. Its own native driver retains dead/help for resurrection and help/nodead
+for buffs. Other target support keeps its original parent and visibility.
+Regression reproduced the hidden-parent defect before the correction and covers
+false/unknown range, released-dead state and reuse of that slot for living buffs.
+The actual failing client returns were not observed; native retest is required.
+
 Central live authority verified Forever1.60.1.70862 and248 recorded references.
 Reviewed matching UnitDocumentation predicates, Spell/SpellBook contracts,
 SecureTemplates macro dispatch and RestrictedAddOnEnvironment/SecureStateDriver.

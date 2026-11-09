@@ -44,8 +44,8 @@ Dead party members and friendly player targets show a resurrection icon in the
 first left-side buff position when you know Resurrection, Redemption or Ancestral
 Spirit. Left-click casts the highest learned rank on that row's dead recipient;
 hover shows its normal spell tooltip. The icon hides during combat, while you
-are dead, for disconnected recipients and on confirmed out-of-range results.
-Unknown range remains available for the client to validate. No buff preference
+are dead and for disconnected recipients. Released ghosts retain the button;
+the client validates corpse range when clicked. No buff preference
 or discovery cast is required. Druid battle resurrection is not included.
 
 Buff buttons on party and target rows now explicitly cast only on that row's

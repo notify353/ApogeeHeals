@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Keep resurrection available after release without filtering by unit range;
+  let the first target-side button remain visible for dead recipients.
+
 - Show learned Priest, Paladin and Shaman resurrection spells beside dead party
   members and friendly player targets, with strict recipient clicks outside combat.
 

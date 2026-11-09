@@ -36,6 +36,10 @@ for class, ranks in pairs(families) do
         assert(button.buffTimer.text == "" and row.buffReminders[1].texture == 123)
         assert(a.View.rows[1].buffButtons[1].attributes.type1 == "", "Never rez self")
         assert(target.buffButtons[1].attributes.macrotext1:find("@target,exists,help,dead", 1, true))
+        assert(target.buffButtons[1].parent == target,
+            "Rez must not inherit the target support frame's nodead visibility gate")
+        assert(target.supportFrame.driver == "[@target,help,nodead] show; hide",
+            "Other target support retains its living-only gate")
     end
     button.scripts.OnEnter(); assert(a.Buffs.tooltipButton == button)
     m.units.party1.dead = false; refresh(); absent(); assert(not a.Buffs.tooltipButton)
@@ -46,7 +50,15 @@ for class, ranks in pairs(families) do
     m.units.party1.hostile = false
     C_Spell.SpellHasRange = function() return true end
     C_Spell.IsSpellInRange = function() return false end
-    refresh(); absent()
+    refresh(); assert(button.attributes.type1 == "macro", "Dead recipient stays actionable regardless of range")
+    local deadOrGhost = UnitIsDeadOrGhost
+    UnitIsDeadOrGhost = function(unit)
+        if unit == "party1" then return true end -- Released ghost still satisfies the native contract.
+        return deadOrGhost(unit)
+    end
+    C_Spell.IsSpellInRange = function() error("Rez must not query ghost/unit range as corpse range") end
+    refresh(); assert(button.attributes.type1 == "macro", "Released ghost keeps rez action")
+    UnitIsDeadOrGhost = deadOrGhost
     C_Spell.IsSpellInRange = function() return m.Secret() end
     refresh(); assert(button.attributes.type1 == "macro", "Unknown range is not false")
     C_Spell.IsSpellInRange = function() error("unavailable") end
@@ -56,6 +68,11 @@ for class, ranks in pairs(families) do
     m.units.player.dead = false
     m.npc = true; refresh(); assert(target.buffButtons[1].attributes.type1 == "")
     m.npc = false; refresh()
+    a.Buffs.Paint(target, {{id=ranks[#ranks], icon=123}})
+    assert(target.buffButtons[1].driver == "[combat] hide; [@target,help,nodead] show; hide",
+        "Reusing the first target slot for a buff restores its living-only gate")
+    refresh()
+    assert(target.buffButtons[1].driver:find(",help,dead] show; hide", 1, true), "Rez restores dead-only gate")
     m.units.target = nil; m.Event("PLAYER_TARGET_CHANGED"); m.Flush()
     assert(target.buffButtons[1].attributes.type1 == "")
     local original = button.attributes.macrotext1
