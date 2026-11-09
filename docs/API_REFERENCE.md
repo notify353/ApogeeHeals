@@ -480,6 +480,41 @@ color. Mocks do not establish live Druid acceptance.
 
 ## Resurrection buttons (November 8, 2026)
 
+Owner accepted DEV.4 resurrection and range behavior, then requested Druid Revive
+and combat Rebirth. Revive candidates are 437138,1237948,1237949,1237950,1237951;
+Rebirth candidates are 20484,20739,20742,20747,20748 (highest learned first).
+Candidate IDs were cross-checked against the Forever client-data spellbook at
+https://www.60.tools/spellbook/druid (70790); the current 70862 live spellbook must
+still confirm each candidate. These are not later-client Revive50769 ranks.
+No alternate-client API authority is used. Current central export check passed
+for 70862 and all248 references before implementation.
+
+Rebirth uses an independent SecureActionButtonTemplate on each party/target row,
+in the second left-side position, directly parented to the row so dead targets
+do not inherit the support frame's nodead gate. Localized explicit-rank macros
+and fixed recipients reuse the existing validated resurrection action builder.
+Before combat it configures a learned action even for absent/living recipients
+and a dead player. Native visibility requires an existing friendly dead recipient
+and hides for player death; unlike Revive it does not hide for combat. The native
+cast remains responsible for valid players, offline recipients, cooldowns,
+reagents, corpse reachability and line of sight. It never falls back to another
+unit. The button overlays the old second buff slot during the brief interval
+between death and the next ordinary buff refresh; no combat repositioning occurs.
+
+Preview/world suspension preserves Rebirth's learned action with a native combat
+gate so entering combat before the next refresh does not lose the binding.
+Startup failure clears actions out of combat and suppresses artwork. Spell/text
+updates defer protected changes until combat ends. The existing one-second
+driver refreshes only Rebirth texture desaturation/color/alpha during combat,
+using guarded SpellRange results; it never reads restricted death state to
+choose a combat action. No extra timer, saved data, TOC entry or API dependency.
+Tests cover all Revive/Rebirth ranks, existing regular classes, combat range,
+unknown/error/secret results, death after combat entry, release-only clicks,
+fixed party/target recipients, learned/text changes, preview-to-combat,
+world-to-combat and failure cleanup. Matching exported SecureTemplates macro
+dispatch and SecureStateDriver resolver run with simulated engine conditions;
+real combat input, secure provenance and taint remain native acceptance checks.
+
 Owner confirmed DEV.3 icon visibility and click-to-resurrect work, then requested
 grey range feedback and line of sight if supported. Reviewed70862 SpellDocumentation
 IsSpellInRange provides nullable range only; no general line-of-sight query was
@@ -516,14 +551,14 @@ Reviewed matching UnitDocumentation predicates, Spell/SpellBook contracts,
 SecureTemplates macro dispatch and RestrictedAddOnEnvironment/SecureStateDriver.
 Existing public-value adapters guard life/connection/help/player/spellbook reads.
 Candidate rank IDs are offered only when the live player spellbook confirms a
-learned, active helpful spell. Localized name/rank text retains injection guards.
+learned, active non-harmful spell. Localized name/rank text retains injection guards.
 The existing buff button receives an explicit exists/help/dead recipient macro
 followed by stopspelltarget. Native visibility additionally requires a dead
 friendly recipient and hides for combat or player death. All protected changes
 remain out of combat; the existing event/one-second refresh handles recovery.
 No new API dependency, polling loop, saved state or layout surface is introduced.
-Tests cover all three normal-resurrection classes; battle resurrection is outside
-this change. Native casting, released ghosts, line of sight and taint need owner
+The original tests cover three normal-resurrection classes; Druid coverage is
+described above. Native casting, released ghosts, line of sight and taint need owner
 acceptance; mocks do not establish server eligibility or successful resurrection.
 
 ## Exclusive class-strip input (October 12)

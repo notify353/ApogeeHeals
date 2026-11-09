@@ -3,6 +3,7 @@ local families = {
     PRIEST = {2006, 2010, 10880, 10881, 20770},
     PALADIN = {7328, 10322, 10324, 20772, 20773},
     SHAMAN = {2008, 20609, 20610, 20776, 20777},
+    DRUID = {437138, 1237948, 1237949, 1237950, 1237951},
 }
 for class, ranks in pairs(families) do
     local m, a = fixture.New({class=class, known=false})
