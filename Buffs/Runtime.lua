@@ -162,13 +162,62 @@ function B.AuraChoices(includeActive)
     end
     return selected and not includeActive and {} or choices
 end
+-- Candidate ranks only: the live player spellbook must confirm every choice.
+-- Battle resurrection is deliberately separate from these out-of-combat actions.
+local resurrectionRanks = {
+    PRIEST = {20770, 10881, 10880, 2010, 2006},
+    PALADIN = {20773, 20772, 10324, 10322, 7328},
+    SHAMAN = {20777, 20776, 20610, 20609, 2008},
+    DRUID = {1237951, 1237950, 1237949, 1237948, 437138},
+}
+local rebirthRanks = {DRUID = {20748, 20747, 20742, 20739, 20484}}
+local function learnedResurrection(families)
+    if InCombatLockdown() then return end
+    local ok, _, class = pcall(UnitClass, "player")
+    if not ok or not A.Access.Readable(class) or type(class) ~= "string" then return end
+    local bank = Enum and Enum.SpellBookSpellBank and Enum.SpellBookSpellBank.Player
+    if not bank or not C_SpellBook then return end
+    for _, id in ipairs(families[class] or {}) do
+        -- Forever resurrection reports IsSpellHelpful=false. Only these explicit
+        -- class/rank candidates bypass the generic healing-assignment filter.
+        local info = B.Info(id)
+        if info and A.Access.Read(C_SpellBook.IsSpellInSpellBook, id, bank, false) == true
+            and A.Access.Read(C_SpellBook.IsSpellKnown, id, bank) == true
+            and A.Access.Read(C_Spell.IsSpellHarmful, id) == false
+            and A.Access.Read(C_Spell.IsSpellPassive, id) == false then
+            return {id=id, icon=info.iconID, name=info.name, resurrection=true}
+        end
+    end
+end
+function B.ResurrectionSpell()
+    if B.suspended or A.View.unlocked or A.UnitAPI.State("player") ~= "alive" then return end
+    return learnedResurrection(resurrectionRanks)
+end
+function B.RebirthSpell()
+    -- Resolve before combat regardless of recipient/player death or preview.
+    -- Native visibility can then reveal the fixed action after a combat death.
+    return learnedResurrection(rebirthRanks)
+end
+function B.CanResurrect(unit, spell)
+    if not spell or unit == "player" or A.Access.Read(UnitIsUnit, unit, "player") ~= false
+        or A.UnitAPI.State(unit) ~= "dead" or A.Access.Read(UnitIsConnected, unit) ~= true
+        or A.Access.Read(UnitCanAssist, "player", unit) ~= true then return false end
+    if unit == "target" and A.Access.Read(UnitIsPlayer, unit) ~= true then return false end
+    -- Unit/spell range does not establish corpse reachability after release.
+    -- Keep the dead recipient's action available; the native cast validates it.
+    return true
+end
 function B.Refresh()
+    B.RefreshRebirth()
+    -- Frequent combat unit events restore activity only; the timer owns range.
+    B.RefreshRebirthRange(not InCombatLockdown())
     if InCombatLockdown() or B.suspended then return end
     B.nameGroups = {}
     A.BuffDefaults.Seed()
     local now = GetTime()
     for id, expires in pairs(B.candidates) do if expires < now then B.candidates[id] = nil end end
     local auraChoices = B.AuraChoices()
+    local resurrection = B.ResurrectionSpell()
     local blessingChoices = A.BuffDefaults.Choices()
     local snapshots, catalogCache = {}, {}
     for index, row in ipairs(A.View.supportRows or A.View.rows) do
@@ -205,6 +254,7 @@ function B.Refresh()
         end
         missing = B.WithTimers(missing, snapshots[index], nil, row.unit)
         blessings = B.WithTimers(blessings, snapshots[index], nil, row.unit)
+        if B.CanResurrect(row.unit, resurrection) then missing = {resurrection} end
         B.Paint(row, missing)
         B.PaintBlessings(row, blessings, #missing)
         local upkeep, suggested, reason = {}, nil, nil
@@ -228,6 +278,8 @@ function B.Refresh()
     if B.picker and B.picker:IsShown() then B.RefreshPicker() end
 end
 function B.Stop()
+    B.RefreshRebirth()
+    B.RefreshRebirthRange()
     B.CloseRecipient()
     B.candidates = {}
     for _, row in ipairs(A.View.supportRows or A.View.rows) do

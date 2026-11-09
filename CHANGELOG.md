@@ -1,5 +1,17 @@
 ## Unreleased
 
+- Grey out visible resurrection icons on confirmed out-of-range spell results,
+  restoring color as you move within range without disabling the click action.
+
+- Detect learned resurrection spells even when Forever classifies them as not
+  helpful; retain active/non-harmful checks and the strict ordinary healing filter.
+
+- Keep resurrection available after release without filtering by unit range;
+  let the first target-side button remain visible for dead recipients.
+
+- Show learned Priest, Paladin and Shaman resurrection spells beside dead party
+  members and friendly player targets, with strict recipient clicks outside combat.
+
 - Fix distant party members appearing in range when the healing-spell check is
   unavailable. Use guarded spell-specific proximity and a distinct unknown fade.
 

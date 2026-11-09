@@ -1,10 +1,13 @@
 local _, A = ...
 local B = A.Buffs
-local function configureAction(button, id, unit)
+local function configureAction(button, id, unit, resurrection)
     if InCombatLockdown() then return end
     local revision = B.actionRevision or 0
+    local suspended = button.rebirth and (B.suspended or A.View.unlocked) or false
     if button.configured and button.configuredSpell == id
-        and button.configuredRevision == revision then return end
+        and button.configuredRevision == revision
+        and button.configuredResurrection == resurrection
+        and button.configuredSuspended == suspended then return end
     local text
     if id and unit ~= "player" then
         local info = B.Info(id)
@@ -14,15 +17,27 @@ local function configureAction(button, id, unit)
         if info and type(rank) == "string" and not info.name:find("[\r\n;%[%]]")
             and not rank:find("[\r\n;%[%]]") then
             local name = info.name .. (rank ~= "" and "(" .. rank .. ")" or "")
-            text = "/cast [@" .. unit .. ",exists,help] " .. name .. "\n/stopspelltarget"
+            text = "/cast [@" .. unit .. ",exists,help" .. (resurrection and ",dead" or "")
+                .. "] " .. name .. "\n/stopspelltarget"
         end
     end
     local active = id and (unit == "player" or text ~= nil)
     button:SetAttribute("type1", active and (unit == "player" and "spell" or "macro") or "")
     button:SetAttribute("spell1", id)
     button:SetAttribute("macrotext1", text)
-    RegisterStateDriver(button, "visibility", active and "[combat] hide; show" or "hide")
+    local visibility = "[combat] hide; show"
+    if button.rebirth then
+        local condition = suspended and "[combat,@" or "[@"
+        visibility = "[@player,dead] hide; " .. condition .. unit .. ",exists,help,dead] show; hide"
+    elseif resurrection then
+        visibility = "[combat][@player,dead] hide; [@" .. unit .. ",exists,help,dead] show; hide"
+    elseif button.deadRecipientSlot then
+        visibility = "[combat] hide; [@target,help,nodead] show; hide"
+    end
+    RegisterStateDriver(button, "visibility", active and visibility or "hide")
     button.configured, button.configuredSpell, button.configuredRevision = not id or active, id, revision
+    button.configuredResurrection = resurrection
+    button.configuredSuspended = suspended
 end
 local function createTimer(button)
     button.buffTimer = A.Style.CleanText(button, 10)
@@ -55,10 +70,11 @@ function B.Create(row)
         B.timerDriver = CreateFrame("Frame")
         local elapsed = 0
         B.timerDriver:SetScript("OnUpdate", function(_, delta)
-            if InCombatLockdown() or B.suspended or A.View.unlocked then elapsed = 0; return end
             elapsed = elapsed + delta
             if elapsed < 1 then return end
-            elapsed = 0; B.Refresh()
+            elapsed = 0
+            if InCombatLockdown() or B.suspended or A.View.unlocked then B.RefreshRebirthRange()
+            else B.Refresh() end
         end)
     end
     -- Parent to the whole row: the health-only name layer excludes the power
@@ -77,11 +93,18 @@ function B.Create(row)
     end)
     local size, gap = A.Style.sideIconSize, A.Style.sideIconGap
     row.buffReminders, row.buffButtons = {}, {}
-    for index = 1, 4 do
-        local button = CreateFrame("Button", nil, row.supportFrame or row, "SecureActionButtonTemplate")
-        row.buffButtons[index] = button
+    for index = 1, (row.unit == "player" and 4 or 5) do
+        -- The first slot hosts regular resurrection; the independent fifth
+        -- button is Rebirth. Both bypass the target's living-only support gate.
+        local rebirth = index == 5
+        local parent = (index == 1 or rebirth) and row or (row.supportFrame or row)
+        local button = CreateFrame("Button", nil, parent, "SecureActionButtonTemplate")
+        button.rebirth = rebirth
+        button.deadRecipientSlot = index == 1 and row.unit == "target"
+        if rebirth then row.rebirthButton = button else row.buffButtons[index] = button end
         button:SetSize(size, size)
-        button:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - (index - 1) * (size + gap), A.Style.sideIconY)
+        button:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - (rebirth and 1 or index - 1) * (size + gap), A.Style.sideIconY)
+        if rebirth then button:SetFrameLevel(row.buffButtons[2]:GetFrameLevel() + 1) end
         button:SetAttribute("unit", row.unit); button:SetAttribute("useOnKeyDown", false)
         button:RegisterForClicks("LeftButtonUp")
         for _, prefix in ipairs({"shift-", "ctrl-", "ctrl-shift-", "alt-", "alt-shift-", "alt-ctrl-", "alt-ctrl-shift-"}) do
@@ -89,7 +112,7 @@ function B.Create(row)
         end
         button:SetHighlightTexture("Interface/Buttons/ButtonHilight-Square")
         button:SetScript("OnEnter", function()
-            if InCombatLockdown() or not button.reminderSpell then return end
+            if (InCombatLockdown() and not button.rebirth) or not button.reminderSpell then return end
             GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
             B.tooltipButton = button
             -- Native tooltip includes the actual configured rank and client spell text.
@@ -101,11 +124,45 @@ function B.Create(row)
         local icon = button:CreateTexture(nil, "ARTWORK")
         icon:SetPoint("TOPLEFT", button, "TOPLEFT", 1, -1); icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -1, 1)
         icon:SetTexCoord(0.07, 0.93, 0.07, 0.93); icon:Hide()
-        row.buffReminders[index] = icon
+        if rebirth then button.icon = icon else row.buffReminders[index] = icon end
         createTimer(button)
+        if rebirth then configureAction(button, nil, row.unit, true) end
     end
     row.buffOverflow = A.Style.Text(row.supportFrame or row, 8)
     row.buffOverflow:SetPoint("RIGHT", row, "LEFT", -gap - 4 * (size + gap), 0); row.buffOverflow:Hide()
+end
+function B.RefreshRebirth()
+    if InCombatLockdown() then return end
+    local spell = A.startupState ~= "failed" and B.RebirthSpell() or nil
+    for _, row in ipairs(A.View.supportRows or A.View.rows or {}) do
+        local button = row.rebirthButton
+        if button then
+            local id = spell and spell.id or nil
+            if button.reminderSpell ~= id then B.HideTooltip(button) end
+            button.reminderSpell = id
+            button.icon:SetTexture(spell and spell.icon)
+            button.icon:SetShown(id ~= nil)
+            configureAction(button, id, row.unit, true)
+        end
+    end
+end
+function B.RefreshRebirthRange(refreshRange)
+    local enabled = not B.suspended and not A.View.unlocked and A.startupState ~= "failed"
+    for _, row in ipairs(A.View.supportRows or A.View.rows or {}) do
+        local button = row.rebirthButton
+        if button then
+            -- Combat updates touch artwork only. Unknown/secret range is neutral.
+            if refreshRange ~= false then
+                local outside = enabled and button.reminderSpell
+                    and A.Bindings.SpellRange(button.reminderSpell, row.unit) == false or false
+                button.icon:SetDesaturated(outside)
+                local brightness = outside and 0.45 or 1
+                button.icon:SetVertexColor(brightness, brightness, brightness, 1)
+            end
+            button.icon:SetAlpha(enabled and 1 or 0)
+            if not enabled then B.HideTooltip(button) end
+        end
+    end
 end
 function B.Paint(row, missing)
     for index, icon in ipairs(row.buffReminders) do
@@ -115,11 +172,17 @@ function B.Paint(row, missing)
         if button.reminderSpell ~= id then B.HideTooltip(button) end
         button.reminderSpell = id -- Public display identity only; never a protected combat attribute.
         icon:SetTexture(entry and entry.icon); icon:SetShown(entry ~= nil)
+        -- Range is artwork only: never hide/disable a released recipient's rez.
+        local outside = entry and entry.resurrection and not InCombatLockdown()
+            and A.Bindings.SpellRange(id, row.unit) == false or false
+        icon:SetDesaturated(outside)
+        local brightness = outside and 0.45 or 1
+        icon:SetVertexColor(brightness, brightness, brightness, 1)
         paintTimer(button, entry)
         if not InCombatLockdown() then
             -- Cache only our public configured spell identity, never aura data.
             -- Combat painting leaves this untouched so deferred changes still apply.
-            configureAction(button, id, row.unit)
+            configureAction(button, id, row.unit, entry and entry.resurrection)
         end
     end
     row.buffOverflow:SetText(#missing > 4 and "+" .. (#missing - 4) or "")

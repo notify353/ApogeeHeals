@@ -478,6 +478,97 @@ Source/generated tests cover ranks, fixed separated geometry, every recipient,
 all-lane refresh/suspension, independent native duration refresh/removal and white
 color. Mocks do not establish live Druid acceptance.
 
+## Resurrection buttons (November 8, 2026)
+
+Owner accepted DEV.4 resurrection and range behavior, then requested Druid Revive
+and combat Rebirth. Revive candidates are 437138,1237948,1237949,1237950,1237951;
+Rebirth candidates are 20484,20739,20742,20747,20748 (highest learned first).
+Candidate IDs were cross-checked against the Forever client-data spellbook at
+https://www.60.tools/spellbook/druid (70790); the current 70862 live spellbook must
+still confirm each candidate. These are not later-client Revive50769 ranks.
+No alternate-client API authority is used. Current central export check passed
+for 70862 and all248 references before implementation.
+
+Rebirth uses an independent SecureActionButtonTemplate on each party/target row,
+in the second left-side position, directly parented to the row so dead targets
+do not inherit the support frame's nodead gate. Localized explicit-rank macros
+and fixed recipients reuse the existing validated resurrection action builder.
+Before combat it configures a learned action even for absent/living recipients
+and a dead player. Native visibility requires an existing friendly dead recipient
+and hides for player death; unlike Revive it does not hide for combat. The native
+cast remains responsible for valid players, offline recipients, cooldowns,
+reagents, corpse reachability and line of sight. It never falls back to another
+unit. The button overlays the old second buff slot during the brief interval
+between death and the next ordinary buff refresh; no combat repositioning occurs.
+
+Preview/world suspension preserves Rebirth's learned action with a native combat
+gate so entering combat before the next refresh does not lose the binding.
+Startup failure clears actions out of combat and suppresses artwork. Spell/text
+updates defer protected changes until combat ends. The existing one-second
+driver refreshes only Rebirth texture desaturation/color/alpha during combat,
+using guarded SpellRange results; it never reads restricted death state to
+choose a combat action. No extra timer, saved data, TOC entry or API dependency.
+Tests cover all Revive/Rebirth ranks, existing regular classes, combat range,
+unknown/error/secret results, death after combat entry, release-only clicks,
+fixed party/target recipients, learned/text changes, preview-to-combat,
+world-to-combat and failure cleanup. Matching exported SecureTemplates macro
+dispatch and SecureStateDriver resolver run with simulated engine conditions;
+real combat input, secure provenance and taint remain native acceptance checks.
+
+The requested follow-up bug sweep reproduced excess combat range polling:
+ordinary health-event refreshes were querying all five Rebirth recipients between
+timer ticks. Combat refresh now updates activity only and preserves range color;
+the existing one-second timer samples range. The regression fails before the fix
+and verifies100 separate health-event flushes add zero Rebirth range reads, then
+one timer tick samples exactly five fixed recipients. Combat-entry cleanup may
+take an immediate initial sample; out-of-combat event refresh remains unchanged.
+
+Owner confirmed DEV.3 icon visibility and click-to-resurrect work, then requested
+grey range feedback and line of sight if supported. Reviewed70862 SpellDocumentation
+IsSpellInRange provides nullable range only; no general line-of-sight query was
+found in the matching generated API or action-bar/secure sources. Resurrection
+artwork now uses the existing guarded SpellRange adapter: false desaturates/dims
+to45%, true restores color, unavailable/restricted/error stays neutral. Existing
+one-second buff refresh handles movement. SetDesaturated/SetVertexColor contracts
+are already recorded in SimpleTextureBase/SimpleRegion authority. No secure
+attributes, visibility or casting eligibility depend on range; native casts still
+validate corpse reachability and line of sight. No failed-cast LoS guess is cached.
+
+Owner's native priest diagnostic established the actual missing-icon cause:
+Resurrection2006 is known=true, inSpellBook=true, helpful=false, harmful=false,
+passive=false, with DEV loaded. The generic healing resolver rejected it.
+Known resurrection class/rank candidates now use readable spell info, exact
+player spellbook/known checks and non-harmful/non-passive predicates directly.
+Only that allowlist omits the helpful classification; normal healing/buff
+assignment rules are unchanged. The observed predicate fixture fails before
+the correction and passes afterward for all three supported resurrection classes.
+No new API dependency. Native icon/casting retest remains required.
+
+Released-recipient follow-up: remove the unit/spell range visibility filter for
+resurrection. Neither that result nor the ghost's location establishes corpse
+reachability; native casting decides. The target's first reminder button now
+parents directly to its row, bypassing the support frame's unconditional nodead
+gate. Its own native driver retains dead/help for resurrection and help/nodead
+for buffs. Other target support keeps its original parent and visibility.
+Regression reproduced the hidden-parent defect before the correction and covers
+false/unknown range, released-dead state and reuse of that slot for living buffs.
+The actual failing client returns were not observed; native retest is required.
+
+Central live authority verified Forever1.60.1.70862 and248 recorded references.
+Reviewed matching UnitDocumentation predicates, Spell/SpellBook contracts,
+SecureTemplates macro dispatch and RestrictedAddOnEnvironment/SecureStateDriver.
+Existing public-value adapters guard life/connection/help/player/spellbook reads.
+Candidate rank IDs are offered only when the live player spellbook confirms a
+learned, active non-harmful spell. Localized name/rank text retains injection guards.
+The existing buff button receives an explicit exists/help/dead recipient macro
+followed by stopspelltarget. Native visibility additionally requires a dead
+friendly recipient and hides for combat or player death. All protected changes
+remain out of combat; the existing event/one-second refresh handles recovery.
+No new API dependency, polling loop, saved state or layout surface is introduced.
+The original tests cover three normal-resurrection classes; Druid coverage is
+described above. Native casting, released ghosts, line of sight and taint need owner
+acceptance; mocks do not establish server eligibility or successful resurrection.
+
 ## Exclusive class-strip input (October 12)
 
 Reviewed matching 70338 SimpleFrame SetHitRectInsets and SimpleScriptRegion
