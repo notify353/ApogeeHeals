@@ -40,6 +40,14 @@ No casting or recipient changes. Native appearance/combat acceptance pending.
 
 # Apogee Heals
 
+Dead party members and friendly player targets show a resurrection icon in the
+first left-side buff position when you know Resurrection, Redemption or Ancestral
+Spirit. Left-click casts the highest learned rank on that row's dead recipient;
+hover shows its normal spell tooltip. The icon hides during combat, while you
+are dead, for disconnected recipients and on confirmed out-of-range results.
+Unknown range remains available for the client to validate. No buff preference
+or discovery cast is required. Druid battle resurrection is not included.
+
 Buff buttons on party and target rows now explicitly cast only on that row's
 recipient, using the selected rank without an alternate self target. Player-row
 buffs, auras and aspects keep their intentional self-cast behavior. Native

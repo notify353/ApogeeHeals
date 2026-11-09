@@ -478,6 +478,23 @@ Source/generated tests cover ranks, fixed separated geometry, every recipient,
 all-lane refresh/suspension, independent native duration refresh/removal and white
 color. Mocks do not establish live Druid acceptance.
 
+## Resurrection buttons (November 8, 2026)
+
+Central live authority verified Forever1.60.1.70862 and248 recorded references.
+Reviewed matching UnitDocumentation predicates, Spell/SpellBook contracts,
+SecureTemplates macro dispatch and RestrictedAddOnEnvironment/SecureStateDriver.
+Existing public-value adapters guard life/connection/help/player/spellbook reads.
+Candidate rank IDs are offered only when the live player spellbook confirms a
+learned, active helpful spell. Localized name/rank text retains injection guards.
+The existing buff button receives an explicit exists/help/dead recipient macro
+followed by stopspelltarget. Native visibility additionally requires a dead
+friendly recipient and hides for combat or player death. All protected changes
+remain out of combat; the existing event/one-second refresh handles recovery.
+No new API dependency, polling loop, saved state or layout surface is introduced.
+Tests cover all three normal-resurrection classes; battle resurrection is outside
+this change. Native casting, released ghosts, line of sight and taint need owner
+acceptance; mocks do not establish server eligibility or successful resurrection.
+
 ## Exclusive class-strip input (October 12)
 
 Reviewed matching 70338 SimpleFrame SetHitRectInsets and SimpleScriptRegion

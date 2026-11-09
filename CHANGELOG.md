@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Show learned Priest, Paladin and Shaman resurrection spells beside dead party
+  members and friendly player targets, with strict recipient clicks outside combat.
+
 - Fix distant party members appearing in range when the healing-spell check is
   unavailable. Use guarded spell-specific proximity and a distinct unknown fade.
 
