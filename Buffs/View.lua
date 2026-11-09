@@ -128,6 +128,12 @@ function B.Paint(row, missing)
         if button.reminderSpell ~= id then B.HideTooltip(button) end
         button.reminderSpell = id -- Public display identity only; never a protected combat attribute.
         icon:SetTexture(entry and entry.icon); icon:SetShown(entry ~= nil)
+        -- Range is artwork only: never hide/disable a released recipient's rez.
+        local outside = entry and entry.resurrection and not InCombatLockdown()
+            and A.Bindings.SpellRange(id, row.unit) == false or false
+        icon:SetDesaturated(outside)
+        local brightness = outside and 0.45 or 1
+        icon:SetVertexColor(brightness, brightness, brightness, 1)
         paintTimer(button, entry)
         if not InCombatLockdown() then
             -- Cache only our public configured spell identity, never aura data.

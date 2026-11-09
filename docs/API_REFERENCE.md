@@ -480,6 +480,17 @@ color. Mocks do not establish live Druid acceptance.
 
 ## Resurrection buttons (November 8, 2026)
 
+Owner confirmed DEV.3 icon visibility and click-to-resurrect work, then requested
+grey range feedback and line of sight if supported. Reviewed70862 SpellDocumentation
+IsSpellInRange provides nullable range only; no general line-of-sight query was
+found in the matching generated API or action-bar/secure sources. Resurrection
+artwork now uses the existing guarded SpellRange adapter: false desaturates/dims
+to45%, true restores color, unavailable/restricted/error stays neutral. Existing
+one-second buff refresh handles movement. SetDesaturated/SetVertexColor contracts
+are already recorded in SimpleTextureBase/SimpleRegion authority. No secure
+attributes, visibility or casting eligibility depend on range; native casts still
+validate corpse reachability and line of sight. No failed-cast LoS guess is cached.
+
 Owner's native priest diagnostic established the actual missing-icon cause:
 Resurrection2006 is known=true, inSpellBook=true, helpful=false, harmful=false,
 passive=false, with DEV loaded. The generic healing resolver rejected it.

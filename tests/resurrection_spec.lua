@@ -54,16 +54,30 @@ for class, ranks in pairs(families) do
     C_Spell.SpellHasRange = function() return true end
     C_Spell.IsSpellInRange = function() return false end
     refresh(); assert(button.attributes.type1 == "macro", "Dead recipient stays actionable regardless of range")
+    local icon = row.buffReminders[1]
+    local macro = button.attributes.macrotext1
+    assert(icon.desaturated and icon.vertexColor[1] == 0.45, "Out-of-range rez is grey")
+    C_Spell.IsSpellInRange = function(id, unit)
+        assert(id == ranks[#ranks] and (unit == "party1" or unit == "target"))
+        return true
+    end
+    a.Buffs.timerDriver.scripts.OnUpdate(a.Buffs.timerDriver, 1)
+    assert(not icon.desaturated and icon.vertexColor[1] == 1, "Walking into range restores color")
+    assert(button.attributes.macrotext1 == macro, "Range never changes the secure action")
     local deadOrGhost = UnitIsDeadOrGhost
     UnitIsDeadOrGhost = function(unit)
         if unit == "party1" then return true end -- Released ghost still satisfies the native contract.
         return deadOrGhost(unit)
     end
-    C_Spell.IsSpellInRange = function() error("Rez must not query ghost/unit range as corpse range") end
+    C_Spell.IsSpellInRange = function() error("Released recipient range unavailable") end
     refresh(); assert(button.attributes.type1 == "macro", "Released ghost keeps rez action")
+    assert(not icon.desaturated, "Unavailable range is not a confirmed out-of-range result")
     UnitIsDeadOrGhost = deadOrGhost
     C_Spell.IsSpellInRange = function() return m.Secret() end
     refresh(); assert(button.attributes.type1 == "macro", "Unknown range is not false")
+    assert(not icon.desaturated and icon.vertexColor[1] == 1)
+    C_Spell.IsSpellInRange = function() return nil end
+    refresh(); assert(not icon.desaturated)
     C_Spell.IsSpellInRange = function() error("unavailable") end
     refresh(); assert(button.attributes.type1 == "macro")
     C_Spell.IsSpellInRange = function() return true end

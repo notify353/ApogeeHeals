@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Grey out visible resurrection icons on confirmed out-of-range spell results,
+  restoring color as you move within range without disabling the click action.
+
 - Detect learned resurrection spells even when Forever classifies them as not
   helpful; retain active/non-harmful checks and the strict ordinary healing filter.
 

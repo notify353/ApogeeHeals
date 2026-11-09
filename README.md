@@ -47,6 +47,8 @@ hover shows its normal spell tooltip. The icon hides during combat, while you
 are dead and for disconnected recipients. Released ghosts retain the button;
 the client validates corpse range when clicked. No buff preference
 or discovery cast is required. Druid battle resurrection is not included.
+The icon becomes grey on a confirmed out-of-range spell check and returns to
+color in range. Unknown range stays neutral; this is not a line-of-sight check.
 
 Buff buttons on party and target rows now explicitly cast only on that row's
 recipient, using the selected rank without an alternate self target. Player-row
