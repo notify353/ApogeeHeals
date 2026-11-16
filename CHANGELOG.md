@@ -1,3 +1,7 @@
+## Unreleased - November15 client review
+
+- Recognize reviewed Forever70938 without a stale startup warning.
+
 ## Unreleased
 
 - Grey out visible resurrection icons on confirmed out-of-range spell results,

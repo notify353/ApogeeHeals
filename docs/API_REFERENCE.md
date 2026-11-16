@@ -1,3 +1,10 @@
+## Reviewed client build - 2026-11-15
+
+Central live Forever70938 verification passes all248 fresh references.247 are
+unchanged; PartyInfo adds an unused PARTY_INVITE_REQUEST isCrossShard field.
+Recognize70938 without a stale warning, retaining prior builds, capability
+checks and future-build warnings. No other gameplay change or native acceptance.
+
 ## Final-minute buff reminders (November 8, 2026)
 
 Own-buff expiry reminders now use one shared60-second window instead of120.
