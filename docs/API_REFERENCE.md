@@ -1,3 +1,11 @@
+## Reviewed client build - 2026-11-17
+
+Fresh Forever70959 export verifies all248 prior references;247 are unchanged.
+The only prior-file change formats the native AddOnList character label through
+NameUtil; GUID and enable-selection behavior are unchanged. Recognize70959 while
+retaining previous reviews, future warnings and capability checks. Native
+acceptance remains separate. Central evidence also records marker references.
+
 ## Reviewed client build - 2026-11-15
 
 Central live Forever70938 verification passes all248 fresh references.247 are

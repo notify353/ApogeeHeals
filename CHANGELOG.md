@@ -1,3 +1,7 @@
+## Unreleased - 2026-11-17
+
+- Recognize the reviewed Forever70959 client without a stale-review warning.
+
 ## Unreleased - November15 client review
 
 - Recognize reviewed Forever70938 without a stale startup warning.
