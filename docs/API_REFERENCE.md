@@ -1,3 +1,18 @@
+## Reviewed client build - 2026-11-17
+
+Fresh Forever70959 export verifies all248 prior references;247 are unchanged.
+The only prior-file change formats the native AddOnList character label through
+NameUtil; GUID and enable-selection behavior are unchanged. Recognize70959 while
+retaining previous reviews, future warnings and capability checks. Native
+acceptance remains separate. Central evidence also records marker references.
+
+## Reviewed client build - 2026-11-15
+
+Central live Forever70938 verification passes all248 fresh references.247 are
+unchanged; PartyInfo adds an unused PARTY_INVITE_REQUEST isCrossShard field.
+Recognize70938 without a stale warning, retaining prior builds, capability
+checks and future-build warnings. No other gameplay change or native acceptance.
+
 ## Final-minute buff reminders (November 8, 2026)
 
 Own-buff expiry reminders now use one shared60-second window instead of120.
