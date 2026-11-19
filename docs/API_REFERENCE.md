@@ -584,6 +584,25 @@ The original tests cover three normal-resurrection classes; Druid coverage is
 described above. Native casting, released ghosts, line of sight and taint need owner
 acceptance; mocks do not establish server eligibility or successful resurrection.
 
+## Priest Dispel Magic classification correction (November 19, 2026)
+
+Owner's Forever70959 diagnostic reports IsSpellKnown(527)=true,
+IsSpellKnown(988)=false and IsSpellHelpful=false for both IDs. The previous
+cleansing-local exception still required helpful=true and therefore suppressed
+the learned rank's action and Magic highlight filter. Remove only that predicate
+for the two exact catalog Dispel Magic IDs. Retain player spellbook membership,
+known state, readable spell metadata, non-passive state and public harmful
+classification. Other cleansing spells and ordinary healing bindings retain
+their helpful checks. No new API, aura inspection or protected combat mutation.
+
+Reverified live70959/16001 export through the central253-reference authority;
+Spell/SpellBook documentation covers the unchanged inputs. Native fixed
+friendly/living row gating, exact-rank release dispatch and native Magic filters
+are unchanged. Source and generated tests must include helpful=false, both ranks,
+combat deferral, unlearned/invalid states and ordinary binding isolation. The
+owner screenshot establishes the classification mismatch, not post-fix native
+rendering or cast acceptance; those remain to be checked after approved DEV install.
+
 ## Exclusive class-strip input (October 12)
 
 Reviewed matching 70338 SimpleFrame SetHitRectInsets and SimpleScriptRegion

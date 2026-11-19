@@ -1,3 +1,8 @@
+## Unreleased - 2026-11-19
+
+- Restore priest Magic debuff borders and cleanse clicks when learned Dispel
+  Magic is classified as not helpful by Forever. Both ranks remain supported.
+
 ## Unreleased - 2026-11-17
 
 - Recognize the reviewed Forever70959 client without a stale-review warning.

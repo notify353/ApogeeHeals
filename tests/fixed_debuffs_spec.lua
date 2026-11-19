@@ -11,10 +11,12 @@ local function fixture(class, option)
     option = option or {}
     local m = Mock.New()
     m.units.player.class = class
-    m.unknown = {}
+    m.unknown = option.rankOneOnly and {[988]=true} or {}
     Enum.SpellBookSpellBank = {Player=0}
     C_Spell.GetSpellInfo = function(id) return {spellID=id,name="Spell "..id,iconID=id+100000} end
-    C_Spell.IsSpellHelpful = function() return true end
+    C_Spell.IsSpellHelpful = function(id)
+        return not (option.dispelNotHelpful and (id==527 or id==988))
+    end
     C_Spell.IsSpellHarmful = function(id) return id==988 or id==527 end
     C_Spell.IsSpellPassive = function() return false end
     C_SpellBook = {IsSpellInSpellBook=function(id, bank, overrides)
@@ -230,6 +232,32 @@ local _,noSlots=fixture("PRIEST",{noSlots=true})
 assert(not noSlots.View.target.fixedDebuffs and noSlots.View.target.debuffContainer.group)
 assert(not noSlots.View.target.cleanseIndicator and noSlots.View.target.cleanseButtons[1].spell==988)
 print("PASS fixed type slots, native hover/click separation, learned ranks, empty/Other slots, lifecycle, combat deferral and capability fallback")
+
+-- Owner's live Forever report: rank 1 known, rank 2 unknown, neither helpful.
+-- Keep both ranks in the native dispatch checks below, not only the mock filter.
+for _,rankOneOnly in ipairs({true,false}) do
+    local dm,da=fixture("PRIEST",{dispelNotHelpful=true,rankOneOnly=rankOneOnly})
+    local expected=rankOneOnly and 527 or 988
+    assert(not da.Bindings.Resolve(527) and not da.Bindings.Resolve(988))
+    for _,row in ipairs(da.View.supportRows) do
+        assert(row.cleanseButtons[1].spell==expected, "learned Dispel rejected for helpful=false")
+        assert(row.cleanseIndicator.slots.Magic.filters.includeDispelTypes.Magic==true)
+        assert(row.cleanseButtons[2].spell==528 and not row.cleanseButtons[3].spell
+            and not row.cleanseButtons[4].spell)
+        assert(row.fixedDebuffGate.driver=="[@"..row.unit..",help,nodead] show; hide")
+    end
+    instances[#instances+1]={m=dm,a=da}
+    if rankOneOnly then
+        dm.combat=true; dm.Event("PLAYER_REGEN_DISABLED"); dm.Flush()
+        dm.unknown[988]=nil; dm.Event("SPELLS_CHANGED"); dm.Flush()
+        assert(da.View.rows[1].cleanseButtons[1].spell==527)
+        dm.combat=false; dm.Event("PLAYER_REGEN_ENABLED"); dm.Flush()
+        assert(da.View.rows[1].cleanseButtons[1].spell==988)
+        dm.unknown[988]=true; dm.Event("SPELLS_CHANGED"); dm.Flush()
+        assert(da.View.rows[1].cleanseButtons[1].spell==527)
+    end
+end
+print("PASS learned priest Dispel with helpful=false, rank selection, ordinary binding isolation and combat deferral")
 
 -- Exercise exact native release dispatch for the new transparent secure buttons.
 local root=os.getenv("APOGEE_FOREVER_EXPORT")
