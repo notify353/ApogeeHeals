@@ -1,4 +1,6 @@
 local Mock = dofile("tests/mock.lua")
+local runtimeRoot = os.getenv("APOGEE_HEALS_RUNTIME_ROOT")
+local runtimeName = os.getenv("APOGEE_HEALS_RUNTIME_NAME") or "ApogeeHeals"
 local kinds = {"Magic", "Disease", "Poison", "Curse", "Other"}
 local cases = {
     PALADIN={4987,1152,1152,false}, PRIEST={988,528,false,false},
@@ -75,9 +77,21 @@ local function fixture(class, option)
         end
         return frame
     end
-    local a=m.Load()
+    local a
+    if runtimeRoot then
+        ApogeeUIDev=ApogeeUI
+        _G[runtimeName.."DB"]=nil
+        a={__ApogeeFamilyAdmission=function(name) return name==runtimeName end}
+        for line in io.lines(runtimeRoot.."/"..runtimeName..".toc") do
+            line=line:gsub("\r$", "")
+            if line:match("%.lua$") and not line:match("^__Distribution/") then
+                assert(loadfile(runtimeRoot.."/"..line))(runtimeName,a)
+            end
+        end
+        m.addon=a
+    else a=m.Load() end
     if option.fail then a.Threat.Start=function() error("injected startup failure") end end
-    m.Event("ADDON_LOADED", "ApogeeHeals"); m.Flush()
+    m.Event("ADDON_LOADED", runtimeName); m.Flush()
     for _, key in ipairs(globals) do _G[key]=previous[key] end
     assert(a.started==not option.fail)
     return m,a
