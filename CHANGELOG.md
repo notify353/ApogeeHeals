@@ -1,3 +1,7 @@
+## Unreleased - 2026-11-20
+
+- Recognize the reviewed Forever71037 client without a stale-review warning; retain capability guards and future-build notices.
+
 ## Unreleased - 2026-11-19 healing click recovery
 
 - Preserve healthy healing bindings on ordinary combat exits, while still applying deferred spell changes. Restore loading state and pending bindings before optional aura presentation, and keep range polling alive after an initial display error.
