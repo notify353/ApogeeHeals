@@ -36,8 +36,9 @@ local function classSpells()
 end
 local function resolve(id)
     if id ~= 527 and id ~= 988 then return A.Bindings.Resolve(id) end
-    -- Dispel Magic is both helpful and harmful. This narrow exception never
-    -- relaxes the ordinary binding editor's friendly-only validation.
+    -- Forever reports learned Dispel Magic as not helpful despite its friendly
+    -- cleanse action. These exact IDs use the class catalog's recipient contract;
+    -- ordinary bindings and all other cleanse spells retain helpful validation.
     local read = A.Access.Read
     local info = A.Buffs.Info(id)
     local bank = Enum and Enum.SpellBookSpellBank and Enum.SpellBookSpellBank.Player
@@ -45,7 +46,6 @@ local function resolve(id)
     local harmful = read(C_Spell.IsSpellHarmful, id)
     if read(C_SpellBook.IsSpellInSpellBook, id, bank, false) == true
         and read(C_SpellBook.IsSpellKnown, id, bank) == true
-        and read(C_Spell.IsSpellHelpful, id) == true
         and type(harmful) == "boolean"
         and read(C_Spell.IsSpellPassive, id) == false then return info end
 end

@@ -14,16 +14,17 @@ function R.RangePolling()
     if not R.driver then return end
     R.driver:SetScript("OnUpdate", nil)
     R.rangeElapsed = 0
+    if not R.suspended and not A.View.unlocked and (type(UnitDistanceSquared) == "function"
+        or A.Bindings.rangeSpell or type(CheckInteractDistance) == "function") then
+        -- Establish future updates before the first paint, which may fail independently.
+        R.driver:SetScript("OnUpdate", function(_, elapsed)
+            R.rangeElapsed = R.rangeElapsed + elapsed
+            if R.rangeElapsed < 0.2 then return end
+            R.rangeElapsed = 0
+            A.View.RefreshRange()
+        end)
+    end
     A.View.RefreshRange()
-    if R.suspended or A.View.unlocked then return end
-    if type(UnitDistanceSquared) ~= "function" and not A.Bindings.rangeSpell
-        and type(CheckInteractDistance) ~= "function" then return end
-    R.driver:SetScript("OnUpdate", function(_, elapsed)
-        R.rangeElapsed = R.rangeElapsed + elapsed
-        if R.rangeElapsed < 0.2 then return end
-        R.rangeElapsed = 0
-        A.View.RefreshRange()
-    end)
 end
 function R.Start()
     local driver = CreateFrame("Frame")
@@ -39,7 +40,7 @@ function R.Start()
         "UNIT_AURA", "PLAYER_DEAD", "PLAYER_ALIVE", "PLAYER_UNGHOST",
         "UNIT_SPELLCAST_SUCCEEDED", "PLAYER_LEAVING_WORLD",
         "UNIT_HEAL_PREDICTION", "UNIT_HEAL_ABSORB_AMOUNT_CHANGED", "UNIT_ABSORB_AMOUNT_CHANGED",
-        "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "SPELLS_CHANGED", "SPELL_TEXT_UPDATE",
+        "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "SPELLS_CHANGED", "SPELL_TEXT_UPDATE", "SPELL_DATA_LOAD_RESULT",
         "UI_SCALE_CHANGED", "DISPLAY_SIZE_CHANGED", "GET_ITEM_INFO_RECEIVED",
         "UPDATE_SHAPESHIFT_FORM", "UPDATE_SHAPESHIFT_FORMS", "PLAYER_ROLES_ASSIGNED" }) do driver:RegisterEvent(event) end
     driver:SetScript("OnEvent", function(_, event, unit, castGUID, spellID)
@@ -72,7 +73,7 @@ function R.Start()
             A.Buffs.CloseRecipient()
             A.Buffs.HideTooltip(A.Buffs.tooltipButton)
         elseif event == "PLAYER_LEAVING_WORLD" then
-            R.suspended = true
+            R.suspended, A.Buffs.suspended = true, true
             A.View.RefreshHotActivity()
             A.View.RefreshPartyActions()
             for _, row in ipairs(A.View.rows) do
@@ -82,7 +83,6 @@ function R.Start()
             A.IncomingHeals.Clear(A.View.target.incoming)
             A.IncomingHeals.Clear(A.View.targetTarget.incoming)
             A.View.ClearTargetCast()
-            A.Buffs.suspended = true
             A.Buffs.Stop()
             R.RangePolling()
             return
@@ -98,7 +98,9 @@ function R.Start()
             end
         elseif event == "PLAYER_REGEN_ENABLED" then
             A.Cleansing.pending = true
-            A.Bindings.Apply()
+            -- Routine combat exits must not discard working actions due to an
+            -- unrelated metadata outage. Actual deferred changes still reconcile.
+            if A.Bindings.pending or A.Bindings.retryNeeded then A.Bindings.Apply() end
             if A.View.pendingPosition then
                 A.View.pendingPosition = nil; A.View.SavePosition()
             end
@@ -113,6 +115,10 @@ function R.Start()
                 end
             end
             return
+        elseif event == "SPELL_DATA_LOAD_RESULT" then
+            if A.Bindings.retryNeeded and A.Access.Readable(unit, castGUID)
+                and type(unit) == "number" and castGUID == true then A.Bindings.Apply() end
+            return
         elseif event == "SPELL_TEXT_UPDATE" then
             A.Buffs.actionRevision = (A.Buffs.actionRevision or 0) + 1
             A.Bindings.Apply()
@@ -123,9 +129,9 @@ function R.Start()
             A.Buffs.spellNames, A.Buffs.nameGroups = nil, nil
             if event == "PLAYER_ENTERING_WORLD" then
                 R.suspended, A.Buffs.suspended = nil, nil
-                A.View.RefreshHotActivity()
             end
             A.Bindings.Apply()
+            if event == "PLAYER_ENTERING_WORLD" then A.View.RefreshHotActivity() end
             A.Drinking.Resolve()
         elseif event == "UI_SCALE_CHANGED" or event == "DISPLAY_SIZE_CHANGED" then
             A.View.ApplyPosition()

@@ -1,3 +1,42 @@
+## Healing click recovery - 2026-11-19
+
+Follow-up lifecycle review reproduces four additional failure paths. Routine combat
+exit now reconciles only pending/retrying bindings; it cannot unnecessarily clear
+healthy actions during an unrelated metadata outage. Actual spell changes queued
+in combat still apply on exit. Both loading suspension flags are set before aura
+presentation, and world entry restores pending bindings before that presentation.
+Range polling is configured before its first paint, so a display error cannot
+permanently remove later updates. The tests inject presentation failures and keep
+errors observable; no error suppression or new client API is introduced.
+
+A shared binding rebuild could clear every click when public spell metadata or
+rank text was unavailable, then remain empty after the data recovered until an
+unrelated event or reload. Regression reproduces all15 slots across7 recipients.
+The matching Forever70959/16001 SpellDocumentation permits missing metadata and
+defines SPELL_DATA_LOAD_RESULT(spellID, success). SecureTemplates honors explicit
+useOnKeyDown=false; the release-click policy and native dispatch stay unchanged.
+
+Resolution now separates definitive rejection (unlearned, harmful, passive, invalid
+assignment or unsafe macro text) from temporarily unreadable/missing information.
+One coalesced timer backs off from0.25 to5 seconds while temporary failures remain.
+It pauses in combat/loading, resumes through existing lifecycle events, stops on
+recovery/removal/failed startup, and never performs casting or data-load requests.
+Successful public spell-data events can reconcile pending bindings immediately.
+Definitively unavailable client capabilities do not cause background polling.
+
+Learned knowledge is checked before optional metadata, so unlearned default ranks
+do not create retries. Unknown automatic heals remain inactive instead of silently
+becoming target clicks. Ordinary binding and exact priest-dispel exception rules
+are unchanged. Secure attributes are compared only outside combat; unavailable
+reads force safe writes rather than skipping stale attribute clearing. Recovery
+is armed before cosmetic refreshes, so presentation errors cannot strand it.
+
+Tests cover restricted/throwing reads, prolonged failures, all modifiers/recipients,
+bandages, defaults, combat/zoning, stale callbacks, missing APIs and startup failure.
+The reports provide no native failure trace, so this confirms a reproducible defect
+and prevention measures, not that every reported freeze has the same cause. Native
+physical-click/taint acceptance still requires player testing after installation.
+
 ## Reviewed client build - 2026-11-17
 
 Fresh Forever70959 export verifies all248 prior references;247 are unchanged.
@@ -583,6 +622,25 @@ No new API dependency, polling loop, saved state or layout surface is introduced
 The original tests cover three normal-resurrection classes; Druid coverage is
 described above. Native casting, released ghosts, line of sight and taint need owner
 acceptance; mocks do not establish server eligibility or successful resurrection.
+
+## Priest Dispel Magic classification correction (November 19, 2026)
+
+Owner's Forever70959 diagnostic reports IsSpellKnown(527)=true,
+IsSpellKnown(988)=false and IsSpellHelpful=false for both IDs. The previous
+cleansing-local exception still required helpful=true and therefore suppressed
+the learned rank's action and Magic highlight filter. Remove only that predicate
+for the two exact catalog Dispel Magic IDs. Retain player spellbook membership,
+known state, readable spell metadata, non-passive state and public harmful
+classification. Other cleansing spells and ordinary healing bindings retain
+their helpful checks. No new API, aura inspection or protected combat mutation.
+
+Reverified live70959/16001 export through the central253-reference authority;
+Spell/SpellBook documentation covers the unchanged inputs. Native fixed
+friendly/living row gating, exact-rank release dispatch and native Magic filters
+are unchanged. Source and generated tests must include helpful=false, both ranks,
+combat deferral, unlearned/invalid states and ordinary binding isolation. The
+owner screenshot establishes the classification mismatch, not post-fix native
+rendering or cast acceptance; those remain to be checked after approved DEV install.
 
 ## Exclusive class-strip input (October 12)
 

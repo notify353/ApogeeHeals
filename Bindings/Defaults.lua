@@ -22,7 +22,11 @@ function D.Action(slot)
     if slot == "1" and bandageClasses[class] then return {kind="item", id=1251} end
     local ranks = classes[class] and classes[class][slot]
     if not ranks then return nil end
+    local unavailable = false
     for _, id in ipairs(ranks) do
-        if A.Bindings.Resolve(id) then return id end
+        local info, reason, retry = A.Bindings.Resolve(id)
+        if info then return id, unavailable end
+        unavailable = unavailable or retry == true
     end
+    return nil, unavailable
 end

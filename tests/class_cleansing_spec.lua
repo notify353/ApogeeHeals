@@ -121,7 +121,15 @@ m.learned[988],m.learned[527]=false,false; m.Event("SPELLS_CHANGED"); m.Flush()
 assert(button.driver=="hide" and not button.attributes.spell1)
 assertTypes(a.View.rows[1].cleanseIndicator.slots.dispelMagic.filters.includeDispelTypes,{})
 assert(a.View.rows[1].cleanseButtons[2].driver=="show" and a.View.rows[1].cleanseButtons[3].driver=="show")
-for _,options in ipairs({{unlearned=true},{helpful=false},{passive=true},{secretInfo=true},{secretKnown=true},
+local lowMock,lowHelpful=fixture("PRIEST",{helpful=false})
+lowMock.learned[988]=false; lowMock.Event("SPELLS_CHANGED"); lowMock.Flush()
+for _,row in ipairs(lowHelpful.View.supportRows) do
+    assert(row.cleanseButtons[1].attributes.spell1==527)
+    assertTypes(row.cleanseIndicator.slots.dispelMagic.filters.includeDispelTypes,{Magic=true})
+    assert(not row.cleanseButtons[2].attributes.spell1 and not row.cleanseButtons[3].attributes.spell1)
+end
+assert(not lowHelpful.Bindings.Resolve(527) and not lowHelpful.Bindings.Resolve(988))
+for _,options in ipairs({{unlearned=true},{passive=true},{secretInfo=true},{secretKnown=true},
     {secretHarmful=true},{bookOnly=true}}) do
     local _,invalid=fixture("PRIEST",options)
     for _,row in ipairs(invalid.View.supportRows) do

@@ -1,3 +1,14 @@
+## Unreleased - 2026-11-19 healing click recovery
+
+- Preserve healthy healing bindings on ordinary combat exits, while still applying deferred spell changes. Restore loading state and pending bindings before optional aura presentation, and keep range polling alive after an initial display error.
+- Recover healing click bindings automatically after temporary spell or bandage metadata failures. Pause recovery during combat/loading and preserve saved assignments.
+- Keep unavailable automatic heals inactive instead of turning their click into targeting; stop rewriting unchanged secure action attributes.
+
+## Unreleased - 2026-11-19
+
+- Restore priest Magic debuff borders and cleanse clicks when learned Dispel
+  Magic is classified as not helpful by Forever. Both ranks remain supported.
+
 ## Unreleased - 2026-11-17
 
 - Recognize the reviewed Forever70959 client without a stale-review warning.
