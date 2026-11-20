@@ -1,3 +1,10 @@
+## Reviewed client build - 2026-11-20
+
+Fresh Forever71037 export verifies all258 central references unchanged from70959.
+Recognize this reviewed build while retaining prior reviews, future warnings and
+capability guards. No API/gameplay contract changed; native acceptance is separate.
+Central current evidence is in ApogeeForever/distribution/forever/api-evidence.json.
+
 ## Healing click recovery - 2026-11-19
 
 Follow-up lifecycle review reproduces four additional failure paths. Routine combat
