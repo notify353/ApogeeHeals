@@ -36,8 +36,9 @@ function B.ResolveItem(id)
         return nil, "Item information unavailable."
     end
     local ok, resolved, _, _, _, icon, class, subclass = pcall(C_Item.GetItemInfoInstant, id)
-    if not ok or not A.Access.Readable(resolved, icon, class, subclass) then
-        return nil, "Item information unavailable."
+    if not ok or not A.Access.Readable(resolved, icon, class, subclass)
+        or resolved == nil or class == nil or subclass == nil then
+        return nil, "Item information unavailable.", true
     end
     local bandageSubclass = Enum and Enum.ItemConsumableSubclass and Enum.ItemConsumableSubclass.Bandage
     local isBandage = (bandageSubclass ~= nil and subclass == bandageSubclass)
@@ -57,21 +58,33 @@ function B.Resolve(id)
         return B.ResolveItem(id.id)
     end
     if not validID(id) then return nil, "Invalid spell." end
+    -- The third result distinguishes retryable reads from definitive rejection.
+    -- Missing client capabilities cannot be repaired by a background timer.
+    if not C_Spell or type(C_Spell.GetSpellInfo) ~= "function"
+        or type(C_Spell.IsSpellHelpful) ~= "function" or type(C_Spell.IsSpellHarmful) ~= "function"
+        or type(C_Spell.IsSpellPassive) ~= "function" then return nil, "Spell API unavailable." end
+    local bank = Enum and Enum.SpellBookSpellBank and Enum.SpellBookSpellBank.Player
+    if not bank or not C_SpellBook or type(C_SpellBook.IsSpellInSpellBook) ~= "function"
+        or type(C_SpellBook.IsSpellKnown) ~= "function" then return nil, "Spell book unavailable." end
+    local inBook = A.Access.Read(C_SpellBook.IsSpellInSpellBook, id, bank, false)
+    local known = A.Access.Read(C_SpellBook.IsSpellKnown, id, bank)
+    if inBook == false or known == false then
+        return nil, "Spell is not learned."
+    end
+    if inBook ~= true or known ~= true then return nil, "Spell book unavailable.", true end
     local info = A.Access.Read(C_Spell and C_Spell.GetSpellInfo, id)
     if type(info) ~= "table" or not A.Access.Readable(info.name, info.iconID)
         or type(info.name) ~= "string" or info.name == "" then
-        return nil, "Spell information unavailable."
+        return nil, "Spell information unavailable.", true
     end
-    local bank = Enum and Enum.SpellBookSpellBank and Enum.SpellBookSpellBank.Player
-    if not bank or not C_SpellBook
-        or A.Access.Read(C_SpellBook.IsSpellInSpellBook, id, bank, false) ~= true
-        or A.Access.Read(C_SpellBook.IsSpellKnown, id, bank) ~= true then
-        return nil, "Spell is not learned."
-    end
-    if A.Access.Read(C_Spell.IsSpellHelpful, id) ~= true
-        or A.Access.Read(C_Spell.IsSpellHarmful, id) ~= false
-        or A.Access.Read(C_Spell.IsSpellPassive, id) ~= false then
+    local helpful = A.Access.Read(C_Spell.IsSpellHelpful, id)
+    local harmful = A.Access.Read(C_Spell.IsSpellHarmful, id)
+    local passive = A.Access.Read(C_Spell.IsSpellPassive, id)
+    if helpful == false or harmful == true or passive == true then
         return nil, "Choose an active friendly spell."
+    end
+    if helpful ~= true or harmful ~= false or passive ~= false then
+        return nil, "Spell classification unavailable.", true
     end
     return info
 end
@@ -100,8 +113,8 @@ end
 function B.Effective(slot)
     local assigned = A.db.bindings[slot]
     if assigned ~= nil then return assigned, false end
-    local id = A.BindingDefaults.Action(slot)
-    return id, id ~= nil
+    local id, unavailable = A.BindingDefaults.Action(slot)
+    return id, id ~= nil, unavailable
 end
 local mouseButtons = { LeftButton=1, RightButton=2, MiddleButton=3, Button4=4, Button5=5 }
 function B.Feedback(_, mouseButton, down)
@@ -116,9 +129,34 @@ function B.Feedback(_, mouseButton, down)
     local prefix = ctrl and "ctrl-" or shift and "shift-" or ""
     A.BindingEditor.FlashInput(prefix .. button)
 end
+local function retryWhenReady(needed)
+    B.retryNeeded = needed
+    if not needed then B.retryToken, B.retryDelay = nil, nil; return end
+    if B.retryToken then return end
+    local token = {}
+    B.retryToken = token
+    local delay = B.retryDelay or 0.25
+    B.retryDelay = math.min(delay * 2, 5)
+    C_Timer.After(delay, function()
+        if B.retryToken ~= token then return end
+        B.retryToken = nil
+        if A.startupState == "failed" then B.retryNeeded = nil; return end
+        -- Combat/world-entry events resume recovery; never poll protected state here.
+        if InCombatLockdown() or A.Runtime.suspended then B.pending = true; return end
+        B.Apply()
+    end)
+end
+local function setActionAttribute(frame, key, value)
+    -- Only public, out-of-combat action attributes. Avoid repeated protected writes.
+    local ok, current = pcall(frame.GetAttribute, frame, key)
+    if not ok or not A.Access.Readable(current) or current ~= value then frame:SetAttribute(key, value) end
+end
 function B.Apply()
+    if A.startupState == "failed" then return end
     if InCombatLockdown() then B.pending = true; return end
+    if A.Runtime.suspended then B.pending = true; return end
     B.pending = nil
+    local retry = false
     local recipients = { unpack(A.View.rows) }
     recipients[#recipients + 1] = A.View.target
     recipients[#recipients + 1] = A.View.targetTarget
@@ -130,11 +168,14 @@ function B.Apply()
         "alt-shift-", "alt-ctrl-", "alt-ctrl-shift-" }) do
         for button = 1, 5 do
             -- One transient resolution per combination, shared by its fixed recipients.
-            local id = B.byId[prefix .. button] and B.Effective(prefix .. button)
-            local info = id and B.Resolve(id)
+            local id, automatic, unavailable
+            if B.byId[prefix .. button] then id, automatic, unavailable = B.Effective(prefix .. button) end
+            local info, reason, unresolved
+            if id then info, reason, unresolved = B.Resolve(id) end
+            retry = retry or unavailable == true or unresolved == true
             -- Plain left targets only without an assignment or learned default. Unavailable assignments
             -- and empty modified slots must not fall through to another action.
-            local fallback = button == 1 and prefix == "" and id == nil and "target" or ""
+            local fallback = button == 1 and prefix == "" and id == nil and not unavailable and "target" or ""
             local item = info and info.itemID
             local castName
             if info and not item then
@@ -145,20 +186,23 @@ function B.Apply()
                     and not rank:find("[\r\n;%[%]]") then
                     castName = info.name .. (rank ~= "" and "(" .. rank .. ")" or "")
                 end
+                if rank == nil and type(C_Spell.GetSpellSubtext) == "function" then retry = true end
             end
             if prefix == "" and button == 1 then
                 B.rangeSpell = info and not item and id or nil
             end
             for _, frame in ipairs(recipients) do
-                frame:SetAttribute(prefix .. "type" .. button,
+                setActionAttribute(frame, prefix .. "type" .. button,
                     info and (item and "item" or (castName and "macro" or "")) or fallback)
-                frame:SetAttribute(prefix .. "macrotext" .. button, castName
+                setActionAttribute(frame, prefix .. "macrotext" .. button, castName
                     and "/cast [@" .. frame.unit .. ",exists,help] " .. castName .. "\n/stopspelltarget" or nil)
-                frame:SetAttribute(prefix .. "spell" .. button, info and not item and id or nil)
-                frame:SetAttribute(prefix .. "item" .. button, item and "item:" .. item or nil)
+                setActionAttribute(frame, prefix .. "spell" .. button, info and not item and id or nil)
+                setActionAttribute(frame, prefix .. "item" .. button, item and "item:" .. item or nil)
             end
         end
     end
+    -- Arm recovery before cosmetic refreshes, which must not strand disabled actions.
+    retryWhenReady(retry)
     if A.Runtime.driver then A.Runtime.RangePolling() end
     if A.BindingEditor then A.BindingEditor.Refresh() end
 end

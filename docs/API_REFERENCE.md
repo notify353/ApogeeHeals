@@ -1,3 +1,33 @@
+## Healing click recovery - 2026-11-19
+
+A shared binding rebuild could clear every click when public spell metadata or
+rank text was unavailable, then remain empty after the data recovered until an
+unrelated event or reload. Regression reproduces all15 slots across7 recipients.
+The matching Forever70959/16001 SpellDocumentation permits missing metadata and
+defines SPELL_DATA_LOAD_RESULT(spellID, success). SecureTemplates honors explicit
+useOnKeyDown=false; the release-click policy and native dispatch stay unchanged.
+
+Resolution now separates definitive rejection (unlearned, harmful, passive, invalid
+assignment or unsafe macro text) from temporarily unreadable/missing information.
+One coalesced timer backs off from0.25 to5 seconds while temporary failures remain.
+It pauses in combat/loading, resumes through existing lifecycle events, stops on
+recovery/removal/failed startup, and never performs casting or data-load requests.
+Successful public spell-data events can reconcile pending bindings immediately.
+Definitively unavailable client capabilities do not cause background polling.
+
+Learned knowledge is checked before optional metadata, so unlearned default ranks
+do not create retries. Unknown automatic heals remain inactive instead of silently
+becoming target clicks. Ordinary binding and exact priest-dispel exception rules
+are unchanged. Secure attributes are compared only outside combat; unavailable
+reads force safe writes rather than skipping stale attribute clearing. Recovery
+is armed before cosmetic refreshes, so presentation errors cannot strand it.
+
+Tests cover restricted/throwing reads, prolonged failures, all modifiers/recipients,
+bandages, defaults, combat/zoning, stale callbacks, missing APIs and startup failure.
+The reports provide no native failure trace, so this confirms a reproducible defect
+and prevention measures, not that every reported freeze has the same cause. Native
+physical-click/taint acceptance still requires player testing after installation.
+
 ## Reviewed client build - 2026-11-17
 
 Fresh Forever70959 export verifies all248 prior references;247 are unchanged.

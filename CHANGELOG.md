@@ -1,3 +1,8 @@
+## Unreleased - 2026-11-19 healing click recovery
+
+- Recover healing click bindings automatically after temporary spell or bandage metadata failures. Pause recovery during combat/loading and preserve saved assignments.
+- Keep unavailable automatic heals inactive instead of turning their click into targeting; stop rewriting unchanged secure action attributes.
+
 ## Unreleased - 2026-11-19
 
 - Restore priest Magic debuff borders and cleanse clicks when learned Dispel
