@@ -195,3 +195,57 @@ do
     end
 end
 print("PASS cosmetic failure preserves recovery; unavailable attribute reads never skip stale-action clearing")
+
+local failures = {}
+local function lifecycleCase(label, test)
+    local ok, reason = pcall(test)
+    print((ok and "PASS " or "FAIL ") .. label)
+    if not ok then failures[#failures+1] = label .. ": " .. tostring(reason) end
+end
+lifecycleCase("routine combat exit preserves healthy bindings; deferred spell changes still apply", function()
+    local m,a,state,rows=setup()
+    m.combat=true; m.Event("PLAYER_REGEN_DISABLED")
+    state.rank=false
+    m.combat=false; m.Event("PLAYER_REGEN_ENABLED")
+    expect(rows,true)
+    assert(not a.Bindings.retryNeeded)
+    -- An actual change received during combat must still reconcile on exit.
+    m.combat=true; state.known=false; m.Event("SPELLS_CHANGED")
+    assert(a.Bindings.pending); expect(rows,true)
+    m.combat=false; m.Event("PLAYER_REGEN_ENABLED")
+    expect(rows,false); assert(not a.Bindings.pending)
+end)
+lifecycleCase("loading suspension is established before optional presentation work", function()
+    local m,a=setup()
+    a.View.RefreshHotActivity=function() error("temporary aura presentation failure") end
+    assert(not pcall(m.Event,"PLAYER_LEAVING_WORLD"))
+    assert(a.Runtime.suspended and a.Buffs.suspended, "both subsystems must suspend together")
+end)
+lifecycleCase("world entry restores deferred healing before optional presentation work", function()
+    local m,a,state,rows=setup()
+    state.rank=false; m.Event("SPELL_TEXT_UPDATE"); expect(rows,false)
+    m.Event("PLAYER_LEAVING_WORLD"); m.Flush()
+    state.rank=true
+    a.View.RefreshHotActivity=function() error("temporary aura presentation failure") end
+    assert(not pcall(m.Event,"PLAYER_ENTERING_WORLD"))
+    assert(not a.Runtime.suspended and not a.Buffs.suspended)
+    expect(rows,true)
+end)
+lifecycleCase("range polling survives first-paint failure and stops when suspended", function()
+    local m,a=setup()
+    local original=a.View.RefreshRange
+    a.View.RefreshRange=function() error("temporary range presentation failure") end
+    assert(not pcall(a.Runtime.RangePolling))
+    local tick=a.Runtime.driver.scripts.OnUpdate
+    assert(type(tick)=="function", "first-paint failure must not remove future updates")
+    local refreshed=0
+    a.View.RefreshRange=function() refreshed=refreshed+1; original() end
+    tick(a.Runtime.driver,0.2); assert(refreshed==1)
+    a.Runtime.suspended=true; a.Runtime.RangePolling()
+    assert(not a.Runtime.driver.scripts.OnUpdate)
+    a.Runtime.suspended=nil; a.Runtime.RangePolling()
+    assert(a.Runtime.driver.scripts.OnUpdate)
+    a.View.unlocked=true; a.Runtime.RangePolling()
+    assert(not a.Runtime.driver.scripts.OnUpdate)
+end)
+assert(#failures==0, table.concat(failures,"\n"))

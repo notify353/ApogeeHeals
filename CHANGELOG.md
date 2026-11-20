@@ -1,5 +1,6 @@
 ## Unreleased - 2026-11-19 healing click recovery
 
+- Preserve healthy healing bindings on ordinary combat exits, while still applying deferred spell changes. Restore loading state and pending bindings before optional aura presentation, and keep range polling alive after an initial display error.
 - Recover healing click bindings automatically after temporary spell or bandage metadata failures. Pause recovery during combat/loading and preserve saved assignments.
 - Keep unavailable automatic heals inactive instead of turning their click into targeting; stop rewriting unchanged secure action attributes.
 

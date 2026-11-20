@@ -1,5 +1,14 @@
 ## Healing click recovery - 2026-11-19
 
+Follow-up lifecycle review reproduces four additional failure paths. Routine combat
+exit now reconciles only pending/retrying bindings; it cannot unnecessarily clear
+healthy actions during an unrelated metadata outage. Actual spell changes queued
+in combat still apply on exit. Both loading suspension flags are set before aura
+presentation, and world entry restores pending bindings before that presentation.
+Range polling is configured before its first paint, so a display error cannot
+permanently remove later updates. The tests inject presentation failures and keep
+errors observable; no error suppression or new client API is introduced.
+
 A shared binding rebuild could clear every click when public spell metadata or
 rank text was unavailable, then remain empty after the data recovered until an
 unrelated event or reload. Regression reproduces all15 slots across7 recipients.
