@@ -51,6 +51,10 @@ function B.ResolveItem(id)
     if type(name) ~= "string" or name == "" then name = "Bandage (item " .. id .. ")" end
     return {name=name, iconID=icon, itemID=id}
 end
+-- Forever's castable Penance wrappers can report harmful/not helpful despite
+-- healing friendly recipients. Candidate IDs only: learned player-book, active,
+-- readable metadata checks still apply; never admit triggered heal/damage bolts.
+local friendlyPenance = { [402174]=true, [1240720]=true, [1240721]=true, [1316995]=true }
 function B.Resolve(id)
     if not A.Access.Readable(id) then return nil, "Assignment unavailable." end
     if type(id) == "table" then
@@ -80,10 +84,11 @@ function B.Resolve(id)
     local helpful = A.Access.Read(C_Spell.IsSpellHelpful, id)
     local harmful = A.Access.Read(C_Spell.IsSpellHarmful, id)
     local passive = A.Access.Read(C_Spell.IsSpellPassive, id)
-    if helpful == false or harmful == true or passive == true then
+    local penance = friendlyPenance[id] == true
+    if passive == true or (not penance and (helpful == false or harmful == true)) then
         return nil, "Choose an active friendly spell."
     end
-    if helpful ~= true or harmful ~= false or passive ~= false then
+    if type(helpful) ~= "boolean" or type(harmful) ~= "boolean" or passive ~= false then
         return nil, "Spell classification unavailable.", true
     end
     return info
