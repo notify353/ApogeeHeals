@@ -212,7 +212,10 @@ Drop a learned
 friendly spell from the player spellbook onto one of fifteen mouse/modifier slots.
 Pickup followed by clicking a slot also works. The selected spell ID/rank is kept;
 hover to see its name and rank. Active helpful spells (including friendly buffs)
-are accepted; harmful and passive spells are rejected. New manual assignments start empty.
+are accepted. Forever Penance is also supported despite its mixed healing/damage
+classification; only its four learned castable ranks qualify, and healing clicks
+remain locked to friendly recipients. Other harmful spells and all passive spells
+are rejected. New manual assignments start empty.
 
 With default spells enabled, empty plain Left uses Priest **Lesser Heal**,
 Paladin **Holy Light**, Druid **Healing Touch** or Shaman **Healing Wave**.

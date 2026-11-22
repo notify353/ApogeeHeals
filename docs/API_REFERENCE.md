@@ -1,3 +1,37 @@
+## Forever Penance healing bindings - 2026-11-22
+
+Owner screenshot shows Penance's ally-healing tooltip and editor rejection.
+B.Resolve rejected harmful=true or helpful=false unconditionally. A failing
+regression reproduces this path for the four castable Penance wrappers.
+
+Fresh central live Forever1.60.1.71037/interface16001 export verifies260 references.
+SpellDocumentation defines helpful/harmful flags independently; a server-scripted
+hybrid can expose harmful flags despite its friendly action. SpellBookDocumentation
+supplies player-bank IsSpellInSpellBook(id,bank,false), IsSpellKnown(id,bank), and
+cursor-slot GetSpellBookItemInfo. Existing secure dispatch retains exactly one
+[@fixedunit,exists,help] action using public localized name and assigned rank.
+
+Candidate identities from Wowhead's Forever data, reviewed2026-11-22:
+- [Rank1 wrapper402174](https://www.wowhead.com/forever/spell=402174/penance)
+- [Rank2 wrapper1240720](https://www.wowhead.com/forever/spell=1240720/penance)
+- [Rank3 wrapper1240721](https://www.wowhead.com/forever/spell=1240721/penance)
+- [Rank4 wrapper1316995](https://www.wowhead.com/forever/spell=1316995/penance)
+
+Each describes enemy damage and ally healing, with a harmful-effect flag. These
+records identify candidates only; matching local exports remain API authority and
+runtime learned-player-book checks remain mandatory. No Wrath47540, localized-name
+matching or triggered bolt/channel IDs qualify. Exact wrappers may have either
+public boolean helpful/harmful value. Unknown/restricted/throwing reads remain
+retryable; missing capabilities remain definitive. Readable spell metadata and
+non-passive status are required. All other spells retain helpful=true/harmful=false.
+No defaults, cleansing catalog, targeting, dispatch or saved-data schema changes.
+
+Source/generated tests cover editor drops/slot cursors, four ranks across15 slots
+and7 recipients, exact rank/localized text, no hostile fallback, rejected unrelated
+IDs, failed-drop preservation, restricted data, recovery, combat and reload.
+Native channel timing/taint acceptance still requires the owner's physical click
+test after reload and assignment. No new API or export dependency was introduced.
+
 ## Reviewed client build - 2026-11-20
 
 Fresh Forever71037 export verifies all258 central references unchanged from70959.

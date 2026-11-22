@@ -1,3 +1,7 @@
+## Unreleased - 2026-11-22
+
+- Accept learned castable Forever Penance ranks in the Healing Mouse editor despite their harmful/not-helpful classification. Keep exact chosen ranks, friendly-only secure recipients, combat locks, restricted-data guards and recovery after temporary metadata failures. Ordinary harmful spells remain rejected.
+
 ## Unreleased - 2026-11-20
 
 - Recognize the reviewed Forever71037 client without a stale-review warning; retain capability guards and future-build notices.
