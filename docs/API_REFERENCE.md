@@ -1,3 +1,10 @@
+## Reviewed client build - 2026-11-25
+
+Fresh Forever71139 export verifies all260 prior central references unchanged
+from71037. Recognize this reviewed build while retaining prior reviews, future
+warnings and capability guards. No gameplay contract changed; native acceptance
+is separate. Central evidence is in ApogeeForever/distribution/forever/api-evidence.json.
+
 ## Forever Penance healing bindings - 2026-11-22
 
 Owner screenshot shows Penance's ally-healing tooltip and editor rejection.
