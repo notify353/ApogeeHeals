@@ -11,13 +11,14 @@ function B.SpellRange(id, unit)
 end
 -- Guarded proximity estimate shared by health fading and living buff recipients.
 -- With a spell, use its reported limits; only unassigned healing uses 40 yards.
-function B.Proximity(unit, spell)
+function B.Proximity(unit, spell, info)
     if unit == "player" or A.Access.Read(UnitIsUnit, unit, "player") == true then return true end
     if type(UnitDistanceSquared) ~= "function" then return nil end
     local minimum, maximum = 0, 40
     if spell then
-        local info = A.Access.Read(C_Spell and C_Spell.GetSpellInfo, spell)
-        if type(info) ~= "table" or not A.Access.Readable(info.minRange, info.maxRange) then return nil end
+        if info == nil then info = A.Access.Read(C_Spell and C_Spell.GetSpellInfo, spell) end
+        if not A.Access.Readable(info) or type(info) ~= "table"
+            or not A.Access.Readable(info.minRange, info.maxRange) then return nil end
         minimum, maximum = info.minRange, info.maxRange
         if type(minimum) ~= "number" or type(maximum) ~= "number"
             or not (minimum >= 0 and maximum > 0 and minimum <= maximum

@@ -386,8 +386,6 @@ The applied, unmodified left-click spell alone controls health-bar fading.
 Confirmed out of range fades health artwork and its text/incoming-heal children
 to 45%; in-range or unknown stays fully opaque. Buff buttons are sibling frames
 and retain their own exact-spell range checks without inheriting this fade.
-When that check is unavailable, living-recipient buff choices use guarded distance
-against each buff's reported limits and hide only when confirmed outside them.
 An empty left slot or bandage uses guarded 40-yard proximity (inclusive), keeping
 non-caster group distance useful. A spell's unknown range never falls back to
 proximity. Right-click and modifier bindings do not alter this cue. The Near/Far

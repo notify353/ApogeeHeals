@@ -122,7 +122,7 @@ function C.Choices(unit, auras, cache, expanded)
             for _, id in ipairs(definition.ranks) do
                 local info = resolve(id, cache)
                 if info and A.Access.Readable(info) and type(info) == "table" and A.Access.Readable(info.iconID) then
-                    choices[#choices + 1] = {id=id, icon=info.iconID, name=info.name}
+                    choices[#choices + 1] = {id=id, icon=info.iconID, name=info.name, info=info}
                     offered[definition.key] = id
                     break
                 end
