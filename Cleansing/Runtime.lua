@@ -55,7 +55,6 @@ function P.HideTooltip()
 end
 -- Permanent action positions; native slots alone select and display aura data.
 local dispelTypes = {"Magic", "Disease", "Poison", "Curse"}
-local allDispelTypes = {Magic=true, Disease=true, Poison=true, Curse=true}
 local timerFormatter
 local function countdownFormatter()
     if timerFormatter then return timerFormatter end
@@ -88,7 +87,7 @@ local function createFixed(row)
         or not A.Access.Readable(direction) or type(direction) ~= "number"
         or type(row.SetMouseMotionEnabled) ~= "function" then return false end
     local size, gap = A.Style.sideIconSize, A.Style.sideIconGap
-    local width = 6 * size + 5 * gap
+    local width = 5 * size + 4 * gap
     local gate = CreateFrame("Frame", nil, row.supportFrame or row, "SecureHandlerStateTemplate")
     gate:SetSize(width, size)
     gate:SetPoint("TOPLEFT", row.health, "TOPRIGHT", gap, A.Style.sideIconY)
@@ -110,7 +109,7 @@ local function createFixed(row)
     row.fixedDebuffs, row.cleanseButtons = true, {}
     row.fixedDebuffGate = gate
     row.debuffContainer, row.cleanseIndicator = icons, highlights
-    row.cleanseSlotCount = 6
+    row.cleanseSlotCount = 5
     if row.unit == "player" or row.unit:match("^party%d$") then
         row.leftSupportSlots = 1
         row.drinkIcon:ClearAllPoints()
@@ -141,9 +140,8 @@ local function createFixed(row)
     end)
     freedom:SetScript("OnLeave", P.HideTooltip)
     freedom:SetScript("OnHide", function() if P.tooltip == freedom then P.HideTooltip() end end)
-    for index = 1, 5 do
-        local kind = dispelTypes[index] or "Other"
-        local x = (index <= 4 and index - 1 or 5) * (size + gap)
+    for index, kind in ipairs(dispelTypes) do
+        local x = (index - 1) * (size + gap)
         local function place(frame, layer)
             frame:SetSize(size, size); frame:SetFrameLevel(level + layer)
             frame:SetPoint("TOPLEFT", gate, "TOPLEFT", x, 0)
@@ -151,8 +149,7 @@ local function createFixed(row)
         end
         icons:AddAuraSlot(kind, "HARMFUL", {
             sortMethod=sort, sortDirection=direction,
-            candidateFilters=index <= 4 and {includeDispelTypes={[kind]=true}}
-                or {excludeDispelTypes=allDispelTypes},
+            candidateFilters={includeDispelTypes={[kind]=true}},
             initializeFrame=function(frame)
                 place(frame, 5)
                 -- Hover belongs to the intrinsic aura tooltip; clicks hit the
@@ -184,32 +181,30 @@ local function createFixed(row)
                 end
             end,
         })
-        if index <= 4 then
-            local button = CreateFrame("Button", nil, gate, "SecureActionButtonTemplate")
-            button:SetSize(size, size); button:SetFrameLevel(level + 4)
-            button:SetPoint("TOPLEFT", gate, "TOPLEFT", x, 0)
-            button:SetAttribute("unit", row.unit); button:SetAttribute("useOnKeyDown", false)
-            button:RegisterForClicks("LeftButtonUp")
-            for _, prefix in ipairs({"shift-", "ctrl-", "ctrl-shift-", "alt-", "alt-shift-", "alt-ctrl-", "alt-ctrl-shift-"}) do
-                button:SetAttribute(prefix .. "type1", "")
-            end
-            row.cleanseButtons[index] = button
-            highlights:AddAuraSlot(kind, "HARMFUL", {
-                sortMethod=sort, sortDirection=direction,
-                candidateFilters={includeDispelTypes={}},
-                initializeFrame=function(frame)
-                    place(frame, 6)
-                    -- Only four edges: a full background here would cover the icon.
-                    for _, edge in ipairs({"TOP", "BOTTOM", "LEFT", "RIGHT"}) do
-                        local texture = frame:CreateTexture(nil, "OVERLAY")
-                        texture:SetColorTexture(1, 0.75, 0.1, 1)
-                        texture:SetPoint(edge, frame, edge, 0, 0)
-                        texture:SetSize((edge == "TOP" or edge == "BOTTOM") and size or 1,
-                            (edge == "LEFT" or edge == "RIGHT") and size or 1)
-                    end
-                end,
-            })
+        local button = CreateFrame("Button", nil, gate, "SecureActionButtonTemplate")
+        button:SetSize(size, size); button:SetFrameLevel(level + 4)
+        button:SetPoint("TOPLEFT", gate, "TOPLEFT", x, 0)
+        button:SetAttribute("unit", row.unit); button:SetAttribute("useOnKeyDown", false)
+        button:RegisterForClicks("LeftButtonUp")
+        for _, prefix in ipairs({"shift-", "ctrl-", "ctrl-shift-", "alt-", "alt-shift-", "alt-ctrl-", "alt-ctrl-shift-"}) do
+            button:SetAttribute(prefix .. "type1", "")
         end
+        row.cleanseButtons[index] = button
+        highlights:AddAuraSlot(kind, "HARMFUL", {
+            sortMethod=sort, sortDirection=direction,
+            candidateFilters={includeDispelTypes={}},
+            initializeFrame=function(frame)
+                place(frame, 6)
+                -- Only four edges: a full background here would cover the icon.
+                for _, edge in ipairs({"TOP", "BOTTOM", "LEFT", "RIGHT"}) do
+                    local texture = frame:CreateTexture(nil, "OVERLAY")
+                    texture:SetColorTexture(1, 0.75, 0.1, 1)
+                    texture:SetPoint(edge, frame, edge, 0, 0)
+                    texture:SetSize((edge == "TOP" or edge == "BOTTOM") and size or 1,
+                        (edge == "LEFT" or edge == "RIGHT") and size or 1)
+                end
+            end,
+        })
     end
     icons:SetEnabled(true); highlights:SetEnabled(true)
     return true

@@ -1,7 +1,7 @@
 local Mock = dofile("tests/mock.lua")
 local runtimeRoot = os.getenv("APOGEE_HEALS_RUNTIME_ROOT")
 local runtimeName = os.getenv("APOGEE_HEALS_RUNTIME_NAME") or "ApogeeHeals"
-local kinds = {"Magic", "Disease", "Poison", "Curse", "Other"}
+local kinds = {"Magic", "Disease", "Poison", "Curse"}
 local cases = {
     PALADIN={4987,1152,1152,false}, PRIEST={988,528,false,false},
     SHAMAN={false,2870,526,false}, DRUID={false,false,8946,2782},
@@ -102,12 +102,16 @@ for class, expected in pairs(cases) do
     instances[#instances+1]={m=m,a=a}
     assert(#a.View.supportRows==6 and not a.View.targetTarget.debuffContainer)
     for _,row in ipairs(a.View.supportRows) do
-        assert(row.fixedDebuffs and row.cleanseSlotCount==6 and #row.cleanseButtons==4)
+        assert(row.fixedDebuffs and row.cleanseSlotCount==5 and #row.cleanseButtons==4)
         local icons, highlights = row.debuffContainer, row.cleanseIndicator
         assert(not icons.group and icons.unit==row.unit and highlights.unit==row.unit)
         assert(icons.parent==highlights.parent and icons.parent.driver=="[@"..row.unit..",help,nodead] show; hide")
         assert(icons.parent.point[2]==row.health and icons.parent.point[4]==a.Style.sideIconGap)
-        assert(icons.width==6*a.Style.sideIconSize+5*a.Style.sideIconGap)
+        assert(icons.width==5*a.Style.sideIconSize+4*a.Style.sideIconGap)
+        assert(not icons.slots.Other and not highlights.slots.Other, "Other must not create an aura slot")
+        local count=0
+        for _ in pairs(icons.slots) do count=count+1 end
+        assert(count==4, "only the four cleanse categories get aura icons")
         if row.unit ~= "target" then
             assert(row.drinkIcon.point[1]=="TOPRIGHT" and row.drinkIcon.point[3]=="TOPLEFT")
             assert(row.drinkIcon.point[4]==-a.Style.sideIconGap and row.leftSupportSlots==1)
@@ -154,36 +158,31 @@ for class, expected in pairs(cases) do
             end
             assert(remaining.justify=="CENTER" and remaining.wrap==false)
             for channel=1,4 do assert(remaining.color[channel]==1) end
-            assert(visual.point[2]==icons.parent and visual.point[4]==(index<=4 and index-1 or 5)*(a.Style.sideIconSize+a.Style.sideIconGap))
-            if index<=4 then
-                assert(slot.filters.includeDispelTypes[kind])
-                local button=row.cleanseButtons[index]
-                assert(button.parent==icons.parent and button.parent~=icons)
-                assert(button.point[2]==icons.parent and button.point[4]==visual.point[4])
-                assert(button.template=="SecureActionButtonTemplate" and not next(button.scripts) and not button.icon)
-                assert(button.attributes.unit==row.unit and button.attributes.useOnKeyDown==false)
-                assert(button.clicks[1]=="LeftButtonUp" and button.attributes.spell1==(expected[index] or nil))
-                assert(button.driver==(expected[index] and "show" or "hide"))
-                for _,prefix in ipairs({"shift-","ctrl-","ctrl-shift-","alt-","alt-shift-","alt-ctrl-","alt-ctrl-shift-"}) do
-                    assert(button.attributes[prefix.."type1"]=="")
-                end
-                local glow=highlights.slots[kind]
-                assert((glow.filters.includeDispelTypes[kind]==true)==(expected[index]~=false))
-                assert(glow.config.sortMethod==slot.config.sortMethod and glow.config.sortDirection==slot.config.sortDirection)
-                assert(glow.frame.mouse==false and not glow.frame.mouseMotion)
-                assert(not glow.frame.durationText, "only the representative icon gets a timer")
-                assert(button.level<visual.level and visual.level<glow.frame.level)
-                local edges=0
-                for _,child in ipairs(m.frames) do
-                    if child.parent==glow.frame and child.kind=="Texture" then
-                        edges=edges+1; assert(child.width==1 or child.height==1, "highlight obscures icon")
-                    end
-                end
-                assert(edges==4)
-            else
-                assert(not highlights.slots.Other and not row.cleanseButtons[5])
-                for i=1,4 do assert(slot.filters.excludeDispelTypes[kinds[i]]) end
+            assert(visual.point[2]==icons.parent and visual.point[4]==(index-1)*(a.Style.sideIconSize+a.Style.sideIconGap))
+            assert(slot.filters.includeDispelTypes[kind])
+            local button=row.cleanseButtons[index]
+            assert(button.parent==icons.parent and button.parent~=icons)
+            assert(button.point[2]==icons.parent and button.point[4]==visual.point[4])
+            assert(button.template=="SecureActionButtonTemplate" and not next(button.scripts) and not button.icon)
+            assert(button.attributes.unit==row.unit and button.attributes.useOnKeyDown==false)
+            assert(button.clicks[1]=="LeftButtonUp" and button.attributes.spell1==(expected[index] or nil))
+            assert(button.driver==(expected[index] and "show" or "hide"))
+            for _,prefix in ipairs({"shift-","ctrl-","ctrl-shift-","alt-","alt-shift-","alt-ctrl-","alt-ctrl-shift-"}) do
+                assert(button.attributes[prefix.."type1"]=="")
             end
+            local glow=highlights.slots[kind]
+            assert((glow.filters.includeDispelTypes[kind]==true)==(expected[index]~=false))
+            assert(glow.config.sortMethod==slot.config.sortMethod and glow.config.sortDirection==slot.config.sortDirection)
+            assert(glow.frame.mouse==false and not glow.frame.mouseMotion)
+            assert(not glow.frame.durationText, "only the representative icon gets a timer")
+            assert(button.level<visual.level and visual.level<glow.frame.level)
+            local edges=0
+            for _,child in ipairs(m.frames) do
+                if child.parent==glow.frame and child.kind=="Texture" then
+                    edges=edges+1; assert(child.width==1 or child.height==1, "highlight obscures icon")
+                end
+            end
+            assert(edges==4)
         end
     end
     a.View.SetUnlocked(true)
@@ -262,7 +261,7 @@ for _,slot in pairs(noFormatter.View.target.debuffContainer.slots) do assert(not
 local _,noSlots=fixture("PRIEST",{noSlots=true})
 assert(not noSlots.View.target.fixedDebuffs and noSlots.View.target.debuffContainer.group)
 assert(not noSlots.View.target.cleanseIndicator and noSlots.View.target.cleanseButtons[1].spell==988)
-print("PASS fixed type slots, native hover/click separation, learned ranks, empty/Other slots, lifecycle, combat deferral and capability fallback")
+print("PASS four fixed debuff types, no Other slot, Freedom position, hover/click separation, learned ranks, lifecycle, combat deferral and capability fallback")
 
 -- Owner's live Forever report: rank 1 known, rank 2 unknown, neither helpful.
 -- Keep both ranks in the native dispatch checks below, not only the mock filter.

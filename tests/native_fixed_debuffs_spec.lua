@@ -52,11 +52,11 @@ local compare=env.AuraContainerUtil.GetAuraSortComparator(
 local filter=env.AuraContainerUtil.DoesAuraPassCandidateFilters
 local allTypes={Magic=true,Disease=true,Poison=true,Curse=true}
 local selected
-for _,kind in ipairs({"Magic","Disease","Poison","Curse","Other"}) do
-    local config=kind=="Other" and {excludeDispelTypes=allTypes} or {includeDispelTypes={[kind]=true}}
+for _,kind in ipairs({"Magic","Disease","Poison","Curse"}) do
+    local config={includeDispelTypes={[kind]=true}}
     local slot=setmetatable({candidates=env.TableUtil.CreatePriorityTable(compare,true),dirtyAuraInstanceIDs={}},
         {__index=env.AuraContainerAuraSlotMixin})
-    local older={auraInstanceID=100,dispelName=kind~="Other" and kind or nil,expirationTime=1000}
+    local older={auraInstanceID=100,dispelName=kind,expirationTime=1000}
     local newest={auraInstanceID=102,dispelName=older.dispelName,expirationTime=10}
     local middle={auraInstanceID=101,dispelName=older.dispelName,expirationTime=100}
     for _,aura in ipairs({newest,older,middle}) do
@@ -71,8 +71,8 @@ for _,kind in ipairs({"Magic","Disease","Poison","Curse","Other"}) do
     for candidate in pairs(allTypes) do
         assert(filter("party1",{dispelName=candidate},config)==(candidate==kind))
     end
-    assert(filter("party1",{dispelName=""},config)==(kind=="Other"))
-    assert(filter("party1",{dispelName="Bleed"},config)==(kind=="Other"))
+    assert(not filter("party1",{dispelName=""},config))
+    assert(not filter("party1",{dispelName="Bleed"},config))
     assert(not filter("party1",older,{includeDispelTypes={}}), "unknown cleanse must not highlight")
     selected=newest
 end

@@ -1,3 +1,14 @@
+## Remove right-side Other slot - 2026-11-27
+
+Owner removes Other after adopting the in-health progress display. Native
+Forever fixed containers now create only Magic/Disease/Poison/Curse aura slots;
+the fixed Freedom button remains in position5. Container width reserves5 icons
+and4 gaps instead of6 icons and5 gaps. No catch-all aura slot remains in this
+path. Existing category filters, native timers/tooltips, secure actions and
+lifecycle gates are unchanged, as are the yellow own-debuff strip and HoTs.
+Legacy/Era fallback remains unchanged. Matching71139/16001 verifies281 references;
+no API change. Source/generated checks assert no Other slot and unchanged actions.
+
 ## Opposite debuff progress direction - 2026-11-27
 
 Current71139/16001 authority reverified,281 references. Reviewed existing

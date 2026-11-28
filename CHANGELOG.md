@@ -1,5 +1,6 @@
 ## Unreleased - 2026-11-27
 
+- Remove the native right-side Other debuff icon and its reserved space. Keep four cleanse categories and Movement/Freedom in order; retain the yellow in-health debuff progress bar.
 - Use bright yellow for the priest own-debuff progress strip so it stands out against green health and white HoTs. Preserve drain direction, full thickness and native timer behavior.
 - Reverse the priest own-debuff progress fill: it stays anchored right and drains left to right. HoTs retain their left anchor and opposite drain direction; native remaining-time behavior stays unchanged.
 - Keep every progress lane at the original single-HoT thickness. Increase health height to fit three full-thickness lanes below the name and role icons; preserve width, fonts, power height and aura behavior.

@@ -137,11 +137,11 @@ guidance, native weapon displays, limitations and live acceptance checks.
   game's assigned role on each player/party row. Unassigned or unavailable roles
   stay blank. Both role and leader icons hide immediately in combat and refresh
   from current assignments afterward; class is never used to guess a role.
-- Five fixed debuff positions extend right of each friendly player/party/target
-  health bar: Magic, Disease, Poison, Curse, Other. Each shows one native aura
+- Four fixed debuff positions extend right of each friendly player/party/target
+  health bar: Magic, Disease, Poison, Curse. Each shows one native aura
   icon; empty positions stay blank. Hover for its native tooltip. A gold border
   marks a type your learned cleanse can remove; left-click casts on that row.
-  A fixed Blessing of Freedom button sits between Curse and Other for paladins
+  A fixed Blessing of Freedom button sits after Curse for paladins
   who know it. It does not detect roots/slows or show a matching-debuff glow.
   Food/drink sits immediately left of party/player bars; buff and resurrection
   buttons start one position farther left.
@@ -200,7 +200,7 @@ guidance, native weapon displays, limitations and live acceptance checks.
   Weakened Soul, with its actual duration. It is not an exact Weakened Soul
   filter: another matching effect can appear, and other priests' debuffs are
   excluded. The bar does not promise that Shield is ready. The right-side Other
-  icon remains available. The owner reports that the priest display works;
+  icon and its reserved space have been removed. The owner reports that the priest display works;
   comprehensive native acceptance remains separate.
   Regrowth includes all nine Classic ranks; Wild Growth includes all three
   Forever ranks. Only your own HoT on that recipient appears in each lane.
@@ -329,9 +329,9 @@ Battle Shout remains handled by Keybinds. See [class support](docs/CLASS_SUPPORT
 
 ## Fixed debuff slots and cleansing
 
-Magic, Disease, Poison and Curse each have a permanent position. A fifth Other
-debuff position shows effects such as Weakened Soul without a cleanse highlight or
-action. The right-hand order is Magic, Disease, Poison, Curse, Movement, Other.
+Magic, Disease, Poison and Curse each have a permanent position.
+The right-hand order is Magic, Disease, Poison, Curse, Movement.
+There is no Other icon or reserved position after Movement.
 Movement is a fixed Blessing of Freedom spell button, visible only for a paladin
 who knows it, with a normal spell tooltip and an unmodified left-release cast
 on that row. It remains usable in combat and follows the same friendly/living
