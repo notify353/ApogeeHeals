@@ -31,7 +31,7 @@ test("fixed clipped geometry, stripes, name/HoT layers and mouse pass-through", 
         assert(out.point[2] == row.health.fill and out.point[3] == "TOPRIGHT")
         assert(inside.point[2] == row.health and inside.reverseFill)
         for _, bar in ipairs({out,inside}) do
-            assert(bar.width == row.incoming.bar.width and bar.height == 14 and bar.mouse == false)
+            assert(bar.width == row.incoming.bar.width and bar.height == 20 and bar.mouse == false)
             assert(bar.level > row.incoming.bar:GetFrameLevel() and row.nameLayer.level > bar.level)
             local found=false
             for _, region in ipairs(m.frames) do

@@ -1,3 +1,16 @@
+## Full-thickness progress lanes - 2026-11-27
+
+Owner reports the priest own-debuff display works and requests larger health
+sections instead of thinner simultaneous lanes. Keep every native duration bar
+at1.5 logical units with0.5-unit gaps. Health20 leaves6 units below centered
+8-unit artwork; three lanes consume5.5 units. At normal2x scale these are3px
+lines with1px gaps inside40px health. Power5, width112, fonts and icon sizes
+remain unchanged. Shared geometry updates live/preview, target/targettarget,
+incoming/absorb overlays, row gaps, class rails and handle/clamping bounds.
+Matching71139/16001 authority reverified; no API/filter/timer contract change.
+Owner feedback establishes observed operation, not exact Weakened Soul identity
+or comprehensive combat acceptance. Resized native appearance awaits reload.
+
 ## Priest own-debuff progress-strip experiment - 2026-11-27
 
 Reverified live Forever71139/16001 with281 references. The existing custom aura

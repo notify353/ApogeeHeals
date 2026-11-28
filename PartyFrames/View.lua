@@ -227,9 +227,9 @@ local function createHot(row, width)
         or type(direction) ~= "number" or type(interpolation) ~= "number" then return end
     local info = A.Access.Read(C_XMLUtil and C_XMLUtil.GetTemplateInfo, "CustomAuraContainerTemplate")
     if type(info) ~= "table" or not A.Access.Readable(info.type) or info.type ~= "AuraContainer" then return end
-    -- At the normal 2x row scale, multiple lanes use 1px lines with 1px gaps.
-    -- The 2.5-unit stack stays below the centered 8-unit role/name artwork.
-    local height, gap, inset = #families > 1 and 0.5 or 1.5, 0.5, S.classStripHitWidth
+    -- Keep the single-HoT thickness for every lane: 3px lines and 1px gaps at 2x.
+    -- Three lanes occupy 5.5 units below centered artwork in the 20-unit health bar.
+    local height, gap, inset = 1.5, 0.5, S.classStripHitWidth
     width = (width or S.width) - inset
     -- Native visibility keeps the artwork friendly/alive even during combat.
     local gate = CreateFrame("Frame", nil, row, "SecureHandlerStateTemplate")

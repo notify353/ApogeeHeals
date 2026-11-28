@@ -156,7 +156,7 @@ guidance, native weapon displays, limitations and live acceptance checks.
   Existing saved positions remain unchanged; use **Reset positions** to adopt it.
 - Only your own druid player row splits the existing power strip equally in cat/bear form:
   blue mana above energy/rage. Caster form restores the full mana strip.
-- Apogee Tank styling with taller health bars: 112x14 health, 112x5 power, at 2x scale.
+- Apogee Tank styling with taller health bars: 112x20 health, 112x5 power, at 2x scale.
   Full character names use Blizzard's native class colors, left-aligned inside health bars with the
   original game font at the same smaller size as NPC names and dark shadow, including
   during combat. Restricted names stay blank. Long names truncate. Health-state and active-resource colors remain.
@@ -187,15 +187,19 @@ guidance, native weapon displays, limitations and live acceptance checks.
   clients without it (including the current Era adapter) omit the strip.
   Druids also get separate white Regrowth and Wild Growth countdowns. The fixed
   order from bottom to top is Rejuvenation, Regrowth, Wild Growth. Each line
-  hides independently without moving the others. Three thin lines and gaps fit
-  below the name inside the existing health bar; frame size stays unchanged.
-  Priests now have two 1px white lines at normal 2x scale: Renew at the bottom,
+  hides independently without moving the others. Every lane retains the original
+  single-HoT thickness: 3px at normal 2x scale, with 1px gaps. The 40px health
+  section reserves room for three full-thickness lines below the centered name
+  and role icons, regardless of how many lanes are active. Width, font size and
+  the 10px power section stay unchanged.
+  Priests have two white lines: Renew at the bottom,
   and an experimental own-debuff countdown above it. The upper lane lets the
   game display one of your non-Magic/Disease/Poison/Curse debuffs, including
   Weakened Soul, with its actual duration. It is not an exact Weakened Soul
   filter: another matching effect can appear, and other priests' debuffs are
   excluded. The bar does not promise that Shield is ready. The right-side Other
-  icon remains available. Live combat acceptance is pending.
+  icon remains available. The owner reports that the priest display works;
+  comprehensive native acceptance remains separate.
   Regrowth includes all nine Classic ranks; Wild Growth includes all three
   Forever ranks. Only your own HoT on that recipient appears in each lane.
   Classes without a matching primary HoT show no strip; Paladin Oath of Light

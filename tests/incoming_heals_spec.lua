@@ -5,7 +5,7 @@ test("native prediction geometry and total-healer display", function()
     local m=Mock.New(); local a=m.Start(); local row=a.View.rows[1]
     assert(row.health.clipsChildren and row.incoming.bar.mouse == false)
     assert(row.incoming.bar.point[2] == row.health.fill and row.incoming.bar.point[3] == "TOPRIGHT")
-    assert(row.incoming.bar.width == 112 and row.incoming.bar.height == 14)
+    assert(row.incoming.bar.width == 112 and row.incoming.bar.height == 20)
     assert(row.incoming.calculator.overflow == 1 and row.incoming.calculator.clampMode == 0)
     m.units.player.incoming=15
     local original=row.incoming.bar.SetValue

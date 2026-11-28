@@ -82,7 +82,7 @@ for _, class in ipairs({"PRIEST", "DRUID", "SHAMAN"}) do
         end
         assert(c.parent.driver=="[@"..row.unit..",help,nodead] show; hide")
         assert(c.parent.point[2]==row.health and c.parent.point[1]=="BOTTOMLEFT")
-        local height=lanes>1 and 0.5 or 1.5
+        local height=1.5
         assert(c.height==height and c.width==a.Style.width-a.Style.classStripHitWidth)
         assert(c.options.layout.elementHeight==height and c.options.layout.elementWidth==c.width)
         assert(c.parent.height==lanes*height+(lanes-1)*0.5)
