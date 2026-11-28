@@ -563,11 +563,12 @@ end
 function V.ClearTargetCast()
     V.target.cast:SetAlpha(0); A.UnitAPI.PaintRowPower(V.target)
 end
-function V.RefreshTargetTarget()
+function V.RefreshTargetTarget(refreshAuras)
     if not A.Runtime.suspended then
         refreshTargetRow(V.targetTarget)
-        -- This alias can change without its own UNIT_AURA notification.
-        refreshRowHots(V.targetTarget)
+        -- Alias changes and the bounded poll reconcile native aura recipients.
+        -- Ordinary health/power/cast paints must not rebuild every aura group.
+        if refreshAuras ~= false then refreshRowHots(V.targetTarget) end
     end
 end
 function V.RefreshTargetAuras()
@@ -578,10 +579,10 @@ function V.RefreshTargetAuras()
     end
     refreshRowHots(V.target)
 end
-function V.RefreshTarget()
+function V.RefreshTarget(refreshAuras)
     V.RefreshPartyActions()
     refreshTargetRow(V.target)
-    V.RefreshTargetTarget()
+    V.RefreshTargetTarget(refreshAuras)
 end
 function V.Refresh()
     V.RefreshTarget()

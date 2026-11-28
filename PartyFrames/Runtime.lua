@@ -18,6 +18,9 @@ function R.RangePolling()
         or A.Bindings.rangeSpell or type(CheckInteractDistance) == "function") then
         -- Establish future updates before the first paint, which may fail independently.
         R.driver:SetScript("OnUpdate", function(_, elapsed)
+            -- Optional presentation can fail before lifecycle teardown reaches
+            -- this driver. Recheck lifecycle state before any live unit/range reads.
+            if R.suspended or A.View.unlocked then return end
             R.rangeElapsed = R.rangeElapsed + elapsed
             if R.rangeElapsed < 0.2 then return end
             R.rangeElapsed = 0
@@ -49,10 +52,16 @@ function R.Start()
             if unit ~= "player" and unit ~= "party1" and unit ~= "party2"
                 and unit ~= "party3" and unit ~= "party4" and unit ~= "target"
                 and unit ~= "targettarget" then return end
-            if unit == "targettarget" then A.View.RefreshTargetTarget(); return end
+            if unit == "targettarget" then
+                A.View.RefreshTargetTarget(event == "UNIT_TARGET")
+                if event == "UNIT_AURA" then R.Request() end
+                return
+            end
             if unit == "target" then
                 if not R.suspended then
-                    A.View.RefreshTarget()
+                    -- Keep health/casts immediate; aura bursts share the existing
+                    -- queued refresh instead of rebuilding native groups per event.
+                    A.View.RefreshTarget(event == "UNIT_TARGET")
                     if event == "UNIT_AURA" or event == "UNIT_FACTION" or event == "UNIT_FLAGS"
                         or event == "UNIT_CONNECTION" then R.Request() end
                 end
