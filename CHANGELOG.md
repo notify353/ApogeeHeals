@@ -1,3 +1,7 @@
+## Unreleased - 2026-11-27
+
+- Move food/drink immediately left of Forever party/player bars, shifting buff and resurrection buttons left to avoid overlap. Add a fixed learned paladin Blessing of Freedom button between Curse and Other; keep native debuff timers, cleansing and combat gates. Freedom is a manual action, not a movement-debuff detector.
+
 ## Unreleased - 2026-11-25
 
 - Recognize reviewed Forever71139; preserve capability guards and gameplay behavior.

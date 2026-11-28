@@ -141,7 +141,10 @@ guidance, native weapon displays, limitations and live acceptance checks.
   health bar: Magic, Disease, Poison, Curse, Other. Each shows one native aura
   icon; empty positions stay blank. Hover for its native tooltip. A gold border
   marks a type your learned cleanse can remove; left-click casts on that row.
-  The drinking indicator follows the fixed strip.
+  A fixed Blessing of Freedom button sits between Curse and Other for paladins
+  who know it. It does not detect roots/slows or show a matching-debuff glow.
+  Food/drink sits immediately left of party/player bars; buff and resurrection
+  buttons start one position farther left.
 - Target sits above the player with a full-row gap; target's target stays
   closely above target. Both retain their size and align with the stack's left
   edge. The drag handle sits above the pair; no helper caption is shown.
@@ -314,8 +317,14 @@ Battle Shout remains handled by Keybinds. See [class support](docs/CLASS_SUPPORT
 ## Fixed debuff slots and cleansing
 
 Magic, Disease, Poison and Curse each have a permanent position. A fifth Other
-position shows effects such as Weakened Soul without a cleanse highlight or
-action. Only debuff artwork is drawn; there are no separate cleanse-spell icons.
+debuff position shows effects such as Weakened Soul without a cleanse highlight or
+action. The right-hand order is Magic, Disease, Poison, Curse, Movement, Other.
+Movement is a fixed Blessing of Freedom spell button, visible only for a paladin
+who knows it, with a normal spell tooltip and an unmodified left-release cast
+on that row. It remains usable in combat and follows the same friendly/living
+gate as cleansing. It has no automatic root/slow detection or debuff highlight;
+movement effects remain in their existing debuff categories. Empty positions
+stay reserved. The other action positions draw the actual debuff artwork.
 The native container selects the highest aura instance ID within each category.
 When it disappears, the next instance appears in the same position. Refreshing
 an existing instance does not make it newest. Instance ordering is not a promise

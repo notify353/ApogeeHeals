@@ -1,3 +1,26 @@
+## Party indicator layout and Freedom - 2026-11-27
+
+Verified central live Forever 1.60.1.71139 /16001 authority (281 references).
+The child historical beta check still rejects its70450 baseline; current live
+authority is the documented central check, not a beta substitute.
+
+Reviewed current CustomAuraContainer ValidateCandidateFilters and AuraContainerUtil
+DoesAuraPassCandidateFilters/CanApplyIdentityCandidateFilters: no root/snare
+mechanic filter exists, and identity matching of harmful friendly auras is
+restricted. Do not infer Movement from spell-ID lists or read secret aura data.
+Owner selected a fixed learned1044 Blessing of Freedom button instead. Existing
+Spell/SpellBook contracts validate player knowledge and friendly active actions;
+SecureTemplates uses exact spell ID and immutable unit on left release, with
+modifier actions empty. Fixed friendly/living gate retains bindings through
+preview/loading/combat transitions and clears them after failed initialization.
+Native spell tooltip has no aura-driven highlight or cooldown/range guarantee.
+
+Six right positions contain five unchanged native aura slots and the ordinary
+secure Freedom sibling in position5; Other moves to6. Food/drink moves left on
+player/party rows only, shifting all static/dynamic buffs, Rebirth and overflow
+one position left. Target retains its existing buff geometry. Era and legacy
+capability fallback retain their old layouts. No new API files or saved fields.
+
 ## Reviewed client build - 2026-11-25
 
 Fresh Forever71139 export verifies all260 prior central references unchanged

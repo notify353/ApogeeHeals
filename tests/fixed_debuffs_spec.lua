@@ -102,13 +102,30 @@ for class, expected in pairs(cases) do
     instances[#instances+1]={m=m,a=a}
     assert(#a.View.supportRows==6 and not a.View.targetTarget.debuffContainer)
     for _,row in ipairs(a.View.supportRows) do
-        assert(row.fixedDebuffs and row.cleanseSlotCount==5 and #row.cleanseButtons==4)
+        assert(row.fixedDebuffs and row.cleanseSlotCount==6 and #row.cleanseButtons==4)
         local icons, highlights = row.debuffContainer, row.cleanseIndicator
         assert(not icons.group and icons.unit==row.unit and highlights.unit==row.unit)
         assert(icons.parent==highlights.parent and icons.parent.driver=="[@"..row.unit..",help,nodead] show; hide")
         assert(icons.parent.point[2]==row.health and icons.parent.point[4]==a.Style.sideIconGap)
-        assert(icons.width==5*a.Style.sideIconSize+4*a.Style.sideIconGap)
-        assert(row.drinkIcon.point[4]==a.Style.sideIconGap+5*(a.Style.sideIconSize+a.Style.sideIconGap))
+        assert(icons.width==6*a.Style.sideIconSize+5*a.Style.sideIconGap)
+        if row.unit ~= "target" then
+            assert(row.drinkIcon.point[1]=="TOPRIGHT" and row.drinkIcon.point[3]=="TOPLEFT")
+            assert(row.drinkIcon.point[4]==-a.Style.sideIconGap and row.leftSupportSlots==1)
+            for i,button in ipairs(row.buffButtons) do
+                assert(button.point[4]==-a.Style.sideIconGap-i*(a.Style.sideIconSize+a.Style.sideIconGap))
+            end
+            assert(row.rebirthButton == nil or row.rebirthButton.point[4]==-a.Style.sideIconGap-2*(a.Style.sideIconSize+a.Style.sideIconGap))
+        else assert(not row.leftSupportSlots) end
+        local freedom=assert(row.freedomButton)
+        assert(freedom.parent==row.fixedDebuffGate and freedom.point[4]==4*(a.Style.sideIconSize+a.Style.sideIconGap))
+        assert(freedom.attributes.unit==row.unit and freedom.attributes.useOnKeyDown==false)
+        assert(freedom.clicks[1]=="LeftButtonUp" and not freedom.scripts.OnClick)
+        assert(freedom.spell==(class=="PALADIN" and 1044 or nil))
+        assert(freedom.driver==(class=="PALADIN" and "show" or "hide"))
+        assert(not highlights.slots.Movement and not icons.slots.Movement, "Freedom must not claim aura detection")
+        for _,prefix in ipairs({"shift-","ctrl-","ctrl-shift-","alt-","alt-shift-","alt-ctrl-","alt-ctrl-shift-"}) do
+            assert(freedom.attributes[prefix.."type1"]=="")
+        end
         for index,kind in ipairs(kinds) do
             local slot=assert(icons.slots[kind])
             local visual=slot.frame
@@ -137,7 +154,7 @@ for class, expected in pairs(cases) do
             end
             assert(remaining.justify=="CENTER" and remaining.wrap==false)
             for channel=1,4 do assert(remaining.color[channel]==1) end
-            assert(visual.point[2]==icons.parent and visual.point[4]==(index-1)*(a.Style.sideIconSize+a.Style.sideIconGap))
+            assert(visual.point[2]==icons.parent and visual.point[4]==(index<=4 and index-1 or 5)*(a.Style.sideIconSize+a.Style.sideIconGap))
             if index<=4 then
                 assert(slot.filters.includeDispelTypes[kind])
                 local button=row.cleanseButtons[index]
@@ -273,6 +290,46 @@ for _,rankOneOnly in ipairs({true,false}) do
 end
 print("PASS learned priest Dispel with helpful=false, rank selection, ordinary binding isolation and combat deferral")
 
+-- Freedom remains prebound through preview and zoning into combat; learning
+-- changes wait for combat exit. No harmful aura reads drive the action.
+local fm,fa=fixture("PALADIN")
+for _,row in ipairs(fa.View.supportRows) do
+    fa.Buffs.PaintBlessings(row, {{id=19740,icon=135906}}, 0)
+    local offset=row.unit=="target" and 0 or 1
+    assert(row.blessingButtons[1].point[4]==-fa.Style.sideIconGap-offset*(fa.Style.sideIconSize+fa.Style.sideIconGap))
+    fa.Buffs.PaintBlessings(row, {{id=19740,icon=135906}}, 2)
+    assert(row.blessingButtons[1].point[4]==-fa.Style.sideIconGap-(offset+2)*(fa.Style.sideIconSize+fa.Style.sideIconGap))
+end
+local function freedomBound(id)
+    for _,row in ipairs(fa.View.supportRows) do
+        assert(row.freedomButton.spell==id and row.freedomButton.attributes.spell1==id)
+        assert(row.freedomButton.driver==(id and "show" or "hide"))
+    end
+end
+freedomBound(1044)
+local tip=fa.View.rows[2].freedomButton
+GameTooltip.SetSpellByID=function(_,id) assert(id==1044); return true end
+tip.scripts.OnEnter(); assert(fa.Cleansing.tooltip==tip)
+tip.scripts.OnHide(); assert(not fa.Cleansing.tooltip)
+fa.View.SetUnlocked(true); freedomBound(1044)
+fm.combat=true; fm.Event("PLAYER_REGEN_DISABLED"); fm.Flush(); freedomBound(1044)
+local reads=fm.auraReads
+fm.Event("UNIT_AURA","party1"); fm.Flush(); assert(fm.auraReads==reads)
+fm.unknown[1044]=true; fm.Event("SPELLS_CHANGED"); fm.Flush(); freedomBound(1044)
+fm.combat=false; fm.Event("PLAYER_REGEN_ENABLED"); fm.Flush(); freedomBound(nil)
+fm.unknown[1044]=nil; fm.Event("SPELLS_CHANGED"); fm.Flush(); freedomBound(1044)
+fm.Event("PLAYER_LEAVING_WORLD"); fm.Flush(); freedomBound(1044)
+fm.combat=true; fm.Event("PLAYER_ENTERING_WORLD"); fm.Flush(); freedomBound(1044)
+for _,row in ipairs(fa.View.supportRows) do
+    assert(row.freedomButton.parent.driver=="[combat,@"..row.unit..",help,nodead] show; hide")
+end
+local _,failedFreedom=fixture("PALADIN",{fail=true})
+for _,row in ipairs(failedFreedom.View.supportRows) do
+    assert(not row.freedomButton.spell and row.freedomButton.driver=="hide")
+end
+instances[#instances+1]={m=fm,a=fa}
+print("PASS Freedom learned action, no aura claims, tooltip, learning/combat/preview/loading/failure lifecycle")
+
 -- Exercise exact native release dispatch for the new transparent secure buttons.
 local root=os.getenv("APOGEE_FOREVER_EXPORT")
 if not root or root=="" then print("SKIP native fixed-slot dispatch (no export)"); return end
@@ -298,7 +355,8 @@ end
 execute(definition("SecureActionButton_ShouldUseOnKeyDown").."\n"..definition("SecureActionButton_OnClick"))
 for _,instance in ipairs(instances) do
     for _,row in ipairs(instance.a.View.supportRows) do
-        for _,button in ipairs(row.cleanseButtons) do
+        local buttons={unpack(row.cleanseButtons)}; buttons[#buttons+1]=row.freedomButton
+        for _,button in ipairs(buttons) do
             local before=casts
             env.SecureActionButton_OnClick(button,"LeftButton",true); assert(casts==before)
             env.SecureActionButton_OnClick(button,"LeftButton",false)

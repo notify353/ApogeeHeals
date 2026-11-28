@@ -88,7 +88,7 @@ local function createFixed(row)
         or not A.Access.Readable(direction) or type(direction) ~= "number"
         or type(row.SetMouseMotionEnabled) ~= "function" then return false end
     local size, gap = A.Style.sideIconSize, A.Style.sideIconGap
-    local width = 5 * size + 4 * gap
+    local width = 6 * size + 5 * gap
     local gate = CreateFrame("Frame", nil, row.supportFrame or row, "SecureHandlerStateTemplate")
     gate:SetSize(width, size)
     gate:SetPoint("TOPLEFT", row.health, "TOPRIGHT", gap, A.Style.sideIconY)
@@ -110,12 +110,40 @@ local function createFixed(row)
     row.fixedDebuffs, row.cleanseButtons = true, {}
     row.fixedDebuffGate = gate
     row.debuffContainer, row.cleanseIndicator = icons, highlights
-    row.cleanseSlotCount = 5
-    row.drinkIcon:ClearAllPoints()
-    row.drinkIcon:SetPoint("TOPLEFT", row.health, "TOPRIGHT", gap + 5 * (size + gap), A.Style.sideIconY)
+    row.cleanseSlotCount = 6
+    if row.unit == "player" or row.unit:match("^party%d$") then
+        row.leftSupportSlots = 1
+        row.drinkIcon:ClearAllPoints()
+        row.drinkIcon:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap, A.Style.sideIconY)
+    end
+    -- Movement is a fixed, learned Freedom action, not an aura detector. The
+    -- native friendly-debuff filters do not expose roots/snares as a category.
+    local freedom = CreateFrame("Button", nil, gate, "SecureActionButtonTemplate")
+    row.freedomButton = freedom
+    freedom:SetSize(size, size); freedom:SetFrameLevel(level + 4)
+    freedom:SetPoint("TOPLEFT", gate, "TOPLEFT", 4 * (size + gap), 0)
+    freedom:SetAttribute("unit", row.unit); freedom:SetAttribute("useOnKeyDown", false)
+    freedom:RegisterForClicks("LeftButtonUp")
+    for _, prefix in ipairs({"shift-", "ctrl-", "ctrl-shift-", "alt-", "alt-shift-", "alt-ctrl-", "alt-ctrl-shift-"}) do
+        freedom:SetAttribute(prefix .. "type1", "")
+    end
+    A.Style.Background(freedom)
+    freedom.icon = freedom:CreateTexture(nil, "ARTWORK")
+    freedom.icon:SetPoint("TOPLEFT", freedom, "TOPLEFT", 1, -1)
+    freedom.icon:SetPoint("BOTTOMRIGHT", freedom, "BOTTOMRIGHT", -1, 1)
+    freedom.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+    freedom:SetHighlightTexture("Interface/Buttons/ButtonHilight-Square")
+    freedom:SetScript("OnEnter", function()
+        if not freedom.spell then return end
+        GameTooltip:SetOwner(freedom, "ANCHOR_RIGHT"); P.tooltip = freedom
+        if GameTooltip:SetSpellByID(freedom.spell, false, true) then GameTooltip:Show()
+        else P.HideTooltip() end
+    end)
+    freedom:SetScript("OnLeave", P.HideTooltip)
+    freedom:SetScript("OnHide", function() if P.tooltip == freedom then P.HideTooltip() end end)
     for index = 1, 5 do
         local kind = dispelTypes[index] or "Other"
-        local x = (index - 1) * (size + gap)
+        local x = (index <= 4 and index - 1 or 5) * (size + gap)
         local function place(frame, layer)
             frame:SetSize(size, size); frame:SetFrameLevel(level + layer)
             frame:SetPoint("TOPLEFT", gate, "TOPLEFT", x, 0)
@@ -280,6 +308,7 @@ function P.Refresh()
         end
     end
     local hasGlow, hasFixed = false, false
+    local freedomInfo = spells == classes.PALADIN and resolve(1044) or nil
     for _, row in ipairs(A.View.supportRows or A.View.rows) do
         if row.fixedDebuffs then
             -- Preview or loading may end after combat lockdown begins. Keep learned
@@ -289,6 +318,13 @@ function P.Refresh()
             local failed = A.startupState == "failed"
             RegisterStateDriver(row.fixedDebuffGate, "visibility", failed and "hide"
                 or condition .. row.unit .. ",help,nodead] show; hide")
+            local freedom = row.freedomButton
+            local freedomEnabled = freedomInfo ~= nil and freedomInfo ~= false and not failed
+            freedom.spell = freedomEnabled and 1044 or nil
+            freedom.icon:SetTexture(freedomEnabled and freedomInfo.iconID or nil)
+            freedom:SetAttribute("type1", freedomEnabled and "spell" or "")
+            freedom:SetAttribute("spell1", freedom.spell)
+            RegisterStateDriver(freedom, "visibility", freedomEnabled and "show" or "hide")
             for index, button in ipairs(row.cleanseButtons) do
                 local kind, result = dispelTypes[index]
                 for spellIndex, spell in ipairs(spells or {}) do

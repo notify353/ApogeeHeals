@@ -7,7 +7,7 @@ for _, rows in ipairs({a.View.rows, a.Preview.rows}) do
         assert(row.health.point[5] == 0 and row.power.point[5] == -14.5)
         assert(row.height == 19.5)
         if i > 1 then assert(rows[i-1].point[5] - row.point[5] - row.height == 2) end
-        assert(row.drinkIcon.point[2] == row.health and row.drinkIcon.point[3] == "TOPRIGHT")
+        assert(row.drinkIcon.point[2] == row.health and row.drinkIcon.point[3] == (rows==a.Preview.rows and "TOPLEFT" or "TOPRIGHT"))
         assert(row.drinkIcon.point[5] == -0.75)
         assert(row.drinkIcon.width == 18 and row.drinkIcon.height == 18)
     end

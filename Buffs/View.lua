@@ -103,7 +103,7 @@ function B.Create(row)
         button.deadRecipientSlot = index == 1 and row.unit == "target"
         if rebirth then row.rebirthButton = button else row.buffButtons[index] = button end
         button:SetSize(size, size)
-        button:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - (rebirth and 1 or index - 1) * (size + gap), A.Style.sideIconY)
+        button:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - ((row.leftSupportSlots or 0) + (rebirth and 1 or index - 1)) * (size + gap), A.Style.sideIconY)
         if rebirth then button:SetFrameLevel(row.buffButtons[2]:GetFrameLevel() + 1) end
         button:SetAttribute("unit", row.unit); button:SetAttribute("useOnKeyDown", false)
         button:RegisterForClicks("LeftButtonUp")
@@ -129,7 +129,7 @@ function B.Create(row)
         if rebirth then configureAction(button, nil, row.unit, true) end
     end
     row.buffOverflow = A.Style.Text(row.supportFrame or row, 8)
-    row.buffOverflow:SetPoint("RIGHT", row, "LEFT", -gap - 4 * (size + gap), 0); row.buffOverflow:Hide()
+    row.buffOverflow:SetPoint("RIGHT", row, "LEFT", -gap - (4 + (row.leftSupportSlots or 0)) * (size + gap), 0); row.buffOverflow:Hide()
 end
 function B.RefreshRebirth()
     if InCombatLockdown() then return end
@@ -234,7 +234,7 @@ local function paintChoices(row, key, choices, offset, recommendedID, recommenda
             button.icon:SetTexture(entry and entry.icon); button.icon:SetShown(entry ~= nil)
             paintTimer(button, entry)
             if not InCombatLockdown() then
-                local position = offset + index - 1
+                local position = (row.leftSupportSlots or 0) + offset + index - 1
                 if button.configuredPosition ~= position then
                     button:ClearAllPoints()
                     button:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -gap - position * (size + gap), A.Style.sideIconY)

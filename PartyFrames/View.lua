@@ -325,6 +325,10 @@ local function buildRow(row, preview, first, width)
     row.drinkIcon = CreateFrame("Frame", nil, row)
     row.drinkIcon:SetSize(S.sideIconSize, S.sideIconSize)
     row.drinkIcon:SetPoint("TOPLEFT", row.health, "TOPRIGHT", S.sideIconGap, A.Style.sideIconY)
+    if preview and A.__ApogeeClient ~= "classic-era" then
+        row.drinkIcon:ClearAllPoints()
+        row.drinkIcon:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -S.sideIconGap, A.Style.sideIconY)
+    end
     row.drinkIcon:EnableMouse(false)
     local drinkBackground = row.drinkIcon:CreateTexture(nil, "BACKGROUND")
     drinkBackground:SetAllPoints(); drinkBackground:SetColorTexture(0.08, 0.10, 0.13, 1)
