@@ -18,6 +18,9 @@ function R.RangePolling()
         or A.Bindings.rangeSpell or type(CheckInteractDistance) == "function") then
         -- Establish future updates before the first paint, which may fail independently.
         R.driver:SetScript("OnUpdate", function(_, elapsed)
+            -- Optional presentation can fail before lifecycle teardown reaches
+            -- this driver. Recheck lifecycle state before any live unit/range reads.
+            if R.suspended or A.View.unlocked then return end
             R.rangeElapsed = R.rangeElapsed + elapsed
             if R.rangeElapsed < 0.2 then return end
             R.rangeElapsed = 0

@@ -215,11 +215,37 @@ lifecycleCase("routine combat exit preserves healthy bindings; deferred spell ch
     m.combat=false; m.Event("PLAYER_REGEN_ENABLED")
     expect(rows,false); assert(not a.Bindings.pending)
 end)
-lifecycleCase("loading suspension is established before optional presentation work", function()
+lifecycleCase("loading suspension stops range reads even when optional presentation interrupts teardown", function()
     local m,a=setup()
+    local activity, range = a.View.RefreshHotActivity, a.View.RefreshRange
+    local paints=0
+    a.View.RefreshRange=function() paints=paints+1; range() end
+    local tick=a.Runtime.driver.scripts.OnUpdate
     a.View.RefreshHotActivity=function() error("temporary aura presentation failure") end
-    assert(not pcall(m.Event,"PLAYER_LEAVING_WORLD"))
+    assert(not pcall(m.Event,"PLAYER_LEAVING_WORLD"), "presentation error must remain observable")
     assert(a.Runtime.suspended and a.Buffs.suspended, "both subsystems must suspend together")
+    tick(a.Runtime.driver,0.2)
+    assert(paints==0, "range callback must not paint/read units after suspension")
+    a.View.RefreshHotActivity=activity
+    m.Event("PLAYER_ENTERING_WORLD"); m.Flush()
+    assert(paints>0 and a.Runtime.driver.scripts.OnUpdate, "world entry must restore range updates")
+    paints=0; a.Runtime.driver.scripts.OnUpdate(a.Runtime.driver,0.2)
+    assert(paints==1, "restored range callback must resume polling")
+end)
+lifecycleCase("preview stops range reads even when optional presentation interrupts teardown", function()
+    local m,a=setup()
+    local activity, range = a.View.RefreshHotActivity, a.View.RefreshRange
+    local paints=0
+    a.View.RefreshRange=function() paints=paints+1; range() end
+    local tick=a.Runtime.driver.scripts.OnUpdate
+    a.View.RefreshHotActivity=function() error("temporary aura presentation failure") end
+    assert(not pcall(a.View.SetUnlocked,true), "presentation error must remain observable")
+    assert(a.View.unlocked)
+    tick(a.Runtime.driver,0.2)
+    assert(paints==0, "range callback must not paint/read live units during preview")
+    a.View.RefreshHotActivity=activity
+    a.View.SetUnlocked(false)
+    assert(paints>0 and a.Runtime.driver.scripts.OnUpdate, "locking must restore range updates")
 end)
 lifecycleCase("world entry restores deferred healing before optional presentation work", function()
     local m,a,state,rows=setup()

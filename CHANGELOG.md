@@ -1,5 +1,7 @@
 ## Unreleased - 2026-11-27
 
+- Stop range polling immediately while loading or previewing, including when an optional aura display error interrupts driver teardown. Resume through normal world entry or preview exit without hiding the original error.
+
 - Check native context access before reading a discovered nameplate unit. Skip denied frames before calling methods that can raise an addon-action-blocked warning; keep the existing non-forbidden fallback on clients without the access check.
 
 - Stop target health, power and cast event bursts from rebuilding every target-of-target aura group. Keep health/casts immediate, batch aura notifications and preserve immediate alias changes, polling and world-transition recovery.

@@ -1,3 +1,14 @@
+## Range callback lifecycle sweep - 2026-11-27
+
+Central live Forever 71139/16001 authority reverified with 283 references. The
+existing optional-aura failure regression exposed a range driver left running
+when world-exit or preview presentation throws before driver teardown. Check
+suspended/unlocked again inside OnUpdate before elapsed work or live range reads.
+Normal world entry and preview exit restore polling; the original display error
+remains observable. No new API, frame mutation or saved-data contract. This
+contains stale work after a presentation failure; it does not prove the cause
+of the reported native addon-action-blocked warning.
+
 ## Nameplate context access - 2026-11-27
 
 Reviewed matching Forever 71139 SimpleFrameScriptObject CanBeAccessedInContext.
