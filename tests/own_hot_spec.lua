@@ -97,6 +97,7 @@ for _, class in ipairs({"PRIEST", "DRUID", "SHAMAN"}) do
         assert(c.parent.level>row.nameLayer.level and c.parent.mouse==false)
         assert(c.button.mouse==false and c.button.duration.mouse==false)
         assert(c.button.duration.allPoints==c.button)
+        assert(c.button.duration.reverseFill==(expected==false), "only debuff progress drains left to right")
         for channel=1,4 do assert(c.button.duration.color[channel]==1, "HoT must stay white") end
         assert(c.button.settings.direction==Enum.StatusBarTimerDirection.RemainingTime)
         assert(c.button.settings.interpolation==Enum.StatusBarInterpolation.Immediate)

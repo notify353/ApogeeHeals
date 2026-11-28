@@ -193,7 +193,9 @@ guidance, native weapon displays, limitations and live acceptance checks.
   and role icons, regardless of how many lanes are active. Width, font size and
   the 10px power section stay unchanged.
   Priests have two white lines: Renew at the bottom,
-  and an experimental own-debuff countdown above it. The upper lane lets the
+  and an experimental own-debuff countdown above it. HoTs stay anchored left
+  and shrink from right to left; the debuff lane stays anchored right and shrinks
+  from left to right. Both disappear when their aura ends. The upper lane lets the
   game display one of your non-Magic/Disease/Poison/Curse debuffs, including
   Weakened Soul, with its actual duration. It is not an exact Weakened Soul
   filter: another matching effect can appear, and other priests' debuffs are

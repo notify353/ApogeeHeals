@@ -1,5 +1,6 @@
 ## Unreleased - 2026-11-27
 
+- Reverse the priest own-debuff progress fill: it stays anchored right and drains left to right. HoTs retain their left anchor and opposite drain direction; native remaining-time behavior stays unchanged.
 - Keep every progress lane at the original single-HoT thickness. Increase health height to fit three full-thickness lanes below the name and role icons; preserve width, fonts, power height and aura behavior.
 - Add an experimental native own-debuff countdown above priest Renew, matching the thin white druid progress bars. Exclude the four cleanse categories; allow Weakened Soul without claiming exact identity or shield readiness. No estimated timer or aura reads.
 - Move food/drink immediately left of Forever party/player bars, shifting buff and resurrection buttons left to avoid overlap. Add a fixed learned paladin Blessing of Freedom button between Curse and Other; keep native debuff timers, cleansing and combat gates. Freedom is a manual action, not a movement-debuff detector.

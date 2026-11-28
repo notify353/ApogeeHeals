@@ -1,3 +1,13 @@
+## Opposite debuff progress direction - 2026-11-27
+
+Current71139/16001 authority reverified,281 references. Reviewed existing
+SimpleStatusBar SetReverseFill(bool) and CustomAuraButton ApplyDurationBar.
+Set a static true reverse-fill on own-debuff lanes, false on HoTs, before
+SetDurationBar registration. Keep RemainingTime and the opaque native duration;
+no elapsed-time conversion, secret reads or combat mutations. Debuff remaining
+fill is right-anchored and its left edge retreats right; HoTs stay left-anchored.
+No new API reference. Existing lane tests cover source/generated class isolation.
+
 ## Full-thickness progress lanes - 2026-11-27
 
 Owner reports the priest own-debuff display works and requests larger health
