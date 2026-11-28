@@ -64,6 +64,17 @@ for _, case in ipairs(cases) do
     assert(active(a.View.rows[1])==case.self,"Self upkeep stays available regardless of target range")
     assert(active(a.View.rows[2])==0 and active(a.View.target)==0,"Every class hides out-of-range recipient upkeep")
     a.View.target.buffStrip.scripts.OnClick(nil,"LeftButton",false);assert(active(a.View.target)==0)
+    local spellInfo, distance=C_Spell.GetSpellInfo, UnitDistanceSquared
+    C_Spell.GetSpellInfo=function(id)
+        local info=spellInfo(id)
+        if info then info.minRange=0; info.maxRange=40 end
+        return info
+    end
+    C_Spell.IsSpellInRange=function() return nil end
+    UnitDistanceSquared=function() return 1601,true end
+    a.Buffs.Refresh()
+    assert(active(a.View.rows[2])==0 and active(a.View.target)==0,"Catalog buffs also use spell-specific fallback for automatic/manual choices")
+    C_Spell.GetSpellInfo, UnitDistanceSquared=spellInfo, distance
     C_Spell.IsSpellInRange=function() return true end
     a.Buffs.Refresh();assert(active(a.View.target)==(case.class=="DRUID" and 2 or case.class=="PRIEST" and 3 or case.party))
     a.View.target.buffStrip.scripts.OnClick(nil,"LeftButton",false)

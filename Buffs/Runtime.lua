@@ -79,7 +79,9 @@ function B.Coverage(auras)
     return result
 end
 function B.OutOfRange(id, unit)
-    return A.Bindings.SpellRange(id, unit) == false
+    local result = A.Bindings.SpellRange(id, unit)
+    if result == nil then result = A.Bindings.Proximity(unit, id) end
+    return result == false
 end
 function B.WithTimers(choices, auras, nativeMode, unit)
     local result = {}
