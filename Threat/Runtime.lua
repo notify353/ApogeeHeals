@@ -14,7 +14,18 @@ function R.Discover()
     for _, plate in pairs(plates) do
         -- Only bootstrap existing plates; never inspect their unit-frame state.
         local ok, unit = pcall(function()
-            if A.Access.Read(plate.IsForbidden, plate) ~= false then return end
+            if not A.Access.Readable(plate) then return end
+            if type(plate) ~= "table" and type(plate) ~= "userdata" then return end
+            -- A non-forbidden frame may still enforce native access restrictions.
+            -- Catching GetUnit's error happens too late to prevent a blocked call.
+            local access = plate.CanBeAccessedInContext
+            if not A.Access.Readable(access) then return end
+            if type(access) == "function" then
+                if A.Access.Read(access, plate) ~= true then return end
+            else
+                local forbidden = plate.IsForbidden
+                if not A.Access.Readable(forbidden) or A.Access.Read(forbidden, plate) ~= false then return end
+            end
             return plate:GetUnit()
         end)
         if ok and nameplate(unit) then R.exposed[unit] = true end

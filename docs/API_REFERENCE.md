@@ -1,3 +1,28 @@
+## Nameplate context access - 2026-11-27
+
+Reviewed matching Forever 71139 SimpleFrameScriptObject CanBeAccessedInContext.
+A non-forbidden nameplate can still deny object access in the current context.
+Threat discovery checks the optional native method before GetUnit and skips
+denied, failed or unreadable results. Clients without the method retain the
+existing IsForbidden guard. Protected failures are prevented before the read;
+pcall alone cannot prevent the client from reporting a blocked action. Central
+live API evidence adds this reference for Heals and Essentials; no new runtime
+version gate, saved-data field or protected mutation is introduced. Native
+acceptance of the reported dungeon scenario remains pending.
+
+## Combat target event bursts - 2026-11-27
+
+Current central Forever 71139/16001 authority verifies 281 references. Existing
+CustomAuraContainer UpdateAllAuras performs a full reconciliation; native aura
+events retain their own updates. Ordinary target health/power/cast paints no
+longer invoke the alias aura rebuild. Relevant UNIT_AURA notifications share
+the existing coalesced callback; UNIT_TARGET and the 0.2-second alias poll retain
+prompt reconciliation. No new API, protected mutation or saved-data contract.
+A 200-event offline reproduction previously forced 200 full rebuilds per aura
+lane before the next frame; it now forces none while keeping health immediate.
+This reduces redundant combat work, but does not establish the cause of the
+owner-reported addon-action-blocked warning. Native taint acceptance is separate.
+
 ## Buff range fallback - 2026-11-27
 
 Matching central live Forever71139/16001 authority verifies281 references.
