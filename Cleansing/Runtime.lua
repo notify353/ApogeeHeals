@@ -53,6 +53,14 @@ function P.HideTooltip()
     if P.tooltip and GameTooltip:IsOwned(P.tooltip) then GameTooltip:Hide() end
     P.tooltip = nil
 end
+-- Fixed recipients and release-only clicks are shared by both renderers.
+local function configureClick(button, unit)
+    button:SetAttribute("unit", unit); button:SetAttribute("useOnKeyDown", false)
+    button:RegisterForClicks("LeftButtonUp")
+    for _, prefix in ipairs({"shift-", "ctrl-", "ctrl-shift-", "alt-", "alt-shift-", "alt-ctrl-", "alt-ctrl-shift-"}) do
+        button:SetAttribute(prefix .. "type1", "")
+    end
+end
 -- Permanent action positions; native slots alone select and display aura data.
 local dispelTypes = {"Magic", "Disease", "Poison", "Curse"}
 local timerFormatter
@@ -87,7 +95,8 @@ local function createFixed(row)
         or not A.Access.Readable(direction) or type(direction) ~= "number"
         or type(row.SetMouseMotionEnabled) ~= "function" then return false end
     local size, gap = A.Style.sideIconSize, A.Style.sideIconGap
-    local width = 5 * size + 4 * gap
+    local slotCount = #dispelTypes + 1 -- Four dispel types plus Freedom.
+    local width = slotCount * size + (slotCount - 1) * gap
     local gate = CreateFrame("Frame", nil, row.supportFrame or row, "SecureHandlerStateTemplate")
     gate:SetSize(width, size)
     gate:SetPoint("TOPLEFT", row.health, "TOPRIGHT", gap, A.Style.sideIconY)
@@ -109,7 +118,7 @@ local function createFixed(row)
     row.fixedDebuffs, row.cleanseButtons = true, {}
     row.fixedDebuffGate = gate
     row.debuffContainer, row.cleanseIndicator = icons, highlights
-    row.cleanseSlotCount = 5
+    row.cleanseSlotCount = slotCount
     if row.unit == "player" or row.unit:match("^party%d$") then
         row.leftSupportSlots = 1
         row.drinkIcon:ClearAllPoints()
@@ -120,12 +129,8 @@ local function createFixed(row)
     local freedom = CreateFrame("Button", nil, gate, "SecureActionButtonTemplate")
     row.freedomButton = freedom
     freedom:SetSize(size, size); freedom:SetFrameLevel(level + 4)
-    freedom:SetPoint("TOPLEFT", gate, "TOPLEFT", 4 * (size + gap), 0)
-    freedom:SetAttribute("unit", row.unit); freedom:SetAttribute("useOnKeyDown", false)
-    freedom:RegisterForClicks("LeftButtonUp")
-    for _, prefix in ipairs({"shift-", "ctrl-", "ctrl-shift-", "alt-", "alt-shift-", "alt-ctrl-", "alt-ctrl-shift-"}) do
-        freedom:SetAttribute(prefix .. "type1", "")
-    end
+    freedom:SetPoint("TOPLEFT", gate, "TOPLEFT", #dispelTypes * (size + gap), 0)
+    configureClick(freedom, row.unit)
     A.Style.Background(freedom)
     freedom.icon = freedom:CreateTexture(nil, "ARTWORK")
     freedom.icon:SetPoint("TOPLEFT", freedom, "TOPLEFT", 1, -1)
@@ -133,7 +138,8 @@ local function createFixed(row)
     freedom.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
     freedom:SetHighlightTexture("Interface/Buttons/ButtonHilight-Square")
     freedom:SetScript("OnEnter", function()
-        if not freedom.spell then return end
+        if not freedom.spell or A.Runtime.suspended or A.View.unlocked
+            or A.startupState == "failed" then return end
         GameTooltip:SetOwner(freedom, "ANCHOR_RIGHT"); P.tooltip = freedom
         if GameTooltip:SetSpellByID(freedom.spell, false, true) then GameTooltip:Show()
         else P.HideTooltip() end
@@ -184,11 +190,7 @@ local function createFixed(row)
         local button = CreateFrame("Button", nil, gate, "SecureActionButtonTemplate")
         button:SetSize(size, size); button:SetFrameLevel(level + 4)
         button:SetPoint("TOPLEFT", gate, "TOPLEFT", x, 0)
-        button:SetAttribute("unit", row.unit); button:SetAttribute("useOnKeyDown", false)
-        button:RegisterForClicks("LeftButtonUp")
-        for _, prefix in ipairs({"shift-", "ctrl-", "ctrl-shift-", "alt-", "alt-shift-", "alt-ctrl-", "alt-ctrl-shift-"}) do
-            button:SetAttribute(prefix .. "type1", "")
-        end
+        configureClick(button, row.unit)
         row.cleanseButtons[index] = button
         highlights:AddAuraSlot(kind, "HARMFUL", {
             sortMethod=sort, sortDirection=direction,
@@ -242,11 +244,7 @@ function P.Create(row)
         if publicLevel then
             button:SetFrameLevel(level + 4)
         end
-        button:SetAttribute("unit", row.unit); button:SetAttribute("useOnKeyDown", false)
-        button:RegisterForClicks("LeftButtonUp")
-        for _, prefix in ipairs({"shift-", "ctrl-", "ctrl-shift-", "alt-", "alt-shift-", "alt-ctrl-", "alt-ctrl-shift-"}) do
-            button:SetAttribute(prefix .. "type1", "")
-        end
+        configureClick(button, row.unit)
         button.icon = button:CreateTexture(nil, "ARTWORK")
         button.icon:SetPoint("TOPLEFT", button, "TOPLEFT", 1, -1); button.icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -1, 1); button.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
         button.icon:SetDesaturated(true); button.icon:SetAlpha(0.3)
@@ -288,7 +286,7 @@ function P.Create(row)
     if container then container:SetEnabled(true) end
 end
 function P.Refresh()
-    if InCombatLockdown() then P.HideTooltip(); return end
+    if InCombatLockdown() then return end
     if not P.pending or not A.View.rows then return end
     P.pending = nil; P.HideTooltip()
     local spells = classSpells()
@@ -364,6 +362,7 @@ function P.Refresh()
 end
 function P.RefreshActivity()
     local enabled = not A.Runtime.suspended and not A.View.unlocked
+    if not enabled then P.HideTooltip() end
     for _, row in ipairs(A.View.supportRows or {}) do
         if row.fixedDebuffs then
             row.debuffContainer:SetEnabled(enabled)

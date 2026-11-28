@@ -89,6 +89,7 @@ function R.Start()
         elseif event == "PLAYER_REGEN_DISABLED" then
             A.View.RefreshPartyActions()
             A.Buffs.Stop()
+            A.Cleansing.HideTooltip()
             A.BindingEditor.Close()
             A.View.Lock(); A.Settings.Refresh()
             -- Hide ancillary indicators immediately, before the queued refresh.
