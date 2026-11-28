@@ -78,6 +78,24 @@ for _, case in ipairs(cases) do
     C_Spell.IsSpellInRange=function() return true end
     a.Buffs.Refresh();assert(active(a.View.target)==(case.class=="DRUID" and 2 or case.class=="PRIEST" and 3 or case.party))
     a.View.target.buffStrip.scripts.OnClick(nil,"LeftButton",false)
+    if case.class=="PRIEST" then
+        GameTooltip.SetSpellByID=function() return true end
+        C_Spell.IsSpellInRange=function(id) return id~=1243 end
+        a.Buffs.Refresh()
+        local button=a.View.rows[2].upkeepButtons[1]
+        assert(button.reminderSpell==14752 and button.suggestion.shown,
+            "Choose the recommendation from buffs that survive range filtering")
+        button.scripts.OnEnter(button)
+        assert(a.Buffs.tooltipButton==button)
+        C_Spell.IsSpellInRange=function() return true end
+        a.Buffs.timerDriver.scripts.OnUpdate(nil,1)
+        assert(button.reminderSpell==1243 and button.suggestion.shown and not a.Buffs.tooltipButton,
+            "Returning preferred buff reclaims its border and clears recycled tooltip")
+        C_Spell.IsSpellInRange=function() return false end
+        a.Buffs.Refresh()
+        assert(not button.icon.shown and not button.suggestion.shown and button.attributes.type1=="",
+            "Filtering every buff clears artwork, recommendation and action")
+    end
     C_Spell.SpellHasRange=nil;C_Spell.IsSpellInRange=nil
     if case.self > 0 then
         local id=case.ids[1]

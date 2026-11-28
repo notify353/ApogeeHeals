@@ -27,8 +27,10 @@ local function setup(class, ids)
     role="NONE"; a.db.buffs={}; known={}; passive={}
     for _, id in ipairs(ids) do known[id]=true end
 end
-local function choices(unit, auras)
-    return C.Choices(unit or "player", auras or {})
+local function choices(unit, auras, cache)
+    unit = unit or "player"
+    local list = C.Choices(unit, auras or {}, cache)
+    return list, C.Recommend(unit, list)
 end
 local function has(list, id)
     for _, entry in ipairs(list) do if entry.id==id then assert(entry.icon==id); return true end end
@@ -121,16 +123,16 @@ a.Bindings.Resolve=function(spell)
 end
 local cache={}
 for _, unit in ipairs({"player","party1","party2","party3","party4","target"}) do
-    list,id=C.Choices(unit,{},cache);assert(#list==1 and id==1126)
+    list,id=choices(unit,{},cache);assert(#list==1 and id==1126)
 end
 assert(cache[9885]==false and type(cache[1126])=="table")
 for _, count in pairs(reads) do assert(count==1) end
 known[9885]=true
-list,id=C.Choices("player",{},{});assert(id==9885 and reads[9885]==2)
+list,id=choices("player",{},{});assert(id==9885 and reads[9885]==2)
 known[9885]=nil
-list,id=C.Choices("player",{});assert(id==1126 and reads[9885]==3)
+list,id=choices("player",{});assert(id==1126 and reads[9885]==3)
 known[9885]=true
-list,id=C.Choices("player",{});assert(id==9885 and reads[9885]==4)
+list,id=choices("player",{});assert(id==9885 and reads[9885]==4)
 a.Bindings.Resolve=nativeResolve
 -- 70009's six Inner Fire ranks include 7128, not 10950.
 setup("PRIEST",{588,7128,10950})

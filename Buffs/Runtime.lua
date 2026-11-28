@@ -259,12 +259,12 @@ function B.Refresh()
         if B.CanResurrect(row.unit, resurrection) then missing = {resurrection} end
         B.Paint(row, missing)
         B.PaintBlessings(row, blessings, #missing)
-        local upkeep, suggested, reason = {}, nil, nil
+        local upkeep = {}
         if A.BuffCatalog and not A.View.unlocked then
-            upkeep, suggested, reason = A.BuffCatalog.Choices(row.unit, expanded and {} or coverage, catalogCache, expanded)
+            upkeep = A.BuffCatalog.Choices(row.unit, expanded and {} or coverage, catalogCache, expanded)
         end
         upkeep = B.WithTimers(upkeep, snapshots[index], nil, row.unit)
-        B.PaintCatalog(row, upkeep, #missing, #blessings, suggested, reason)
+        B.PaintCatalog(row, upkeep, #missing, #blessings)
         if row.unit == "player" then
             local modes = snapshots[index] and (expanded and B.AuraChoices(true) or auraChoices) or {}
             if not A.SmartBuffs.Allows("modes", expanded) then modes = {} end

@@ -89,6 +89,16 @@ local function suggest(class, unit, offered)
     elseif class == "HUNTER" then key, reason = "trueshot", "maintain your learned attack-power aura" end
     if key and offered[key] then return offered[key], "Suggested: " .. reason .. "." end
 end
+-- Recommend only from the final visible choices, after range/timer filtering.
+function C.Recommend(unit, choices)
+    if InCombatLockdown() or #choices == 0 then return end
+    local offered = {}
+    for _, entry in ipairs(choices) do
+        local key = variants[entry.id]
+        if key then offered[key] = entry.id end
+    end
+    return suggest(classOf("player"), unit, offered)
+end
 -- The caller may share a fresh cache among recipient calls in ONE refresh.
 -- No cache is retained here: omitted/new caches always revalidate native state.
 local function resolve(id, cache)
@@ -112,7 +122,6 @@ function C.Choices(unit, auras, cache, expanded)
         local family = A.Buffs.NamedGroup(families, aura.spellId, aura.name)
         if family then covered[family] = true end
     end
-    local offered = {}
     for _, definition in ipairs(definitions) do
         if (not definition.self or unit == "player")
             and A.SmartBuffs.Allows(definition.family or definition.key, expanded,
@@ -123,12 +132,10 @@ function C.Choices(unit, auras, cache, expanded)
                 local info = resolve(id, cache)
                 if info and A.Access.Readable(info) and type(info) == "table" and A.Access.Readable(info.iconID) then
                     choices[#choices + 1] = {id=id, icon=info.iconID, name=info.name, info=info}
-                    offered[definition.key] = id
                     break
                 end
             end
         end
     end
-    local id, reason = suggest(class, unit, offered)
-    return choices, id, reason
+    return choices
 end

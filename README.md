@@ -32,6 +32,7 @@ Buff buttons are sibling frames
 and retain their own exact-spell range checks without inheriting this fade.
 When that check is unavailable, living-recipient buff choices use guarded distance
 against each buff's reported limits and hide only when confirmed outside them.
+The yellow recommendation is selected from the choices that remain visible.
 An empty left slot or bandage uses guarded 40-yard proximity (inclusive), keeping
 non-caster group distance useful. An unavailable spell check falls back to readable
 distance using that spell's reported minimum/maximum range, never a fixed 40-yard
