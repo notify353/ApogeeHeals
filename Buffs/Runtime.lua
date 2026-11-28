@@ -78,14 +78,16 @@ function B.Coverage(auras)
     end
     return result
 end
-function B.OutOfRange(id, unit)
-    return A.Bindings.SpellRange(id, unit) == false
+function B.OutOfRange(id, unit, info)
+    local result = A.Bindings.SpellRange(id, unit)
+    if result == nil then result = A.Bindings.Proximity(unit, id, info) end
+    return result == false
 end
 function B.WithTimers(choices, auras, nativeMode, unit)
     local result = {}
     for _, entry in ipairs(choices) do
         local remaining, unknown, protected
-        local info = not entry.name and B.Info(entry.id)
+        local info = entry.info or (not entry.name and B.Info(entry.id))
         local name = entry.name or (info and info.name)
         local blessing = A.BuffDefaults.Group(entry.id)
         local catalog = A.BuffCatalog.TimerGroup(entry.id)
@@ -99,7 +101,7 @@ function B.WithTimers(choices, auras, nativeMode, unit)
                 if value then remaining = math.max(remaining or 0, value) else unknown = true end
             end
         end
-        if not protected and not B.OutOfRange(entry.id, unit) then
+        if not protected and not B.OutOfRange(entry.id, unit, info) then
             result[#result + 1] = {id=entry.id, icon=entry.icon, remaining=not unknown and remaining or nil}
         end
     end
@@ -248,7 +250,7 @@ function B.Refresh()
                     or (row.unit == "target" and A.Access.Read(UnitIsUnit, "target", "player") == true))
                     and not grouped and A.SmartBuffs.Allows(A.SmartBuffs.Key(watch.entry.id), expanded)
                     and (expanded or (not ids[watch.entry.id] and not names[watch.info.name])) then
-                    missing[#missing + 1] = { id = watch.entry.id, icon = watch.info.iconID, name = watch.info.name }
+                    missing[#missing + 1] = { id = watch.entry.id, icon = watch.info.iconID, name = watch.info.name, info = watch.info }
                 end
             end
         end
@@ -257,12 +259,12 @@ function B.Refresh()
         if B.CanResurrect(row.unit, resurrection) then missing = {resurrection} end
         B.Paint(row, missing)
         B.PaintBlessings(row, blessings, #missing)
-        local upkeep, suggested, reason = {}, nil, nil
+        local upkeep = {}
         if A.BuffCatalog and not A.View.unlocked then
-            upkeep, suggested, reason = A.BuffCatalog.Choices(row.unit, expanded and {} or coverage, catalogCache, expanded)
+            upkeep = A.BuffCatalog.Choices(row.unit, expanded and {} or coverage, catalogCache, expanded)
         end
         upkeep = B.WithTimers(upkeep, snapshots[index], nil, row.unit)
-        B.PaintCatalog(row, upkeep, #missing, #blessings, suggested, reason)
+        B.PaintCatalog(row, upkeep, #missing, #blessings)
         if row.unit == "player" then
             local modes = snapshots[index] and (expanded and B.AuraChoices(true) or auraChoices) or {}
             if not A.SmartBuffs.Allows("modes", expanded) then modes = {} end

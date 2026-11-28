@@ -65,7 +65,7 @@ function D.Choices()
     for _, ranks in ipairs(choices) do
         for _, id in ipairs(ranks) do
             local info = A.Bindings.Resolve(id)
-            if info then result[#result + 1] = {id=id, icon=info.iconID, name=info.name}; break end
+            if info then result[#result + 1] = {id=id, icon=info.iconID, name=info.name, info=info}; break end
         end
     end
     return result

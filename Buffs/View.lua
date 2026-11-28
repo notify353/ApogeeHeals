@@ -263,8 +263,10 @@ function B.PaintBlessings(row, choices, missingCount)
     local id, reason = A.BuffDefaults.Recommend(row.unit, choices)
     paintChoices(row, "blessingButtons", choices, offset, id, reason)
 end
-function B.PaintCatalog(row, choices, missingCount, blessingCount, id, reason)
+function B.PaintCatalog(row, choices, missingCount, blessingCount)
     local offset = math.min(missingCount, 4) + (missingCount > 4 and 1 or 0) + (blessingCount or 0)
+    local id, reason
+    if A.BuffCatalog then id, reason = A.BuffCatalog.Recommend(row.unit, choices) end
     paintChoices(row, "upkeepButtons", choices, offset, id, reason)
 end
 function B.PaintAuras(row, choices, missingCount, blessingCount)

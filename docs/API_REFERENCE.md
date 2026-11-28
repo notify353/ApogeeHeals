@@ -1,3 +1,12 @@
+## Buff range fallback - 2026-11-27
+
+Matching central live Forever71139/16001 authority verifies281 references.
+SpellDocumentation allows IsSpellInRange to return nil for an invalid check.
+Reuse the existing guarded UnitDistanceSquared checkedDistance and public
+GetSpellInfo minRange/maxRange fallback for living buff recipients. Native bool
+results win; secret/unreadable data stays unknown. No fixed-yard guess for buffs,
+no protected combat mutation and no change to direct-only resurrection cues.
+
 ## Remove right-side Other slot - 2026-11-27
 
 Owner removes Other after adopting the in-health progress display. Native

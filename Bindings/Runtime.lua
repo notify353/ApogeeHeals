@@ -9,6 +9,27 @@ function B.SpellRange(id, unit)
     local result = A.Access.Read(C_Spell and C_Spell.IsSpellInRange, id, unit)
     if type(result) == "boolean" then return result end
 end
+-- Guarded proximity estimate shared by health fading and living buff recipients.
+-- With a spell, use its reported limits; only unassigned healing uses 40 yards.
+function B.Proximity(unit, spell, info)
+    if unit == "player" or A.Access.Read(UnitIsUnit, unit, "player") == true then return true end
+    if type(UnitDistanceSquared) ~= "function" then return nil end
+    local minimum, maximum = 0, 40
+    if spell then
+        if info == nil then info = A.Access.Read(C_Spell and C_Spell.GetSpellInfo, spell) end
+        if not A.Access.Readable(info) or type(info) ~= "table"
+            or not A.Access.Readable(info.minRange, info.maxRange) then return nil end
+        minimum, maximum = info.minRange, info.maxRange
+        if type(minimum) ~= "number" or type(maximum) ~= "number"
+            or not (minimum >= 0 and maximum > 0 and minimum <= maximum
+                and maximum * maximum < math.huge) then return nil end
+    end
+    local ok, distance, checked = pcall(UnitDistanceSquared, unit)
+    if ok and A.Access.Readable(distance, checked) and checked == true
+        and type(distance) == "number" and distance >= 0 and distance < math.huge then
+        return distance >= minimum * minimum and distance <= maximum * maximum
+    end
+end
 for row, prefix in ipairs({ "", "shift-", "ctrl-" }) do
     for button = 1, 5 do
         local slot = { id = prefix .. button, prefix = prefix, button = button, row = row,

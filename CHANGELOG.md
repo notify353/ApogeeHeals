@@ -1,5 +1,9 @@
 ## Unreleased - 2026-11-27
 
+- Choose the yellow catalog-buff recommendation after range and timer filtering, so it follows the remaining usable choices and recovers as recipients move. Consolidate recommendation selection at display time.
+
+- Hide out-of-range buff choices when native spell range is unavailable but checked distance exceeds that buff's reported limits. Restore choices on movement; preserve native results, self buffs and resurrection cues.
+
 - Remove the native right-side Other debuff icon and its reserved space. Keep four cleanse categories and Movement/Freedom in order; retain the yellow in-health debuff progress bar.
 - Use bright yellow for the priest own-debuff progress strip so it stands out against green health and white HoTs. Preserve drain direction, full thickness and native timer behavior.
 - Reverse the priest own-debuff progress fill: it stays anchored right and drains left to right. HoTs retain their left anchor and opposite drain direction; native remaining-time behavior stays unchanged.
