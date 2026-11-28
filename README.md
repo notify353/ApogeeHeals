@@ -192,8 +192,8 @@ guidance, native weapon displays, limitations and live acceptance checks.
   section reserves room for three full-thickness lines below the centered name
   and role icons, regardless of how many lanes are active. Width, font size and
   the 10px power section stay unchanged.
-  Priests have two white lines: Renew at the bottom,
-  and an experimental own-debuff countdown above it. HoTs stay anchored left
+  Priests have white Renew at the bottom and a bright yellow experimental
+  own-debuff countdown above it. HoTs stay anchored left
   and shrink from right to left; the debuff lane stays anchored right and shrinks
   from left to right. Both disappear when their aura ends. The upper lane lets the
   game display one of your non-Magic/Disease/Poison/Curse debuffs, including
