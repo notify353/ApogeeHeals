@@ -1,7 +1,7 @@
 local Mock = dofile("tests/mock.lua")
 local runtimeRoot = os.getenv("APOGEE_HEALS_RUNTIME_ROOT")
 local runtimeName = os.getenv("APOGEE_HEALS_RUNTIME_NAME") or "ApogeeHeals"
-local kinds = {"Magic", "Disease", "Poison", "Curse", "Other"}
+local kinds = {"Magic", "Disease", "Poison", "Curse"}
 local cases = {
     PALADIN={4987,1152,1152,false}, PRIEST={988,528,false,false},
     SHAMAN={false,2870,526,false}, DRUID={false,false,8946,2782},
@@ -108,7 +108,28 @@ for class, expected in pairs(cases) do
         assert(icons.parent==highlights.parent and icons.parent.driver=="[@"..row.unit..",help,nodead] show; hide")
         assert(icons.parent.point[2]==row.health and icons.parent.point[4]==a.Style.sideIconGap)
         assert(icons.width==5*a.Style.sideIconSize+4*a.Style.sideIconGap)
-        assert(row.drinkIcon.point[4]==a.Style.sideIconGap+5*(a.Style.sideIconSize+a.Style.sideIconGap))
+        assert(not icons.slots.Other and not highlights.slots.Other, "Other must not create an aura slot")
+        local count=0
+        for _ in pairs(icons.slots) do count=count+1 end
+        assert(count==4, "only the four cleanse categories get aura icons")
+        if row.unit ~= "target" then
+            assert(row.drinkIcon.point[1]=="TOPRIGHT" and row.drinkIcon.point[3]=="TOPLEFT")
+            assert(row.drinkIcon.point[4]==-a.Style.sideIconGap and row.leftSupportSlots==1)
+            for i,button in ipairs(row.buffButtons) do
+                assert(button.point[4]==-a.Style.sideIconGap-i*(a.Style.sideIconSize+a.Style.sideIconGap))
+            end
+            assert(row.rebirthButton == nil or row.rebirthButton.point[4]==-a.Style.sideIconGap-2*(a.Style.sideIconSize+a.Style.sideIconGap))
+        else assert(not row.leftSupportSlots) end
+        local freedom=assert(row.freedomButton)
+        assert(freedom.parent==row.fixedDebuffGate and freedom.point[4]==4*(a.Style.sideIconSize+a.Style.sideIconGap))
+        assert(freedom.attributes.unit==row.unit and freedom.attributes.useOnKeyDown==false)
+        assert(freedom.clicks[1]=="LeftButtonUp" and not freedom.scripts.OnClick)
+        assert(freedom.spell==(class=="PALADIN" and 1044 or nil))
+        assert(freedom.driver==(class=="PALADIN" and "show" or "hide"))
+        assert(not highlights.slots.Movement and not icons.slots.Movement, "Freedom must not claim aura detection")
+        for _,prefix in ipairs({"shift-","ctrl-","ctrl-shift-","alt-","alt-shift-","alt-ctrl-","alt-ctrl-shift-"}) do
+            assert(freedom.attributes[prefix.."type1"]=="")
+        end
         for index,kind in ipairs(kinds) do
             local slot=assert(icons.slots[kind])
             local visual=slot.frame
@@ -138,35 +159,30 @@ for class, expected in pairs(cases) do
             assert(remaining.justify=="CENTER" and remaining.wrap==false)
             for channel=1,4 do assert(remaining.color[channel]==1) end
             assert(visual.point[2]==icons.parent and visual.point[4]==(index-1)*(a.Style.sideIconSize+a.Style.sideIconGap))
-            if index<=4 then
-                assert(slot.filters.includeDispelTypes[kind])
-                local button=row.cleanseButtons[index]
-                assert(button.parent==icons.parent and button.parent~=icons)
-                assert(button.point[2]==icons.parent and button.point[4]==visual.point[4])
-                assert(button.template=="SecureActionButtonTemplate" and not next(button.scripts) and not button.icon)
-                assert(button.attributes.unit==row.unit and button.attributes.useOnKeyDown==false)
-                assert(button.clicks[1]=="LeftButtonUp" and button.attributes.spell1==(expected[index] or nil))
-                assert(button.driver==(expected[index] and "show" or "hide"))
-                for _,prefix in ipairs({"shift-","ctrl-","ctrl-shift-","alt-","alt-shift-","alt-ctrl-","alt-ctrl-shift-"}) do
-                    assert(button.attributes[prefix.."type1"]=="")
-                end
-                local glow=highlights.slots[kind]
-                assert((glow.filters.includeDispelTypes[kind]==true)==(expected[index]~=false))
-                assert(glow.config.sortMethod==slot.config.sortMethod and glow.config.sortDirection==slot.config.sortDirection)
-                assert(glow.frame.mouse==false and not glow.frame.mouseMotion)
-                assert(not glow.frame.durationText, "only the representative icon gets a timer")
-                assert(button.level<visual.level and visual.level<glow.frame.level)
-                local edges=0
-                for _,child in ipairs(m.frames) do
-                    if child.parent==glow.frame and child.kind=="Texture" then
-                        edges=edges+1; assert(child.width==1 or child.height==1, "highlight obscures icon")
-                    end
-                end
-                assert(edges==4)
-            else
-                assert(not highlights.slots.Other and not row.cleanseButtons[5])
-                for i=1,4 do assert(slot.filters.excludeDispelTypes[kinds[i]]) end
+            assert(slot.filters.includeDispelTypes[kind])
+            local button=row.cleanseButtons[index]
+            assert(button.parent==icons.parent and button.parent~=icons)
+            assert(button.point[2]==icons.parent and button.point[4]==visual.point[4])
+            assert(button.template=="SecureActionButtonTemplate" and not next(button.scripts) and not button.icon)
+            assert(button.attributes.unit==row.unit and button.attributes.useOnKeyDown==false)
+            assert(button.clicks[1]=="LeftButtonUp" and button.attributes.spell1==(expected[index] or nil))
+            assert(button.driver==(expected[index] and "show" or "hide"))
+            for _,prefix in ipairs({"shift-","ctrl-","ctrl-shift-","alt-","alt-shift-","alt-ctrl-","alt-ctrl-shift-"}) do
+                assert(button.attributes[prefix.."type1"]=="")
             end
+            local glow=highlights.slots[kind]
+            assert((glow.filters.includeDispelTypes[kind]==true)==(expected[index]~=false))
+            assert(glow.config.sortMethod==slot.config.sortMethod and glow.config.sortDirection==slot.config.sortDirection)
+            assert(glow.frame.mouse==false and not glow.frame.mouseMotion)
+            assert(not glow.frame.durationText, "only the representative icon gets a timer")
+            assert(button.level<visual.level and visual.level<glow.frame.level)
+            local edges=0
+            for _,child in ipairs(m.frames) do
+                if child.parent==glow.frame and child.kind=="Texture" then
+                    edges=edges+1; assert(child.width==1 or child.height==1, "highlight obscures icon")
+                end
+            end
+            assert(edges==4)
         end
     end
     a.View.SetUnlocked(true)
@@ -245,7 +261,7 @@ for _,slot in pairs(noFormatter.View.target.debuffContainer.slots) do assert(not
 local _,noSlots=fixture("PRIEST",{noSlots=true})
 assert(not noSlots.View.target.fixedDebuffs and noSlots.View.target.debuffContainer.group)
 assert(not noSlots.View.target.cleanseIndicator and noSlots.View.target.cleanseButtons[1].spell==988)
-print("PASS fixed type slots, native hover/click separation, learned ranks, empty/Other slots, lifecycle, combat deferral and capability fallback")
+print("PASS four fixed debuff types, no Other slot, Freedom position, hover/click separation, learned ranks, lifecycle, combat deferral and capability fallback")
 
 -- Owner's live Forever report: rank 1 known, rank 2 unknown, neither helpful.
 -- Keep both ranks in the native dispatch checks below, not only the mock filter.
@@ -273,6 +289,62 @@ for _,rankOneOnly in ipairs({true,false}) do
 end
 print("PASS learned priest Dispel with helpful=false, rank selection, ordinary binding isolation and combat deferral")
 
+-- Freedom remains prebound through preview and zoning into combat; learning
+-- changes wait for combat exit. No harmful aura reads drive the action.
+local fm,fa=fixture("PALADIN")
+for _,row in ipairs(fa.View.supportRows) do
+    fa.Buffs.PaintBlessings(row, {{id=19740,icon=135906}}, 0)
+    local offset=row.unit=="target" and 0 or 1
+    assert(row.blessingButtons[1].point[4]==-fa.Style.sideIconGap-offset*(fa.Style.sideIconSize+fa.Style.sideIconGap))
+    fa.Buffs.PaintBlessings(row, {{id=19740,icon=135906}}, 2)
+    assert(row.blessingButtons[1].point[4]==-fa.Style.sideIconGap-(offset+2)*(fa.Style.sideIconSize+fa.Style.sideIconGap))
+end
+local function freedomBound(id)
+    for _,row in ipairs(fa.View.supportRows) do
+        assert(row.freedomButton.spell==id and row.freedomButton.attributes.spell1==id)
+        assert(row.freedomButton.driver==(id and "show" or "hide"))
+    end
+end
+freedomBound(1044)
+local tip=fa.View.rows[2].freedomButton
+GameTooltip.SetSpellByID=function(_,id) assert(id==1044); return true end
+tip.scripts.OnEnter(); assert(fa.Cleansing.tooltip==tip)
+tip.scripts.OnHide(); assert(not fa.Cleansing.tooltip)
+fa.View.SetUnlocked(true); freedomBound(1044)
+tip.scripts.OnEnter(); assert(not fa.Cleansing.tooltip, "preview reopened Freedom tooltip")
+fm.combat=true; fm.Event("PLAYER_REGEN_DISABLED"); fm.Flush(); freedomBound(1044)
+tip.scripts.OnEnter(); assert(fa.Cleansing.tooltip==tip and GameTooltip.shown)
+fm.Event("UNIT_HEALTH","party1"); fm.Flush()
+assert(fa.Cleansing.tooltip==tip and GameTooltip.shown, "combat health refresh closed Freedom tooltip")
+local reads=fm.auraReads
+fm.Event("UNIT_AURA","party1"); fm.Flush(); assert(fm.auraReads==reads)
+assert(fa.Cleansing.tooltip==tip and GameTooltip.shown, "combat aura refresh closed Freedom tooltip")
+fm.Event("PLAYER_LEAVING_WORLD"); fm.Flush()
+assert(not fa.Cleansing.tooltip and not GameTooltip.shown, "loading retained Freedom tooltip")
+tip.scripts.OnEnter(); assert(not fa.Cleansing.tooltip, "loading reopened Freedom tooltip")
+fm.Event("PLAYER_ENTERING_WORLD"); fm.Flush()
+tip.scripts.OnEnter(); assert(fa.Cleansing.tooltip==tip and GameTooltip.shown)
+fm.Event("PLAYER_TARGET_CHANGED"); fm.Flush()
+assert(not fa.Cleansing.tooltip and not GameTooltip.shown, "target change retained Freedom tooltip")
+fm.unknown[1044]=true; fm.Event("SPELLS_CHANGED"); fm.Flush(); freedomBound(1044)
+fm.combat=false; fm.Event("PLAYER_REGEN_ENABLED"); fm.Flush(); freedomBound(nil)
+fm.unknown[1044]=nil; fm.Event("SPELLS_CHANGED"); fm.Flush(); freedomBound(1044)
+tip.scripts.OnEnter(); assert(fa.Cleansing.tooltip==tip)
+fm.combat=true; fm.Event("PLAYER_REGEN_DISABLED"); fm.Flush()
+assert(not fa.Cleansing.tooltip and not GameTooltip.shown, "combat entry retained old tooltip")
+fm.combat=false; fm.Event("PLAYER_REGEN_ENABLED"); fm.Flush()
+fm.Event("PLAYER_LEAVING_WORLD"); fm.Flush(); freedomBound(1044)
+fm.combat=true; fm.Event("PLAYER_ENTERING_WORLD"); fm.Flush(); freedomBound(1044)
+for _,row in ipairs(fa.View.supportRows) do
+    assert(row.freedomButton.parent.driver=="[combat,@"..row.unit..",help,nodead] show; hide")
+end
+local _,failedFreedom=fixture("PALADIN",{fail=true})
+for _,row in ipairs(failedFreedom.View.supportRows) do
+    assert(not row.freedomButton.spell and row.freedomButton.driver=="hide")
+end
+instances[#instances+1]={m=fm,a=fa}
+print("PASS Freedom learned action, no aura claims, tooltip, learning/combat/preview/loading/failure lifecycle")
+
 -- Exercise exact native release dispatch for the new transparent secure buttons.
 local root=os.getenv("APOGEE_FOREVER_EXPORT")
 if not root or root=="" then print("SKIP native fixed-slot dispatch (no export)"); return end
@@ -298,7 +370,8 @@ end
 execute(definition("SecureActionButton_ShouldUseOnKeyDown").."\n"..definition("SecureActionButton_OnClick"))
 for _,instance in ipairs(instances) do
     for _,row in ipairs(instance.a.View.supportRows) do
-        for _,button in ipairs(row.cleanseButtons) do
+        local buttons={unpack(row.cleanseButtons)}; buttons[#buttons+1]=row.freedomButton
+        for _,button in ipairs(buttons) do
             local before=casts
             env.SecureActionButton_OnClick(button,"LeftButton",true); assert(casts==before)
             env.SecureActionButton_OnClick(button,"LeftButton",false)

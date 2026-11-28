@@ -1,18 +1,18 @@
 local Mock = dofile("tests/mock.lua")
 local m=Mock.New(); local a=m.Start()
 assert(a.Style.sideIconSize * a.Style.scale == 36 and a.Style.sideIconGap * a.Style.scale == 4)
-assert((a.Style.rowHeight - a.Style.sideIconSize) * a.Style.scale == 7)
+assert((a.Style.rowHeight - a.Style.sideIconSize) * a.Style.scale == 19)
 for _, rows in ipairs({a.View.rows, a.Preview.rows}) do
     for i, row in ipairs(rows) do
-        assert(row.health.point[5] == 0 and row.power.point[5] == -14.5)
-        assert(row.height == 19.5)
+        assert(row.health.point[5] == 0 and row.power.point[5] == -20.5)
+        assert(row.health.height == 20 and row.power.height == 5 and row.height == 25.5)
         if i > 1 then assert(rows[i-1].point[5] - row.point[5] - row.height == 2) end
-        assert(row.drinkIcon.point[2] == row.health and row.drinkIcon.point[3] == "TOPRIGHT")
-        assert(row.drinkIcon.point[5] == -0.75)
+        assert(row.drinkIcon.point[2] == row.health and row.drinkIcon.point[3] == (rows==a.Preview.rows and "TOPLEFT" or "TOPRIGHT"))
+        assert(row.drinkIcon.point[5] == -3.75)
         assert(row.drinkIcon.width == 18 and row.drinkIcon.height == 18)
     end
 end
-assert(a.View.root.height == 105.5 and a.Preview.root.height == 105.5)
+assert(a.View.root.height == 135.5 and a.Preview.root.height == 135.5)
 -- The raised target pair and drag handle must stay inside the top edge.
 local targetTop = a.View.target.point[5] + a.View.target.height
 local pairTop = targetTop + a.View.targetTarget.point[5] + a.View.targetTarget.height

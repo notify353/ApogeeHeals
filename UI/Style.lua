@@ -1,6 +1,7 @@
--- Tank's accepted dimensions and palette, copied locally with MIT attribution.
+-- Tank's palette, copied locally with MIT attribution; taller health reserves
+-- three full-thickness progress lanes below the centered names and role icons.
 local _, A = ...
-local S = { width = 112, healthHeight = 14, powerHeight = 5, barGap = 0.5,
+local S = { width = 112, healthHeight = 20, powerHeight = 5, barGap = 0.5,
     rowGap = 2, scale = 2, targetTargetGap = 4,
     background = { 0.06, 0.075, 0.1, 0.94 }, muted = { 0.65, 0.70, 0.78, 1 } }
 A.Style = S

@@ -1,3 +1,77 @@
+## Remove right-side Other slot - 2026-11-27
+
+Owner removes Other after adopting the in-health progress display. Native
+Forever fixed containers now create only Magic/Disease/Poison/Curse aura slots;
+the fixed Freedom button remains in position5. Container width reserves5 icons
+and4 gaps instead of6 icons and5 gaps. No catch-all aura slot remains in this
+path. Existing category filters, native timers/tooltips, secure actions and
+lifecycle gates are unchanged, as are the yellow own-debuff strip and HoTs.
+Legacy/Era fallback remains unchanged. Matching71139/16001 verifies281 references;
+no API change. Source/generated checks assert no Other slot and unchanged actions.
+
+## Opposite debuff progress direction - 2026-11-27
+
+Current71139/16001 authority reverified,281 references. Reviewed existing
+SimpleStatusBar SetReverseFill(bool) and CustomAuraButton ApplyDurationBar.
+Set a static true reverse-fill on own-debuff lanes, false on HoTs, before
+SetDurationBar registration. Keep RemainingTime and the opaque native duration;
+no elapsed-time conversion, secret reads or combat mutations. Debuff remaining
+fill is right-anchored and its left edge retreats right; HoTs stay left-anchored.
+No new API reference. Existing lane tests cover source/generated class isolation.
+
+## Full-thickness progress lanes - 2026-11-27
+
+Owner reports the priest own-debuff display works and requests larger health
+sections instead of thinner simultaneous lanes. Keep every native duration bar
+at1.5 logical units with0.5-unit gaps. Health20 leaves6 units below centered
+8-unit artwork; three lanes consume5.5 units. At normal2x scale these are3px
+lines with1px gaps inside40px health. Power5, width112, fonts and icon sizes
+remain unchanged. Shared geometry updates live/preview, target/targettarget,
+incoming/absorb overlays, row gaps, class rails and handle/clamping bounds.
+Matching71139/16001 authority reverified; no API/filter/timer contract change.
+Owner feedback establishes observed operation, not exact Weakened Soul identity
+or comprehensive combat acceptance. Resized native appearance awaits reload.
+
+## Priest own-debuff progress-strip experiment - 2026-11-27
+
+Reverified live Forever71139/16001 with281 references. The existing custom aura
+duration sink supports a HARMFUL|PLAYER group with excludeDispelTypes for Magic,
+Disease, Poison and Curse. Native filtering owns caster selection and forwards
+opaque duration objects to the same SetDurationBar sink as Renew and druid HoTs.
+No includeSpellIDs, property-based identity guesses or estimated durations.
+
+The second priest lane displays one native-selected own untyped debuff, which
+can be Weakened Soul. It does not uniquely identify6788, show other priests'
+applications or promise shield readiness. Exact spell-ID filtering rejects
+secret harmful auras on friendly units, even when their caster is the player.
+Source tests cover both lanes on seven fixed recipients and all lifecycle gates;
+exported-function tests cover category filtering, PLAYER forwarding and opaque
+timer/visibility sinks. Owner explicitly requested installing this experiment
+for live combat testing; offline checks cannot establish that acceptance.
+
+## Party indicator layout and Freedom - 2026-11-27
+
+Verified central live Forever 1.60.1.71139 /16001 authority (281 references).
+The child historical beta check still rejects its70450 baseline; current live
+authority is the documented central check, not a beta substitute.
+
+Reviewed current CustomAuraContainer ValidateCandidateFilters and AuraContainerUtil
+DoesAuraPassCandidateFilters/CanApplyIdentityCandidateFilters: no root/snare
+mechanic filter exists, and identity matching of harmful friendly auras is
+restricted. Do not infer Movement from spell-ID lists or read secret aura data.
+Owner selected a fixed learned1044 Blessing of Freedom button instead. Existing
+Spell/SpellBook contracts validate player knowledge and friendly active actions;
+SecureTemplates uses exact spell ID and immutable unit on left release, with
+modifier actions empty. Fixed friendly/living gate retains bindings through
+preview/loading/combat transitions and clears them after failed initialization.
+Native spell tooltip has no aura-driven highlight or cooldown/range guarantee.
+
+Six right positions contain five unchanged native aura slots and the ordinary
+secure Freedom sibling in position5; Other moves to6. Food/drink moves left on
+player/party rows only, shifting all static/dynamic buffs, Rebirth and overflow
+one position left. Target retains its existing buff geometry. Era and legacy
+capability fallback retain their old layouts. No new API files or saved fields.
+
 ## Reviewed client build - 2026-11-25
 
 Fresh Forever71139 export verifies all260 prior central references unchanged

@@ -198,8 +198,14 @@ end
 -- The native PLAYER filter owns caster selection.
 -- No aura records, native slot visibility or timer values are read back.
 local hotFamilies = {
-    PRIEST = {{[139]=true,[6074]=true,[6075]=true,[6076]=true,[6077]=true,
-        [6078]=true,[10927]=true,[10928]=true,[10929]=true,[25315]=true}},
+    PRIEST = {
+        {[139]=true,[6074]=true,[6075]=true,[6076]=true,[6077]=true,
+            [6078]=true,[10927]=true,[10928]=true,[10929]=true,[25315]=true},
+        -- A native own-debuff lane, not an exact Weakened Soul identity test.
+        -- Friendly secret debuffs cannot use includeSpellIDs. Another own
+        -- untyped effect can occupy this lane; it never promises shield readiness.
+        {ownDebuff=true},
+    },
     -- Fixed bottom-to-top lanes: Rejuvenation, Regrowth, Wild Growth.
     DRUID = {
         {[774]=true,[1058]=true,[1430]=true,[2090]=true,[2091]=true,
@@ -221,9 +227,9 @@ local function createHot(row, width)
         or type(direction) ~= "number" or type(interpolation) ~= "number" then return end
     local info = A.Access.Read(C_XMLUtil and C_XMLUtil.GetTemplateInfo, "CustomAuraContainerTemplate")
     if type(info) ~= "table" or not A.Access.Readable(info.type) or info.type ~= "AuraContainer" then return end
-    -- At the normal 2x row scale, Druid gets three 1px lines with 1px gaps.
-    -- The 2.5-unit stack stays below the centered 8-unit role/name artwork.
-    local height, gap, inset = #families > 1 and 0.5 or 1.5, 0.5, S.classStripHitWidth
+    -- Keep the single-HoT thickness for every lane: 3px lines and 1px gaps at 2x.
+    -- Three lanes occupy 5.5 units below centered artwork in the 20-unit health bar.
+    local height, gap, inset = 1.5, 0.5, S.classStripHitWidth
     width = (width or S.width) - inset
     -- Native visibility keeps the artwork friendly/alive even during combat.
     local gate = CreateFrame("Frame", nil, row, "SecureHandlerStateTemplate")
@@ -243,8 +249,12 @@ local function createHot(row, width)
         container:EnableMouse(false)
         container:SetEnabled(false)
         container:SetUnit(row.unit)
-        container:AddAuraGroup("ownHot", "HELPFUL|PLAYER", {
-            maxFrameCount = 1, candidateFilters = {includeSpellIDs = ids},
+        container:AddAuraGroup(ids.ownDebuff and "ownDebuff" or "ownHot",
+            ids.ownDebuff and "HARMFUL|PLAYER" or "HELPFUL|PLAYER", {
+            maxFrameCount = 1,
+            candidateFilters = ids.ownDebuff
+                and {excludeDispelTypes={Magic=true, Disease=true, Poison=true, Curse=true}}
+                or {includeSpellIDs=ids},
             layout = {elementWidth = width, elementHeight = height, elementSpacing = 0},
             initializeFrame = function(button)
                 button:SetSize(width, height); button:SetCancelAuraButtons(nil)
@@ -253,7 +263,9 @@ local function createHot(row, width)
                 local duration = CreateFrame("StatusBar", nil, button)
                 duration:SetAllPoints(button); duration:EnableMouse(false)
                 duration:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
-                duration:SetStatusBarColor(1, 1, 1, 1)
+                if ids.ownDebuff then duration:SetStatusBarColor(1, 0.95, 0.2, 1)
+                else duration:SetStatusBarColor(1, 1, 1, 1) end
+                duration:SetReverseFill(ids.ownDebuff == true)
                 duration:SetMinMaxValues(0, 1); duration:SetValue(0)
                 button:SetDurationBar(duration, {interpolation = interpolation, direction = direction})
             end,
@@ -325,6 +337,10 @@ local function buildRow(row, preview, first, width)
     row.drinkIcon = CreateFrame("Frame", nil, row)
     row.drinkIcon:SetSize(S.sideIconSize, S.sideIconSize)
     row.drinkIcon:SetPoint("TOPLEFT", row.health, "TOPRIGHT", S.sideIconGap, A.Style.sideIconY)
+    if preview and A.__ApogeeClient ~= "classic-era" then
+        row.drinkIcon:ClearAllPoints()
+        row.drinkIcon:SetPoint("TOPRIGHT", row.health, "TOPLEFT", -S.sideIconGap, A.Style.sideIconY)
+    end
     row.drinkIcon:EnableMouse(false)
     local drinkBackground = row.drinkIcon:CreateTexture(nil, "BACKGROUND")
     drinkBackground:SetAllPoints(); drinkBackground:SetColorTexture(0.08, 0.10, 0.13, 1)

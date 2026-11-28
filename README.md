@@ -137,11 +137,14 @@ guidance, native weapon displays, limitations and live acceptance checks.
   game's assigned role on each player/party row. Unassigned or unavailable roles
   stay blank. Both role and leader icons hide immediately in combat and refresh
   from current assignments afterward; class is never used to guess a role.
-- Five fixed debuff positions extend right of each friendly player/party/target
-  health bar: Magic, Disease, Poison, Curse, Other. Each shows one native aura
+- Four fixed debuff positions extend right of each friendly player/party/target
+  health bar: Magic, Disease, Poison, Curse. Each shows one native aura
   icon; empty positions stay blank. Hover for its native tooltip. A gold border
   marks a type your learned cleanse can remove; left-click casts on that row.
-  The drinking indicator follows the fixed strip.
+  A fixed Blessing of Freedom button sits after Curse for paladins
+  who know it. It does not detect roots/slows or show a matching-debuff glow.
+  Food/drink sits immediately left of party/player bars; buff and resurrection
+  buttons start one position farther left.
 - Target sits above the player with a full-row gap; target's target stays
   closely above target. Both retain their size and align with the stack's left
   edge. The drag handle sits above the pair; no helper caption is shown.
@@ -153,7 +156,7 @@ guidance, native weapon displays, limitations and live acceptance checks.
   Existing saved positions remain unchanged; use **Reset positions** to adopt it.
 - Only your own druid player row splits the existing power strip equally in cat/bear form:
   blue mana above energy/rage. Caster form restores the full mana strip.
-- Apogee Tank styling with taller health bars: 112x14 health, 112x5 power, at 2x scale.
+- Apogee Tank styling with taller health bars: 112x20 health, 112x5 power, at 2x scale.
   Full character names use Blizzard's native class colors, left-aligned inside health bars with the
   original game font at the same smaller size as NPC names and dark shadow, including
   during combat. Restricted names stay blank. Long names truncate. Health-state and active-resource colors remain.
@@ -184,8 +187,21 @@ guidance, native weapon displays, limitations and live acceptance checks.
   clients without it (including the current Era adapter) omit the strip.
   Druids also get separate white Regrowth and Wild Growth countdowns. The fixed
   order from bottom to top is Rejuvenation, Regrowth, Wild Growth. Each line
-  hides independently without moving the others. Three thin lines and gaps fit
-  below the name inside the existing health bar; frame size stays unchanged.
+  hides independently without moving the others. Every lane retains the original
+  single-HoT thickness: 3px at normal 2x scale, with 1px gaps. The 40px health
+  section reserves room for three full-thickness lines below the centered name
+  and role icons, regardless of how many lanes are active. Width, font size and
+  the 10px power section stay unchanged.
+  Priests have white Renew at the bottom and a bright yellow experimental
+  own-debuff countdown above it. HoTs stay anchored left
+  and shrink from right to left; the debuff lane stays anchored right and shrinks
+  from left to right. Both disappear when their aura ends. The upper lane lets the
+  game display one of your non-Magic/Disease/Poison/Curse debuffs, including
+  Weakened Soul, with its actual duration. It is not an exact Weakened Soul
+  filter: another matching effect can appear, and other priests' debuffs are
+  excluded. The bar does not promise that Shield is ready. The right-side Other
+  icon and its reserved space have been removed. The owner reports that the priest display works;
+  comprehensive native acceptance remains separate.
   Regrowth includes all nine Classic ranks; Wild Growth includes all three
   Forever ranks. Only your own HoT on that recipient appears in each lane.
   Classes without a matching primary HoT show no strip; Paladin Oath of Light
@@ -313,9 +329,15 @@ Battle Shout remains handled by Keybinds. See [class support](docs/CLASS_SUPPORT
 
 ## Fixed debuff slots and cleansing
 
-Magic, Disease, Poison and Curse each have a permanent position. A fifth Other
-position shows effects such as Weakened Soul without a cleanse highlight or
-action. Only debuff artwork is drawn; there are no separate cleanse-spell icons.
+Magic, Disease, Poison and Curse each have a permanent position.
+The right-hand order is Magic, Disease, Poison, Curse, Movement.
+There is no Other icon or reserved position after Movement.
+Movement is a fixed Blessing of Freedom spell button, visible only for a paladin
+who knows it, with a normal spell tooltip and an unmodified left-release cast
+on that row. It remains usable in combat and follows the same friendly/living
+gate as cleansing. It has no automatic root/slow detection or debuff highlight;
+movement effects remain in their existing debuff categories. Empty positions
+stay reserved. The other action positions draw the actual debuff artwork.
 The native container selects the highest aura instance ID within each category.
 When it disappears, the next instance appears in the same position. Refreshing
 an existing instance does not make it newest. Instance ordering is not a promise
