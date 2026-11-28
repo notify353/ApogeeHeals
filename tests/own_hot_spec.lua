@@ -17,7 +17,7 @@ local function fixture(class, unavailable, failStartup)
             function frame:SetEnabled(enabled) self.enabled=enabled end
             function frame:UpdateAllAuras() self.refreshes=(self.refreshes or 0)+1 end
             function frame:AddAuraGroup(key, filter, options)
-                if key ~= "ownHot" then return end
+                if key ~= "ownHot" and key ~= "ownDebuff" then return end
                 assert(not m.combat)
                 self.filter, self.options = filter, options
                 containers[#containers+1] = self
@@ -40,7 +40,7 @@ local function fixture(class, unavailable, failStartup)
     return m, a, containers
 end
 local expectedRanks = {
-    PRIEST = {{139,6074,6075,6076,6077,6078,10927,10928,10929,25315}},
+    PRIEST = {{139,6074,6075,6076,6077,6078,10927,10928,10929,25315}, false},
     DRUID = {{774,1058,1430,2090,2091,3627,8910,9839,9840,9841,25299},
         {8936,8938,8939,8940,8941,9750,9856,9857,9858}, {408120,1238214,1238215}},
     SHAMAN = {{408521,1239242,1239243}},
@@ -62,18 +62,27 @@ for _, class in ipairs({"PRIEST", "DRUID", "SHAMAN"}) do
       for lane, expected in ipairs(expectedRanks[class]) do
         local c = containers[(index-1)*lanes+lane]
         assert(row.hotContainers[lane]==c and c.enabled and c.unit==row.unit)
-        assert(c.filter=="HELPFUL|PLAYER" and c.options.maxFrameCount==1)
+        assert(c.options.maxFrameCount==1)
         local ids = c.options.candidateFilters.includeSpellIDs
-        for _, id in ipairs(expected) do assert(ids[id], "missing HoT rank "..id) end
-        local count=0
-        for _ in pairs(ids) do count=count+1 end
-        assert(count==#expected, "unexpected HoT identity")
-        -- Exclude shields, NPC spells, rune wrappers and other-client ranks.
-        assert(not ids[17] and not ids[22419] and not ids[436937]
-            and not ids[409954] and not ids[61295] and not ids[409810] and not ids[48438])
+        if expected then
+            assert(c.filter=="HELPFUL|PLAYER")
+            for _, id in ipairs(expected) do assert(ids[id], "missing HoT rank "..id) end
+            local count=0
+            for _ in pairs(ids) do count=count+1 end
+            assert(count==#expected, "unexpected HoT identity")
+            -- Exclude shields, NPC spells, rune wrappers and other-client ranks.
+            assert(not ids[17] and not ids[22419] and not ids[436937]
+                and not ids[409954] and not ids[61295] and not ids[409810] and not ids[48438])
+        else
+            assert(class=="PRIEST" and lane==2 and c.filter=="HARMFUL|PLAYER")
+            assert(ids==nil, "secret friendly debuffs must not be selected by spell ID")
+            local excluded=c.options.candidateFilters.excludeDispelTypes
+            for _, kind in ipairs({"Magic","Disease","Poison","Curse"}) do assert(excluded[kind]) end
+            assert(not c.options.candidateFilters.maxDuration, "do not guess Weakened Soul by duration")
+        end
         assert(c.parent.driver=="[@"..row.unit..",help,nodead] show; hide")
         assert(c.parent.point[2]==row.health and c.parent.point[1]=="BOTTOMLEFT")
-        local height=lanes==3 and 0.5 or 1.5
+        local height=lanes>1 and 0.5 or 1.5
         assert(c.height==height and c.width==a.Style.width-a.Style.classStripHitWidth)
         assert(c.options.layout.elementHeight==height and c.options.layout.elementWidth==c.width)
         assert(c.parent.height==lanes*height+(lanes-1)*0.5)
@@ -119,10 +128,12 @@ for _, class in ipairs({"WARRIOR", "PALADIN", "HUNTER", "ROGUE", "MAGE", "WARLOC
 end
 local _, _, absent = fixture("PRIEST", true)
 assert(#absent==0)
-local m, a, failed = fixture("DRUID", false, true)
-assert(#failed==21 and a.startupState=="failed")
-for _, c in ipairs(failed) do assert(not c.enabled) end
-m.Event("PLAYER_ENTERING_WORLD"); m.Flush()
-for _, c in ipairs(failed) do assert(not c.enabled) end
+for _, class in ipairs({"DRUID","PRIEST"}) do
+    local m, a, failed = fixture(class, false, true)
+    assert(#failed==7*#expectedRanks[class] and a.startupState=="failed")
+    for _, c in ipairs(failed) do assert(not c.enabled) end
+    m.Event("PLAYER_ENTERING_WORLD"); m.Flush()
+    for _, c in ipairs(failed) do assert(not c.enabled) end
+end
 C_XMLUtil, C_AuraContainerUtil = oldXML, oldUtil
 print("PASS own HoT native configuration, seven fixed recipients, rank families, combat, preview, roster, target aliases, zoning and absent capabilities")

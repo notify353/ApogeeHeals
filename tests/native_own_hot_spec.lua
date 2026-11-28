@@ -26,17 +26,27 @@ for _, unit in ipairs({"player","party1","party2","party3","party4","target","ta
     assert(filter(unit,{isHelpful=true,spellId=139},{includeSpellIDs={[139]=true}}))
     assert(not filter(unit,{isHelpful=true,spellId=17},{includeSpellIDs={[139]=true}}))
     assert(filter(unit,{isHelpful=true,spellId=774},{includeSpellIDs={[774]=true}}))
+    local ownDebuff={excludeDispelTypes={Magic=true,Disease=true,Poison=true,Curse=true}}
+    assert(not filter(unit,{isHarmful=true,spellId=6788},{includeSpellIDs={[6788]=true}}))
+    assert(filter(unit,{isHarmful=true,spellId=6788},ownDebuff))
+    -- Another untyped effect also passes: this is not an identity guarantee.
+    assert(filter(unit,{isHarmful=true,spellId=11196},ownDebuff))
+    for _, kind in ipairs({"Magic","Disease","Poison","Curse"}) do
+        assert(not filter(unit,{isHarmful=true,spellId=999,dispelName=kind},ownDebuff))
+    end
 end
 friendly=false
 assert(not filter("target",{isHelpful=true,spellId=139},{includeSpellIDs={[139]=true}}))
 assert(not filter("targettarget",{isHelpful=true,spellId=774},{includeSpellIDs={[774]=true}}))
 -- Native filter dispatch receives exactly the player-only filter unchanged.
-env.C_UnitAuras={IsAuraFilteredOutByInstanceID=function(unit,id,filterString)
-    assert(unit=="party1" and filterString=="HELPFUL|PLAYER"); return id==2
-end}
 execute(definition(source,"AuraContainerUtil.ShouldIncludeAuraForFilterString"),env)
-assert(env.AuraContainerUtil.ShouldIncludeAuraForFilterString("party1",{auraInstanceID=1},"HELPFUL|PLAYER"))
-assert(not env.AuraContainerUtil.ShouldIncludeAuraForFilterString("party1",{auraInstanceID=2},"HELPFUL|PLAYER"))
+for _, expectedFilter in ipairs({"HELPFUL|PLAYER","HARMFUL|PLAYER"}) do
+    env.C_UnitAuras={IsAuraFilteredOutByInstanceID=function(unit,id,filterString)
+        assert(unit=="party1" and filterString==expectedFilter); return id==2
+    end}
+    assert(env.AuraContainerUtil.ShouldIncludeAuraForFilterString("party1",{auraInstanceID=1},expectedFilter))
+    assert(not env.AuraContainerUtil.ShouldIncludeAuraForFilterString("party1",{auraInstanceID=2},expectedFilter))
+end
 -- Execute the exact native timer sink on application and refresh. Duration
 -- objects are opaque; addon code does not calculate from restricted timestamps.
 source=read("Blizzard_AuraContainer/Blizzard_CustomAuraButton.lua")

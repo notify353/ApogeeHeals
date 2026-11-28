@@ -1,3 +1,20 @@
+## Priest own-debuff progress-strip experiment - 2026-11-27
+
+Reverified live Forever71139/16001 with281 references. The existing custom aura
+duration sink supports a HARMFUL|PLAYER group with excludeDispelTypes for Magic,
+Disease, Poison and Curse. Native filtering owns caster selection and forwards
+opaque duration objects to the same SetDurationBar sink as Renew and druid HoTs.
+No includeSpellIDs, property-based identity guesses or estimated durations.
+
+The second priest lane displays one native-selected own untyped debuff, which
+can be Weakened Soul. It does not uniquely identify6788, show other priests'
+applications or promise shield readiness. Exact spell-ID filtering rejects
+secret harmful auras on friendly units, even when their caster is the player.
+Source tests cover both lanes on seven fixed recipients and all lifecycle gates;
+exported-function tests cover category filtering, PLAYER forwarding and opaque
+timer/visibility sinks. Owner explicitly requested installing this experiment
+for live combat testing; offline checks cannot establish that acceptance.
+
 ## Party indicator layout and Freedom - 2026-11-27
 
 Verified central live Forever 1.60.1.71139 /16001 authority (281 references).
